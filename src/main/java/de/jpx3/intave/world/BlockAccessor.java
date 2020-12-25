@@ -1,5 +1,7 @@
 package de.jpx3.intave.world;
 
+import de.jpx3.intave.event.bukkit.BukkitEventSubscriber;
+import de.jpx3.intave.event.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

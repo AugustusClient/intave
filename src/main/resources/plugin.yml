@@ -1,7 +1,10 @@
-name: IntaveBase
-authors: [Jpx3,vento, DarkAndBlue]
-version: 0.1
-main: de.jpx3.intavebase.IntavePlugin
+name: Intave
+authors: [Jpx3, ventolotl, DarkAndBlue]
+version: @VERSION@
 api-version: 1.13
-depend:
-  - ProtocolLib
+description: @DESCRIPTION@
+
+load: STARTUP
+main: de.jpx3.intave.IntavePlugin
+database: false
+softdepend: [ProtocolLib, ViaVersion]

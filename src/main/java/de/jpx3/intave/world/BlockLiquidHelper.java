@@ -1,5 +1,7 @@
 package de.jpx3.intave.world;
 
+import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
+import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import org.bukkit.Material;
 import org.bukkit.World;
 

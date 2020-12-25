@@ -22,13 +22,13 @@ public final class UserRepositoryEventListener implements BukkitEventSubscriber 
   }
 
   @BukkitEventSubscription
-  private void receiveJoin(PlayerJoinEvent event) {
+  public void receiveJoin(PlayerJoinEvent event) {
     Player player = event.getPlayer();
     UserRepository.registerUser(player);
   }
 
   @BukkitEventSubscription
-  private void receiveQuit(PlayerQuitEvent event) {
+  public void receiveQuit(PlayerQuitEvent event) {
     Player player = event.getPlayer();
     UserRepository.unregisterUser(player);
   }

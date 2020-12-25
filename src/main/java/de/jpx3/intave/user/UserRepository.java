@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public final class UserRepository {
   private final static Map<UUID, User> userRepository = Maps.newHashMap();
-  private final static User deadUser = User.empty();
+//  private final static User deadUser = User.empty();
   private final static Object lock = new Object();
 
   public static synchronized void registerUser(Player player) {
@@ -37,7 +37,8 @@ public final class UserRepository {
         }
       } else {
         // offline -> return dead user
-        return deadUser;
+//        return deadUser;
+        return null;
       }
     }
     return user;

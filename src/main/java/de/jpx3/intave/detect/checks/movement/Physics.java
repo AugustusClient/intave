@@ -44,9 +44,6 @@ public final class Physics extends IntaveCheck {
   private WaterMovementLegacyResolver waterMovementLegacyResolver;
   private AquaticWaterMovementBase aquaticWaterMovement;
 
-
-  private double minVL;
-
   public Physics(IntavePlugin plugin) {
     super("Physics", "physics");
     this.plugin = plugin;

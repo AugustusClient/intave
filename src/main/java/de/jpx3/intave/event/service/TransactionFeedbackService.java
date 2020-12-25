@@ -8,10 +8,14 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import de.jpx3.intave.event.service.transaction.TransactionCallBackData;
 import de.jpx3.intave.event.service.transaction.TransactionFeedbackCallback;
+import de.jpx3.intave.user.User;
+import de.jpx3.intave.user.UserMetaSynchronizeData;
+import de.jpx3.intave.user.UserRepository;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
 public final class TransactionFeedbackService extends PacketAdapter {
   public final static short TRANSACTION_MIN_CODE = Short.MIN_VALUE;
@@ -26,26 +30,24 @@ public final class TransactionFeedbackService extends PacketAdapter {
   @Override
   public void onPacketReceiving(PacketEvent event) {
     Player player = event.getPlayer();
-    Checkable checkable = CheckableRegistry.checkableOf(player);
-
-    if (checkable == null) {
+    User user = UserRepository.userOf(player);
+    if (user == null) {
       return;
     }
-    short transactionCode = event.getPacket().getShorts().readSafely(0);
-    if (transactionCode <= TRANSACTION_MAX_CODE) {
-      TransactionCallBackData<?> transactionResponse = checkable.transactionFeedbackMap().get(transactionCode);
+    UserMetaSynchronizeData synchronizeData = user.meta().synchronizeData();
+    Map<Short, TransactionCallBackData<?>> transactionFeedBackMap = synchronizeData.transactionFeedBackMap();
+    Short transactionIdentifier = event.getPacket().getShorts().readSafely(0);
+    if (transactionIdentifier <= TRANSACTION_MAX_CODE) {
+      TransactionCallBackData<?> transactionResponse = transactionFeedBackMap.get(transactionIdentifier);
       if (transactionResponse == null) {
         return;
       }
-      try {
-        transactionResponse.transactionFeedbackCallback().success(
-          player,
-          convertInstanceOfObject(transactionResponse.obj())
-        );
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-      checkable.transactionFeedbackMap().remove(transactionCode);
+      transactionFeedBackMap.remove(transactionIdentifier);
+      transactionResponse.transactionFeedbackCallback().success(
+        player,
+        convertInstanceOfObject(transactionResponse.obj())
+      );
+      event.setCancelled(true);
     }
   }
 
@@ -66,16 +68,17 @@ public final class TransactionFeedbackService extends PacketAdapter {
   }
 
   private <T> Short acquireNewId(Player player, T obj, TransactionFeedbackCallback<T> callback) {
-    Checkable checkable = CheckableRegistry.checkableOf(player);
-    if (checkable == null) {
+    User user = UserRepository.userOf(player);
+    if (user == null) {
       return null;
     }
-    short transactionCounter = ++checkable.transactionCounter;
+    UserMetaSynchronizeData synchronizeData = user.meta().synchronizeData();
+    short transactionCounter = ++synchronizeData.transactionCounter;
     if (transactionCounter >= TRANSACTION_MAX_CODE) {
       transactionCounter = TRANSACTION_MIN_CODE;
     }
     TransactionCallBackData<T> transactionCallBackData = new TransactionCallBackData<>(callback, obj);
-    checkable.transactionFeedbackMap().put(transactionCounter, transactionCallBackData);
+    synchronizeData.transactionFeedBackMap().put(transactionCounter, transactionCallBackData);
     return transactionCounter;
   }
 

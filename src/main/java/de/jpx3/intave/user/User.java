@@ -49,6 +49,7 @@ public final class User {
     private final UserMetaAbilityData abilityData;
     private final UserMetaPotionData potionData;
     private final UserMetaClientData clientData;
+    private final UserMetaSynchronizeData synchronizeData;
     private final UserMetaInventoryData inventoryData;
 
     public UserMeta(Player player, User user) {
@@ -57,6 +58,7 @@ public final class User {
       this.abilityData = new UserMetaAbilityData(player);
       this.potionData = new UserMetaPotionData();
       this.inventoryData = new UserMetaInventoryData(player);
+      this.synchronizeData = new UserMetaSynchronizeData();
       this.movementData = new UserMetaMovementData(player, user);
     }
 
@@ -78,6 +80,10 @@ public final class User {
 
     public UserMetaPotionData potionData() {
       return potionData;
+    }
+
+    public UserMetaSynchronizeData synchronizeData() {
+      return synchronizeData;
     }
 
     public UserMetaClientData clientData() {

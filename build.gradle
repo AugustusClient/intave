@@ -1,9 +1,14 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
   id 'java'
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
+group 'de.jpx3'
+version = '14.0.0'
+description = 'Intave is an event- & packetbased, hyper-threaded & polyheuristic cheat detection software, providing fair play'
+
+def stable_version = false
 
 repositories {
   mavenCentral()
@@ -16,12 +21,25 @@ dependencies {
   testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
   compileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT' // The Spigot API with no shadowing. Requires the OSS repo.
-  compileOnly 'org.bukkit:bukkit:1.12.2-R0.1-SNAPSHOT' // The Bukkit API with no shadowing.
-  compileOnly 'org.spigotmc:spigot:1.12.2.-R0.1-SNAPSHOT' // The full Spigot server with no shadowing. Requires mavenLocal.
-  compileOnly 'org.bukkit:craftbukkit:1.12.2-R0.1-SNAPSHOT' // The full CraftBukkit server with no shadowing. Requires mavenLocal.
   compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.5.0";
 }
 
 test {
   useJUnitPlatform()
+}
+
+jar {
+  def name = "INTAVE-"
+  if (stable_version) {
+    name += "STABLE"
+  } else {
+    name += "LATEST"
+  }
+  name += "-PROD"
+  baseName name
+}
+
+processResources {
+  from "src/main/resources/plugin.yml"
+  filter(ReplaceTokens, tokens: ['VERSION': project.version, 'DESCRIPTION': project.description])
 }

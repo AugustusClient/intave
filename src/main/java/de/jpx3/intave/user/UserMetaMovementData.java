@@ -2,12 +2,12 @@ package de.jpx3.intave.user;
 
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.reflect.StructureModifier;
+import de.jpx3.intave.tools.client.PlayerEffectHelper;
+import de.jpx3.intave.tools.client.PlayerMovementHelper;
+import de.jpx3.intave.tools.client.PlayerMovementLocaleHelper;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.detect.checks.movement.physics.CollisionHelper;
 import de.jpx3.intave.reflect.Reflection;
-import de.jpx3.intave.user.helper.PlayerEffectHelper;
-import de.jpx3.intave.user.helper.PlayerMovementHelper;
-import de.jpx3.intave.user.helper.PlayerMovementLocaleHelper;
 import de.jpx3.intave.world.BlockLiquidHelper;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
