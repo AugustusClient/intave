@@ -7,8 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldLoadEvent;
 
 import java.util.Map;
@@ -18,13 +16,13 @@ public final class BlockAccessor implements BukkitEventSubscriber {
   private static final Map<World, Block> invalidRequestBlockMap = new WeakHashMap<>();
 
   @BukkitEventSubscription
-  private void onWorldLoad(WorldLoadEvent event) {
+  public void onWorldLoad(WorldLoadEvent event) {
     World world = event.getWorld();
     Block block = world.getBlockAt(0, -1, 0);
     invalidRequestBlockMap.put(world, block);
   }
 
-  static {
+  public static void setup() {
     Bukkit.getWorlds().forEach(world -> invalidRequestBlockMap.put(world, world.getBlockAt(0, -1, 0)));
   }
 

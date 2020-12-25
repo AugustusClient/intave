@@ -8,6 +8,7 @@ import de.jpx3.intave.event.bukkit.BukkitEventLinker;
 import de.jpx3.intave.event.packet.PacketSubscriptionLinker;
 import de.jpx3.intave.tools.client.SinusCache;
 import de.jpx3.intave.tools.inventory.InventoryUseItemHelper;
+import de.jpx3.intave.world.BlockAccessor;
 import de.jpx3.intave.world.collision.CollisionEngine;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -48,6 +49,7 @@ public final class IntavePlugin extends JavaPlugin {
     // stage 5
 
     SinusCache.setup();
+    BlockAccessor.setup();
     ViaVersionAdapter.setup();
     InventoryUseItemHelper.setup();
     CollisionEngine.setup();
