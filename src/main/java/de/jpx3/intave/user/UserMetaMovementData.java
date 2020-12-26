@@ -12,6 +12,7 @@ import de.jpx3.intave.detect.checks.movement.physics.CollisionHelper;
 import de.jpx3.intave.reflect.Reflection;
 import de.jpx3.intave.tools.wrapper.WrappedVector;
 import de.jpx3.intave.world.BlockLiquidHelper;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -72,6 +73,10 @@ public final class UserMetaMovementData {
   }
 
   private void applyPlayerLocation() {
+    if(player == null) {
+      return;
+    }
+
     Location location = player.getLocation();
     verifiedLocation = player.getLocation();
     positionX = location.getX();
@@ -84,11 +89,18 @@ public final class UserMetaMovementData {
   }
 
   private void applyPlayerStats() {
+    if(player == null) {
+      return;
+    }
     sprinting = player.isSprinting();
     sneaking = player.isSneaking();
   }
 
   public void updateWorld() {
+    if(player == null) {
+      nmsWorld = Reflection.resolveWorldNMSHandle(Bukkit.getWorlds().get(0));
+      return;
+    }
     nmsWorld = Reflection.resolveWorldNMSHandle(player.getWorld());
   }
 

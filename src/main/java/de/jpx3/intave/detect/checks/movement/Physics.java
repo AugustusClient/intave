@@ -40,7 +40,7 @@ import static de.jpx3.intave.user.UserMetaClientData.PROTOCOL_VERSION_VILLAGE_UP
 public final class Physics extends IntaveCheck {
   private final static boolean DEBUG_MOVEMENT = true;
   private final static boolean DEBUG_PERFORMANCE = false; // Disable DEBUG_MOVEMENT
-  private final static boolean MOVEMENT_EMULATION = false;
+  private final static boolean MOVEMENT_EMULATION = true;
   private final static float STEP_HEIGHT = 0.6f;
 
   private final IntavePlugin plugin;

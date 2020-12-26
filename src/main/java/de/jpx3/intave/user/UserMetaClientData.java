@@ -14,7 +14,7 @@ public final class UserMetaClientData {
   private final int protocolVersion;
 
   public UserMetaClientData(Player player) {
-    this.protocolVersion = ViaVersionAdapter.protocolVersionOf(player);
+    this.protocolVersion = player == null ? -1 : ViaVersionAdapter.protocolVersionOf(player);
   }
 
   public int protocolVersion() {

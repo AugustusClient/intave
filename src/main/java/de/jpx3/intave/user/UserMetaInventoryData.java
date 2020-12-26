@@ -8,7 +8,7 @@ import org.bukkit.inventory.PlayerInventory;
 
 public final class UserMetaInventoryData {
   private final Player player;
-  private ItemStack heldItem;
+  private ItemStack heltItem;
   private boolean handActive;
 
   private boolean inventoryOpen;
@@ -19,15 +19,15 @@ public final class UserMetaInventoryData {
 
   public UserMetaInventoryData(Player player) {
     this.player = player;
-    this.heldItem = resolveMaterialInHand();
+    this.heltItem = resolveMaterialInHand();
   }
 
   public void resynchronizeHeldItem() {
-    this.heldItem = resolveMaterialInHand();
+    this.heltItem = resolveMaterialInHand();
   }
 
   private ItemStack resolveMaterialInHand() {
-    return player.getItemInHand();
+    return player == null ? null : player.getItemInHand();
   }
 
   public boolean handActive() {
@@ -35,11 +35,11 @@ public final class UserMetaInventoryData {
   }
 
   public ItemStack heldItem() {
-    return heldItem;
+    return heltItem;
   }
 
   public Material heldItemType() {
-    return heldItem == null ? Material.AIR : heldItem.getType();
+    return heltItem == null ? Material.AIR : heltItem.getType();
   }
 
   public boolean inventoryOpen() {
@@ -47,13 +47,13 @@ public final class UserMetaInventoryData {
   }
 
   public void setHeldItem(ItemStack heldItem) {
-    this.heldItem = heldItem;
+    this.heltItem = heldItem;
   }
 
   public void deactivateHand() {
     User user = UserRepository.userOf(player);
     UserMetaMovementData movementData = user.meta().movementData();
-    if (heldItem != null && PlayerEnchantmentHelper.tridentRiptideEnchanted(heldItem)) {
+    if (heltItem != null && PlayerEnchantmentHelper.tridentRiptideEnchanted(heltItem)) {
       movementData.pastRiptideSpin = 0;
     }
     this.handActive = false;
@@ -78,6 +78,9 @@ public final class UserMetaInventoryData {
   }
 
   private void setHeldItemSlot(int slot) {
+    if(player == null) {
+      return;
+    }
     PlayerInventory inventory = player.getInventory();
     inventory.setHeldItemSlot(slot);
   }

@@ -9,8 +9,13 @@ public final class UserMetaAbilityData {
   private float walkSpeed = 0.1f;
 
   public UserMetaAbilityData(Player player) {
-    this.allowFlying = player.getAllowFlight();
-    this.flying = player.isFlying();
+    boolean hasPlayer = (player != null);
+    if(hasPlayer) {
+      this.allowFlying = player.getAllowFlight();
+      this.flying = player.isFlying();
+    } else {
+      this.allowFlying = this.flying = false;
+    }
   }
 
   public boolean flying() {
