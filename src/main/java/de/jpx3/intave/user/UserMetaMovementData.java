@@ -73,12 +73,13 @@ public final class UserMetaMovementData {
   }
 
   private void applyPlayerLocation() {
+    Location location;
     if(player == null) {
-      return;
+      location = new Location(Bukkit.getWorlds().get(0), 0,0,0);
+    } else {
+      location = player.getLocation();
     }
-
-    Location location = player.getLocation();
-    verifiedLocation = player.getLocation();
+    verifiedLocation = location.clone();
     positionX = location.getX();
     positionY = location.getY();
     positionZ = location.getZ();

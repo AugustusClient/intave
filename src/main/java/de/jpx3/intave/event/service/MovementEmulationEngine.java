@@ -1,6 +1,8 @@
 package de.jpx3.intave.event.service;
 
 import de.jpx3.intave.IntavePlugin;
+import de.jpx3.intave.access.IntaveInternalException;
+import de.jpx3.intave.reflect.Reflection;
 import de.jpx3.intave.tools.MathHelper;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.detect.checks.movement.physics.CollisionHelper;
@@ -13,9 +15,15 @@ import de.jpx3.intave.world.collision.CollisionFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public final class MovementEmulationEngine {
   private final IntavePlugin plugin;
@@ -116,7 +124,47 @@ public final class MovementEmulationEngine {
     );
     movementData.setBoundingBox(entityBoundingBox);
     movementData.verifiedLocation = teleportLocation.clone();
-    player.teleport(teleportLocation);
+    //player.teleport(teleportLocation);
+    rotationlessTeleport(player, teleportLocation);
+  }
+
+  private final static Set<Object> teleportFlags = new HashSet<>();
+
+  private synchronized void rotationlessTeleport(Player player, Location to) {
+    PlayerTeleportEvent event = new PlayerTeleportEvent(player, player.getLocation().clone(), to.clone(), PlayerTeleportEvent.TeleportCause.SPECTATE);
+    IntavePlugin.singletonInstance().eventLinker().fireEvent(event);
+    if(player.isDead() || player.getHealth() <= 0 || player.getPassenger() != null || !player.isOnline() || !UserRepository.hasUser(player)) {
+      return;
+    }
+    if(!event.isCancelled()) {
+      try {
+        Object playerHandle = UserRepository.userOf(player).playerHandle();
+        Object playerConnection = playerHandle.getClass().getField("playerConnection").get(playerHandle);
+        Class<?> playerConnectionClass = Reflection.lookupServerClass("PlayerConnection");
+        Method internalTeleport = playerConnectionClass.getDeclaredMethod("internalTeleport", Double.TYPE, Double.TYPE, Double.TYPE, Float.TYPE, Float.TYPE, Set.class);
+        if(!internalTeleport.isAccessible()) {
+          internalTeleport.setAccessible(true);
+        }
+        Class<?> entityClass = Reflection.lookupServerClass("Entity");
+        Field yawField = entityClass.getField("yaw");
+        Field pitchField = entityClass.getField("pitch");
+        float yaw = (float) yawField.get(playerHandle);
+        float pitch = (float) pitchField.get(playerHandle);
+        yawField.set(playerHandle, 0f);
+        pitchField.set(playerHandle, 0f);
+        if(teleportFlags.isEmpty()) {
+          Class<?> playerTeleportFlags = Reflection.lookupServerClass("PacketPlayOutPosition$EnumPlayerTeleportFlags");
+          teleportFlags.add(playerTeleportFlags.getField("X_ROT").get(null));
+          teleportFlags.add(playerTeleportFlags.getField("Y_ROT").get(null));
+        }
+        Location dest = event.getTo();
+        internalTeleport.invoke(playerConnection, dest.getX(), dest.getY(), dest.getZ(), 0, 0, teleportFlags);
+        yawField.set(playerHandle, yaw);
+        pitchField.set(playerHandle, pitch);
+      } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException | NoSuchFieldException e) {
+        throw new IntaveInternalException(e);
+      }
+    }
   }
 
   public static Vector resolveCollisionVector(
