@@ -10,7 +10,8 @@ public final class BasicCheck extends IntaveMetaCheck<BasicCheck.MyCustomMeta> {
   }
 
   public void test(Player player) {
-    metaOf(player).test = false;
+    MyCustomMeta myCustomMeta = metaOf(player);
+    myCustomMeta.test = false;
   }
 
   public static class MyCustomMeta extends UserCustomCheckMeta {

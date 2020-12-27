@@ -1,8 +1,13 @@
 package de.jpx3.intave.tools.wrapper;
 
+import de.jpx3.intave.reflect.Reflection;
 import de.jpx3.intave.reflect.ReflectionFailureException;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 public class WrappedVector {
   public static final WrappedVector ZERO = new WrappedVector(0.0D, 0.0D, 0.0D);
@@ -24,6 +29,21 @@ public class WrappedVector {
     this.zCoord = z;
   }
 
+
+  public Vector convertToBukkitVec() {
+    return new Vector(xCoord, yCoord, zCoord);
+  }
+
+  public Object convertToNativeVec3() {
+    try {
+      return Reflection.lookupServerClass("Vec3D")
+        .getConstructor(Double.TYPE, Double.TYPE, Double.TYPE)
+        .newInstance(xCoord, yCoord, zCoord);
+    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException exception) {
+      throw new IllegalStateException(exception);
+    }
+  }
+
   public static WrappedVector fromClass(Object obj) {
     try {
       if (fromClassXField == null) {
@@ -38,6 +58,20 @@ public class WrappedVector {
     }
   }
 
+  public static WrappedVector fromVec3D(Object obj) {
+    try {
+      Field[] fields = obj.getClass().getFields();
+
+      return new WrappedVector(
+        (double) fields[0].get(obj),
+        (double) fields[1].get(obj),
+        (double) fields[2].get(obj)
+      );
+    } catch (IllegalAccessException e) {
+      throw new ReflectionFailureException(e);
+    }
+  }
+
   private static void cacheFields(Class<?> fromClass) {
     try {
       fromClassXField = fromClass.getField("x");
@@ -46,6 +80,10 @@ public class WrappedVector {
     } catch (NoSuchFieldException e) {
       throw new ReflectionFailureException(e);
     }
+  }
+
+  public Location toLocation(World world) {
+    return new Location(world, xCoord, yCoord, zCoord);
   }
 
   /**

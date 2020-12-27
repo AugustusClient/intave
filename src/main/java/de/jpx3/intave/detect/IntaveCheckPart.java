@@ -7,4 +7,7 @@ public abstract class IntaveCheckPart implements EventProcessor {
     this.parentCheck = parentCheck;
   }
 
+  public boolean enabled() {
+    return true;
+  }
 }

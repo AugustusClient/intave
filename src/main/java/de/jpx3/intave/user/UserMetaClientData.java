@@ -7,6 +7,7 @@ public final class UserMetaClientData {
   public final static int PROTOCOL_VERSION_NETHER_UPDATE = 735; // 1.16
   public final static int PROTOCOL_VERSION_BEE_UPDATE = 573; // 1.15
   public final static int PROTOCOL_VERSION_VILLAGE_UPDATE = 477; // 1.14
+  public final static int SOMETHING_BETWEEN = 404; // 1.13.2
   public final static int PROTOCOL_VERSION_AQUATIC_UPDATE = 393; // 1.13
   public final static int PROTOCOL_VERSION_COLOR_UPDATE = 335; // 1.12
   public final static int PROTOCOL_VERSION_COMBAT_UPDATE = 107; // 1.9
@@ -19,6 +20,10 @@ public final class UserMetaClientData {
 
   public int protocolVersion() {
     return protocolVersion;
+  }
+
+  public double cameraSneakOffset() {
+    return protocolVersion >= SOMETHING_BETWEEN ? 0.35 : 0.08;
   }
 
   public boolean hitBoxSneakAffected() {

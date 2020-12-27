@@ -632,7 +632,7 @@ public final class Physics extends IntaveCheck {
 
     // Update the player's verified location
     if (violationLevelIncrease == 0) {
-      movementData.verifiedLocation = new Location(player.getWorld(), receivedPositionX, receivedPositionY, receivedPositionZ);
+      movementData.verifiedLocation = new Location(player.getWorld(), receivedPositionX, receivedPositionY, receivedPositionZ, movementData.rotationYaw, movementData.rotationPitch);
     }
 
     if (violationLevelData.physicsVL > 2 && violationLevelIncrease > 0) {
@@ -659,7 +659,6 @@ public final class Physics extends IntaveCheck {
       if (violationLevelData.physicsVL > 20 && MOVEMENT_EMULATION) {
         Vector emulationMotion = new Vector(predictedX, predictedY, predictedZ);
         plugin.eventService().emulationEngine().emulationSetBack(player, emulationMotion, 2);
-
       }
     }
 

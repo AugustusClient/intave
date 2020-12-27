@@ -71,7 +71,7 @@ public final class BukkitEventLinker {
     }
   }
 
-  public final Map<Class<? extends Event>, Set<RegisteredListener>> processLinking(BukkitEventSubscriber listener) {
+  private Map<Class<? extends Event>, Set<RegisteredListener>> processLinking(BukkitEventSubscriber listener) {
     Class<? extends BukkitEventSubscriber> listenerClass = listener.getClass();
     List<Method> methods = ImmutableList.copyOf(listenerClass.getDeclaredMethods());
     Map<Class<? extends Event>, Set<RegisteredListener>> ret = Maps.newConcurrentMap();

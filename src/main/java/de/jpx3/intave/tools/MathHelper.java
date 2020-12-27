@@ -23,7 +23,6 @@ public final class MathHelper {
     return Math.max(a, Math.min(b, c));
   }
 
-
   public static float distanceInDegrees(float alpha, float beta) {
     float phi = Math.abs(beta - alpha) % 360;
     return phi > 180 ? 360 - phi : phi;
