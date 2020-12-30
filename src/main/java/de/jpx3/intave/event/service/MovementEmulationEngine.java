@@ -102,9 +102,7 @@ public final class MovementEmulationEngine {
       //   s += " @" + movementData.entityBoundingBox();
 
       Vector finalMotion = motion;
-      Synchronizer.synchronizeDelayed(() -> {
-        proceedEmulationTick(player, finalMotion, ticks - 1);
-      }, 1);
+      Synchronizer.synchronizeDelayed(() -> proceedEmulationTick(player, finalMotion, ticks - 1), 1);
 
       // velocity
       Vector futureMotion = motionProceed(motion, player, boundingBox);
@@ -113,6 +111,14 @@ public final class MovementEmulationEngine {
   }
 
   private Vector motionProceed(Vector lastMotion, Player player, WrappedAxisAlignedBB boundingBox) {
+   /* User user = UserRepository.userOf(player);
+    boolean boundingBoxIntersection = CollisionHelper.checkBoundingBoxIntersection(user, user.meta().movementData().boundingBox());
+    if (boundingBoxIntersection) {
+      double positionX = (boundingBox.minX + boundingBox.maxX) / 2.0;
+      double positionY = (boundingBox.minY + boundingBox.maxY) / 2.0;
+      double positionZ = (boundingBox.minZ + boundingBox.maxZ) / 2.0;
+      return CollisionHelper.resolvePushVector(player, positionX, positionY, positionZ);
+    }*/
     double motionY = (lastMotion.getY() - 0.08) * 0.98f;
     Vector collisionVector = resolveCollisionVector(player, boundingBox, lastMotion.getX(), motionY, lastMotion.getZ());
     boolean onGround = motionY != collisionVector.getY() && motionY < 0.0;

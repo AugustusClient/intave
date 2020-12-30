@@ -20,7 +20,10 @@ import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import de.jpx3.intave.user.*;
 import de.jpx3.intave.world.BlockAccessor;
 import de.jpx3.intave.world.collision.CollisionFactory;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -118,7 +121,7 @@ public final class Physics extends IntaveCheck {
     Physics process
      */
     PreciseCollisionResult predictedMovement;
-    boolean boundingBoxIntersection = checkBoundingBoxIntersection(user);
+    boolean boundingBoxIntersection = CollisionHelper.checkBoundingBoxIntersection(user, movementData.boundingBox());
     if (boundingBoxIntersection) {
       PhysicsProcessorContext context = movementData.physicsProcessorContext;
       context.reset(0.0, 0.0, 0.0);
@@ -153,28 +156,6 @@ public final class Physics extends IntaveCheck {
     movementData.physicsResetMotionX = predictedMovement.resetMotionX;
     movementData.physicsResetMotionZ = predictedMovement.resetMotionZ;
     movementData.pastRiptideSpin++;
-  }
-
-  private boolean checkBoundingBoxIntersection(User user) {
-    Player player = user.player();
-    World world = player.getWorld();
-    UserMetaMovementData movementData = user.meta().movementData();
-    double positionX = movementData.positionX;
-    double positionY = movementData.positionY;
-    double positionZ = movementData.positionZ;
-    WrappedAxisAlignedBB boundingBox = CollisionHelper.entityBoundingBoxOf(user, positionX, positionY, positionZ);
-    List<WrappedAxisAlignedBB> collisionBoxes = CollisionFactory.getCollisionBoxes(user.player(), boundingBox);
-    for (WrappedAxisAlignedBB collisionBox : collisionBoxes) {
-      int blockX = WrappedMathHelper.floor(collisionBox.minX);
-      int blockY = WrappedMathHelper.floor(collisionBox.minY);
-      int blockZ = WrappedMathHelper.floor(collisionBox.minZ);
-      Block block = world.getBlockAt(blockX, blockY, blockZ);
-      Material type = block.getType();
-      if (!CollisionFactory.blockIntersectionExclusionNames().contains(type.name())) {
-        return true;
-      }
-    }
-    return false;
   }
 
   private PreciseCollisionResult physicsAccurate(
@@ -288,10 +269,10 @@ public final class Physics extends IntaveCheck {
     PhysicsProcessorContext context = movementData.physicsProcessorContext;
     int keyForward = movementData.keyForward;
     int keyStrafe = movementData.keyStrafe;
-//    if (inventoryData.inventoryOpen()) {
-//      keyForward = 0;
-//      keyStrafe = 0;
-//    }
+    if (inventoryData.inventoryOpen()) {
+      keyForward = 0;
+      keyStrafe = 0;
+    }
     double positionX = movementData.verifiedPositionX;
     double positionY = movementData.verifiedPositionY;
     double positionZ = movementData.verifiedPositionZ;
@@ -674,7 +655,7 @@ public final class Physics extends IntaveCheck {
     }
 
     // Update the player's verified location
-    if (violationLevelIncrease == 0 && !boundingBoxIntersection) {
+    if (violationLevelIncrease == 0) {
       movementData.verifiedLocation = new Location(player.getWorld(), receivedPositionX, receivedPositionY, receivedPositionZ, movementData.rotationYaw, movementData.rotationPitch);
     }
 
@@ -695,17 +676,19 @@ public final class Physics extends IntaveCheck {
       movementData.invalidMovement = true;
       String received = formatPosition(receivedMotionX, receivedMotionY, receivedMotionZ);
       String expected = formatPosition(predictedX, predictedY, predictedZ);
+
+      Vector emulationMotion;
       String message;
       if (!boundingBoxIntersection) {
         message = "sent unexpected position: (" + received + ") but expected (" + expected + ")";
+        emulationMotion = new Vector(predictedX, predictedY, predictedZ);
       } else {
         message = "intersected with bounding box";
+        emulationMotion = CollisionHelper.resolvePushVector(player, positionX, positionY, positionZ);
       }
 
       plugin.retributionService().markPlayer(player, (int) violationLevelIncrease, "Physics", message);
-
-      if (violationLevelData.physicsVL > 40 && MOVEMENT_EMULATION) {
-        Vector emulationMotion = new Vector(predictedX, predictedY, predictedZ);
+      if (violationLevelData.physicsVL > 40 && MOVEMENT_EMULATION && emulationMotion != null) {
         plugin.eventService().emulationEngine().emulationSetBack(player, emulationMotion, 8);
       }
     }
@@ -747,9 +730,7 @@ public final class Physics extends IntaveCheck {
         debug += " bb-intersection";
       }
       String finalDebug = debug;
-      Synchronizer.packetSynchronize(() -> {
-        player.sendMessage(player.getName() + "| " + finalDebug);
-      });
+      Synchronizer.packetSynchronize(() -> player.sendMessage(player.getName() + "| " + finalDebug));
 
 //      player.sendMessage(debug + " dist=" + formatDouble(distance, 10));
     }
@@ -876,7 +857,7 @@ public final class Physics extends IntaveCheck {
     double distance = MathHelper.resolveHorizontalDistance(predictedX, predictedZ, motionX, motionZ);
     double abuseHorizontally = Math.max(0, distance - legitimateDeviation);
     boolean movedTooQuickly = distanceMoved > predictedDistanceMoved * 1.005
-        && inventoryData.pastItemUsageTransition > 10;
+      && inventoryData.pastItemUsageTransition > 10;
     if (movedTooQuickly && distanceMoved > 0.2 && abuseHorizontally > 0 && !recentlySentFlying && !recentlyVelocity) {
 //      double v = Math.max(abuseHorizontally, 0.3) * 100.0;
 //      Bukkit.broadcastMessage(user.bukkitPlayer().getName() + " moved too quickly: vl+" + v + " -" + inventoryData.pastItemUsageTransition);
