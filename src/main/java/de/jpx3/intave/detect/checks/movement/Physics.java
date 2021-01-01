@@ -83,6 +83,15 @@ public final class Physics extends IntaveCheck {
     double motionZ = movementData.motionZ();
     if (hasMovement) {
       processMovement(user, motionX, motionY, motionZ);
+    }
+  }
+
+  public void endMovement(User user, boolean hasMovement) {
+    UserMetaMovementData movementData = user.meta().movementData();
+    double motionX = movementData.motionX();
+    double motionY = movementData.motionY();
+    double motionZ = movementData.motionZ();
+    if (hasMovement) {
       prepareNextTick(
         user,
         movementData.positionX, movementData.positionY, movementData.positionZ,
@@ -626,6 +635,10 @@ public final class Physics extends IntaveCheck {
     double horizontalViolationIncrease = resolveHorizontalViolationIncrease(user, keyForward, keyStrafe, predictedX, predictedZ, onLadder);
     double violationLevelIncrease = horizontalViolationIncrease + verticalViolationIncrease;
 
+    if (distance > 1e-3) {
+      movementData.suspiciousMovement = true;
+    }
+
     if (flying || spectator) {
       violationLevelIncrease = 0;
     }
@@ -699,24 +712,24 @@ public final class Physics extends IntaveCheck {
 
     if (DEBUG_MOVEMENT) {
       ChatColor chatColor = violationLevelIncrease == 0 ? ChatColor.GRAY : ChatColor.YELLOW;
-      String position = MathHelper.formatPositionAsInt(receivedPositionX, receivedPositionY, receivedPositionZ);
+      String motion = MathHelper.formatPositionAsInt(positionX, positionY, positionZ);
       String displayPhysicsVL = formatDouble(violationLevelData.physicsVL, 4);
       String displayHorizontalVL = formatDouble(horizontalViolationIncrease, 3);
       String displayVerticalVL = formatDouble(verticalViolationIncrease, 3);
       String displayViolationIncrease = formatDouble(violationLevelIncrease, 3);
 
-      if (movementData.pastFlyingPacketAccurate == 0) {
-        key += ".";
-      }
-
       String violationLevelInfo;
       if (violationLevelIncrease > 0) {
-        violationLevelInfo = "g:" + displayPhysicsVL + ",c:" + displayViolationIncrease
-          + "(" + displayHorizontalVL + "," + displayVerticalVL + ")";
+        violationLevelInfo = "g:" + displayPhysicsVL + ",c:" + displayViolationIncrease + "(" + displayHorizontalVL + "," + displayVerticalVL + ")";
       } else {
         violationLevelInfo = "g:" + displayPhysicsVL;
       }
-      String debug = chatColor + position + " (" + key + ") " + " " + violationLevelInfo;
+      String debug = chatColor + motion + " ";
+      if (movementData.pastFlyingPacketAccurate == 0) {
+        debug += "f";
+      }
+      debug += "(" + key + ") " + " " + violationLevelInfo;
+
 //      debug += " (sneak " + movementData.sneaking + ")";
 //      debug += " (size:" + movementData.width + "," + movementData.height + ")";
 //      debug += "handActive=" + inventoryData.handActive();
@@ -728,10 +741,9 @@ public final class Physics extends IntaveCheck {
       if (movedIntoBlock) {
         debug += " bb-intersection";
       }
-      String finalDebug = debug;
-      Synchronizer.packetSynchronize(() -> player.sendMessage(player.getName() + "| " + finalDebug));
 
-//      player.sendMessage(debug + " dist=" + formatDouble(distance, 10));
+      String finalDebug = debug;
+      Synchronizer.packetSynchronize(() -> player.sendMessage(finalDebug));
     }
   }
 

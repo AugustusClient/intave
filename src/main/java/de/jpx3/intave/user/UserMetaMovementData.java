@@ -12,7 +12,6 @@ import de.jpx3.intave.tools.client.PlayerRotationHelper;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.world.BlockLiquidHelper;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -50,7 +49,7 @@ public final class UserMetaMovementData {
   public int pastElytraFlying = 100, pastVelocity = 100;
   public boolean onLadderLast;
 
-  public boolean invalidMovement;
+  public boolean invalidMovement, suspiciousMovement;
   public double physicsLastMotionX, physicsLastMotionY, physicsLastMotionZ;
   public int pastRiptideSpin;
   public int pastPlayerAttackPhysics;

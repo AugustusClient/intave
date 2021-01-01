@@ -154,7 +154,10 @@ public final class MovementDispatcher implements EventProcessor {
       event.setCancelled(true);
     }
 
+    physicsCheck.endMovement(user, hasMovement);
+
     movementData.invalidMovement = false;
+    movementData.suspiciousMovement = false;
     movementData.teleport = false;
 
     boolean flyingWithElytra = PlayerMovementLocaleHelper.flyingWithElytra(player);
