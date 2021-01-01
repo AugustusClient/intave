@@ -147,7 +147,6 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
     if (entity != null) {
       boolean synchronizeEntityMovement = suitableDistanceForSynchronization(player, entity);
       boolean exceededSynchronizationLimit = synchronizeData.synchronizedEntitiesPerSecond++ > SYNCHRONIZATIONS_PER_SECOND;
-      System.out.println(synchronizeData.synchronizedEntitiesPerSecond);
       if (!entity.isEntityLiving || synchronizeEntityMovement && exceededSynchronizationLimit) {
         synchronizeEntityMovement = false;
       }
