@@ -105,10 +105,12 @@ public final class Physics extends IntaveCheck {
     User.UserMeta meta = user.meta();
     UserMetaMovementData movementData = meta.movementData();
     UserMetaClientData clientData = meta.clientData();
+    UserMetaInventoryData inventoryData = meta.inventoryData();
     double positionX = movementData.verifiedPositionX;
     double positionY = movementData.verifiedPositionY;
     double positionZ = movementData.verifiedPositionZ;
     float friction = resolveFriction(player, movementData, positionX, positionY, positionZ);
+    boolean sprinting = movementData.sprinting;
     boolean sneaking;
     if (clientData.delayedSneak()) {
       sneaking = movementData.lastSneaking;
@@ -117,10 +119,12 @@ public final class Physics extends IntaveCheck {
     } else {
       sneaking = movementData.sneaking;
     }
+    if (inventoryData.inventoryOpen()) {
+      sprinting = false;
+    }
     float rotationYaw = movementData.rotationYaw;
     float yawSine = SinusCache.sin(rotationYaw * (float) Math.PI / 180.0F, false);
     float yawCosine = SinusCache.cos(rotationYaw * (float) Math.PI / 180.0F, false);
-    boolean sprinting = movementData.sprinting;
     long startTime = System.nanoTime();
     /*
     Physics process
@@ -647,7 +651,8 @@ public final class Physics extends IntaveCheck {
       if (violationLevelIncrease > 0) {
         violationLevelIncrease = Math.max(violationLevelIncrease, 1.0);
       }
-      violationLevelIncrease *= 8.5;
+      double multiplier = distance > 0.007 ? 8.5 : 3.5;
+      violationLevelIncrease *= multiplier;
     }
 
     if (violationLevelIncrease == 0 && violationLevelData.physicsVL > 0) {
@@ -864,7 +869,7 @@ public final class Physics extends IntaveCheck {
         legitimateDeviation = Math.max(legitimateDeviation, distanceMoved);
       }
     }
-    if (pressedNothing) {
+    if (pressedNothing && !inventoryData.inventoryOpen()) {
       double deviation = movementData.onGround || movementData.lastOnGround ? 0.1 : 0.07;
       legitimateDeviation = Math.max(legitimateDeviation, deviation);
     }
@@ -1431,6 +1436,9 @@ public final class Physics extends IntaveCheck {
       boolean collidedHorizontally, boolean collidedVertically,
       boolean resetMotionX, boolean resetMotionZ
     ) {
+      if (context == null) {
+        throw new IllegalArgumentException("Context cannot be null");
+      }
       this.context = context;
       this.onGround = onGround;
       this.collidedHorizontally = collidedHorizontally;
