@@ -87,10 +87,16 @@ public class WrappedEntity {
       newPosX = packet.getDoubles().read(0);
       newPosY = packet.getDoubles().read(1);
       newPosZ = packet.getDoubles().read(2);
+//      serverPosX = (int) (newPosX * 32.0);
+//      serverPosY = (int) (newPosY * 32.0);
+//      serverPosZ = (int) (newPosZ * 32.0);
     } else {
-      newPosX = packet.getIntegers().read(1) / 32.0;
-      newPosY = packet.getIntegers().read(2) / 32.0;
-      newPosZ = packet.getIntegers().read(3) / 32.0;
+      serverPosX = packet.getIntegers().read(1);
+      serverPosY = packet.getIntegers().read(2);
+      serverPosZ = packet.getIntegers().read(3);
+      newPosX = serverPosX / 32.0;
+      newPosY = serverPosY / 32.0;
+      newPosZ = serverPosZ / 32.0;
     }
 
     if (Math.abs(positions.posX - newPosX) < 0.03125d &&
