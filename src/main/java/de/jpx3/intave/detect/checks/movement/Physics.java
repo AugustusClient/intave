@@ -682,14 +682,14 @@ public final class Physics extends IntaveCheck {
       if (movedIntoBlock) {
         movementData.invalidMovement = true;
 
-        String boundingBoxOutput;
+/*        String boundingBoxOutput;
         if(intersectionBoundingBoxesCurrent.size() > 1) {
           boundingBoxOutput = String.valueOf(intersectionBoundingBoxesCurrent);
         } else {
           boundingBoxOutput = String.valueOf(intersectionBoundingBoxesCurrent.get(0));
-        }
+        }*/
 
-        String message = "moved into block (" + boundingBoxOutput + ")";
+        String message = "moved into block";//+"(" + boundingBoxOutput + ")";
 
         user.boundingBoxAccess().invalidate();
 

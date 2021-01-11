@@ -22,6 +22,8 @@ import de.jpx3.intave.tools.wrapper.WrappedVector;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserCustomCheckMeta;
 import de.jpx3.intave.user.UserMetaMovementData;
+import de.jpx3.intave.world.BlockAccessor;
+import de.jpx3.intave.world.block.BlockDataAccess;
 import de.jpx3.intave.world.collision.BoundingBoxAccess;
 import de.jpx3.intave.world.raytrace.Raytracer;
 import org.bukkit.Location;
@@ -35,7 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerDigType.START_DESTROY_BLOCK;
 import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerDigType.STOP_DESTROY_BLOCK;
 
 public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytrace.InteractionMeta> {
@@ -45,15 +46,6 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
     super("InteractionRaytrace", "interactionRaytrace", InteractionMeta.class);
     this.plugin = plugin;
   }
-
-  // break
-  // 1st invalid -> save packet and queue packet for 2nd move (--> cancel)
-
-  // interact
-  // 1st invalid -> save raytrace and queue packet for 2nd move packet (--> raytrace override)
-
-  // place
-  // 1st invalid -> save raytrace and queue packet for 2nd move packet (--> raytrace override)
 
   @PacketSubscription(
     priority = ListenerPriority.LOW,
@@ -74,6 +66,10 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
       enumDirection = packet.getDirections().readSafely(0).ordinal();
     }
     if(enumDirection == 255) {
+      return;
+    }
+
+    if(event.isCancelled()) {
       return;
     }
 
@@ -109,8 +105,17 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
       return;
     }
 
+
+    if(event.isCancelled()) {
+      return;
+    }
+
     EnumWrappers.PlayerDigType playerDigType = packet.getPlayerDigTypes().readSafely(0);
-    if(!(playerDigType == START_DESTROY_BLOCK || playerDigType == STOP_DESTROY_BLOCK)) {
+    float blockDamage = BlockDataAccess.blockDamage(player, player.getItemInHand(), blockPosition);
+    boolean instantBreak = blockDamage == Float.POSITIVE_INFINITY || blockDamage >= 1.0f;
+    boolean breakBlock = instantBreak || playerDigType == STOP_DESTROY_BLOCK;
+
+    if(!breakBlock) {
       return;
     }
 
@@ -182,24 +187,25 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
     Player player = interaction.player();
     InteractionMeta interactionMeta = metaOf(player);
 
-    boolean hitMiss = interactionMeta.estimateMouseDelayFix ? raycastResultmdf == null || raycastResultmdf.hitVec == WrappedVector.ZERO : raycastResult == null || raycastResult.hitVec == WrappedVector.ZERO;
-    WrappedBlockPosition raycastVector = hitMiss ? WrappedBlockPosition.ORIGIN : raycastResult.getBlockPos();
+    boolean estimateMouseDelayFix = interactionMeta.estimateMouseDelayFix;
+    boolean hitMiss = estimateMouseDelayFix ? (raycastResultmdf == null || raycastResultmdf.hitVec == WrappedVector.ZERO) : raycastResult == null || raycastResult.hitVec == WrappedVector.ZERO;
+    WrappedBlockPosition raycastVector = hitMiss ? WrappedBlockPosition.ORIGIN : (estimateMouseDelayFix ? raycastResultmdf.getBlockPos() : raycastResult.getBlockPos());
     Location raycastLocation = raycastVector.toLocation(world);
     Location targetLocation = interaction.targetBlock.toLocation(world);
 
     boolean invalid = hitMiss ||
       raycastLocation.distance(targetLocation) > 0 ||
-      interaction.targetDirection != raycastResult.sideHit.getIndex();
+      interaction.targetDirection != (estimateMouseDelayFix ? raycastResultmdf : raycastResult).sideHit.getIndex();
 
     // mouse delay fix (on/off)
     if(invalid) {
-      boolean hitMiss2 = interactionMeta.estimateMouseDelayFix ? raycastResultmdf == null || raycastResultmdf.hitVec == WrappedVector.ZERO : raycastResultmdf == null || raycastResultmdf.hitVec == WrappedVector.ZERO;
-      WrappedBlockPosition raycastVector2 = hitMiss2 ? WrappedBlockPosition.ORIGIN : raycastResultmdf.getBlockPos();
+      boolean hitMiss2 = estimateMouseDelayFix ? raycastResult == null || raycastResult.hitVec == WrappedVector.ZERO : raycastResultmdf == null || raycastResultmdf.hitVec == WrappedVector.ZERO;
+      WrappedBlockPosition raycastVector2 = hitMiss2 ? WrappedBlockPosition.ORIGIN : (estimateMouseDelayFix ? raycastResult.getBlockPos() : raycastResultmdf.getBlockPos());
       Location raycastLocation2 = raycastVector2.toLocation(world);
 
       invalid = hitMiss2 ||
         raycastLocation2.distance(targetLocation) > 0 ||
-        interaction.targetDirection != raycastResultmdf.sideHit.getIndex();
+        interaction.targetDirection != (estimateMouseDelayFix ? raycastResult : raycastResultmdf).sideHit.getIndex();
 
       if(invalid) {
         raycastResult = raycastResultmdf;
@@ -231,7 +237,7 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
 //    }
 
     if(response == ResponseType.RAYTRACE_CAST) {
-      if(hitMiss) {
+      if(hitMiss || raycastResult == null) {
 //        player.sendMessage("Emulation " + raycastLocation + " " + targetLocation);
         refreshBlocksAround(player, targetLocation);
         boundingBoxAccess.invalidateOverride(interaction.world, targetLocation.getBlockX(), targetLocation.getBlockY(), targetLocation.getBlockZ());
@@ -289,36 +295,43 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
     Player player = interaction.player();
     InteractionType type = interaction.type();
 
+    Block targetLocationBlock = BlockAccessor.blockAccess(targetLocation);
+    Block raycastLocationBlock = BlockAccessor.blockAccess(raycastLocation);
+    if(targetLocationBlock.getType() == Material.AIR || raycastLocationBlock.getType() == Material.AIR) {
+      return true;
+    }
+
     String flagMessage;
     if(type == InteractionType.BREAK) {
-      String typeName = targetLocation.getBlock().getType().name().toLowerCase().replace("_", "").replace("block", "");
+      String typeName = targetLocationBlock.getType().name().toLowerCase().replace("_", "").replace("block", "");
       String append = "";
       if (hitMiss || (raycastLocation.getBlockX() == 0 && raycastLocation.getBlockY() == 0 && raycastLocation.getBlockZ() == 0)) {
-        append = " (looking in air)";
-      } else if(raycastLocation.distance(targetLocation) > 0 && raycastLocation.getBlock().getType() != Material.AIR) {
-        String blockName = raycastLocation.getBlock().getType().name().toLowerCase().replace("_", "").replace("block", "");
-        if(raycastLocation.getBlock().getType() == targetLocation.getBlock().getType()) {
+        append = " looking in air)";
+      } else if(raycastLocation.distance(targetLocation) > 0 && raycastLocationBlock.getType() != Material.AIR) {
+        String blockName = raycastLocationBlock.getType().name().toLowerCase().replace("_", "").replace("block", "");
+        if(raycastLocationBlock.getType() == targetLocationBlock.getType()) {
           blockName = "a different " + blockName;
         }
-        append = " (looking at " + blockName + " block)";
+        append = " looking at " + blockName + " block)";
       } else if (interaction.targetDirection != raycastResult.sideHit.getIndex()){
-        append = " (invalid block face)";
+        append = " invalid block face)";
       }
-      flagMessage = "broke a " + typeName + " block out of sight" + append;
+      flagMessage = "invalid break (" + typeName + " block)";// +" -" + append;
     } else if(type == InteractionType.PLACE) {
-      String typeAgainstName = shortenTypeName(targetLocation.getBlock().getType());
+      String typeAgainstName = shortenTypeName(targetLocationBlock.getType());
       String typeName = shortenTypeName(player.getItemInHand().getType());
-      flagMessage = "tried to placed a " + typeName + " block against a " + typeAgainstName + " block out of sight";
+      flagMessage = "invalid placement (" + typeName + " block on " + typeAgainstName + " block)";
     } else {
-      String typeAgainstName = shortenTypeName(targetLocation.getBlock().getType());
-      flagMessage = "tried to interact with a " + typeAgainstName + " block out of sight";
+//      String typeAgainstName = shortenTypeName(targetLocationBlock.getType());
+//      flagMessage = "invalid interaction (" + typeAgainstName + " block)";
+      return true;
     }
 
-    flagMessage += " (mdf: "+metaOf(player).estimateMouseDelayFix+")";
-
-    if(delayed) {
-      flagMessage += " (timeout)";
-    }
+//    flagMessage += " (mdf: "+metaOf(player).estimateMouseDelayFix+")";
+//
+//    if(delayed) {
+//      flagMessage += " (timeout)";
+//    }
 
     return plugin.retributionService().markPlayer(player, 0, name(), flagMessage);
   }

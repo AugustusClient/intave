@@ -174,7 +174,7 @@ public class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackRaytrac
     String entityName = entity.entityName();
     switch (attackRaytraceResult) {
       case MISS: {
-        message = "missed hitbox of " + resolveIndefArticle(entityName) + " " + entityName.toLowerCase();
+        message = "attacked " + resolveIndefArticle(entityName) + " " + entityName.toLowerCase() + " out of sight";
         vl = 1;
         break;
       }
@@ -183,7 +183,7 @@ public class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackRaytrac
           return false;
         }
         String displayReach = MathHelper.formatDouble(reach, 4);
-        message = "attacked " + resolveIndefArticle(entityName) + " " + entityName.toLowerCase() + " too far away (" + displayReach + " blocks)";
+        message = "attacked " + resolveIndefArticle(entityName) + " " + entityName.toLowerCase() + " from too far away (" + displayReach + " blocks)";
         vl = 6;
         break;
       }
@@ -279,11 +279,12 @@ public class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackRaytrac
 
       String message;
       if(minReach == 10) {
-        message = "missed hitbox of "+targetDescriptor+" (estimated)";
+        message = "attacked " + resolveIndefArticle(entityName) + " " + entityName.toLowerCase() + " out of sight (estimated)";
       } else {
         String minReachDisplay = MathHelper.formatDouble(minReach, 4) + " blocks";
 //        String maxReachDisplay = maxReach == 10 ? "miss" : MathHelper.formatDouble(maxReach, 4) + " blocks";
-        message = "attacked "+targetDescriptor+" too far away (estimated) (" + minReachDisplay + " at best)";
+//        message = "attacked "+targetDescriptor+" too far away (estimated) (" + minReachDisplay + " at best)";
+        message = "attacked " + resolveIndefArticle(entityName) + " " + entityName.toLowerCase() + " from too far away (" + minReachDisplay + " at best) (estimated)";
       }
       plugin.retributionService().markPlayer(player, 0, "AttackRaytrace", message);
       return true;

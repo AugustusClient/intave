@@ -131,8 +131,19 @@ public final class BlockActionDispatcher implements EventProcessor {
       return;
     }*/
 
+    // distance check
+
     World world = player.getWorld();
     Location blockAgainstLocation = blockPosition.toLocation(world).clone();
+
+    // air check
+
+    if(BlockAccessor.blockAccess(blockAgainstLocation).getType() == Material.AIR) {
+      event.setCancelled(true);
+      refreshBlocksAround(player, blockAgainstLocation);
+      return;
+    }
+
     boolean replace = BlockDataAccess.replacementPlace(world, new BlockPosition(blockAgainstLocation.toVector()));
     Location blockPlacementLocation = replace ? blockAgainstLocation : blockAgainstLocation.clone().add(WrappedEnumDirection.getFront(enumDirection).getDirectionVec().convertToBukkitVec());
 
@@ -170,6 +181,10 @@ public final class BlockActionDispatcher implements EventProcessor {
       if(access) {
         BoundingBoxAccess boundingBoxAccess = UserRepository.userOf(player).boundingBoxAccess();
         boundingBoxAccess.override(world, blockX, blockY, blockZ, id, shape);
+
+        Synchronizer.synchronizeDelayed(() -> {
+          boundingBoxAccess.invalidateOverride(world, blockX, blockY, blockZ);
+        }, 1);
       } else {
         refreshBlocksAround(player, blockPlacementLocation);
         event.setCancelled(true);
