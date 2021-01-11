@@ -4,11 +4,14 @@ import de.jpx3.intave.adapter.ComponentLoader;
 import de.jpx3.intave.adapter.ProtocolLibAdapter;
 import de.jpx3.intave.adapter.ViaVersionAdapter;
 import de.jpx3.intave.config.ConfigurationService;
+import de.jpx3.intave.connect.proxy.ProxyMessenger;
+import de.jpx3.intave.connect.sibyl.SibylIntegrationService;
 import de.jpx3.intave.detect.CheckService;
 import de.jpx3.intave.event.EventService;
 import de.jpx3.intave.event.bukkit.BukkitEventLinker;
 import de.jpx3.intave.event.packet.PacketSubscriptionLinker;
 import de.jpx3.intave.event.service.RetributionService;
+import de.jpx3.intave.executor.UniversalIOExecutor;
 import de.jpx3.intave.logging.IntaveLogger;
 import de.jpx3.intave.tools.annotate.Natify;
 import de.jpx3.intave.tools.client.SinusCache;
@@ -26,6 +29,8 @@ public final class IntavePlugin extends JavaPlugin {
   private static String version = "UNKNOWN";
 
   private IntaveLogger logger;
+  private ProxyMessenger proxyMessenger;
+  private SibylIntegrationService sibylIntegrationService;
   private ConfigurationService configurationService;
   private ComponentLoader componentLoader;
   private BukkitEventLinker eventLinker;
@@ -88,6 +93,7 @@ public final class IntavePlugin extends JavaPlugin {
     Synchronizer.setup();
     BlockAccessor.setup();
     ViaVersionAdapter.setup();
+    UniversalIOExecutor.start();
     InventoryUseItemHelper.setup();
     BoundingBoxPatcher.setup();
 
@@ -108,6 +114,8 @@ public final class IntavePlugin extends JavaPlugin {
       checkService = new CheckService(this);
       retributionService = new RetributionService();
       eventService = new EventService(this);
+      proxyMessenger = new ProxyMessenger(this);
+      sibylIntegrationService = new SibylIntegrationService(this);
 
       // stage 8
 
@@ -124,6 +132,8 @@ public final class IntavePlugin extends JavaPlugin {
   @Natify
   @Override
   public void onDisable() {
+    UniversalIOExecutor.stopBlocking();
+
     logger.shutdown();
     packetSubscriptionLinker.reset();
     eventLinker.performShutdown();
@@ -135,6 +145,10 @@ public final class IntavePlugin extends JavaPlugin {
 
   public IntaveLogger logger() {
     return logger;
+  }
+
+  public ProxyMessenger proxyMessenger() {
+    return proxyMessenger;
   }
 
   public CheckService checkService() {
