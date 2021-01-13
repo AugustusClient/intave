@@ -187,7 +187,7 @@ public class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackRaytrac
         String displayReach = MathHelper.formatDouble(reach, 4);
         message = "attacked " + resolveIndefArticle(entityName) + " " + entityName.toLowerCase() + " from too far away";
         details = displayReach + " blocks";
-        vl = 10;
+        vl = 20;
         break;
       }
       default: {

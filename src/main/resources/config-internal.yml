@@ -34,7 +34,7 @@ check:
       50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is attacking suspiciously (hitbox)"
       100:
         - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for attacking suspiciously (hitbox)"
-        - "intave internals delay kick &c{player}&7/{trust-color}&7 &cYou have been removed from the game based on data that was collected by the anti-cheat"
+        - "kick {player} &cYou have been removed from the game based on data that was collected by the anti-cheat"
 
   interactionRaytrace:
 
