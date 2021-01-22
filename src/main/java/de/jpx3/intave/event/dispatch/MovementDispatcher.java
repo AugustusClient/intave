@@ -3,17 +3,18 @@ package de.jpx3.intave.event.dispatch;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
-import com.comphenix.protocol.wrappers.EnumWrappers;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.adapter.ProtocolLibAdapter;
 import de.jpx3.intave.detect.EventProcessor;
 import de.jpx3.intave.detect.checks.movement.Physics;
 import de.jpx3.intave.event.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.event.packet.*;
-import de.jpx3.intave.reflect.Reflection;
+import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.tools.MathHelper;
-import de.jpx3.intave.tools.client.PlayerMovementLocaleHelper;
+import de.jpx3.intave.tools.client.PlayerMovementPoseHelper;
 import de.jpx3.intave.tools.sync.Synchronizer;
+import de.jpx3.intave.tools.packet.PlayerAction;
+import de.jpx3.intave.tools.packet.PlayerActionResolver;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.user.*;
 import de.jpx3.intave.world.collision.Collision;
@@ -49,7 +50,7 @@ public final class MovementDispatcher implements EventProcessor {
   }
 
   private void linkFallDamageInvokeMethod() {
-    Class<?> entityLivingClass = Reflection.lookupServerClass("EntityLiving");
+    Class<?> entityLivingClass = ReflectiveAccess.lookupServerClass("EntityLiving");
     String methodName = "e";
     if (ProtocolLibAdapter.VILLAGE_UPDATE.atOrAbove()) {
       methodName = "b";
@@ -282,7 +283,7 @@ public final class MovementDispatcher implements EventProcessor {
     movementData.suspiciousMovement = false;
     movementData.isTeleportConfirmationPacket = false;
 
-    boolean flyingWithElytra = PlayerMovementLocaleHelper.flyingWithElytra(player);
+    boolean flyingWithElytra = PlayerMovementPoseHelper.flyingWithElytra(player);
     if (flyingWithElytra) {
       movementData.pastElytraFlying = 0;
     } else {
@@ -455,7 +456,7 @@ public final class MovementDispatcher implements EventProcessor {
     User user = UserRepository.userOf(player);
     UserMetaMovementData movementData = user.meta().movementData();
     PacketContainer packet = event.getPacket();
-    EnumWrappers.PlayerAction playerAction = packet.getPlayerActions().read(0);
+    PlayerAction playerAction = PlayerActionResolver.resolveActionFromPacket(packet);
     switch (playerAction) {
       case START_SPRINTING:
         if (allowSprinting(player)) {
