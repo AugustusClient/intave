@@ -249,6 +249,13 @@ public final class MovementEmulationEngine {
     }
     double motionX = lastMotion.getX() * multiplier;
     double motionZ = lastMotion.getZ() * multiplier;
+    if (applyPhysics) {
+      if (movementData.inWeb) {
+        motionX *= 0.25D;
+        motionY *= 0.05f;
+        motionZ *= 0.25D;
+      }
+    }
     collisionVector = resolveCollisionVector(player, boundingBox, motionX, motionY, motionZ);
 
     // webs, water

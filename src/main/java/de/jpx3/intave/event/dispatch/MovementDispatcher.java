@@ -502,7 +502,6 @@ public final class MovementDispatcher implements EventProcessor {
       movementData.lastVelocity = velocity.clone();
 
       movementData.pastExternalVelocity = 0;
-//      player.sendMessage("Apply velocity: " + MathHelper.formatMotion(velocity));
     }
     Synchronizer.synchronize(() -> movementData.emulationVelocity = null);
     movementData.pastVelocity = 0;

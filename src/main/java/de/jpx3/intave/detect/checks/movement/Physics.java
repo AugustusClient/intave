@@ -361,11 +361,6 @@ public final class Physics extends IntaveCheck {
       legitimateDeviation = 0.1;
     }
 
-    // Movement in webs is always skipped
-    if (movementData.inWeb && receivedMotionY < 0.05) {
-      legitimateDeviation = 0.03;
-    }
-
     // Water flow cannot be calculated correctly
     if (pushedByWaterFlow) {
       legitimateDeviation = 0.1;
@@ -383,6 +378,14 @@ public final class Physics extends IntaveCheck {
       }
     }
 
+    boolean criticalWeb = receivedMotionY > -0.01
+      && movementData.inWeb
+      && movementData.positionY % 1 > 0.1
+      && movementData.pastExternalVelocity != 0;
+
+    if (movementData.inWeb) {
+      legitimateDeviation = criticalWeb ? 1e-6 : 0.03;
+    }
     double abuseVertically = Math.max(0, differenceY - legitimateDeviation);
 
     // Jump out of water
@@ -397,6 +400,9 @@ public final class Physics extends IntaveCheck {
     }
 
     double multiplier = abuseVertically > 1e-5 ? 205.0 : 25.0;
+    if (criticalWeb) {
+      multiplier *= 40;
+    }
 
     if (onLadder && movementData.motionY() <= LADDER_UPWARDS_MOTION) {
       abuseVertically = 0;
