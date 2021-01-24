@@ -18,7 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 public final class TransactionFeedbackService implements PacketEventSubscriber {
-  public final static short TRANSACTION_MIN_CODE = Short.MIN_VALUE;
+  public final static short TRANSACTION_MIN_CODE = -32768;
   public final static short TRANSACTION_MAX_CODE = -16370;
   private final static ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
 
@@ -75,7 +75,7 @@ public final class TransactionFeedbackService implements PacketEventSubscriber {
 
   private <T> Short acquireNewId(Player player, T obj, TransactionFeedbackCallback<T> callback) {
     User user = UserRepository.userOf(player);
-    if (user == null) {
+    if (user == null || !user.hasOnlinePlayer()) {
       return null;
     }
     UserMetaSynchronizeData synchronizeData = user.meta().synchronizeData();
@@ -83,12 +83,13 @@ public final class TransactionFeedbackService implements PacketEventSubscriber {
     if (transactionCounter >= TRANSACTION_MAX_CODE) {
       transactionCounter = TRANSACTION_MIN_CODE;
     }
+    synchronizeData.transactionCounter = transactionCounter;
     if(obj == null) {
       //noinspection unchecked
       obj = (T) FALLBACK_OBJECT;
     }
-    TransactionCallBackData<T> transactionCallBackData = new TransactionCallBackData<>(callback, obj);
-    synchronizeData.transactionFeedBackMap().put(transactionCounter, transactionCallBackData);
+    TransactionCallBackData<T> feedbackEntry = new TransactionCallBackData<>(callback, obj);
+    synchronizeData.transactionFeedBackMap().put(transactionCounter, feedbackEntry);
     return transactionCounter;
   }
 
