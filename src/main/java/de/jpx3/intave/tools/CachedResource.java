@@ -157,6 +157,7 @@ public final class CachedResource {
     return file.exists();
   }
 
+  @Native
   private File fileStore() {
     String operatingSystem = System.getProperty("os.name").toLowerCase(Locale.ROOT);
     File workDirectory;
@@ -173,6 +174,7 @@ public final class CachedResource {
     return new File(workDirectory, resourceId());
   }
 
+  @Native
   private String resourceId() {
     return new UUID(~name.hashCode(), ~intaveVersion().hashCode()).toString() + "e";
   }

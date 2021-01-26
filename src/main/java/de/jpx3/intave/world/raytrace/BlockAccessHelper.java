@@ -3,7 +3,6 @@ package de.jpx3.intave.world.raytrace;
 import de.jpx3.intave.access.IntaveException;
 import de.jpx3.intave.access.IntaveInternalException;
 import de.jpx3.intave.adapter.ProtocolLibAdapter;
-import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.reflect.ReflectiveHandleAccess;
 import de.jpx3.intave.tools.wrapper.WrappedMovingObjectPosition;
 import org.bukkit.Location;

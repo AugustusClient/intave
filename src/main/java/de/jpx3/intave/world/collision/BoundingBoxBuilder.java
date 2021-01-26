@@ -27,11 +27,26 @@ public final class BoundingBoxBuilder {
   }
 
   public void apply() {
-    boundingBoxes.add(new WrappedAxisAlignedBB(minX, minY, minZ, maxX, minY, maxZ));
+    WrappedAxisAlignedBB boundingBox = new WrappedAxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
+    boundingBox.setOriginBox(true);
+    boundingBoxes.add(boundingBox);
   }
 
   public List<WrappedAxisAlignedBB> resolve() {
     return boundingBoxes;
+  }
+
+  @Override
+  public String toString() {
+    return "BoundingBoxBuilder{" +
+      "boundingBoxes=" + boundingBoxes +
+      ", minX=" + minX +
+      ", minY=" + minY +
+      ", minZ=" + minZ +
+      ", maxX=" + maxX +
+      ", maxY=" + maxY +
+      ", maxZ=" + maxZ +
+      '}';
   }
 
   public static BoundingBoxBuilder create() {

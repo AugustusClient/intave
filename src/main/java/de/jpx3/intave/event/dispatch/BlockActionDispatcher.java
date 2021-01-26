@@ -92,17 +92,18 @@ public final class BlockActionDispatcher implements EventProcessor {
 //    }
 
     boolean replace = BlockDataAccess.replacementPlace(world, new BlockPosition(blockAgainstLocation.toVector()));
-    Location blockPlacementLocation = replace ? blockAgainstLocation : blockAgainstLocation.clone().add(WrappedEnumDirection.getFront(enumDirection).getDirectionVec().convertToBukkitVec());
+    Location finalBlockLocation = blockAgainstLocation.clone().add(WrappedEnumDirection.getFront(enumDirection).getDirectionVec().convertToBukkitVec());
+    Location blockPlacementLocation = replace ? blockAgainstLocation : finalBlockLocation;
 
     User user = UserRepository.userOf(player);
     Material itemTypeInHand = user.meta().inventoryData().heldItemType();
 
     Block clickedBlock = BlockAccessor.blockAccess(blockAgainstLocation);
     Material clickedType = clickedBlock.getType();
-    boolean clickable = BlockDataAccess.isClickable(clickedType);
-    boolean isPlacement = itemTypeInHand != Material.AIR && itemTypeInHand.isBlock() && !clickable;
 
-//    player.sendMessage(clickedType + " " + isPlacement);
+    boolean targetBlockClickable = BlockDataAccess.isClickable(clickedType);
+    boolean placeableBlockInHand = itemTypeInHand != Material.AIR && (itemTypeInHand.isBlock());
+    boolean isPlacement = placeableBlockInHand && !targetBlockClickable;
 
     if(isPlacement) {
       int blockX = blockPlacementLocation.getBlockX();
@@ -141,14 +142,21 @@ public final class BlockActionDispatcher implements EventProcessor {
         );
 
       if(access) {
-//        player.sendMessage("Internal place emulation at " + MathHelper.formatPosition(blockPlacementLocation));
+//        Synchronizer.synchronize(() -> {
+//          player.sendMessage("Internal place emulation at " + MathHelper.formatPosition(blockPlacementLocation));
+//        });
 
         BoundingBoxAccess boundingBoxAccess = UserRepository.userOf(player).boundingBoxAccess();
+        boundingBoxAccess.invalidate(blockX, blockY, blockZ);
         boundingBoxAccess.override(world, blockX, blockY, blockZ, id, shape);
 
         Synchronizer.synchronizeDelayed(() -> {
+//          Synchronizer.synchronize(() -> {
+//            player.sendMessage("Place emulation reverted");
+//          });
+          boundingBoxAccess.invalidate(blockX, blockY, blockZ);
           boundingBoxAccess.invalidateOverride(world, blockX, blockY, blockZ);
-        }, 2);
+        }, 5);
       } else {
         event.setCancelled(true);
         refreshBlocksAround(player, blockPlacementLocation);
@@ -159,17 +167,24 @@ public final class BlockActionDispatcher implements EventProcessor {
 
       } else if(clickedType == Material.TRAP_DOOR) {
         int data = clickedBlock.getData();
-        boolean isOpen = (data & 4) > 0;
+        boolean newOpen = (data & 4) != 0;
         int bitMask = 4;
-        byte newData = (byte) (!isOpen ? (data | bitMask) : (data & ~bitMask));
+        byte newData = (byte) (!newOpen ? (data | bitMask) : (data & ~bitMask));
+
+//        player.sendMessage("Currently open: " + newOpen + " " + Integer.toBinaryString(data) + " -> " + Integer.toBinaryString(newData));
 
         int id = clickedBlock.getType().getId();
         BoundingBoxAccess boundingBoxAccess = UserRepository.userOf(player).boundingBoxAccess();
         boundingBoxAccess.override(world, clickedBlock.getX(), clickedBlock.getY(), clickedBlock.getZ(), id, newData);
 
-        Synchronizer.synchronize(() -> {
-          boundingBoxAccess.invalidateOverride(world, clickedBlock.getX(), clickedBlock.getY(), clickedBlock.getZ());
-        });
+        Synchronizer.packetSynchronize(() ->
+          boundingBoxAccess.invalidateOverride(world, clickedBlock.getX(), clickedBlock.getY(), clickedBlock.getZ()));
+      } else {
+        BoundingBoxAccess boundingBoxAccess = UserRepository.userOf(player).boundingBoxAccess();
+
+        Synchronizer.synchronizeDelayed(() ->
+          boundingBoxAccess.invalidate(finalBlockLocation.getBlockX(), finalBlockLocation.getBlockY(), finalBlockLocation.getBlockZ()),
+        2);
       }
     }
   }
@@ -230,10 +245,12 @@ public final class BlockActionDispatcher implements EventProcessor {
 
       // add to future bounding boxes
       BoundingBoxAccess boundingBoxAccess = UserRepository.userOf(player).boundingBoxAccess();
+      boundingBoxAccess.invalidate(blockX, blockY, blockZ);
       boundingBoxAccess.override(world, blockX, blockY, blockZ, 0, (byte) 0);
 
       Synchronizer.synchronizeDelayed(() -> {
         boundingBoxAccess.invalidateOverride(world, blockX, blockY, blockZ);
+        boundingBoxAccess.invalidate(blockX, blockY, blockZ);
       }, 2);
     } else {
       refreshBlocksAround(player, blockBreakLocation);

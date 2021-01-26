@@ -49,7 +49,6 @@ public final class CheckService {
 
   public void addCheck(Class<? extends IntaveCheck> checkClass) {
     try {
-
       IntaveCheck check;
       try {
         checkClass.getConstructor(IntavePlugin.class);
@@ -88,7 +87,7 @@ public final class CheckService {
         continue;
       }
       packetSubscriptionLinker.linkSubscriptionsIn(check);
-      for (IntaveCheckPart checkPart : check.checkParts()) {
+      for (IntaveCheckPart<?> checkPart : check.checkParts()) {
         if (!checkPart.enabled()) {
           continue;
         }
@@ -104,7 +103,7 @@ public final class CheckService {
         continue;
       }
       packetSubscriptionLinker.removeSubscriptionsOf(check);
-      for (IntaveCheckPart checkPart : check.checkParts()) {
+      for (IntaveCheckPart<?> checkPart : check.checkParts()) {
         if (!checkPart.enabled()) {
           continue;
         }
@@ -120,7 +119,7 @@ public final class CheckService {
         continue;
       }
       bukkitEventLinker.registerEventsIn(check);
-      for (IntaveCheckPart checkPart : check.checkParts()) {
+      for (IntaveCheckPart<?> checkPart : check.checkParts()) {
         if (!checkPart.enabled()) {
           continue;
         }
@@ -136,7 +135,7 @@ public final class CheckService {
         continue;
       }
       bukkitEventLinker.unregisterEventsIn(check);
-      for (IntaveCheckPart checkPart : check.checkParts()) {
+      for (IntaveCheckPart<?> checkPart : check.checkParts()) {
         if (!checkPart.enabled()) {
           continue;
         }

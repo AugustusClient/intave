@@ -100,6 +100,7 @@ public final class BoundingBoxAccess {
         BlockAccessor.blockAccess(world, posX, posY, posZ),
         globalBoundingBoxResolver.resolve(world, posX, posY, posZ)
       );
+//      player.sendMessage(String.valueOf(boundingBoxes));
       if(!DISABLE_BLOCK_CACHING_ENTIRELY) {
         blockCache.put(blockPositionKey, boundingBoxes);
       }
@@ -167,11 +168,14 @@ public final class BoundingBoxAccess {
   }
 
   public List<WrappedAxisAlignedBB> constructBlock(World world, int posX, int posY, int posZ, int typeId, int blockState) {
-    return BoundingBoxPatcher.patch(
+    List<WrappedAxisAlignedBB> patch = BoundingBoxPatcher.patch(
       world, player,
+      posX, posY, posZ,
       typeId, blockState,
       globalBoundingBoxResolver.resolve(world, posX, posY, posZ, typeId, blockState)
     );
+//    Bukkit.broadcastMessage("Constructing ")
+    return patch;
   }
 
   public void invalidateOverride(World world, int posX, int posY, int posZ) {

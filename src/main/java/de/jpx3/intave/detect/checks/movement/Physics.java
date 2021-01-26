@@ -253,11 +253,12 @@ public final class Physics extends IntaveCheck {
     Location verifiedLocation = movementData.verifiedLocation();
 
     List<WrappedAxisAlignedBB> intersectionBoundingBoxesLast = Collision.resolve(user.player(), CollisionHelper.boundingBoxOf(user, verifiedLocation.getX(), verifiedLocation.getY(), verifiedLocation.getZ()));
-    List<WrappedAxisAlignedBB> intersectionBoundingBoxesCurrent = Collision.resolve(user.player(), CollisionHelper.boundingBoxOf(user, receivedPositionX, receivedPositionY, receivedPositionZ));
+    WrappedAxisAlignedBB currentBoundingBox = CollisionHelper.boundingBoxOf(user, receivedPositionX, receivedPositionY, receivedPositionZ);
+    List<WrappedAxisAlignedBB> intersectionBoundingBoxesCurrent = Collision.resolve(user.player(), currentBoundingBox);
 
     boolean boundingBoxIntersectionLast = !intersectionBoundingBoxesLast.isEmpty();
-    WrappedAxisAlignedBB currentPhaseBoundingBox = CollisionHelper.boundingBoxOf(user, receivedPositionX, receivedPositionY, receivedPositionZ);
-    boolean boundingBoxIntersectionCurrent = CollisionHelper.checkBoundingBoxIntersection(user, currentPhaseBoundingBox);
+    boolean boundingBoxIntersectionCurrent = !intersectionBoundingBoxesCurrent.isEmpty();
+
     boolean movedIntoBlock = !boundingBoxIntersectionLast && boundingBoxIntersectionCurrent;
 
     if (boundingBoxIntersectionCurrent && !spectator) {
@@ -271,8 +272,10 @@ public final class Physics extends IntaveCheck {
           boundingBoxOutput = String.valueOf(intersectionBoundingBoxesCurrent.get(0));
         }
 
+        String selfBoundingBox = String.valueOf(currentBoundingBox);
+
         String message = "moved into block";
-        String details = boundingBoxOutput;
+        String details = "self: " + selfBoundingBox  + " coll:" + boundingBoxOutput;
         user.boundingBoxAccess().invalidate();
 
         plugin.retributionService().processViolation(player, 0, "Physics", message, details);

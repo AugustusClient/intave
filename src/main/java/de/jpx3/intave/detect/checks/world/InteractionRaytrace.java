@@ -396,21 +396,23 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
 
     String message, details;
     if (type == InteractionType.BREAK) {
+      boolean longBreakDuration = BlockDataAccess.blockDamage(player, user.meta().inventoryData().heldItem(), interaction.targetBlock) < 0.8;
+
       String typeName = shortenTypeName(targetLocationBlock.getType());
       String append = "";
       if (hitMiss || (raycastLocation.getBlockX() == 0 && raycastLocation.getBlockY() == 0 && raycastLocation.getBlockZ() == 0)) {
         append = "looking in air";
-        vl = 5;
+        vl = longBreakDuration ? 20 : 5;
       } else if (raycastLocation.distance(targetLocation) > 0 && raycastLocationBlock.getType() != Material.AIR) {
         String blockName = shortenTypeName(raycastLocationBlock.getType());
         if (raycastLocationBlock.getType() == targetLocationBlock.getType()) {
           blockName = "a different " + blockName;
         }
         append = "looking at " + blockName + " block";
-        vl = 5;
+        vl = longBreakDuration ? 20 : 5;
       } else if (interaction.targetDirection != raycastResult.sideHit.getIndex()) {
         append = "invalid block face";
-        vl = 15;
+        vl = longBreakDuration ? 20 : 15;
       }
 
       message = "performed invalid break";// +" -" + append;

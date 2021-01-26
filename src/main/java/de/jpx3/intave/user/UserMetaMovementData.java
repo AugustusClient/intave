@@ -26,6 +26,8 @@ public final class UserMetaMovementData {
 
   public boolean disabledFlying;
   public float width = 0.6f, height = 1.8f;
+  public double widthRounded = Math.round(width * 50000d) / 100000D;
+
   public boolean swimming, elytraFlying;
 
   public boolean onGround, lastOnGround;

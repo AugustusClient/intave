@@ -14,6 +14,7 @@ public final class BoundingBoxPatcher {
 
   public static void setup() {
     add(BlockTrapdoorPatch.class);
+    add(BlockAnvilPatch.class);
   }
 
   private static void add(Class<? extends BoundingBoxPatch> patchClass) {
@@ -30,11 +31,22 @@ public final class BoundingBoxPatcher {
 
   public static List<WrappedAxisAlignedBB> patch(World world, Player player, Block block, List<WrappedAxisAlignedBB> bbs) {
     BoundingBoxPatch boundingBoxPatch = patches.get(block.getTypeId());
-    return boundingBoxPatch == null ? bbs : boundingBoxPatch.patch(world, player, block, bbs);
+    return boundingBoxPatch == null ? bbs : transpose(boundingBoxPatch.patch(world, player, block, bbs), block.getX(), block.getY(), block.getZ());
   }
 
-  public static List<WrappedAxisAlignedBB> patch(World world, Player player, int typeId, int blockState, List<WrappedAxisAlignedBB> bbs) {
+  public static List<WrappedAxisAlignedBB> patch(World world, Player player, int blockX, int blockY, int blockZ, int typeId, int blockState, List<WrappedAxisAlignedBB> bbs) {
     BoundingBoxPatch boundingBoxPatch = patches.get(typeId);
-    return boundingBoxPatch == null ? bbs : boundingBoxPatch.patch(world, player, typeId, blockState, bbs);
+    return boundingBoxPatch == null ? bbs : transpose(boundingBoxPatch.patch(world, player, typeId, blockState, bbs), blockX, blockY, blockZ);
+  }
+
+  public static List<WrappedAxisAlignedBB> transpose(List<WrappedAxisAlignedBB> boundingBoxes, int posX, int posY, int posZ) {
+    for (int i = 0; i < boundingBoxes.size(); i++) {
+      WrappedAxisAlignedBB boundingBox = boundingBoxes.get(i);
+      if(boundingBox.isOriginBox()) {
+        WrappedAxisAlignedBB transposedBox = boundingBox.offset(posX, posY, posZ);
+        boundingBoxes.set(i, transposedBox);
+      }
+    }
+    return boundingBoxes;
   }
 }

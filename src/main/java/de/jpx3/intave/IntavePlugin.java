@@ -18,6 +18,7 @@ import de.jpx3.intave.event.packet.PacketSubscriptionLinker;
 import de.jpx3.intave.event.service.CustomEventService;
 import de.jpx3.intave.event.service.ViolationService;
 import de.jpx3.intave.executor.BackgroundExecutor;
+import de.jpx3.intave.filter.Filterer;
 import de.jpx3.intave.lib.asm.Frame;
 import de.jpx3.intave.logging.IntaveLogger;
 import de.jpx3.intave.metrics.Metrics;
@@ -25,6 +26,7 @@ import de.jpx3.intave.security.HWIDVerification;
 import de.jpx3.intave.security.SSLConnectionVerifier;
 import de.jpx3.intave.tools.AccessHelper;
 import de.jpx3.intave.tools.DurationTranslator;
+import de.jpx3.intave.tools.EncryptedResource;
 import de.jpx3.intave.tools.annotate.Native;
 import de.jpx3.intave.tools.client.SinusCache;
 import de.jpx3.intave.tools.items.InventoryUseItemHelper;
@@ -43,16 +45,16 @@ import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 public final class IntavePlugin extends JavaPlugin {
   private static IntavePlugin singletonInstance;
@@ -78,6 +80,7 @@ public final class IntavePlugin extends JavaPlugin {
   private CustomEventService customEventService;
   private ViolationService violationService;
   private CheckService checkService;
+  private Filterer filterer;
   private InteractionPermissionService interactionPermissionService;
   private TrustFactorService trustFactorService;
   private VersionList versionList;
@@ -180,6 +183,8 @@ public final class IntavePlugin extends JavaPlugin {
 
       // license check call
 
+      EncryptedResource contextStatusResource = new EncryptedResource("context-status", false);
+
       String requiredConfigurationHash;
 
       // ja das muss so krebsig hier hin
@@ -275,6 +280,7 @@ public final class IntavePlugin extends JavaPlugin {
           logger().error(message);
         }
         if (bad || response.length() < 2) {
+          contextStatusResource.write(new ByteArrayInputStream(("failure-"+response).getBytes(StandardCharsets.UTF_8)));
           getCommand("intave").setExecutor((commandSender, command, s, strings) -> {
             commandSender.sendMessage(prefix() + ChatColor.RED + "Intave couldn't boot properly");
             return false;
@@ -308,14 +314,89 @@ public final class IntavePlugin extends JavaPlugin {
         }
       }
 
-      if (offlineMode && !configurationService.loader().configurationCacheExists()) {
-        logger().error("Unable to boot: Intave requires an internet connection for first-time startup");
-        getCommand("intave").setExecutor((commandSender, command, s, strings) -> {
-          commandSender.sendMessage(prefix() + ChatColor.RED + "Intave couldn't boot properly");
-          return false;
-        });
-        performShutdown();
-        return;
+      if (offlineMode) {
+        // check last online
+        boolean allowLeniency = IntaveControl.DISABLE_LICENSE_CHECK;
+        if(!allowLeniency && contextStatusResource.exists()) {
+          InputStream input = contextStatusResource.read();
+          Scanner scanner = new Scanner(input);
+          StringBuilder text = new StringBuilder();
+          while (scanner.hasNext()) {
+            text.append(scanner.next());
+          }
+          String textString = text.toString();
+          if(textString.startsWith("success")) {
+            Long lastSuccessfulStart = null;
+            try {
+              lastSuccessfulStart = Long.valueOf(textString.split("/")[1]);
+            } catch (Exception ignored) {}
+
+            if(lastSuccessfulStart != null) {
+              if(AccessHelper.now() - lastSuccessfulStart > TimeUnit.DAYS.toMillis(3)) {
+                String url_path = "https://raw.githubusercontent.com/Jpx3/IntaveStatus/main/availability";
+                URL url = new URL(url_path);
+                URLConnection connection = url.openConnection();
+                connection.setUseCaches(false);
+                connection.setDefaultUseCaches(false);
+                connection.addRequestProperty("User-Agent", "Intave/" + version());
+                connection.addRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate");
+                connection.addRequestProperty("Pragma", "no-cache");
+                connection.connect();
+                connection.setConnectTimeout(4000);
+                connection.setReadTimeout(4000);
+                try {
+                  connection.connect();
+                  allowLeniency = true;
+                } catch (IOException ignored) {}
+              } else {
+                // perform github check
+                String url_path = "https://raw.githubusercontent.com/Jpx3/IntaveStatus/main/availability";
+                URL url = new URL(url_path);
+                URLConnection connection = url.openConnection();
+                connection.setUseCaches(false);
+                connection.setDefaultUseCaches(false);
+                connection.addRequestProperty("User-Agent", "Intave/" + version());
+                connection.addRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate");
+                connection.addRequestProperty("Pragma", "no-cache");
+                connection.connect();
+                connection.setConnectTimeout(4000);
+                connection.setReadTimeout(4000);
+                Scanner scanner2 = new Scanner(connection.getInputStream(), "UTF-8");
+                Map<String, String> availabilities = new HashMap<>();
+                while (scanner2.hasNextLine()) {
+                  String line = scanner2.nextLine();
+                  String[] split = line.split("=");
+                  availabilities.put(split[0], split[1]);
+                }
+                allowLeniency = availabilities.get("intave.de").equalsIgnoreCase("false");
+              }
+            }
+          }
+        }
+
+        if(allowLeniency && !configurationService().loader().configurationCacheExists()) {
+          logger().error("Unable to boot: Intave requires an internet connection for first-time startup");
+          getCommand("intave").setExecutor((commandSender, command, s, strings) -> {
+            commandSender.sendMessage(prefix() + ChatColor.RED + "Intave couldn't boot properly");
+            return false;
+          });
+          performShutdown();
+          return;
+        }
+
+        // check if Intave even has internet connection
+
+        if(!allowLeniency) {
+          logger().error("Unable to boot: Intave requires an internet connection");
+          getCommand("intave").setExecutor((commandSender, command, s, strings) -> {
+            commandSender.sendMessage(prefix() + ChatColor.RED + "Intave couldn't boot properly");
+            return false;
+          });
+          performShutdown();
+          return;
+        }
+      } else {
+        contextStatusResource.write(new ByteArrayInputStream(("success/" + AccessHelper.now()).getBytes(StandardCharsets.UTF_8)));
       }
 
       versionList = new VersionList();
@@ -358,6 +439,9 @@ public final class IntavePlugin extends JavaPlugin {
       prefix = configurationService.configuration().getString("layout.prefix", prefix);
       prefix = ChatColor.translateAlternateColorCodes('&', prefix);
       defaultColor = ChatColor.getLastColors(prefix);
+
+      filterer = new Filterer(this);
+      filterer.setup();
 
       customEventService = new CustomEventService(this);
       interactionPermissionService = new InteractionPermissionService();

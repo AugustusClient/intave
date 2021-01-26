@@ -19,6 +19,7 @@ import java.util.Locale;
 import java.util.UUID;
 
 public final class EncryptedResource {
+  private final static int CLASS_VERSION = 3;
   private final String name;
   private final boolean versionDependent;
 
@@ -45,7 +46,7 @@ public final class EncryptedResource {
       ByteBuffer byteBuffer = ByteBuffer.wrap(byteArrayOutputStream.toByteArray());
       byte[] iv = new byte[byteBuffer.getInt()];
       byteBuffer.get(iv);
-      KeySpec spec = new PBEKeySpec("AES/GCM/NoPadding".toCharArray(), iv, 65536, 128); // AES-128
+      KeySpec spec = new PBEKeySpec("adXUOhsZW7H5m4dlOyrNV7ZvHBBB071Sy2jCiuUZ91QMAcYyexjxwDQmXL1LR1nV".toCharArray(), iv, 65536, 128); // AES-128
       SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
       byte[] key = secretKeyFactory.generateSecret(spec).getEncoded();
       SecretKey secretKey = new SecretKeySpec(key, "AES");
@@ -83,7 +84,7 @@ public final class EncryptedResource {
       SecureRandom secureRandom = new SecureRandom();
       byte[] iv = new byte[12];
       secureRandom.nextBytes(iv);
-      KeySpec spec = new PBEKeySpec("AES/GCM/NoPadding".toCharArray(), iv, 65536, 128); // AES-128
+      KeySpec spec = new PBEKeySpec("adXUOhsZW7H5m4dlOyrNV7ZvHBBB071Sy2jCiuUZ91QMAcYyexjxwDQmXL1LR1nV".toCharArray(), iv, 65536, 128); // AES-128
       SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
       byte[] key = secretKeyFactory.generateSecret(spec).getEncoded();
       SecretKey secretKey = new SecretKeySpec(key, "AES");
@@ -113,6 +114,7 @@ public final class EncryptedResource {
     return file.exists();
   }
 
+  @Native
   private File fileStore() {
     String operatingSystem = System.getProperty("os.name").toLowerCase(Locale.ROOT);
     File workDirectory;
@@ -129,8 +131,9 @@ public final class EncryptedResource {
     return new File(workDirectory, resourceId());
   }
 
+  @Native
   private String resourceId() {
-    return new UUID(~name.hashCode(), versionDependent ? ~intaveVersion().hashCode() : -391180952).toString() + "e";
+    return new UUID(~name.hashCode() | (CLASS_VERSION | CLASS_VERSION << 2), versionDependent ? ~intaveVersion().hashCode() : -391180952).toString() + "e";
   }
 
   private String intaveVersion() {

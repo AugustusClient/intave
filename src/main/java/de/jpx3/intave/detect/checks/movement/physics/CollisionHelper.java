@@ -30,7 +30,7 @@ public final class CollisionHelper {
     double positionX, double positionY, double positionZ
   ) {
     UserMetaMovementData movementData = user.meta().movementData();
-    double width = movementData.width / 2.0;
+    double width = movementData.widthRounded;
     float height = movementData.height;
     return new WrappedAxisAlignedBB(
       positionX - width, positionY, positionZ - width,

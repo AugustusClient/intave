@@ -1,8 +1,8 @@
 package de.jpx3.intave.tools.wrapper;
 
 import de.jpx3.intave.access.IntaveInternalException;
-import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.reflect.ReflectionFailureException;
+import de.jpx3.intave.reflect.ReflectiveAccess;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -13,6 +13,8 @@ public class WrappedAxisAlignedBB {
   private static Field fromClassMaxXField, fromClassMaxYField, fromClassMaxZField;
   public final double minX, minY, minZ;
   public final double maxX, maxY, maxZ;
+
+  private boolean originBox;
 
   public WrappedAxisAlignedBB(
     double x1, double y1, double z1,
@@ -419,6 +421,14 @@ public class WrappedAxisAlignedBB {
 
   public boolean func_181656_b() {
     return Double.isNaN(this.minX) || Double.isNaN(this.minY) || Double.isNaN(this.minZ) || Double.isNaN(this.maxX) || Double.isNaN(this.maxY) || Double.isNaN(this.maxZ);
+  }
+
+  public boolean isOriginBox() {
+    return originBox;
+  }
+
+  public void setOriginBox(boolean originBox) {
+    this.originBox = originBox;
   }
 
   public WrappedAxisAlignedBB copy() {

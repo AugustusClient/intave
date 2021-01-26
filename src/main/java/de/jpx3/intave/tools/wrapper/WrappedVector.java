@@ -1,7 +1,7 @@
 package de.jpx3.intave.tools.wrapper;
 
-import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.reflect.ReflectionFailureException;
+import de.jpx3.intave.reflect.ReflectiveAccess;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
