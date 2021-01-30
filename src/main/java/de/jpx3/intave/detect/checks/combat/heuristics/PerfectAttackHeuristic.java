@@ -74,6 +74,10 @@ public final class PerfectAttackHeuristic extends IntaveMetaCheckPart<Heuristics
     UserMetaMovementData movementData = user.meta().movementData();
     PerfectAttackMeta heuristicMeta = metaOf(user);
 
+    if (!attackData.recentlyAttacked(1000) || attackData.recentlySwitchedEntity(500) || attackData.lastReach() < 1.0) {
+      return;
+    }
+
     float distanceToPerfectYaw = MathHelper.distanceInDegrees(attackData.perfectYaw(), movementData.rotationYaw);
     float yawSpeed = MathHelper.distanceInDegrees(movementData.rotationYaw, movementData.lastRotationYaw);
     float pitchSpeed = MathHelper.distanceInDegrees(movementData.rotationPitch, movementData.lastRotationPitch);
@@ -91,7 +95,8 @@ public final class PerfectAttackHeuristic extends IntaveMetaCheckPart<Heuristics
           + "%, r:" + MathHelper.formatDouble(yawSpeedAverage, 2)
           + ", d:" + MathHelper.formatDouble(distanceAverage, 2)
           + ")";
-        Anomaly anomaly = Anomaly.anomalyOf(Confidence.PROBABLE, Anomaly.Type.KILLAURA, description, Anomaly.AnomalyOption.LIMIT_2 | Anomaly.AnomalyOption.SUGGEST_MINING);
+        int options = Anomaly.AnomalyOption.LIMIT_2 | Anomaly.AnomalyOption.SUGGEST_MINING | Anomaly.AnomalyOption.DELAY_16s;
+        Anomaly anomaly = Anomaly.anomalyOf("30", Confidence.PROBABLE, Anomaly.Type.KILLAURA, description, options);
         parentCheck().saveAnomaly(player, anomaly);
 //      } else {
 //        player.sendMessage("failRate:" + MathHelper.formatDouble(failRate, 2) + ", " + descriptor);

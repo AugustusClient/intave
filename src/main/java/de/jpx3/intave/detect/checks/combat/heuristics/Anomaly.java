@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 public class Anomaly {
   private final static long ANOMALY_EXPIRE_DURATION = TimeUnit.MINUTES.toMillis(5);
 
+  private final String key;
   private final long added;
   private final String description;
   private final Confidence confidence;
@@ -14,16 +15,22 @@ public class Anomaly {
   private final int options;
 
   private Anomaly(
+    String key,
     Confidence confidence,
     Type type,
     String description,
     int options
   ) {
+    this.key = key;
     this.added = AccessHelper.now();
     this.description = description;
     this.confidence = confidence;
     this.type = type;
     this.options = options;
+  }
+
+  public String key() {
+    return key;
   }
 
   public long timestamp() {
@@ -67,12 +74,12 @@ public class Anomaly {
     return type;
   }
 
-  public static Anomaly anomalyOf(Confidence confidence, Type type, String description) {
-    return new Anomaly(confidence, type, description, AnomalyOption.LIMIT_2);
+  public static Anomaly anomalyOf(String key, Confidence confidence, Type type, String description) {
+    return new Anomaly(key, confidence, type, description, AnomalyOption.LIMIT_2);
   }
 
-  public static Anomaly anomalyOf(Confidence confidence, Type type, String description, int options) {
-    return new Anomaly(confidence, type, description, options);
+  public static Anomaly anomalyOf(String key, Confidence confidence, Type type, String description, int options) {
+    return new Anomaly(key, confidence, type, description, options);
   }
 
   public enum Type {

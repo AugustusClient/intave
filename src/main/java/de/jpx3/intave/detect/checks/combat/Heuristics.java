@@ -57,11 +57,23 @@ public final class Heuristics extends IntaveMetaCheck<Heuristics.HeuristicMeta> 
   @Native
   private void debug(Player player, String description) {
     HeuristicMeta heuristicMeta = metaOf(player);
-    List<Confidence> confidences = heuristicMeta.anomalies
-      .stream()
-      .map(Anomaly::confidence)
-      .collect(Collectors.toList());
-    Confidence overallConfidence = computeOverallConfidence(confidences);
+    List<Anomaly> anomalies = heuristicMeta.anomalies;
+    anomalies.removeIf(Anomaly::expired);
+    anomalies = new ArrayList<>(anomalies);
+
+    Map<String, Integer> types = new HashMap<>();
+    List<Confidence> allConfidences = new ArrayList<>();
+
+    // limit
+    for (Anomaly anomaly : anomalies) {
+      String key = anomaly.key();
+      if (types.getOrDefault(key, 0) <= anomaly.limit() || anomaly.limit() == 0) {
+        allConfidences.add(anomaly.confidence());
+      }
+      types.put(key, types.getOrDefault(key, 0) + 1);
+    }
+
+    Confidence overallConfidence = computeOverallConfidence(allConfidences);
     String message = ChatColor.RED + "[HEUR] [DEB] " + player.getName() + "(" + overallConfidence + "): " + description;
 
     if (IntaveControl.DEBUG_HEURISTICS && !plugin.sibylIntegrationService().isAuthenticated(player)) {
@@ -87,7 +99,7 @@ public final class Heuristics extends IntaveMetaCheck<Heuristics.HeuristicMeta> 
     anomalies.removeIf(Anomaly::expired);
     anomalies = new ArrayList<>(anomalies);
 
-    // filter non active
+    // filter non active (delay)
     anomalies.removeIf(anomaly -> !anomaly.active());
 
     Map<String, Integer> types = new HashMap<>();
@@ -95,11 +107,11 @@ public final class Heuristics extends IntaveMetaCheck<Heuristics.HeuristicMeta> 
 
     // limit
     for (Anomaly anomaly : anomalies) {
-      String key = anomaly.description();
-      types.put(key, types.getOrDefault(key, 0) + 1);
-      if(anomaly.limit() <= types.get(key) || anomaly.limit() < 1) {
+      String key = anomaly.key();
+      if (types.getOrDefault(key, 0) <= anomaly.limit() || anomaly.limit() == 0) {
         allConfidences.add(anomaly.confidence());
       }
+      types.put(key, types.getOrDefault(key, 0) + 1);
     }
 
     Confidence overallConfidence = computeOverallConfidence(allConfidences);
@@ -113,30 +125,14 @@ public final class Heuristics extends IntaveMetaCheck<Heuristics.HeuristicMeta> 
       }
     }
 
-    if(overallConfidence.level() >= Confidence.LIKELY.level()) {
+    if (overallConfidence.level() >= Confidence.LIKELY.level()) {
       Anomaly.Type type = findDominantType(anomalies);
-      plugin.retributionService().processViolation(
-        player, 25, this.name(),
-        "is fighting suspiciously",
-        type.details() + overallConfidence.output(),
-        "confidence-thresholds." + overallConfidence.output()
-      );
+      plugin.retributionService().processViolation(player, 25, this.name(), "is fighting suspiciously", type.details() + overallConfidence.output(), "confidence-thresholds." + overallConfidence.output());
     }
   }
 
   private Anomaly.Type findDominantType(List<Anomaly> anomalies) {
-    return anomalies
-      .stream()
-      .collect(Collectors.groupingBy(
-        Anomaly::type,
-        Collectors.counting()
-      ))
-      .entrySet()
-      .stream()
-      .sorted()
-      .map(Map.Entry::getKey)
-      .findFirst()
-      .orElse(null);
+    return anomalies.stream().collect(Collectors.groupingBy(Anomaly::type, Collectors.counting())).entrySet().stream().sorted().map(Map.Entry::getKey).findFirst().orElse(null);
   }
 
   // this implementation is pure garbage, please get some experience with this check and refactor this method
@@ -149,14 +145,7 @@ public final class Heuristics extends IntaveMetaCheck<Heuristics.HeuristicMeta> 
     int overallConfidenceInteger = overallConfidence.level();
     int requiredConfidenceInter = confidenceGoal.level() - overallConfidenceInteger;
     Confidence requiredConfidence = Confidence.confidenceFrom(requiredConfidenceInter);
-    return MiningStrategy.RATING
-      .keySet()
-      .stream()
-      .filter(
-        miningStrategy -> availableMiningStrategies.contains(miningStrategy) &&
-          miningStrategy.detectionConfidence().level() > requiredConfidence.level()
-      ).findFirst()
-      .orElseThrow(IllegalStateException::new);
+    return MiningStrategy.RATING.keySet().stream().filter(miningStrategy -> availableMiningStrategies.contains(miningStrategy) && miningStrategy.detectionConfidence().level() > requiredConfidence.level()).findFirst().orElseThrow(IllegalStateException::new);
   }
 
   private void performMiningStrategy(Player player, MiningStrategy miningStrategy) {
@@ -178,11 +167,7 @@ public final class Heuristics extends IntaveMetaCheck<Heuristics.HeuristicMeta> 
 
   // events
 
-  @PacketSubscription(
-    packets = {
-      @PacketDescriptor(sender = Sender.CLIENT, packetName = "USE_ENTITY")
-    }
-  )
+  @PacketSubscription(packets = {@PacketDescriptor(sender = Sender.CLIENT, packetName = "USE_ENTITY")})
   public void receiveUseEntity(PacketEvent event) {
     Player player = event.getPlayer();
     HeuristicMeta heuristicMeta = metaOf(player);

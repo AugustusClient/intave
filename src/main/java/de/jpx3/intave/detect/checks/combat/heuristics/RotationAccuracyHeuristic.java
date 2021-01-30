@@ -20,13 +20,7 @@ public final class RotationAccuracyHeuristic extends IntaveMetaCheckPart<Heurist
     super(parentCheck, RotationAccuracyHeuristicMeta.class);
   }
 
-  @PacketSubscription(
-    priority = ListenerPriority.HIGH,
-    packets = {
-      @PacketDescriptor(sender = Sender.CLIENT, packetName = "POSITION_LOOK"),
-      @PacketDescriptor(sender = Sender.CLIENT, packetName = "LOOK")
-    }
-  )
+  @PacketSubscription(priority = ListenerPriority.HIGH, packets = {@PacketDescriptor(sender = Sender.CLIENT, packetName = "POSITION_LOOK"), @PacketDescriptor(sender = Sender.CLIENT, packetName = "LOOK")})
   public void receiveMovement(PacketEvent event) {
     Player player = event.getPlayer();
     User user = userOf(player);
@@ -49,7 +43,8 @@ public final class RotationAccuracyHeuristic extends IntaveMetaCheckPart<Heurist
         // Check perfect yaw
         if (distanceToPerfectYaw == 0) {
           String description = "rotated yaw too precisely (0.0)";
-          Anomaly anomaly = Anomaly.anomalyOf(Confidence.LIKELY, Anomaly.Type.KILLAURA, description, Anomaly.AnomalyOption.LIMIT_2);
+          int options = Anomaly.AnomalyOption.LIMIT_2 | Anomaly.AnomalyOption.DELAY_128s | Anomaly.AnomalyOption.SUGGEST_MINING;
+          Anomaly anomaly = Anomaly.anomalyOf("20", Confidence.LIKELY, Anomaly.Type.KILLAURA, description, options);
           parentCheck().saveAnomaly(player, anomaly);
         }
 
@@ -60,9 +55,14 @@ public final class RotationAccuracyHeuristic extends IntaveMetaCheckPart<Heurist
           heuristicMeta.balanceYawAccuracy = Math.max(0, heuristicMeta.balanceYawAccuracy);
           int suspiciousLevel = (int) heuristicMeta.balanceYawAccuracy;
           if (suspiciousLevel > 8) {
-            String description = "high accuracy rotation yaw vl:" + suspiciousLevel;
-            Anomaly anomaly = Anomaly.anomalyOf(Confidence.LIKELY, Anomaly.Type.KILLAURA, description, Anomaly.AnomalyOption.LIMIT_2);
-            parentCheck().saveAnomaly(player, anomaly);
+            if (heuristicMeta.rotationAccuracyVL++ > 3) {
+              String description = "high accuracy rotation yaw vl:" + suspiciousLevel;
+              int options = Anomaly.AnomalyOption.LIMIT_2 | Anomaly.AnomalyOption.DELAY_32s | Anomaly.AnomalyOption.SUGGEST_MINING;
+              Anomaly anomaly = Anomaly.anomalyOf("21", Confidence.PROBABLE, Anomaly.Type.KILLAURA, description, options);
+              parentCheck().saveAnomaly(player, anomaly);
+            }
+          } else if (heuristicMeta.rotationAccuracyVL > 0) {
+            heuristicMeta.rotationAccuracyVL -= 0.005;
           }
 
           // player.sendMessage("vl:" + suspiciousLevel + ", " + distanceToPerfectYaw);
@@ -72,12 +72,10 @@ public final class RotationAccuracyHeuristic extends IntaveMetaCheckPart<Heurist
         if (distanceToPerfectYaw > 4.0) {
           heuristicMeta.balanceYawAccuracyOther = 0;
         } else if (heuristicMeta.balanceYawAccuracyOther++ > 50) {
-
           String description = "high accuracy rotation yaw (2) vl:" + heuristicMeta.balanceYawAccuracyOther;
-          Anomaly anomaly = Anomaly.anomalyOf(Confidence.MAYBE, Anomaly.Type.KILLAURA, description, Anomaly.AnomalyOption.LIMIT_2);
+          int options = Anomaly.AnomalyOption.LIMIT_2 | Anomaly.AnomalyOption.DELAY_32s | Anomaly.AnomalyOption.SUGGEST_MINING;
+          Anomaly anomaly = Anomaly.anomalyOf("22", Confidence.MAYBE, Anomaly.Type.KILLAURA, description, options);
           parentCheck().saveAnomaly(player, anomaly);
-
-
           heuristicMeta.balanceYawAccuracyOther = 0;
         }
       }
@@ -98,5 +96,6 @@ public final class RotationAccuracyHeuristic extends IntaveMetaCheckPart<Heurist
   public final static class RotationAccuracyHeuristicMeta extends UserCustomCheckMeta {
     private double balanceYawAccuracy;
     private double balanceYawAccuracyOther;
+    private double rotationAccuracyVL;
   }
 }

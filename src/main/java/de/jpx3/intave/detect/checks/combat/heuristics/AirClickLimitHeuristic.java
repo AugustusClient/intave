@@ -191,6 +191,7 @@ public class AirClickLimitHeuristic extends IntaveMetaCheckPart<Heuristics, AirC
     if(sum > 13 && user.meta().clientData().protocolVersion() <= UserMetaClientData.PROTOCOL_VERSION_BOUNTIFUL_UPDATE) {
       parentCheck().saveAnomaly(player,
         Anomaly.anomalyOf(
+          "40",
           sum > 14 ? Confidence.VERY_LIKELY : Confidence.MAYBE,
           Anomaly.Type.AUTOCLICKER,
           "too many swing packets in air " + sum, Anomaly.AnomalyOption.DELAY_128s

@@ -61,7 +61,7 @@ public final class RotationStandardDeviationHeuristic extends IntaveMetaCheckPar
     if (standardDeviation < 1.0) {
       if (heuristicMeta.rotationBalance++ >= 2) {
         String description = "standard deviation (" + standardDeviation + ")";
-        Anomaly anomaly = Anomaly.anomalyOf(Confidence.PROBABLE, Anomaly.Type.KILLAURA, description, Anomaly.AnomalyOption.LIMIT_2);
+        Anomaly anomaly = Anomaly.anomalyOf("26", Confidence.PROBABLE, Anomaly.Type.KILLAURA, description, Anomaly.AnomalyOption.LIMIT_2);
         parentCheck().saveAnomaly(player, anomaly);
         heuristicMeta.rotationBalance--;
       }
