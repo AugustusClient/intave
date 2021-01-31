@@ -76,6 +76,10 @@ public final class UserMetaMovementData {
   // Jump prevention
   public boolean physicsJumped;
   public double physicsJumpedOverrideVL;
+  // If the player changes his hotbar slot the slot change packet will be sent *after* the movement
+  // To prevent a slot switch if the player changes his slot by itself we have to check if the movement is 2x wrong
+  // If the player does not have an active use-item this field will be set to 0
+  public int physicsEatingSlotSwitchVL;
 
   public boolean isTeleportConfirmationPacket;
   public boolean willReceiveSetbackVelocity;

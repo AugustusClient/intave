@@ -11,17 +11,12 @@ import de.jpx3.intave.tools.client.PlayerMovementHelper;
 import de.jpx3.intave.tools.client.SinusCache;
 import de.jpx3.intave.tools.items.InventoryUseItemHelper;
 import de.jpx3.intave.tools.sync.Synchronizer;
-import de.jpx3.intave.user.User;
-import de.jpx3.intave.user.UserMetaClientData;
-import de.jpx3.intave.user.UserMetaInventoryData;
-import de.jpx3.intave.user.UserMetaMovementData;
+import de.jpx3.intave.user.*;
 import org.bukkit.inventory.ItemStack;
 
 import static de.jpx3.intave.reflect.ReflectiveDataWatcherAccess.DATA_WATCHER_BLOCKING_ID;
 
 public final class PhysicsSimulationService {
-  private final static boolean SIMULATE_USE_ITEM_TWICE = false;
-
   public EntityCollisionResult simulate(User user, PhysicsMovementPoseType poseType) {
     User.UserMeta meta = user.meta();
     UserMetaMovementData movementData = meta.movementData();
@@ -74,7 +69,11 @@ public final class PhysicsSimulationService {
           // Release the player's hand on the client and serverside
           ItemStack itemStack = inventoryData.heldItem();
           if (itemStack != null && !InventoryUseItemHelper.isSwordItem(user.player(), itemStack)) {
-            inventoryData.applySlotSwitch();
+            if (movementData.physicsEatingSlotSwitchVL++ > 1) {
+              inventoryData.applySlotSwitch();
+            } else {
+              inventoryData.setHandActive(true);
+            }
           }
           Synchronizer.synchronize(() -> ReflectiveDataWatcherAccess.setDataWatcherFlag(user.player(), DATA_WATCHER_BLOCKING_ID, false));
         }
@@ -140,10 +139,7 @@ public final class PhysicsSimulationService {
     float moveStrafe = keyStrafe * 0.98f;
     movementData.physicsJumped = jumped;
     context.reset(movementData.physicsLastMotionX, movementData.physicsLastMotionY, movementData.physicsLastMotionZ);
-    return calculationPart.performSimulation(
-      user, context, yawSine, yawCosine, friction, moveForward, moveStrafe,
-      sneaking, attackReduce, jumped, sprinting, handActive
-    );
+    return calculationPart.performSimulation(user, context, yawSine, yawCosine, friction, moveForward, moveStrafe, sneaking, attackReduce, jumped, sprinting, handActive);
   }
 
   private EntityCollisionResult simulatePossibleMovement(
@@ -164,7 +160,6 @@ public final class PhysicsSimulationService {
     double lastMotionX = movementData.physicsLastMotionX;
     double lastMotionY = movementData.physicsLastMotionY;
     double lastMotionZ = movementData.physicsLastMotionZ;
-    boolean lenientItemUsageChecking = lenientItemUsageChecking(user);
     boolean inventoryOpen = inventoryData.inventoryOpen();
     boolean inLava = movementData.inLava();
     boolean inWater = movementData.inWater;
@@ -178,65 +173,54 @@ public final class PhysicsSimulationService {
     EntityCollisionResult predictedMovement = null;
 
     LOOP:
-    for (int heldItemState = 0; heldItemState <= 1; heldItemState++) {
-      boolean handActive = heldItemState == 1;
-
-      if (!lenientItemUsageChecking && handActive && !inventoryData.handActive()) {
+    for (int attackState = 0; attackState <= 1; attackState++) {
+      boolean attackReduce = attackState == 1;
+      if (attackReduce && movementData.pastPlayerAttackPhysics >= 1) {
         continue;
       }
 
-      for (int attackState = 0; attackState <= 1; attackState++) {
-        boolean attackReduce = attackState == 1;
-        if (attackReduce && movementData.pastPlayerAttackPhysics >= 1) {
+      for (int jumpState = 0; jumpState <= 1; jumpState++) {
+        boolean jumped = jumpState == 1;
+        // Jumps are only allowed on the ground :(
+        if (jumped && ((!lastOnGround && !inLava && !inWater) || inventoryOpen)) {
+          continue;
+        }
+        if (jumped && movementData.exceededJumpPrevention()) {
           continue;
         }
 
-        for (int jumpState = 0; jumpState <= 1; jumpState++) {
-          boolean jumped = jumpState == 1;
-          // Jumps are only allowed on the ground :(
-          if (jumped && ((!lastOnGround && !inLava && !inWater) || inventoryOpen)) {
-            continue;
-          }
-          if (jumped && movementData.exceededJumpPrevention()) {
-            continue;
-          }
-
-          for (int keyForward = 1; keyForward > -2; keyForward--) {
-            for (int keyStrafe = -1; keyStrafe <= 1; keyStrafe++) {
-              if (sprinting && keyForward != 1) {
+        for (int keyForward = 1; keyForward > -2; keyForward--) {
+          for (int keyStrafe = -1; keyStrafe <= 1; keyStrafe++) {
+            if (sprinting && keyForward != 1) {
+              continue;
+            }
+            if (inventoryOpen) {
+              if ((keyForward != 0 || keyStrafe != 0) || jumped) {
                 continue;
               }
-              if (inventoryOpen) {
-                if ((keyForward != 0 || keyStrafe != 0) || jumped) {
-                  continue;
-                }
-              }
-              float moveForward = keyForward * 0.98f;
-              float moveStrafe = keyStrafe * 0.98f;
-              context.reset(lastMotionX, lastMotionY, lastMotionZ);
-              EntityCollisionResult collisionResult = calculationPart.performSimulation(
-                user, context, yawSine, yawCosine, friction, moveForward, moveStrafe,
-                sneaking, attackReduce, jumped, sprinting, handActive
-              );
-              Physics.PhysicsProcessorContext collisionContext = collisionResult.context();
-              double differenceX = collisionContext.motionX - receivedMotionX;
-              double differenceY = collisionContext.motionY - receivedMotionY;
-              double differenceZ = collisionContext.motionZ - receivedMotionZ;
-              double distance = MathHelper.resolveDistance(differenceX, differenceY, differenceZ);
-              if (distance < mostAccurateDistance) {
-                predictedMovement = collisionResult;
-                mostAccurateDistance = distance;
-                bestForwardKey = keyForward;
-                bestStrafeKey = keyStrafe;
-                jumpedOnBestSimulation = jumped;
-              }
-              boolean fastMovementProcess = (!inWater && inLava) || elytraFlying;
-              if (distance < 5e-4 && fastMovementProcess) {
-                break LOOP;
-              }
-              if (!calculationPart.requiresKeyCalculation()) {
-                break LOOP;
-              }
+            }
+            float moveForward = keyForward * 0.98f;
+            float moveStrafe = keyStrafe * 0.98f;
+            context.reset(lastMotionX, lastMotionY, lastMotionZ);
+            EntityCollisionResult collisionResult = calculationPart.performSimulation(user, context, yawSine, yawCosine, friction, moveForward, moveStrafe, sneaking, attackReduce, jumped, sprinting, inventoryData.handActive());
+            Physics.PhysicsProcessorContext collisionContext = collisionResult.context();
+            double differenceX = collisionContext.motionX - receivedMotionX;
+            double differenceY = collisionContext.motionY - receivedMotionY;
+            double differenceZ = collisionContext.motionZ - receivedMotionZ;
+            double distance = MathHelper.resolveDistance(differenceX, differenceY, differenceZ);
+            if (distance < mostAccurateDistance) {
+              predictedMovement = collisionResult;
+              mostAccurateDistance = distance;
+              bestForwardKey = keyForward;
+              bestStrafeKey = keyStrafe;
+              jumpedOnBestSimulation = jumped;
+            }
+            boolean fastMovementProcess = (!inWater && inLava) || elytraFlying;
+            if (distance < 5e-4 && fastMovementProcess) {
+              break LOOP;
+            }
+            if (!calculationPart.requiresKeyCalculation()) {
+              break LOOP;
             }
           }
         }
@@ -246,14 +230,5 @@ public final class PhysicsSimulationService {
     movementData.keyStrafe = bestStrafeKey;
     movementData.physicsJumped = jumpedOnBestSimulation;
     return predictedMovement;
-  }
-
-  private boolean lenientItemUsageChecking(User user) {
-    if (SIMULATE_USE_ITEM_TWICE) {
-      return true;
-    }
-    UserMetaInventoryData inventoryData = user.meta().inventoryData();
-    ItemStack heldItemStack = inventoryData.heldItem();
-    return heldItemStack != null && heldItemStack.getType() == InventoryUseItemHelper.ITEM_TRIDENT;
   }
 }

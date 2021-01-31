@@ -379,6 +379,10 @@ public final class MovementDispatcher implements EventProcessor {
     movementData.pastExternalVelocity++;
     movementData.physicsUnpredictableVelocityExpected = false;
 
+    if (!inventoryData.handActive()) {
+      movementData.physicsEatingSlotSwitchVL = 0;
+    }
+
     if (!event.isCancelled() && !movementData.isTeleportConfirmationPacket) {
       movementData.lastOnGround = movementData.onGround;
       movementData.verifiedPositionX = movementData.positionX;
