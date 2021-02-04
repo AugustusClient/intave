@@ -6,6 +6,7 @@ import de.jpx3.intave.adapter.ViaVersionAdapter;
 import de.jpx3.intave.command.CommandProcessor;
 import de.jpx3.intave.config.ConfigurationService;
 import de.jpx3.intave.connect.proxy.ProxyMessenger;
+import de.jpx3.intave.connect.shadow.LabymodShadowIntegration;
 import de.jpx3.intave.connect.sibyl.SibylIntegrationService;
 import de.jpx3.intave.detect.CheckService;
 import de.jpx3.intave.event.EventService;
@@ -81,6 +82,7 @@ public final class IntavePlugin extends JavaPlugin {
   private InteractionPermissionService interactionPermissionService;
   private TrustFactorService trustFactorService;
   private VersionList versionList;
+  private LabymodShadowIntegration shadowIntegration;
   private Metrics metrics;
 
   public IntavePlugin() {
@@ -408,6 +410,9 @@ public final class IntavePlugin extends JavaPlugin {
       filterer = new Filterer(this);
       filterer.setup();
 
+      shadowIntegration = new LabymodShadowIntegration(this);
+      shadowIntegration.setup();
+
       customEventService = new CustomEventService(this);
       interactionPermissionService = new InteractionPermissionService();
       checkService = new CheckService(this);
@@ -463,10 +468,11 @@ public final class IntavePlugin extends JavaPlugin {
   public void performShutdown() {
     logger().info("Stopping Intave");
     BackgroundExecutor.stopBlocking();
-    logger.shutdown();
+    shadowIntegration.shutdown();
     packetSubscriptionLinker.reset();
     eventLinker.performShutdown();
     logger().info("Intave offline");
+    logger.shutdown();
   }
 
   public TrustFactorService trustFactorService() {

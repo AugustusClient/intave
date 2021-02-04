@@ -3,6 +3,7 @@ package de.jpx3.intave.user;
 import com.google.common.collect.Maps;
 import de.jpx3.intave.access.IntaveInternalException;
 import de.jpx3.intave.access.TrustFactor;
+import de.jpx3.intave.connect.shadow.ShadowPacketDataLink;
 import de.jpx3.intave.permission.PermissionCache;
 import de.jpx3.intave.permission.PermissionCheck;
 import de.jpx3.intave.reflect.ReflectiveHandleAccess;
@@ -30,6 +31,8 @@ public final class User {
   private final List<UserMessageChannel> receivingUserChannels = new ArrayList<>();
   private final Map<UserMessageChannel, UserMessageChannelPlayerConstraint> receiveWhitelist = Maps.newEnumMap(UserMessageChannel.class);
   private boolean ignoreNextPacket;
+  private boolean hasShadow;
+  private ShadowPacketDataLink shadowRepo = null;
   private final long birthTimestamp = AccessHelper.now();
 
   private final PlayerContext playerPlaceholderContext = new PlayerContext(this);
@@ -98,6 +101,22 @@ public final class User {
 
   public void receiveNextPacket() {
     this.ignoreNextPacket = false;
+  }
+
+  public boolean hasShadow() {
+    return hasShadow;
+  }
+
+  public void setShadow(boolean hasShadow) {
+    this.hasShadow = hasShadow;
+  }
+
+  public ShadowPacketDataLink shadowRepo() {
+    return shadowRepo;
+  }
+
+  public void setShadowRepo(ShadowPacketDataLink shadowRepo) {
+    this.shadowRepo = shadowRepo;
   }
 
   public BoundingBoxAccess boundingBoxAccess() {

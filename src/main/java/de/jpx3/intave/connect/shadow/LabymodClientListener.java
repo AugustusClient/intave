@@ -1,10 +1,11 @@
-package de.jpx3.intave.connect.sibyl;
+package de.jpx3.intave.connect.shadow;
 
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import de.jpx3.intave.IntavePlugin;
+import de.jpx3.intave.connect.sibyl.LabyModChannelHelper;
 import de.jpx3.intave.event.packet.PacketDescriptor;
 import de.jpx3.intave.event.packet.PacketEventSubscriber;
 import de.jpx3.intave.event.packet.PacketSubscription;
@@ -56,10 +57,10 @@ public final class LabymodClientListener implements PacketEventSubscriber {
     ByteBuf bytes = (ByteBuf) packet.getSpecificModifier(ReflectiveAccess.lookupServerClass("PacketDataSerializer")).getValues().get(0);
     try {
       bytes.markReaderIndex();
-      String messageKey = LabyModChannelHelper.readString(bytes, Short.MAX_VALUE);
+      String messageKey = LabyModChannelHelper.readString(bytes, 32767);
+      String messageContent = LabyModChannelHelper.readString(bytes, 32767);
+      JsonElement jsonElement = jsonParser.parse(messageContent);
       if(messageKey.equalsIgnoreCase(channel)) {
-        String messageContent = LabyModChannelHelper.readString(bytes, Short.MAX_VALUE);
-        JsonElement jsonElement = jsonParser.parse(messageContent);
         elementConsumer.accept(player, jsonElement);
       }
     } catch (RuntimeException e) {
