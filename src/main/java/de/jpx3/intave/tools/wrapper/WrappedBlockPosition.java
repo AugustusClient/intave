@@ -1,11 +1,7 @@
 package de.jpx3.intave.tools.wrapper;
 
-import de.jpx3.intave.reflect.ReflectionFailureException;
-import de.jpx3.intave.reflect.ReflectiveAccess;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
-
-import java.lang.reflect.Field;
 
 public final class WrappedBlockPosition extends WrappedVector {
   public static final WrappedBlockPosition ORIGIN = new WrappedBlockPosition(0, 0, 0);
@@ -17,8 +13,6 @@ public final class WrappedBlockPosition extends WrappedVector {
   private static final long X_MASK = (1L << NUM_X_BITS) - 1L;
   private static final long Y_MASK = (1L << NUM_Y_BITS) - 1L;
   private static final long Z_MASK = (1L << NUM_Z_BITS) - 1L;
-
-  private static Field fromClassXField, fromClassYField, fromClassZField;
 
   public WrappedBlockPosition(int x, int y, int z) {
     super(x, y, z);
@@ -38,30 +32,6 @@ public final class WrappedBlockPosition extends WrappedVector {
 
   public WrappedBlockPosition(Location source) {
     this(source.getX(), source.getY(), source.getZ());
-  }
-
-  public static WrappedBlockPosition fromBlockPosition(Object blockPosition) {
-    Class<?> blockPositionBase = ReflectiveAccess.lookupServerClass("BaseBlockPosition");
-    try {
-      Field xPosField = blockPositionBase.getDeclaredFields()[1];
-      Field yPosField = blockPositionBase.getDeclaredFields()[2];
-      Field zPosField = blockPositionBase.getDeclaredFields()[3];
-      if(!xPosField.isAccessible()) {
-        xPosField.setAccessible(true);
-      }
-      if(!yPosField.isAccessible()) {
-        yPosField.setAccessible(true);
-      }
-      if(!zPosField.isAccessible()) {
-        zPosField.setAccessible(true);
-      }
-      int xPos = (int) xPosField.get(blockPosition);
-      int yPos = (int) yPosField.get(blockPosition);
-      int zPos = (int) zPosField.get(blockPosition);
-      return new WrappedBlockPosition(xPos, yPos, zPos);
-    } catch (IllegalAccessException e) {
-      throw new ReflectionFailureException(e);
-    }
   }
 
   /**

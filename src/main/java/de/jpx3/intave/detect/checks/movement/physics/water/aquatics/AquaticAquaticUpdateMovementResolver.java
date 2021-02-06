@@ -7,6 +7,7 @@ import de.jpx3.intave.reflect.ReflectionFailureException;
 import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import de.jpx3.intave.tools.wrapper.WrappedVector;
+import de.jpx3.intave.tools.wrapper.link.WrapperLinkage;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaMovementData;
 
@@ -174,7 +175,7 @@ public final class AquaticAquaticUpdateMovementResolver extends AquaticWaterMove
   public WrappedVector resolveFlowVector(Object fluidState, Object world, Object blockPosition) {
     try {
       Object vector = fluidFlowMethodHandle.invoke(fluidState, world, blockPosition);
-      return WrappedVector.fromClass(vector);
+      return WrapperLinkage.vectorOf(vector);
     } catch (Throwable t) {
       throw new ReflectionFailureException(t);
     }

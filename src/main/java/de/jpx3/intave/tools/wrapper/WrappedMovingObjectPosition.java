@@ -1,6 +1,7 @@
 package de.jpx3.intave.tools.wrapper;
 
 import de.jpx3.intave.reflect.ReflectiveAccess;
+import de.jpx3.intave.tools.wrapper.link.WrapperLinkage;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -76,9 +77,9 @@ public class WrappedMovingObjectPosition {
       Object direction = movingObjectPositionClass.getField("direction").get(movingObjectPosition);
       Object pos = movingObjectPositionClass.getField("pos").get(movingObjectPosition);
       Object entity = movingObjectPositionClass.getField("entity").get(movingObjectPosition);
-      WrappedVector wrappedPos = WrappedVector.fromVec3D(pos);
+      WrappedVector wrappedPos = WrapperLinkage.vectorOf(pos);
       if(entity == null) {
-        WrappedBlockPosition wrappedBlockPosition = WrappedBlockPosition.fromBlockPosition(blockPosition);
+        WrappedBlockPosition wrappedBlockPosition = WrapperLinkage.blockPositionOf(blockPosition);
         String typeName = (String) Enum.class.getMethod("name").invoke(type);
         MovingObjectType movingObjectType = MovingObjectType.valueOf(typeName);
         String directionName = (String) Enum.class.getMethod("name").invoke(direction);
