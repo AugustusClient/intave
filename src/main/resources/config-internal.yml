@@ -57,6 +57,13 @@ check:
       100:
         - "intave internals sendnotify &c{player}&7/{trust-color}&7 is interacting suspiciously #2"
 
+  breakspeedlimiter:
+
+    enabled: true
+
+    thresholds:
+      100: "intave internals sendnotify &c{player}&7/{trust-color}&7 is trying to break blocks too quickly"
+
   protocolscanner:
 
     enabled: true

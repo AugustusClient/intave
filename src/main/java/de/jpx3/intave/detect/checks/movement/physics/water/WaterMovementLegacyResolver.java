@@ -12,6 +12,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 
 public final class WaterMovementLegacyResolver {
+
   public static boolean handleMaterialAcceleration(User user, WrappedAxisAlignedBB boundingBox) {
     Player player = user.player();
     UserMetaMovementData movementData = user.meta().movementData();
@@ -50,6 +51,88 @@ public final class WaterMovementLegacyResolver {
     }
     return inWater;
   }
+
+
+//  public static boolean handleMaterialAcceleration(User user, WrappedAxisAlignedBB bb) {
+//    Player player = user.player();
+//    UserMetaMovementData movementData = user.meta().movementData();
+//
+//    World world = player.getWorld();
+//
+//    int i = WrappedMathHelper.floor(bb.minX);
+//    int j = WrappedMathHelper.floor(bb.maxX + 1.0D);
+//    int k = WrappedMathHelper.floor(bb.minY);
+//    int l = WrappedMathHelper.floor(bb.maxY + 1.0D);
+//    int i1 = WrappedMathHelper.floor(bb.minZ);
+//    int j1 = WrappedMathHelper.floor(bb.maxZ + 1.0D);
+//
+//    boolean flag = false;
+//    WrappedVector vec3 = new WrappedVector(0.0D, 0.0D, 0.0D);
+//
+//    for (int x = i; x < j; ++x) {
+//      for (int y = k; y < l; ++y) {
+//        for (int z = i1; z < j1; ++z) {
+//          Block block = BlockAccessor.blockAccess(user.player().getWorld(), x, y, z);
+//
+//          if (BlockLiquidHelper.isWater(block.getType())) {
+//            float liquidHeightPercent = resolveLiquidHeightPercentage(resolveLiquidLevel(block));
+//            double d0 = (float) (y + 1) - ((int) liquidHeightPercent);
+//            if ((double) l >= d0) {
+//              flag = true;
+//              WrappedBlockPosition blockPosition = new WrappedBlockPosition(x, y, z);
+//              vec3 = resolveWaterFlowVector(world, blockPosition);
+//            }
+//          }
+//        }
+//      }
+//    }
+//
+//    if (vec3.lengthVector() > 0.0D) {
+//      vec3 = vec3.normalize();
+//      double d1 = 0.014D;
+//      movementData.physicsLastMotionX += vec3.xCoord * d1;
+//      movementData.physicsLastMotionY += vec3.yCoord * d1;
+//      movementData.physicsLastMotionZ += vec3.zCoord * d1;
+//    }
+//    return flag;
+//  }
+
+//  protected Vec3 getFlowVector(IBlockAccess worldIn, BlockPos pos) {
+//    Vec3 vec3 = new Vec3(0.0D, 0.0D, 0.0D);
+//    int i = this.getEffectiveFlowDecay(worldIn, pos);
+//
+//    for (EnumFacing enumfacing : EnumFacing.Plane.HORIZONTAL) {
+//      BlockPos blockpos = pos.offset(enumfacing);
+//      int j = this.getEffectiveFlowDecay(worldIn, blockpos);
+//
+//      if (j < 0) {
+//        if (!worldIn.getBlockState(blockpos).getBlock().getMaterial().blocksMovement()) {
+//          j = this.getEffectiveFlowDecay(worldIn, blockpos.down());
+//
+//          if (j >= 0) {
+//            int k = j - (i - 8);
+//            vec3 = vec3.addVector((blockpos.getX() - pos.getX()) * k, (blockpos.getY() - pos.getY()) * k, (blockpos.getZ() - pos.getZ()) * k);
+//          }
+//        }
+//      } else {
+//        int l = j - i;
+//        vec3 = vec3.addVector((blockpos.getX() - pos.getX()) * l, (blockpos.getY() - pos.getY()) * l, (blockpos.getZ() - pos.getZ()) * l);
+//      }
+//    }
+//
+//    if (worldIn.getBlockState(pos).getValue(LEVEL) >= 8) {
+//      for (EnumFacing enumfacing1 : EnumFacing.Plane.HORIZONTAL) {
+//        BlockPos blockpos1 = pos.offset(enumfacing1);
+//
+//        if (this.isBlockSolid(worldIn, blockpos1, enumfacing1) || this.isBlockSolid(worldIn, blockpos1.up(), enumfacing1)) {
+//          vec3 = vec3.normalize().addVector(0.0D, -6.0D, 0.0D);
+//          break;
+//        }
+//      }
+//    }
+//
+//    return vec3.normalize();
+//  }
 
   public static WrappedVector resolveWaterFlowVector(
     World world,

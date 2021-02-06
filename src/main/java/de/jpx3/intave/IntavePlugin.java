@@ -29,6 +29,7 @@ import de.jpx3.intave.tools.annotate.Native;
 import de.jpx3.intave.tools.client.SinusCache;
 import de.jpx3.intave.tools.items.InventoryUseItemHelper;
 import de.jpx3.intave.tools.sync.Synchronizer;
+import de.jpx3.intave.tools.wrapper.link.WrapperLinkage;
 import de.jpx3.intave.trustfactor.TrustFactorService;
 import de.jpx3.intave.update.VersionInformation;
 import de.jpx3.intave.update.VersionList;
@@ -116,6 +117,7 @@ public final class IntavePlugin extends JavaPlugin {
 
     try {
       SinusCache.setup();
+      WrapperLinkage.setup();
       Synchronizer.setup();
       ContextSecrets.setup();
       BackgroundExecutor.start();

@@ -2,6 +2,7 @@ package de.jpx3.intave.world.collision.resolver;
 
 import de.jpx3.intave.patchy.annotate.PatchyAutoTranslation;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
+import de.jpx3.intave.tools.wrapper.link.WrapperLinkage;
 import de.jpx3.intave.world.collision.BoundingBoxResolver;
 import de.jpx3.intave.world.collision.resolver.ac.v8AlwaysCollidingBoundingBox;
 import net.minecraft.server.v1_8_R3.*;
@@ -65,7 +66,7 @@ public final class v8BoundingBoxResolver implements BoundingBoxResolver {
     }
     List<WrappedAxisAlignedBB> list = new ArrayList<>();
     for (Object bb : bbs) {
-      list.add(WrappedAxisAlignedBB.fromClass(bb));
+      list.add(WrapperLinkage.boundingBoxOf(bb));
     }
     return list;
   }

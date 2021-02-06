@@ -1,19 +1,14 @@
 package de.jpx3.intave.tools.wrapper;
 
-import de.jpx3.intave.reflect.ReflectionFailureException;
 import de.jpx3.intave.reflect.ReflectiveAccess;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.util.Vector;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
 
 public class WrappedVector {
   public static final WrappedVector ZERO = new WrappedVector(0.0D, 0.0D, 0.0D);
-  private static Field fromClassXField, fromClassYField, fromClassZField;
   public final double xCoord, yCoord, zCoord;
 
   public WrappedVector(double x, double y, double z) {
@@ -31,7 +26,6 @@ public class WrappedVector {
     this.zCoord = z;
   }
 
-
   public Vector convertToBukkitVec() {
     return new Vector(xCoord, yCoord, zCoord);
   }
@@ -43,48 +37,6 @@ public class WrappedVector {
         .newInstance(xCoord, yCoord, zCoord);
     } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException exception) {
       throw new IllegalStateException(exception);
-    }
-  }
-
-  public static WrappedVector fromClass(Object obj) {
-    try {
-      if (fromClassXField == null) {
-        cacheFields(obj.getClass());
-      }
-      double x = (double) fromClassXField.get(obj);
-      double y = (double) fromClassYField.get(obj);
-      double z = (double) fromClassZField.get(obj);
-      return new WrappedVector(x, y, z);
-    } catch (IllegalAccessException e) {
-      throw new ReflectionFailureException(e);
-    }
-  }
-
-  private static Field[] VEC3D_FIELDS;
-
-  public static WrappedVector fromVec3D(Object obj) {
-    try {
-      if(VEC3D_FIELDS == null) {
-        VEC3D_FIELDS = Arrays.stream(obj.getClass().getFields()).filter(field -> !Modifier.isStatic(field.getModifiers())).toArray(Field[]::new);
-      }
-
-      return new WrappedVector(
-        (double) VEC3D_FIELDS[0].get(obj),
-        (double) VEC3D_FIELDS[1].get(obj),
-        (double) VEC3D_FIELDS[2].get(obj)
-      );
-    } catch (IllegalAccessException e) {
-      throw new ReflectionFailureException(e);
-    }
-  }
-
-  private static void cacheFields(Class<?> fromClass) {
-    try {
-      fromClassXField = fromClass.getField("x");
-      fromClassYField = fromClass.getField("y");
-      fromClassZField = fromClass.getField("z");
-    } catch (NoSuchFieldException e) {
-      throw new ReflectionFailureException(e);
     }
   }
 

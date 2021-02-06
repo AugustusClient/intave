@@ -1,17 +1,8 @@
 package de.jpx3.intave.tools.wrapper;
 
-import de.jpx3.intave.access.IntaveInternalException;
-import de.jpx3.intave.reflect.ReflectionFailureException;
-import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.tools.MathHelper;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-
 public class WrappedAxisAlignedBB {
-  private static Field fromClassMinXField, fromClassMinYField, fromClassMinZField;
-  private static Field fromClassMaxXField, fromClassMaxYField, fromClassMaxZField;
   public final double minX, minY, minZ;
   public final double maxX, maxY, maxZ;
 
@@ -27,49 +18,6 @@ public class WrappedAxisAlignedBB {
     this.maxX = Math.max(x1, x2);
     this.maxY = Math.max(y1, y2);
     this.maxZ = Math.max(z1, z2);
-  }
-
-  public static WrappedAxisAlignedBB fromClass(Object obj) {
-    try {
-      if (fromClassMinXField == null) {
-        cacheFields(obj.getClass());
-      }
-      double minX = (double) fromClassMinXField.get(obj);
-      double minY = (double) fromClassMinYField.get(obj);
-      double minZ = (double) fromClassMinZField.get(obj);
-      double maxX = (double) fromClassMaxXField.get(obj);
-      double maxY = (double) fromClassMaxYField.get(obj);
-      double maxZ = (double) fromClassMaxZField.get(obj);
-      return new WrappedAxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
-    } catch (Throwable throwable) {
-      throw new IntaveInternalException(throwable);
-    }
-  }
-
-  private static void cacheFields(Class<?> fromClass) {
-    fromClassMinXField = fromClass.getFields()[0];
-    fromClassMinYField = fromClass.getFields()[1];
-    fromClassMinZField = fromClass.getFields()[2];
-    fromClassMaxXField = fromClass.getFields()[3];
-    fromClassMaxYField = fromClass.getFields()[4];
-    fromClassMaxZField = fromClass.getFields()[5];
-  }
-
-  private static final Class<?>[] AABB_CONSTRUCTOR = new Class[]{
-    Double.TYPE, Double.TYPE, Double.TYPE,
-    Double.TYPE, Double.TYPE, Double.TYPE
-  };
-  private static Constructor<?> axisAlignedBBConstructor;
-
-  public Object unwrap() {
-    try {
-      if (axisAlignedBBConstructor == null) {
-        axisAlignedBBConstructor = ReflectiveAccess.NMS_AABB_CLASS.getConstructor(AABB_CONSTRUCTOR);
-      }
-      return axisAlignedBBConstructor.newInstance(minX, minY, minZ, maxX, maxY, maxZ);
-    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-      throw new ReflectionFailureException(e);
-    }
   }
 
   public double getMin(WrappedEnumDirection.Axis axis) {
@@ -369,8 +317,8 @@ public class WrappedAxisAlignedBB {
   private WrappedVector nearestPointTo(WrappedVector fieldPoint) {
     double pointX, pointY, pointZ;
     double refX = fieldPoint.xCoord,
-           refY = fieldPoint.yCoord,
-           refZ = fieldPoint.zCoord;
+      refY = fieldPoint.yCoord,
+      refZ = fieldPoint.zCoord;
 
     if (refX > maxX/*(targetX + (hitboxWidth / 2))*/) {
       pointX = maxX/*targetX + (hitboxWidth / 2)*/;
