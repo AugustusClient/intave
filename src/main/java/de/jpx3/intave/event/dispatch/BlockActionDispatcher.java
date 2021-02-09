@@ -33,9 +33,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.util.NumberConversions;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerDigType.STOP_DESTROY_BLOCK;
@@ -313,18 +315,47 @@ public final class BlockActionDispatcher implements EventProcessor {
     PacketType packetType = event.getPacketType();
 
     BoundingBoxAccess boundingBoxAccess = UserRepository.userOf(player).boundingBoxAccess();
-    World world = player.getWorld();
+
+    List<BlockPosition> blockPositions;
+
     if(packetType == PacketType.Play.Server.MULTI_BLOCK_CHANGE) {
       MultiBlockChangeInfo[] multiBlockChangeInfos = packet.getMultiBlockChangeInfoArrays().readSafely(0);
+      blockPositions = new ArrayList<>();
       for (MultiBlockChangeInfo multiBlockChangeInfo : multiBlockChangeInfos) {
-        boundingBoxAccess.invalidate(multiBlockChangeInfo.getAbsoluteX(), multiBlockChangeInfo.getY(), multiBlockChangeInfo.getAbsoluteZ());
-//        boundingBoxAccess.invalidateOverride(world, multiBlockChangeInfo.getAbsoluteX(), multiBlockChangeInfo.getY(), multiBlockChangeInfo.getAbsoluteZ());
+//        boundingBoxAccess.invalidate(multiBlockChangeInfo.getAbsoluteX(), multiBlockChangeInfo.getY(), multiBlockChangeInfo.getAbsoluteZ());
+        blockPositions.add(new BlockPosition(multiBlockChangeInfo.getAbsoluteX(), multiBlockChangeInfo.getY(), multiBlockChangeInfo.getAbsoluteZ()));
       }
     } else {
       BlockPosition position = packet.getBlockPositionModifier().readSafely(0);
-      boundingBoxAccess.invalidate(position.getX(), position.getY(), position.getZ());
-//      boundingBoxAccess.invalidateOverride(world, position.getX(), position.getY(), position.getZ());
+//      boundingBoxAccess.invalidate(position.getX(), position.getY(), position.getZ());
+      blockPositions = Collections.singletonList(position);
     }
+
+    boolean transactionSynchronize = false;
+
+    Location location = player.getLocation();
+    for (BlockPosition blockPosition : blockPositions) {
+      if(distance(location, blockPosition) < 4) {
+        transactionSynchronize = true;
+        break;
+      }
+    }
+
+    if(transactionSynchronize) {
+      plugin.eventService().transactionFeedbackService().requestPong(player, blockPositions, (player1, target) -> {
+        for (BlockPosition blockPosition : blockPositions) {
+          boundingBoxAccess.invalidate(blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
+        }
+      });
+    } else {
+      for (BlockPosition blockPosition : blockPositions) {
+        boundingBoxAccess.invalidate(blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
+      }
+    }
+  }
+
+  private double distance(Location playerLocation, BlockPosition blockPosition) {
+    return NumberConversions.square(playerLocation.getBlockX() - blockPosition.getX()) + NumberConversions.square(playerLocation.getBlockY() - blockPosition.getY()) + NumberConversions.square(playerLocation.getBlockZ() - blockPosition.getZ());
   }
 
 //  @BukkitEventSubscription(ignoreCancelled = true)

@@ -2,6 +2,7 @@ package de.jpx3.intave.detect.checks.movement;
 
 import com.comphenix.protocol.events.PacketEvent;
 import de.jpx3.intave.IntavePlugin;
+import de.jpx3.intave.detect.CheckViolationLevelDecrementer;
 import de.jpx3.intave.detect.IntaveMetaCheck;
 import de.jpx3.intave.event.packet.ListenerPriority;
 import de.jpx3.intave.event.packet.PacketDescriptor;
@@ -19,10 +20,12 @@ import org.bukkit.util.Vector;
 
 public final class Timer extends IntaveMetaCheck<Timer.TimerData> {
   private final IntavePlugin plugin;
+  private final CheckViolationLevelDecrementer decrementer;
 
   public Timer(IntavePlugin plugin) {
     super("Timer", "timer", TimerData.class);
     this.plugin = plugin;
+    this.decrementer = new CheckViolationLevelDecrementer(this, 0.2);
   }
 
   @PacketSubscription(
@@ -99,6 +102,8 @@ public final class Timer extends IntaveMetaCheck<Timer.TimerData> {
       }
       // leniency
       timerData.timerBalance -= 5.5;
+    } else {
+      decrementer.decrement(user, 0.01);
     }
   }
 

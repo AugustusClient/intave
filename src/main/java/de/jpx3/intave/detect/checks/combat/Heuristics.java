@@ -8,8 +8,8 @@ import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.detect.IntaveMetaCheck;
 import de.jpx3.intave.detect.checks.combat.heuristics.Anomaly;
-import de.jpx3.intave.detect.checks.combat.heuristics.Confidence;
 import de.jpx3.intave.detect.checks.combat.heuristics.AnomalyEnigma;
+import de.jpx3.intave.detect.checks.combat.heuristics.Confidence;
 import de.jpx3.intave.detect.checks.combat.heuristics.MiningStrategy;
 import de.jpx3.intave.detect.checks.combat.heuristics.detection.*;
 import de.jpx3.intave.event.packet.PacketDescriptor;
@@ -148,7 +148,7 @@ public final class Heuristics extends IntaveMetaCheck<Heuristics.HeuristicMeta> 
       } else {
         identifier = resolveIdentifier(anomalies);
       }
-      String details = type.details() + overallConfidence.output() + ", " + identifier;
+      String details = type.details() + ": " + overallConfidence.name().toLowerCase().replace("_", " ") + " / " + identifier;
       plugin.retributionService().processViolation(player, 25, this.name(), "is fighting suspiciously", details, "confidence-thresholds." + overallConfidence.output());
     }
   }
@@ -239,6 +239,7 @@ public final class Heuristics extends IntaveMetaCheck<Heuristics.HeuristicMeta> 
       }
     }
   }
+
 
   public static class HeuristicMeta extends UserCustomCheckMeta {
     public List<Anomaly> anomalies = Lists.newCopyOnWriteArrayList();

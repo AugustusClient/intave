@@ -1,13 +1,13 @@
 package de.jpx3.intave.encrypt;
 
-import com.google.common.collect.Lists;
 import de.jpx3.intave.detect.checks.combat.heuristics.Anomaly;
 import de.jpx3.intave.detect.checks.combat.heuristics.Confidence;
-import joptsimple.internal.Strings;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public final class HeuristicsPatternEncryption {
   @Test
   public void testPatternEncryption() {
-    List<Anomaly> anomalies = Lists.newArrayList(
+    List<Anomaly> anomalies = Arrays.asList(
 //      Anomaly.anomalyOf("11", Confidence.LIKELY, Anomaly.Type.KILLAURA, "description", 0),
 //      Anomaly.anomalyOf("13", Confidence.LIKELY, Anomaly.Type.KILLAURA, "description", 0),
 //      Anomaly.anomalyOf("121", Confidence.LIKELY, Anomaly.Type.KILLAURA, "description", 0),
@@ -101,7 +101,7 @@ public final class HeuristicsPatternEncryption {
   private String decryptPatterns(String patterns) {
     patterns = decryptWithPadding(patterns);
     int size = patterns.length() / 2;
-    List<String> decryptedPatterns = Lists.newArrayList();
+    List<String> decryptedPatterns = new ArrayList<>();
     while (patterns.length() > 0) {
       if (patterns.length() % 2 == 0) {
         String pattern = patterns.substring(0, 2);
@@ -110,7 +110,7 @@ public final class HeuristicsPatternEncryption {
       }
       patterns = patterns.substring(1);
     }
-    return Strings.join(decryptedPatterns, " ");
+    return String.join(" ", decryptedPatterns);
   }
 
   private String decryptWithPadding(String pattern) {
