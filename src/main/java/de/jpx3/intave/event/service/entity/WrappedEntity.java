@@ -3,7 +3,7 @@ package de.jpx3.intave.event.service.entity;
 import com.comphenix.protocol.events.PacketContainer;
 import de.jpx3.intave.access.IntaveInternalException;
 import de.jpx3.intave.adapter.ProtocolLibAdapter;
-import de.jpx3.intave.tools.hitbox.HitBoxBoundaries;
+import de.jpx3.intave.reflect.hitbox.HitBoxBoundaries;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 
 import java.util.List;

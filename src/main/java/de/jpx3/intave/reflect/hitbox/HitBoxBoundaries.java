@@ -1,4 +1,4 @@
-package de.jpx3.intave.tools.hitbox;
+package de.jpx3.intave.reflect.hitbox;
 
 public final class HitBoxBoundaries {
   private final float width;
@@ -9,8 +9,12 @@ public final class HitBoxBoundaries {
     this.length = length;
   }
 
-  public static HitBoxBoundaries from(float width, float length) {
+  public static HitBoxBoundaries of(float width, float length) {
     return new HitBoxBoundaries(width, length);
+  }
+
+  public static HitBoxBoundaries zero() {
+    return new HitBoxBoundaries(0, 0);
   }
 
   public float width() {

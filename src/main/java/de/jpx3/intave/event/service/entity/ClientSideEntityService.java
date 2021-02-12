@@ -12,8 +12,8 @@ import de.jpx3.intave.event.packet.*;
 import de.jpx3.intave.logging.IntaveLogger;
 import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.reflect.ReflectiveHandleAccess;
-import de.jpx3.intave.tools.hitbox.EntityHitBoxResolver;
-import de.jpx3.intave.tools.hitbox.HitBoxBoundaries;
+import de.jpx3.intave.reflect.hitbox.HitBoxBoundaries;
+import de.jpx3.intave.reflect.hitbox.ReflectiveEntityHitBoxAccess;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaSynchronizeData;
@@ -65,9 +65,9 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
     Class<?> dataWatcherClass = ReflectiveAccess.lookupServerClass("DataWatcher");
 
     for (Field declaredField : dataWatcherClass.getDeclaredFields()) {
-      if(declaredField.getType() == entityClass) {
+      if (declaredField.getType() == entityClass) {
         String fieldName = declaredField.getName();
-        if(!dataWatcherEntityFieldName.equals(fieldName)) {
+        if (!dataWatcherEntityFieldName.equals(fieldName)) {
           IntaveLogger.logger().globalPrintLn("[Intave] Conflicting field name internal for entity-from-datawatcher access: Internals suggest " + dataWatcherEntityFieldName + " but found " + fieldName);
         }
         dataWatcherEntityFieldName = fieldName;
@@ -95,13 +95,13 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
 
     for (WrappedEntity entity : synchronizeData.synchronizedEntityMap().values()) {
       boolean firstSurvive = false;
-      if(entity.isEntityLiving) {
+      if (entity.isEntityLiving) {
         WrappedEntity.EntityPositionContext positions = entity.position;
         location.setX(positions.posX);
         location.setY(positions.posY);
         location.setZ(positions.posZ);
         double distance = location.distance(playerLocation);
-        if(distance <= REQUIRED_DISTANCE) {
+        if (distance <= REQUIRED_DISTANCE) {
           validEntities.add(entity);
           entity.distanceToPlayerCache = distance;
           firstSurvive = true;
@@ -137,13 +137,13 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
     boolean livingEntity;
     if (event.getPacketType() == PacketType.Play.Server.SPAWN_ENTITY) {
       // dead entities
-      hitBoxBoundaries = HitBoxBoundaries.from(0, 0);
+      hitBoxBoundaries = HitBoxBoundaries.of(0, 0);
       livingEntity = false;
       entityName = "DeadEntity";
     } else {
       // player
       Object entity = entityOfDataWatcher(packet.getDataWatcherModifier().read(0));
-      hitBoxBoundaries = EntityHitBoxResolver.resolveHitBoxOf(entity);
+      hitBoxBoundaries = ReflectiveEntityHitBoxAccess.boundariesOf(entity);
       entityName = entityNameOf(entity);
       livingEntity = true;
     }
@@ -244,8 +244,8 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
       } else {
         entity.handleEntityMovement(packet);
       }
-      if(!clientTickSync) {
-        if(entity.possiblePositions.size() > 7) {
+      if (!clientTickSync) {
+        if (entity.possiblePositions.size() > 7) {
           entity.possiblePositions.remove(0);
           entity.possibleAlternativePositions.remove(0);
         }
@@ -277,8 +277,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
     String entityName = entityNameByBukkitEntity(bukkitEntity);
     Location location = bukkitEntity.getLocation();
     boolean isEntityLiving = !bukkitEntity.isDead();
-    HitBoxBoundaries boundaries = bukkitEntity.isDead() ? HitBoxBoundaries.from(0, 0) :
-      EntityHitBoxResolver.resolveHitBoxOf(bukkitEntity);
+    HitBoxBoundaries boundaries = bukkitEntity.isDead() ? HitBoxBoundaries.zero() : ReflectiveEntityHitBoxAccess.boundariesOf(bukkitEntity);
     int entityID = bukkitEntity.getEntityId();
     int serverPosX = WrappedMathHelper.floor(location.getX() * 32d);
     int serverPosY = WrappedMathHelper.floor(location.getY() * 32d);
