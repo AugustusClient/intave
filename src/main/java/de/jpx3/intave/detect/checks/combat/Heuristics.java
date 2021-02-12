@@ -189,7 +189,13 @@ public final class Heuristics extends IntaveMetaCheck<Heuristics.HeuristicMeta> 
   }
 
   private Anomaly.Type findDominantType(List<Anomaly> anomalies) {
-    return anomalies.stream().collect(Collectors.groupingBy(Anomaly::type, Collectors.counting())).entrySet().stream().sorted().map(Map.Entry::getKey).findFirst().orElse(null);
+    return anomalies.stream()
+      .collect(Collectors.groupingBy(Anomaly::type, Collectors.counting()))
+      .entrySet()
+      .stream()
+      .max(Comparator.comparingLong(Map.Entry::getValue))
+      .orElseThrow(IllegalMonitorStateException::new)
+      .getKey();
   }
 
   // this implementation is pure garbage, please get some experience with this check and refactor this method
