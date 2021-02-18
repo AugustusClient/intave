@@ -15,6 +15,7 @@ import de.jpx3.intave.detect.checks.movement.physics.collision.entity.EntityColl
 import de.jpx3.intave.detect.checks.movement.physics.pose.PhysicsCalculationPart;
 import de.jpx3.intave.detect.checks.movement.physics.pose.PhysicsMovementPoseType;
 import de.jpx3.intave.detect.checks.movement.physics.water.AquaticWaterMovementBase;
+import de.jpx3.intave.detect.checks.movement.physics.water.WaterMovementLegacyResolver;
 import de.jpx3.intave.detect.checks.movement.physics.water.aquatics.*;
 import de.jpx3.intave.diagnostics.timings.Timings;
 import de.jpx3.intave.tools.MathHelper;
@@ -24,7 +25,6 @@ import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import de.jpx3.intave.user.*;
 import de.jpx3.intave.world.BlockAccessor;
-import de.jpx3.intave.world.BlockLiquidHelper;
 import de.jpx3.intave.world.collision.Collision;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -39,6 +39,7 @@ import java.util.List;
 import static de.jpx3.intave.detect.checks.movement.physics.PhysicsHelper.resolveKeysFromInput;
 import static de.jpx3.intave.tools.MathHelper.formatDouble;
 import static de.jpx3.intave.tools.MathHelper.formatPosition;
+import static de.jpx3.intave.user.UserMetaClientData.PROTOCOL_VERSION_AQUATIC_UPDATE;
 
 public final class Physics extends IntaveCheck {
   private final static double VL_DECREMENT_PER_VALID_MOVE = 0.05;
@@ -46,6 +47,7 @@ public final class Physics extends IntaveCheck {
   private final IntavePlugin plugin;
   private final CheckViolationLevelDecrementer decrementer;
   private final PhysicsSimulationService simulationService;
+  private final AquaticWaterMovementBase aquaticWaterMovementBase;
 
   public Physics(IntavePlugin plugin) {
     super("Physics", "physics");
@@ -55,6 +57,7 @@ public final class Physics extends IntaveCheck {
     EntityCollisionRepository entityCollisionRepository = new EntityCollisionRepository();
     BlockCollisionRepository blockCollisionRepository = new BlockCollisionRepository();
     AquaticWaterMovementBase aquaticWaterMovementBase = resolveAquaticMovement();
+    this.aquaticWaterMovementBase = aquaticWaterMovementBase;
     setupPoseTypes(entityCollisionRepository, blockCollisionRepository, aquaticWaterMovementBase);
   }
 
@@ -138,6 +141,7 @@ public final class Physics extends IntaveCheck {
   private void processMovement(User user) {
     User.UserMeta meta = user.meta();
     UserMetaMovementData movementData = meta.movementData();
+    updateAquatics(user);
     simulateMotionClamp(user);
 
     Timings.CHECK_PHYSICS_PROC_TOT.start();
@@ -179,6 +183,34 @@ public final class Physics extends IntaveCheck {
     evaluateBestSimulation(user, predictedMovement);
     Timings.CHECK_PHYSICS_EVAL.stop();
     movementData.pastRiptideSpin++;
+  }
+
+  private void updateAquatics(User user) {
+    updateInWater(user);
+    updateEyesInWater(user);
+  }
+
+  private void updateEyesInWater(User user) {
+    UserMetaMovementData movementData = user.meta().movementData();
+    movementData.eyesInWater = aquaticWaterMovementBase.areEyesInFluid(user, movementData.positionX, movementData.positionY, movementData.positionZ);
+  }
+
+  private void updateInWater(User user) {
+    User.UserMeta meta = user.meta();
+    UserMetaClientData clientData = meta.clientData();
+    UserMetaMovementData movementData = meta.movementData();
+    if (clientData.protocolVersion() >= PROTOCOL_VERSION_AQUATIC_UPDATE) {
+      movementData.inWater = aquaticWaterMovementBase.handleFluidAcceleration(user, movementData.boundingBox());
+    } else {
+      WrappedAxisAlignedBB entityBoundingBox = movementData.boundingBox();
+      WrappedAxisAlignedBB checkableBoundingBox = entityBoundingBox
+        .expand(0.0D, -0.4000000059604645D, 0.0D)
+        .contract(0.001D, 0.001D, 0.001D);
+      movementData.inWater = WaterMovementLegacyResolver.handleMaterialAcceleration(user, checkableBoundingBox);
+    }
+    if (movementData.inWater) {
+      movementData.pastWaterMovement = 0;
+    }
   }
 
   private void evaluateBestSimulation(User user, EntityCollisionResult expectedMovement) {
@@ -303,8 +335,6 @@ public final class Physics extends IntaveCheck {
           movementData.phaseIntersectingBoundingBoxes = ImmutableList.copyOf(intersectionBoundingBoxesCurrent);
         }
 
-        List<WrappedAxisAlignedBB> phaseIntersectingBoundingBox = movementData.phaseIntersectingBoundingBoxes;
-
         // Prevents players from walking in other blocks
         boolean startBoundingBoxInList = false;
         for (WrappedAxisAlignedBB intersectingBoundingBox : movementData.phaseIntersectingBoundingBoxes) {
@@ -383,11 +413,7 @@ public final class Physics extends IntaveCheck {
     violationLevelData.physicsVL = Math.max(0, violationLevelData.physicsVL);
     violationLevelData.physicsVL = Math.min(100, violationLevelData.physicsVL);
 
-    Material blockBelowPlayer = BlockAccessor.cacheAppliedTypeAccess(
-      user, player.getWorld(),
-      movementData.positionX, movementData.positionY, movementData.positionZ
-    );
-    boolean inWater = BlockLiquidHelper.isWater(blockBelowPlayer) || movementData.inWater;
+    boolean inWater = movementData.inWater;
     if (inWater || movementData.onLadderLast) {
       movementData.artificialFallDistance = 0;
     }
@@ -465,7 +491,6 @@ public final class Physics extends IntaveCheck {
     );
     boolean swimming = movementData.swimming;
     boolean elytraFlying = movementData.elytraFlying;
-    boolean pushedByWaterFlow = movementData.pastPushedByWaterFlow <= 20;
     double receivedMotionY = movementData.motionY();
     double differenceY = Math.abs(receivedMotionY - predictedY);
     boolean accountedSkippedMovement = movementData.recentlyEncounteredFlyingPacket(2);
@@ -476,12 +501,7 @@ public final class Physics extends IntaveCheck {
     }
 
     if ((movementData.pastPushedByWaterFlow < 10 || movementData.inLava()) && distanceMoved < 0.2) {
-      legitimateDeviation = 0.1;
-    }
-
-    // Water flow cannot be calculated correctly
-    if (pushedByWaterFlow) {
-      legitimateDeviation = 0.1;
+      legitimateDeviation = 0.02;
     }
 
     // Riptide
@@ -531,10 +551,6 @@ public final class Physics extends IntaveCheck {
       abuseVertically = 0;
     }
 
-    if (movementData.pastWaterMovement < 5 || movementData.inLava()) {
-      multiplier *= 0.4;
-    }
-
     return abuseVertically * multiplier;
   }
 
@@ -568,12 +584,8 @@ public final class Physics extends IntaveCheck {
       legitimateDeviation = 0.027;
     }
 
-    if (movementData.pastWaterMovement < 10) {
-      legitimateDeviation = 0.01;
-    }
-
     if (pushedByWaterFlow) {
-      legitimateDeviation = 0.028;
+      legitimateDeviation = 0.018;
     }
 
     if (movementData.currentlyInBlock && predictedDistanceMoved < distanceMoved * 1.3) {
@@ -656,14 +668,14 @@ public final class Physics extends IntaveCheck {
   private void simulateMotionClamp(User user) {
     UserMetaMovementData movementData = user.meta().movementData();
     double resetMotion = movementData.resetMotion();
-    if (Math.abs(movementData.physicsLastMotionX) < resetMotion) {
-      movementData.physicsLastMotionX = 0.0;
+    if (Math.abs(movementData.physicsMotionX) < resetMotion) {
+      movementData.physicsMotionX = 0.0;
     }
-    if (Math.abs(movementData.physicsLastMotionY) < resetMotion) {
-      movementData.physicsLastMotionY = 0.0;
+    if (Math.abs(movementData.physicsMotionY) < resetMotion) {
+      movementData.physicsMotionY = 0.0;
     }
-    if (Math.abs(movementData.physicsLastMotionZ) < resetMotion) {
-      movementData.physicsLastMotionZ = 0.0;
+    if (Math.abs(movementData.physicsMotionZ) < resetMotion) {
+      movementData.physicsMotionZ = 0.0;
     }
   }
 

@@ -13,6 +13,7 @@ import de.jpx3.intave.detect.checks.world.InteractionRaytrace;
 import de.jpx3.intave.event.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.event.packet.*;
 import de.jpx3.intave.reflect.ReflectiveAccess;
+import de.jpx3.intave.reflect.ReflectiveEntityAccess;
 import de.jpx3.intave.tools.MathHelper;
 import de.jpx3.intave.tools.client.PlayerMovementPoseHelper;
 import de.jpx3.intave.tools.packet.PlayerAction;
@@ -182,9 +183,9 @@ public final class MovementDispatcher implements EventProcessor {
       Float motionX = floats.read(1);
       Float motionY = floats.read(2);
       Float motionZ = floats.read(3);
-      movementData.physicsLastMotionX += motionX;
-      movementData.physicsLastMotionY += motionY;
-      movementData.physicsLastMotionZ += motionZ;
+      movementData.physicsMotionX += motionX;
+      movementData.physicsMotionY += motionY;
+      movementData.physicsMotionZ += motionZ;
     });
   }
 
@@ -232,9 +233,9 @@ public final class MovementDispatcher implements EventProcessor {
       movementData.verifiedPositionX, movementData.verifiedPositionY, movementData.verifiedPositionZ,
       movementData.positionX, movementData.positionY, movementData.positionZ
     );
-    if (distance > 10) {
+    if (distance > 50) {
       event.setCancelled(true);
-      Vector vector = new Vector(movementData.physicsLastMotionX, movementData.physicsLastMotionY, movementData.physicsLastMotionZ);
+      Vector vector = new Vector(movementData.physicsMotionX, movementData.physicsMotionY, movementData.physicsMotionZ);
       plugin.eventService().emulationEngine().emulationSetBack(player, vector, 10);
       String details = "moved " + MathHelper.formatDouble(distance, 2) + " blocks";
       plugin.violationProcessor().processViolation(player, 25, "Physics", "sent unsafe position", details);
@@ -249,9 +250,9 @@ public final class MovementDispatcher implements EventProcessor {
     if (
       !movementData.isTeleportConfirmationPacket &&
         movementData.canResetMotion &&
-        movementData.physicsLastMotionX == 0 &&
-        movementData.physicsLastMotionY == 0 &&
-        movementData.physicsLastMotionZ == 0 &&
+        movementData.physicsMotionX == 0 &&
+        movementData.physicsMotionY == 0 &&
+        movementData.physicsMotionZ == 0 &&
         movementData.motionX() == 0 &&
         movementData.motionY() == 0 &&
         movementData.motionZ() == 0
@@ -259,7 +260,6 @@ public final class MovementDispatcher implements EventProcessor {
       movementData.canResetMotion = false;
       return;
     }
-
 
     if (!movementData.isTeleportConfirmationPacket) {
       interactionRaytraceCheck.receiveMovement(event);
@@ -269,6 +269,7 @@ public final class MovementDispatcher implements EventProcessor {
 
       if (!vehicleMove) {
         movementData.applyGroundInformationToPacket(packet);
+        ReflectiveEntityAccess.setOnGround(player, movementData.onGround);
       }
 
       if (movementData.onGround && !clientOnGround && movementData.step) {
@@ -532,12 +533,12 @@ public final class MovementDispatcher implements EventProcessor {
     UserMetaViolationLevelData violationLevelData = meta.violationLevelData();
     UserMetaMovementData movementData = meta.movementData();
     if (!violationLevelData.isInActiveTeleportBundle) {
-      movementData.physicsMotionXBeforeVelocity = movementData.physicsLastMotionX;
-      movementData.physicsMotionYBeforeVelocity = movementData.physicsLastMotionY;
-      movementData.physicsMotionZBeforeVelocity = movementData.physicsLastMotionZ;
-      movementData.physicsLastMotionX = velocity.getX();
-      movementData.physicsLastMotionY = velocity.getY();
-      movementData.physicsLastMotionZ = velocity.getZ();
+      movementData.physicsMotionXBeforeVelocity = movementData.physicsMotionX;
+      movementData.physicsMotionYBeforeVelocity = movementData.physicsMotionY;
+      movementData.physicsMotionZBeforeVelocity = movementData.physicsMotionZ;
+      movementData.physicsMotionX = velocity.getX();
+      movementData.physicsMotionY = velocity.getY();
+      movementData.physicsMotionZ = velocity.getZ();
       movementData.lastVelocity = velocity.clone();
 
       if (!movementData.willReceiveSetbackVelocity) {

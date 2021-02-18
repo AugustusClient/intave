@@ -13,7 +13,6 @@ import de.jpx3.intave.tools.client.PlayerMovementPoseHelper;
 import de.jpx3.intave.tools.client.PlayerRotationHelper;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.trustfactor.TrustFactorService;
-import de.jpx3.intave.world.BlockLiquidHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -66,7 +65,7 @@ public final class UserMetaMovementData {
 
   public int physicsPacketRelinkFlyVL; // In Air
   public boolean invalidMovement, suspiciousMovement;
-  public double physicsLastMotionX, physicsLastMotionY, physicsLastMotionZ;
+  public double physicsMotionX, physicsMotionY, physicsMotionZ;
   public double physicsMotionXBeforeVelocity, physicsMotionYBeforeVelocity, physicsMotionZBeforeVelocity;
   public int pastRiptideSpin;
   public int pastPlayerAttackPhysics = 100;
@@ -193,18 +192,13 @@ public final class UserMetaMovementData {
   }
 
   public float eyeHeight() {
-    float f = 1.62F;
-    if (player.isSleeping()) {
-      f = 0.2F;
-    } else if (!swimming && !elytraFlying && height != 0.6F) {
-      if (sneaking || height == 1.65F) {
-        f -= 0.08F;
-      }
+    if (swimming || elytraFlying /*|| spinAttack */) {
+      return 0.4f;
+    } else if (sneaking) {
+      return 1.27f;
     } else {
-      f = 0.4F;
+      return 1.62f;
     }
-
-    return f;
   }
 
   public void applyGroundInformationToPacket(PacketContainer packet) {
@@ -214,13 +208,6 @@ public final class UserMetaMovementData {
   private void updateMovementMetaData() {
     UserMetaAbilityData abilityData = user.meta().abilityData();
     UserMetaPotionData potionData = user.meta().potionData();
-    UserMetaClientData clientData = user.meta().clientData();
-
-    // Sprinting conditions
-    sprinting = sprinting && !collidedHorizontally;
-
-    // Sneaking conditions
-    sneaking = sneaking && (clientData.sprintWhenSneaking() || !sprinting);
 
     aiMoveSpeed = abilityData.walkSpeed();
     jumpMovementFactor = 0.02f;
@@ -245,7 +232,7 @@ public final class UserMetaMovementData {
       -0.4000000059604645D,
       -0.1f
     );
-    return BlockLiquidHelper.isLavaInBB(player.getWorld(), lavaBoundingBox);
+    return PlayerMovementHelper.isLavaInBB(player.getWorld(), lavaBoundingBox);
   }
 
   public boolean recentlyEncounteredFlyingPacket(int ticks) {
@@ -333,7 +320,7 @@ public final class UserMetaMovementData {
   }
 
   public void setVerifiedLocation(Location verifiedLocation, @SuppressWarnings("unused") String reason) {
-   /* boolean boundingBoxIntersection = CollisionHelper.checkBoundingBoxIntersection(user, CollisionHelper.boundingBoxOf(user, verifiedLocation));
+/*    boolean boundingBoxIntersection = CollisionHelper.checkBoundingBoxIntersection(user, CollisionHelper.boundingBoxOf(user, verifiedLocation));
     if (boundingBoxIntersection) {
       Bukkit.broadcastMessage(ChatColor.DARK_RED + "Position was set into a block: " + reason);
     }*/

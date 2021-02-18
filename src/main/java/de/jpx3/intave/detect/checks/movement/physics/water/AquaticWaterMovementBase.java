@@ -1,18 +1,23 @@
 package de.jpx3.intave.detect.checks.movement.physics.water;
 
+import de.jpx3.intave.tools.client.ClientBlockHelper;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import de.jpx3.intave.tools.wrapper.WrappedVector;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaMovementData;
+import de.jpx3.intave.world.BlockAccessor;
+import org.bukkit.Material;
+import org.bukkit.World;
 
 public abstract class AquaticWaterMovementBase {
   public void setup() throws Exception {}
   public abstract boolean fluidStateEmpty(User user, double x, double y, double z);
 
   public boolean handleFluidAcceleration(User user, WrappedAxisAlignedBB boundingBox) {
+    World world = user.player().getWorld();
     UserMetaMovementData movementData = user.meta().movementData();
-    Object world = movementData.nmsWorld();
+    Object serverWorld = movementData.nmsWorld();
     WrappedAxisAlignedBB wrappedAxisAlignedBB = boundingBox.shrink(0.001D);
     int minX = WrappedMathHelper.floor(wrappedAxisAlignedBB.minX);
     int minY = WrappedMathHelper.floor(wrappedAxisAlignedBB.minY);
@@ -30,20 +35,22 @@ public abstract class AquaticWaterMovementBase {
         for (int z = minZ; z < maxZ; ++z) {
           Object blockPosition = blockPositionOf(x, y, z);
           Object fluidState = fluidState(user, blockPosition);
-          if (!fluidTaggedWithWater(fluidState)) {
-            continue;
-          }
-          float fluidHeight = fluidHeight(fluidState);
-          double d1 = (float) y + fluidHeight;
-          if (d1 >= wrappedAxisAlignedBB.minY) {
-            inWater = true;
-            d0 = Math.max(d1 - wrappedAxisAlignedBB.minY, d0);
-            WrappedVector flowVector = resolveFlowVector(fluidState, world, blockPosition);
-            if (d0 < 0.4) {
-              flowVector = flowVector.scale(d0);
+          Material blockClientSide = BlockAccessor.cacheAppliedTypeAccess(user, world, x, y, z);
+          if (fluidTaggedWithWater(fluidState)) {
+            float fluidHeight = fluidHeight(fluidState);
+            double d1 = (float) y + fluidHeight;
+            if (d1 >= wrappedAxisAlignedBB.minY) {
+              inWater = true;
+              d0 = Math.max(d1 - wrappedAxisAlignedBB.minY, d0);
+              WrappedVector flowVector = resolveFlowVector(fluidState, serverWorld, blockPosition);
+              if (d0 < 0.4) {
+                flowVector = flowVector.scale(d0);
+              }
+              waterFlowTotal = waterFlowTotal.add(flowVector);
+              ++countedWaterCollisions;
             }
-            waterFlowTotal = waterFlowTotal.add(flowVector);
-            ++countedWaterCollisions;
+          } else if (ClientBlockHelper.isWater(blockClientSide)) {
+            inWater = true;
           }
         }
       }
@@ -55,9 +62,9 @@ public abstract class AquaticWaterMovementBase {
       }
       waterFlowTotal = waterFlowTotal.normalize();
       double d2 = 0.014D;
-      movementData.physicsLastMotionX += waterFlowTotal.xCoord * d2;
-      movementData.physicsLastMotionY += waterFlowTotal.yCoord * d2;
-      movementData.physicsLastMotionZ += waterFlowTotal.zCoord * d2;
+      movementData.physicsMotionX += waterFlowTotal.xCoord * d2;
+      movementData.physicsMotionY += waterFlowTotal.yCoord * d2;
+      movementData.physicsMotionZ += waterFlowTotal.zCoord * d2;
       movementData.pastPushedByWaterFlow = 0;
     }
 

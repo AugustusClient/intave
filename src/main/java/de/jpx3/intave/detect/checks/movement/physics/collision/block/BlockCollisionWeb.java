@@ -5,6 +5,7 @@ import de.jpx3.intave.detect.checks.movement.physics.collision.PhysicsBlockColli
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaClientData;
 import de.jpx3.intave.user.UserMetaMovementData;
+import de.jpx3.intave.world.block.BlockTypeAccess;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.util.Vector;
@@ -19,9 +20,7 @@ final class BlockCollisionWeb implements PhysicsBlockCollision {
 
   @Override
   public void setup(MinecraftVersion serverVersion) {
-    Material legacyWeb = Material.getMaterial("WEB");
-    Material web = legacyWeb != null ? legacyWeb : Material.getMaterial("COBWEB");
-    material = Collections.singletonList(web);
+    material = Collections.singletonList(BlockTypeAccess.WEB);
   }
 
   @Override

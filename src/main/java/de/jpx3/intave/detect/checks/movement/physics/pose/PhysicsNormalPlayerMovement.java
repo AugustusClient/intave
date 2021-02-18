@@ -3,7 +3,6 @@ package de.jpx3.intave.detect.checks.movement.physics.pose;
 import de.jpx3.intave.detect.checks.movement.Physics;
 import de.jpx3.intave.detect.checks.movement.physics.CollisionHelper;
 import de.jpx3.intave.detect.checks.movement.physics.collision.entity.EntityCollisionResult;
-import de.jpx3.intave.detect.checks.movement.physics.water.WaterMovementLegacyResolver;
 import de.jpx3.intave.tools.client.PlayerEffectHelper;
 import de.jpx3.intave.tools.client.PlayerMovementHelper;
 import de.jpx3.intave.tools.client.PlayerMovementPoseHelper;
@@ -22,7 +21,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import static de.jpx3.intave.user.UserMetaClientData.PROTOCOL_VERSION_AQUATIC_UPDATE;
 import static de.jpx3.intave.user.UserMetaClientData.PROTOCOL_VERSION_VILLAGE_UPDATE;
 
 public class PhysicsNormalPlayerMovement extends PhysicsCalculationPart {
@@ -333,13 +331,10 @@ public class PhysicsNormalPlayerMovement extends PhysicsCalculationPart {
     }
 
     if (!violationLevelData.isInActiveTeleportBundle) {
-      movementData.physicsLastMotionX = context.motionX;
-      movementData.physicsLastMotionY = context.motionY;
-      movementData.physicsLastMotionZ = context.motionZ;
+      movementData.physicsMotionX = context.motionX;
+      movementData.physicsMotionY = context.motionY;
+      movementData.physicsMotionZ = context.motionZ;
     }
-
-    updateAquatics(user);
-
     movementData.increaseFlyingPacket();
     movementData.pastPlayerAttackPhysics++;
     movementData.pastPushedByWaterFlow++;
@@ -381,7 +376,7 @@ public class PhysicsNormalPlayerMovement extends PhysicsCalculationPart {
     if (movementData.collidedVertically) {
       Vector collisionVector = blockCollisionRepository().blockLanded(
         user, block,
-        context.motionX, movementData.physicsLastMotionY, context.motionZ
+        context.motionX, movementData.physicsMotionY, context.motionZ
       );
       if (collisionVector != null) {
         context.motionX = collisionVector.getX();
@@ -535,33 +530,5 @@ public class PhysicsNormalPlayerMovement extends PhysicsCalculationPart {
     context.motionX *= multiplier;
     context.motionY *= 0.98f;
     context.motionZ *= multiplier;
-  }
-
-  private void updateAquatics(User user) {
-    updateInWater(user);
-    updateEyesInWater(user);
-  }
-
-  private void updateEyesInWater(User user) {
-    UserMetaMovementData movementData = user.meta().movementData();
-    movementData.eyesInWater = aquaticWaterMovementBase().areEyesInFluid(user, movementData.positionX, movementData.positionY, movementData.positionZ);
-  }
-
-  private void updateInWater(User user) {
-    User.UserMeta meta = user.meta();
-    UserMetaClientData clientData = meta.clientData();
-    UserMetaMovementData movementData = meta.movementData();
-    if (clientData.protocolVersion() >= PROTOCOL_VERSION_AQUATIC_UPDATE) {
-      movementData.inWater = aquaticWaterMovementBase().handleFluidAcceleration(user, movementData.boundingBox());
-    } else {
-      WrappedAxisAlignedBB entityBoundingBox = movementData.boundingBox();
-      WrappedAxisAlignedBB checkableBoundingBox = entityBoundingBox
-        .expand(0.0D, -0.4000000059604645D, 0.0D)
-        .contract(0.001D, 0.001D, 0.001D);
-      movementData.inWater = WaterMovementLegacyResolver.handleMaterialAcceleration(user, checkableBoundingBox);
-    }
-    if (movementData.inWater) {
-      movementData.pastWaterMovement = 0;
-    }
   }
 }

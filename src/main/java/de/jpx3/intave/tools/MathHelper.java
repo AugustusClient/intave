@@ -13,9 +13,13 @@ public final class MathHelper {
       return "NaN";
     }
     if (Double.isInfinite(value)) {
-      return "Infinity";
+      return "Infinite";
     }
     return new BigDecimal(value).setScale(digits, RoundingMode.HALF_UP).toPlainString();
+  }
+
+  public static double map(double currentValue, double min, double max, double min2, double max2) {
+    return (currentValue - min) / (max - min) * (max2 - min2) + min2;
   }
 
   public static double minmax(double a, double b, double c) {
@@ -28,6 +32,10 @@ public final class MathHelper {
 
   public static long minmax(long a, long b, long c) {
     return Math.max(a, Math.min(b, c));
+  }
+
+  public static double diff(double a, double b) {
+    return Math.abs( a- b);
   }
 
   public static double maximumIn(List<? extends Number> numbers) {

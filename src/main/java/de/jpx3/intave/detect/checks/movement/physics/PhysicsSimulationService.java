@@ -98,7 +98,7 @@ public final class PhysicsSimulationService {
     UserMetaMovementData movementData = meta.movementData();
     PhysicsMovementPoseType movementPoseType = movementData.movementPoseType();
     Physics.PhysicsProcessorContext context = Physics.PhysicsProcessorContext.from(movementData.physicsProcessorContext);
-    context.reset(movementData.physicsLastMotionX, movementData.physicsLastMotionY,movementData.physicsLastMotionZ);
+    context.reset(movementData.physicsMotionX, movementData.physicsMotionY, movementData.physicsMotionZ);
     boolean sprinting = movementData.sprinting;
     boolean sneaking = movementData.sneaking;
     float yawSine = SinusCache.sin(movementData.rotationYaw * (float) Math.PI / 180.0F, false);
@@ -141,7 +141,7 @@ public final class PhysicsSimulationService {
     float moveForward = keyForward * 0.98f;
     float moveStrafe = keyStrafe * 0.98f;
     movementData.physicsJumped = jumped;
-    context.reset(movementData.physicsLastMotionX, movementData.physicsLastMotionY, movementData.physicsLastMotionZ);
+    context.reset(movementData.physicsMotionX, movementData.physicsMotionY, movementData.physicsMotionZ);
     return calculationPart.performSimulation(user, context, yawSine, yawCosine, friction, moveForward, moveStrafe, sneaking, attackReduce, jumped, sprinting, handActive);
   }
 
@@ -160,9 +160,9 @@ public final class PhysicsSimulationService {
     double receivedMotionY = movementData.motionY();
     double receivedMotionZ = movementData.motionZ();
 
-    double lastMotionX = movementData.physicsLastMotionX;
-    double lastMotionY = movementData.physicsLastMotionY;
-    double lastMotionZ = movementData.physicsLastMotionZ;
+    double lastMotionX = movementData.physicsMotionX;
+    double lastMotionY = movementData.physicsMotionY;
+    double lastMotionZ = movementData.physicsMotionZ;
     boolean inventoryOpen = inventoryData.inventoryOpen();
     boolean inLava = movementData.inLava();
     boolean inWater = movementData.inWater;

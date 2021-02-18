@@ -4,7 +4,6 @@ import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import de.jpx3.intave.user.*;
 import de.jpx3.intave.world.BlockAccessor;
-import de.jpx3.intave.world.BlockLiquidHelper;
 import de.jpx3.intave.world.collision.Collision;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -94,7 +93,7 @@ public final class PlayerMovementHelper {
       for (int y = minY; y <= maxY; ++y) {
         for (int z = minZ; z <= maxZ; ++z) {
           Material material = BlockAccessor.blockAccess(world, x, y, z).getType();
-          if (BlockLiquidHelper.isLiquid(material)) {
+          if (ClientBlockHelper.isLiquid(material)) {
             return true;
           }
         }
@@ -114,13 +113,32 @@ public final class PlayerMovementHelper {
       for (int y = minY; y <= maxY; ++y) {
         for (int z = minZ; z <= maxZ; ++z) {
           Material material = BlockAccessor.blockAccess(world, x, y, z).getType();
-          if (!BlockLiquidHelper.isLiquid(material)) {
+          if (!ClientBlockHelper.isLiquid(material)) {
             return false;
           }
         }
       }
     }
     return true;
+  }
+
+  public static boolean isLavaInBB(World world, WrappedAxisAlignedBB boundingBox) {
+    int minX = WrappedMathHelper.floor(boundingBox.minX);
+    int minY = WrappedMathHelper.floor(boundingBox.minY);
+    int minZ = WrappedMathHelper.floor(boundingBox.minZ);
+    int maxX = WrappedMathHelper.floor(boundingBox.maxX + 1.0D);
+    int maxY = WrappedMathHelper.floor(boundingBox.maxY + 1.0D);
+    int maxZ = WrappedMathHelper.floor(boundingBox.maxZ + 1.0D);
+    for (int x = minX; x < maxX; ++x) {
+      for (int y = minY; y < maxY; ++y) {
+        for (int z = minZ; z < maxZ; ++z) {
+          if (ClientBlockHelper.isLava(BlockAccessor.blockAccess(world, x, y, z).getType())) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 
   public static boolean isOnLadder(User user, double positionX, double positionY, double positionZ) {

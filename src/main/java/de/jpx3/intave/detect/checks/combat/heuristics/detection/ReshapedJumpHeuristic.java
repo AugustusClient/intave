@@ -9,11 +9,9 @@ import de.jpx3.intave.event.packet.ListenerPriority;
 import de.jpx3.intave.event.packet.PacketDescriptor;
 import de.jpx3.intave.event.packet.PacketSubscription;
 import de.jpx3.intave.event.packet.Sender;
-import de.jpx3.intave.tools.AccessHelper;
 import de.jpx3.intave.tools.client.SinusCache;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserCustomCheckMeta;
-import de.jpx3.intave.user.UserMetaAttackData;
 import de.jpx3.intave.user.UserMetaMovementData;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -43,7 +41,7 @@ public final class ReshapedJumpHeuristic extends IntaveMetaCheckPart<Heuristics,
       float yawSine = SinusCache.sin(rotationYaw * (float) Math.PI / 180.0F, false);
       float yawCosine = SinusCache.cos(rotationYaw * (float) Math.PI / 180.0F, false);
 
-      Vector motion = new Vector(movementData.physicsLastMotionX, 0.0, movementData.physicsLastMotionZ);
+      Vector motion = new Vector(movementData.physicsMotionX, 0.0, movementData.physicsMotionZ);
       float friction = 0.13f;
       float moveForward = movementData.keyForward * 0.98f;
       float moveStrafe = movementData.keyStrafe * 0.98f;
