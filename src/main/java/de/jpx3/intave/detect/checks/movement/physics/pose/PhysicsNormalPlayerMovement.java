@@ -340,7 +340,6 @@ public class PhysicsNormalPlayerMovement extends PhysicsCalculationPart {
       movementData.physicsMotionY = context.motionY;
       movementData.physicsMotionZ = context.motionZ;
     }
-    movementData.increaseFlyingPacket();
     movementData.pastPlayerAttackPhysics++;
     movementData.pastPushedByWaterFlow++;
 
