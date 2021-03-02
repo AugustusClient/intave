@@ -329,7 +329,6 @@ public final class MovementDispatcher implements EventProcessor {
       movementData.lastTeleport++;
     }
 
-    movementData.increaseFlyingPacket();
     movementData.invalidMovement = false;
     movementData.suspiciousMovement = false;
     movementData.isTeleportConfirmationPacket = false;
