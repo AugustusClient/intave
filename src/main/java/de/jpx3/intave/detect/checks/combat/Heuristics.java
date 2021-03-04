@@ -64,6 +64,7 @@ public final class Heuristics extends IntaveMetaCheck<Heuristics.HeuristicMeta> 
     appendCheckPart(new RotationLHeuristics(this));
     appendCheckPart(new AttackReduceIgnoreHeuristic(this));
     appendCheckPart(new PacketInventoryHeuristic(this));
+    appendCheckPart(new BlockingHeuristic(this));
 //    appendCheckPart(new LinearRegressionHeuristic(this));
   }
 

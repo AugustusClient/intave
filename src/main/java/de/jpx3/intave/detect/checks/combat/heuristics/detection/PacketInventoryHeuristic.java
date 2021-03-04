@@ -3,6 +3,7 @@ package de.jpx3.intave.detect.checks.combat.heuristics.detection;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
+import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.detect.IntaveMetaCheckPart;
 import de.jpx3.intave.detect.checks.combat.Heuristics;
 import de.jpx3.intave.detect.checks.combat.heuristics.Anomaly;
@@ -11,14 +12,16 @@ import de.jpx3.intave.event.packet.ListenerPriority;
 import de.jpx3.intave.event.packet.PacketDescriptor;
 import de.jpx3.intave.event.packet.PacketSubscription;
 import de.jpx3.intave.event.packet.Sender;
-import de.jpx3.intave.event.punishment.AttackCancelService;
 import de.jpx3.intave.event.punishment.AttackCancelType;
 import de.jpx3.intave.user.*;
 import org.bukkit.entity.Player;
 
 public final class PacketInventoryHeuristic extends IntaveMetaCheckPart<Heuristics, PacketInventoryHeuristic.PacketInventoryMeta> {
+  private final IntavePlugin plugin;
+
   public PacketInventoryHeuristic(Heuristics parentCheck) {
     super(parentCheck, PacketInventoryHeuristic.PacketInventoryMeta.class);
+    this.plugin = IntavePlugin.singletonInstance();
   }
 
   @PacketSubscription(
@@ -55,7 +58,7 @@ public final class PacketInventoryHeuristic extends IntaveMetaCheckPart<Heuristi
       String details = "closed inventory too quickly (" + meta.inventoryTicks + ")";
       Anomaly anomaly = Anomaly.anomalyOf("131", Confidence.CERTAIN, Anomaly.Type.KILLAURA, details, options);
       parentCheck().saveAnomaly(player, anomaly);
-      AttackCancelService.requestDamageCancel(user, AttackCancelType.DCRM);
+      plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.DCRM);
     }
   }
 
@@ -96,7 +99,7 @@ public final class PacketInventoryHeuristic extends IntaveMetaCheckPart<Heuristi
         String details = "sent rotations in inventory (" + meta.rotationsInInventory + " rotations)";
         Anomaly anomaly = Anomaly.anomalyOf("132", Confidence.NONE, Anomaly.Type.KILLAURA, details, options);
         parentCheck().saveAnomaly(player, anomaly);
-        AttackCancelService.requestDamageCancel(user, AttackCancelType.DCRL);
+        plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.DCRL);
       }
     }
 

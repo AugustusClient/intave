@@ -30,6 +30,7 @@ public final class EventService implements BukkitEventSubscriber {
   private final IntavePlugin plugin;
   private TransactionFeedbackService transactionFeedbackService;
   private MovementEmulationEngine emulationEngine;
+  private AttackCancelService attackCancelService;
 
   public EventService(IntavePlugin plugin) {
     this.plugin = plugin;
@@ -38,6 +39,7 @@ public final class EventService implements BukkitEventSubscriber {
   public void setup() {
     this.transactionFeedbackService = new TransactionFeedbackService(plugin);
     this.emulationEngine = new MovementEmulationEngine(plugin);
+    this.attackCancelService = new AttackCancelService(plugin);
     new UserRepositoryEventListener(plugin);
     new AttackDispatcher(plugin);
     new BlockActionDispatcher(plugin);
@@ -47,7 +49,6 @@ public final class EventService implements BukkitEventSubscriber {
     new PlayerInventoryEvaluator(plugin);
     new ClientSideEntityService(plugin);
     new ConnectionHealthResolver(plugin);
-    new AttackCancelService(plugin);
 
     plugin.eventLinker().registerEventsIn(this);
   }
@@ -104,5 +105,9 @@ public final class EventService implements BukkitEventSubscriber {
 
   public TransactionFeedbackService transactionFeedbackService() {
     return transactionFeedbackService;
+  }
+
+  public AttackCancelService attackCancelService() {
+    return attackCancelService;
   }
 }
