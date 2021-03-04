@@ -56,6 +56,10 @@ public abstract class IntaveCheck implements EventProcessor {
     return configurationKey;
   }
 
+  public CheckConfiguration configuration() {
+    return checkConfiguration;
+  }
+
   public List<IntaveCheckPart<?>> checkParts() {
     return checkParts;
   }

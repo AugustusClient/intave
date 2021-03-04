@@ -25,7 +25,6 @@ import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.security.ContextSecrets;
 import de.jpx3.intave.security.HWIDVerification;
 import de.jpx3.intave.security.HashAccess;
-import de.jpx3.intave.security.SSLConnectionVerifier;
 import de.jpx3.intave.tools.*;
 import de.jpx3.intave.tools.annotate.Native;
 import de.jpx3.intave.tools.client.SinusCache;
@@ -45,7 +44,6 @@ import de.jpx3.intave.world.raytrace.Raytracer;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -198,7 +196,7 @@ public final class IntavePlugin extends JavaPlugin {
           connection.addRequestProperty("C", HWIDVerification.publicHardwareIdentifier());
           connection.addRequestProperty("D", configurationKey);
           connection.connect();
-          SSLConnectionVerifier.verifyURLConnection((HttpsURLConnection) connection);
+//          SSLConnectionVerifier.verifyURLConnection((HttpsURLConnection) connection);
           connection.setConnectTimeout(4000);
           connection.setReadTimeout(4000);
           Scanner scanner2 = new Scanner(connection.getInputStream(), "UTF-8");

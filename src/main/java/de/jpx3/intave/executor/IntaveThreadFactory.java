@@ -30,7 +30,8 @@ public final class IntaveThreadFactory implements ThreadFactory {
   }
 
   private String newThreadName() {
-    return String.format("Intave (%02X-%02X)", currentPoolNumber, Math.min(threadNumber.getAndIncrement(), 99));
+    return "Intave";
+//    return String.format("Intave (%02X-%02X)", currentPoolNumber, Math.min(threadNumber.getAndIncrement(), 99));
   }
 
   private Runnable wrapTask(Runnable runnable) {
