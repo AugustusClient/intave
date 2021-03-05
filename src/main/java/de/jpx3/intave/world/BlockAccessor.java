@@ -2,6 +2,7 @@ package de.jpx3.intave.world;
 
 import de.jpx3.intave.event.bukkit.BukkitEventSubscriber;
 import de.jpx3.intave.event.bukkit.BukkitEventSubscription;
+import de.jpx3.intave.tools.annotate.Relocate;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import de.jpx3.intave.user.User;
 import org.bukkit.Bukkit;
@@ -14,6 +15,7 @@ import org.bukkit.event.world.WorldLoadEvent;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+@Relocate
 public final class BlockAccessor implements BukkitEventSubscriber {
   private static final Map<World, Block> invalidRequestBlockMap = new WeakHashMap<>();
 

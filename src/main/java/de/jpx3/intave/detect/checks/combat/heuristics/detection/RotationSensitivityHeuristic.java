@@ -1,6 +1,7 @@
 package de.jpx3.intave.detect.checks.combat.heuristics.detection;
 
 import com.comphenix.protocol.events.PacketEvent;
+import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.detect.IntaveMetaCheckPart;
 import de.jpx3.intave.detect.checks.combat.Heuristics;
 import de.jpx3.intave.detect.checks.combat.heuristics.Anomaly;
@@ -8,7 +9,6 @@ import de.jpx3.intave.detect.checks.combat.heuristics.Confidence;
 import de.jpx3.intave.event.packet.PacketDescriptor;
 import de.jpx3.intave.event.packet.PacketSubscription;
 import de.jpx3.intave.event.packet.Sender;
-import de.jpx3.intave.event.punishment.AttackCancelService;
 import de.jpx3.intave.event.punishment.AttackCancelType;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserCustomCheckMeta;
@@ -19,9 +19,11 @@ import org.bukkit.entity.Player;
 import static de.jpx3.intave.detect.checks.combat.heuristics.Anomaly.AnomalyOption.*;
 
 public final class RotationSensitivityHeuristic extends IntaveMetaCheckPart<Heuristics, RotationSensitivityHeuristic.RotationGCDMeta> {
+  private final IntavePlugin plugin;
 
   public RotationSensitivityHeuristic(Heuristics parentCheck) {
     super(parentCheck, RotationGCDMeta.class);
+    this.plugin = IntavePlugin.singletonInstance();
   }
 
   @PacketSubscription(
@@ -69,7 +71,7 @@ public final class RotationSensitivityHeuristic extends IntaveMetaCheckPart<Heur
               LIMIT_1 | LIMIT_2 | DELAY_16s | SUGGEST_MINING
             )
           );
-          AttackCancelService.requestDamageCancel(user, AttackCancelType.DCRM);
+          plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.DCRM);
         }
       } else if (heuristicMeta.decimalVL > 0) {
         heuristicMeta.decimalVL--;
@@ -124,7 +126,7 @@ public final class RotationSensitivityHeuristic extends IntaveMetaCheckPart<Heur
             SUGGEST_MINING
           )
         );
-        AttackCancelService.requestDamageCancel(user, AttackCancelType.DCRM);
+        plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.DCRM);
       }
     } else if (heuristicMeta.sensitivityVL > 0) {
       heuristicMeta.sensitivityVL--;

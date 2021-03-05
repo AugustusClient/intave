@@ -5,6 +5,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.google.common.collect.Lists;
+import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.detect.IntaveMetaCheckPart;
 import de.jpx3.intave.detect.checks.combat.Heuristics;
 import de.jpx3.intave.detect.checks.combat.heuristics.Anomaly;
@@ -13,7 +14,6 @@ import de.jpx3.intave.event.packet.ListenerPriority;
 import de.jpx3.intave.event.packet.PacketDescriptor;
 import de.jpx3.intave.event.packet.PacketSubscription;
 import de.jpx3.intave.event.packet.Sender;
-import de.jpx3.intave.event.punishment.AttackCancelService;
 import de.jpx3.intave.event.punishment.AttackCancelType;
 import de.jpx3.intave.event.service.entity.WrappedEntity;
 import de.jpx3.intave.tools.MathHelper;
@@ -27,8 +27,11 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 public final class PerfectAttackHeuristic extends IntaveMetaCheckPart<Heuristics, PerfectAttackHeuristic.PerfectAttackMeta> {
+  private final IntavePlugin plugin;
+
   public PerfectAttackHeuristic(Heuristics parentCheck) {
     super(parentCheck, PerfectAttackMeta.class);
+    this.plugin = IntavePlugin.singletonInstance();
   }
 
   @PacketSubscription(
@@ -102,7 +105,7 @@ public final class PerfectAttackHeuristic extends IntaveMetaCheckPart<Heuristics
         int options = Anomaly.AnomalyOption.LIMIT_4 | Anomaly.AnomalyOption.SUGGEST_MINING | Anomaly.AnomalyOption.DELAY_16s;
         Anomaly anomaly = Anomaly.anomalyOf("51", Confidence.PROBABLE, Anomaly.Type.KILLAURA, description, options);
         parentCheck().saveAnomaly(player, anomaly);
-        AttackCancelService.requestDamageCancel(user, AttackCancelType.DCRM);
+        plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.DCRM);
 //      } else {
 //        player.sendMessage("failRate:" + MathHelper.formatDouble(failRate, 2) + ", " + descriptor);
       }

@@ -1,8 +1,10 @@
 package de.jpx3.intave.event.punishment;
 
+import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.event.bukkit.BukkitEventSubscriber;
 import de.jpx3.intave.event.bukkit.BukkitEventSubscription;
+import de.jpx3.intave.tools.sync.Synchronizer;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaPunishmentData;
 import de.jpx3.intave.user.UserRepository;
@@ -13,7 +15,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
 public final class AttackCancelService implements BukkitEventSubscriber {
+  private final IntavePlugin plugin;
+
   public AttackCancelService(IntavePlugin plugin) {
+    this.plugin = plugin;
     plugin.eventLinker().registerEventsIn(this);
   }
 
@@ -33,19 +38,21 @@ public final class AttackCancelService implements BukkitEventSubscriber {
     }
   }
 
-  public static void requestDamageCancel(
+  public void requestDamageCancel(
     User user,
     AttackCancelType type
   ) {
-    UserMetaPunishmentData punishmentData = user.meta().punishmentData();
-    UserMetaPunishmentData.DamageCancel damageCancel = punishmentData.damageCancelOfType(type);
-    if (!damageCancel.active()) {
-      sendSibylNotify(user, damageCancel);
-    }
-    damageCancel.activate();
+    Synchronizer.synchronize(() -> {
+      UserMetaPunishmentData punishmentData = user.meta().punishmentData();
+      UserMetaPunishmentData.DamageCancel damageCancel = punishmentData.damageCancelOfType(type);
+      if (!damageCancel.active()) {
+        sendSibylNotify(user, damageCancel);
+      }
+      damageCancel.activate();
+    });
   }
 
-  private static void sendSibylNotify(
+  private void sendSibylNotify(
     User user,
     UserMetaPunishmentData.DamageCancel damageCancel
   ) {
@@ -53,8 +60,12 @@ public final class AttackCancelService implements BukkitEventSubscriber {
       return;
     }
 
-    IntavePlugin plugin = IntavePlugin.singletonInstance();
-    String message = ChatColor.RED + "[DC] Performed " + damageCancel.name() + " damage cancel on " + user.player().getName();
+    Player player = user.player();
+    String message = ChatColor.RED + "[DC] Performed " + damageCancel.name() + " damage cancel on " + player.getName();
+
+    if (IntaveControl.DEBUG_HEURISTICS && ! plugin.sibylIntegrationService().isAuthenticated(player)) {
+      player.sendMessage(message);
+    }
 
     for (Player authenticatedPlayer : Bukkit.getOnlinePlayers()) {
       if (plugin.sibylIntegrationService().isAuthenticated(authenticatedPlayer)) {

@@ -2,6 +2,7 @@ package de.jpx3.intave.detect.checks.combat.heuristics.detection;
 
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.detect.IntaveMetaCheckPart;
 import de.jpx3.intave.detect.checks.combat.Heuristics;
 import de.jpx3.intave.detect.checks.combat.heuristics.Anomaly;
@@ -9,7 +10,6 @@ import de.jpx3.intave.detect.checks.combat.heuristics.Confidence;
 import de.jpx3.intave.event.packet.PacketDescriptor;
 import de.jpx3.intave.event.packet.PacketSubscription;
 import de.jpx3.intave.event.packet.Sender;
-import de.jpx3.intave.event.punishment.AttackCancelService;
 import de.jpx3.intave.event.punishment.AttackCancelType;
 import de.jpx3.intave.tools.packet.PlayerAction;
 import de.jpx3.intave.tools.packet.PlayerActionResolver;
@@ -20,8 +20,11 @@ import de.jpx3.intave.user.UserMetaMovementData;
 import org.bukkit.entity.Player;
 
 public final class PacketSprintToggleHeuristic extends IntaveMetaCheckPart<Heuristics, PacketSprintToggleHeuristic.PacketSprintToggleHeuristicMeta> {
+  private final IntavePlugin plugin;
+
   public PacketSprintToggleHeuristic(Heuristics parentCheck) {
     super(parentCheck, PacketSprintToggleHeuristicMeta.class);
+    this.plugin = IntavePlugin.singletonInstance();
   }
 
   @PacketSubscription(
@@ -71,7 +74,7 @@ public final class PacketSprintToggleHeuristic extends IntaveMetaCheckPart<Heuri
         int options = Anomaly.AnomalyOption.DELAY_128s | Anomaly.AnomalyOption.REQUIRES_HEAVY_COMBAT;
         Anomaly anomaly = Anomaly.anomalyOf("41", confidence, Anomaly.Type.KILLAURA, description, options);
         parentCheck().saveAnomaly(player, anomaly);
-        AttackCancelService.requestDamageCancel(user, AttackCancelType.DCRH);
+        plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.DCRH);
       }
     }
   }

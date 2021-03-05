@@ -2,6 +2,7 @@ package de.jpx3.intave.detect.checks.combat.heuristics.detection;
 
 import com.comphenix.protocol.events.PacketEvent;
 import com.google.common.collect.Lists;
+import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.detect.IntaveMetaCheckPart;
 import de.jpx3.intave.detect.checks.combat.Heuristics;
 import de.jpx3.intave.detect.checks.combat.heuristics.Anomaly;
@@ -10,7 +11,6 @@ import de.jpx3.intave.event.packet.ListenerPriority;
 import de.jpx3.intave.event.packet.PacketDescriptor;
 import de.jpx3.intave.event.packet.PacketSubscription;
 import de.jpx3.intave.event.packet.Sender;
-import de.jpx3.intave.event.punishment.AttackCancelService;
 import de.jpx3.intave.event.punishment.AttackCancelType;
 import de.jpx3.intave.event.service.entity.WrappedEntity;
 import de.jpx3.intave.tools.MathHelper;
@@ -24,8 +24,11 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 public final class RotationStandardDeviationHeuristic extends IntaveMetaCheckPart<Heuristics, RotationStandardDeviationHeuristic.RotationStandardDeviationMeta> {
+  private final IntavePlugin plugin;
+
   public RotationStandardDeviationHeuristic(Heuristics parentCheck) {
     super(parentCheck, RotationStandardDeviationMeta.class);
+    this.plugin = IntavePlugin.singletonInstance();
   }
 
   @PacketSubscription(
@@ -84,7 +87,7 @@ public final class RotationStandardDeviationHeuristic extends IntaveMetaCheckPar
         Anomaly anomaly = Anomaly.anomalyOf("121", Confidence.PROBABLE, Anomaly.Type.KILLAURA, description, Anomaly.AnomalyOption.LIMIT_2);
         parentCheck().saveAnomaly(player, anomaly);
         heuristicMeta.rotationBalanceYaw--;
-        AttackCancelService.requestDamageCancel(user, AttackCancelType.DCRM);
+        plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.DCRM);
       }
     } else {
       heuristicMeta.rotationBalanceYaw -= heuristicMeta.rotationBalanceYaw > 0 ? 0.2 : 0;
@@ -102,7 +105,7 @@ public final class RotationStandardDeviationHeuristic extends IntaveMetaCheckPar
         Anomaly anomaly = Anomaly.anomalyOf("122", Confidence.PROBABLE, Anomaly.Type.KILLAURA, description, Anomaly.AnomalyOption.LIMIT_2);
         parentCheck().saveAnomaly(player, anomaly);
         heuristicMeta.rotationBalancePitch--;
-        AttackCancelService.requestDamageCancel(user, AttackCancelType.DCRM);
+        plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.DCRM);
       }
     } else {
       heuristicMeta.rotationBalancePitch -= heuristicMeta.rotationBalancePitch > 0 ? 0.2 : 0;

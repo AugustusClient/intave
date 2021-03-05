@@ -1,5 +1,6 @@
 package de.jpx3.intave.world.collision;
 
+import de.jpx3.intave.tools.annotate.Relocate;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.tools.wrapper.WrappedBlockPosition;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
@@ -19,6 +20,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+@Relocate
 public final class Collision {
   public static List<WrappedAxisAlignedBB> resolve(Player player, WrappedAxisAlignedBB playerBoundingBox) {
     int minX = WrappedMathHelper.floor(playerBoundingBox.minX);
@@ -139,7 +141,7 @@ public final class Collision {
     double width = movementData.widthRounded;
     float height = movementData.height;
     // 0.000000001 accuracy
-    double newYMax = Math.round((positionY + height) * 1000000000d) / 1000000000d;
+    double newYMax = Math.round((positionY + height) * 10000000d) / 10000000d;
     return new WrappedAxisAlignedBB(
       positionX - width, positionY, positionZ - width,
       positionX + width, newYMax, positionZ + width
