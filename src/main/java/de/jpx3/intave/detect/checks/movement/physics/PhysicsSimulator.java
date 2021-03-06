@@ -90,7 +90,13 @@ public final class PhysicsSimulator {
     int keyStrafe = movementData.keyStrafe;
 
     boolean handActive = inventoryData.handActive();
-    boolean attackReduce = movementData.sprintingAllowed() && user.meta().movementData().pastPlayerAttackPhysics == 0;
+    boolean attackReduce;
+
+    if (AttackDispatcher.REDUCING_DISABLED) {
+      attackReduce = false;
+    } else {
+      attackReduce = movementData.sprintingAllowed() && user.meta().movementData().pastPlayerAttackPhysics == 0;
+    }
 
     boolean jumped = false;
     if (movementData.lastOnGround && !movementData.denyJump()) {
