@@ -9,10 +9,7 @@ import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaMovementData;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.world.BlockAccessor;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -52,7 +49,16 @@ public final class Collision {
             for (int z = zstart; z < zend; ++z) {
               for (int y = ystart; y < maxY; ++y) {
                 List<WrappedAxisAlignedBB> resolve = boundingBoxAccess.resolve(chunk, x, y, z);
-                if (resolve != null && !resolve.isEmpty()) {
+
+                boolean insideBorder = !isInsideBorder(world, x, z);
+                if (insideBorder) {
+                  if (resolvedBoundingBoxes == null) {
+                    resolvedBoundingBoxes = new ArrayList<>();
+                  }
+                  resolvedBoundingBoxes.add(new WrappedAxisAlignedBB(x, y, z, x + 1, y, z + 1));
+                }
+
+                if ((resolve != null && !resolve.isEmpty())) {
                   if (resolvedBoundingBoxes == null) {
                     resolvedBoundingBoxes = new ArrayList<>(resolve);
                   } else {
@@ -79,10 +85,23 @@ public final class Collision {
     return resolvedBoundingBoxes;
   }
 
+  private static boolean isInsideBorder(World world, double positionX, double positionZ) {
+    WorldBorder worldBorder = world.getWorldBorder();
+    Location center = worldBorder.getCenter();
+    double radians = worldBorder.getSize() / 2.0;
+    double minX = center.getX() - radians;
+    double minZ = center.getZ() - radians;
+    double maxX = center.getX() + radians;
+    double maxZ = center.getZ() + radians;
+      --minX;
+      --minZ;
+    return positionX > minX && positionX < maxX && positionZ > minZ && positionZ < maxZ;
+  }
+
   public static boolean playerInImaginaryBlock(User user, World world, int posX, int posY, int posZ, int type, int data) {
     List<WrappedAxisAlignedBB> boundingboxes =
       user.boundingBoxAccess().constructBlock(world, posX, posY, posZ, type, data);
-    if(boundingboxes == null || boundingboxes.isEmpty()) {
+    if (boundingboxes == null || boundingboxes.isEmpty()) {
       return false;
     }
     WrappedAxisAlignedBB playerBox = user.meta().movementData().boundingBox();
@@ -110,7 +129,7 @@ public final class Collision {
     int maxZ = WrappedMathHelper.floor(boundingBox.maxZ);
     for (int x = minX; x <= maxX; x++) {
       for (int y = minY; y <= maxY; y++) {
-        for (int z = minZ; z <= maxZ ; z++) {
+        for (int z = minZ; z <= maxZ; z++) {
           Block block = BlockAccessor.blockAccess(world, x, y, z);
           Material type = block.getType();
           if (!ClientBlockHelper.isLiquid(type) && block.getType() != Material.AIR) {
@@ -135,7 +154,7 @@ public final class Collision {
     int maxZ = WrappedMathHelper.floor(playerBoundingBox.maxZ);
     for (int x = minX; x <= maxX; x++) {
       for (int y = minY; y <= maxY; y++) {
-        for (int z = minZ; z <= maxZ ; z++) {
+        for (int z = minZ; z <= maxZ; z++) {
           Block block = BlockAccessor.blockAccess(world, x, y, z);
           if (block.getType() == blockType) {
             return true;
