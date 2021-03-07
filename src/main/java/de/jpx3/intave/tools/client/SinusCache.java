@@ -41,7 +41,7 @@ public final class SinusCache {
 //      SIN_TABLE_FAST[(int) (i * 11.377778f) & 4095] = (float) Math.sin(i * 0.017453292f);
 //    }
 
-    // 1.8.9 optifine L5
+    // 1.8.9 optifine H5
     for (int i = 0; i < 4096; ++i) {
       SIN_TABLE_FAST[i] = roundToFloat(Math.sin((double)i * Math.PI * 2d / 4096d));
     }

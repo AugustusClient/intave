@@ -86,15 +86,32 @@ public class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackRaytrac
         WrappedEntity entity = entityByIdentifier(user, remainingAttack.entityId());
         boolean invalid = false;
         if (entity != null && entity.checkable() && !player.isDead()) {
-          if (entity.clientSynchronized && clientData.protocolVersion() >= PROTOCOL_VERSION_COMBAT_UPDATE
-            && !movementData.recentlyEncounteredFlyingPacket(2)
-            && attackRaytraceMeta.lastFlyPacketCounterReach > 1
-          ) {
-            invalid = processReachCheck(player, entity);
-          } else if (entity.clientSynchronized && clientData.protocolVersion() <= PROTOCOL_VERSION_BOUNTIFUL_UPDATE && attackRaytraceMeta.lastFlyPacketCounterReach > 1) {
-            invalid = processReachCheck(player, entity);
-          } else {
-            invalid = processIterativeReachCheck(player, entity);
+          if(clientData.protocolVersion() >= PROTOCOL_VERSION_COMBAT_UPDATE) {
+            // >= 1.9.x
+            if (entity.clientSynchronized
+              && !movementData.recentlyEncounteredFlyingPacket(2)
+              && attackRaytraceMeta.lastFlyPacketCounterReach > 1
+            ) {
+              // 1.9+ beim bewegen
+              invalid = processReachCheck(player, entity, 0.1f);
+            } else {
+              // 1.9+ beim still stehen oder wenn das entity nicht synchronisiert ist
+              invalid = processIterativeReachCheck(player, entity);
+            }
+          }
+
+          if(clientData.protocolVersion() <= PROTOCOL_VERSION_BOUNTIFUL_UPDATE) {
+            // <= 1.8.9
+            if(!entity.clientSynchronized) {
+              // 1.8.x wenn das entity nicht synchronisiert ist
+              invalid = processIterativeReachCheck(player, entity);
+            } else if (attackRaytraceMeta.lastFlyPacketCounterReach > 1) {
+              // 1.8.x beim bewegen
+              invalid = processReachCheck(player, entity, 0.1f);
+            } else {
+              // 1.8.x beim still stehen
+              invalid = processReachCheck(player, entity, 0.13f);
+            }
           }
         }
         if(!invalid && !violationLevelData.isInActiveTeleportBundle) {
@@ -121,7 +138,7 @@ public class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackRaytrac
     }
   }
 
-  private boolean processReachCheck(Player player, WrappedEntity entity) {
+  private boolean processReachCheck(Player player, WrappedEntity entity, double expandHitbox) {
     User user = UserRepository.userOf(player);
     User.UserMeta meta = user.meta();
     AttackRaytraceMeta attackRaytraceMeta = metaOf(user);
@@ -140,7 +157,8 @@ public class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackRaytrac
       player,
       entity, alternativePositionY,
       movementData.lastPositionX, movementData.lastPositionY, movementData.lastPositionZ,
-      rotationYaw, movementData.rotationPitch
+      rotationYaw, movementData.rotationPitch,
+      expandHitbox
     );
 
     if (!hasAlwaysMouseDelayFix && reach > blockReachDistance) {
@@ -149,7 +167,8 @@ public class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackRaytrac
         player,
         entity, true,
         movementData.lastPositionX, movementData.lastPositionY, movementData.lastPositionZ,
-        lastRotationYaw, movementData.rotationPitch
+        lastRotationYaw, movementData.rotationPitch,
+        expandHitbox
       );
     }
 
@@ -169,7 +188,8 @@ public class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackRaytrac
         thresholdKey = "applicable-thresholds.hitbox";
         vl = 2;
         Synchronizer.synchronize(() -> {
-          String sibylMessage = ChatColor.RED + "[R] " + player.getName() + " missed " + entityName.toLowerCase();
+          String sibylMessage = ChatColor.RED + "[R] " + player.getName() + " attacked " + entityName.toLowerCase() +
+            " out of sight (" + clientData.versionAsString() + ")";
           for (Player authenticatedPlayer : Bukkit.getOnlinePlayers()) {
             if (plugin.sibylIntegrationService().isAuthenticated(authenticatedPlayer)) {
               authenticatedPlayer.sendMessage(sibylMessage);
@@ -190,7 +210,8 @@ public class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackRaytrac
         vl = 20;
 
         Synchronizer.synchronize(() -> {
-          String sibylMessage = ChatColor.RED + "[R] " + player.getName() + " attacked " + entityName.toLowerCase() + " from " + displayReach + " blocks";
+          String sibylMessage = ChatColor.RED + "[R] " + player.getName() + " attacked " + entityName.toLowerCase() +
+            " from " + displayReach + " blocks (" + clientData.versionAsString() + ")";
           for (Player authenticatedPlayer : Bukkit.getOnlinePlayers()) {
             if (plugin.sibylIntegrationService().isAuthenticated(authenticatedPlayer)) {
               authenticatedPlayer.sendMessage(sibylMessage);
@@ -244,22 +265,22 @@ public class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackRaytrac
         // mouse delay fix
         double reach = distanceOf(
           player,
-          clonedEntity.entityBoundingBox().grow(0.13),
-          clonedEntity.position, null,
+          clonedEntity,
           false,
           movementData.lastPositionX, movementData.lastPositionY, movementData.lastPositionZ,
-          rotationYaw, movementData.rotationPitch
+          rotationYaw, movementData.rotationPitch,
+          0.13f
         );
 
         if (!hasAlwaysMouseDelayFix && reach > blockReachDistance) {
           // normal
           reach = distanceOf(
             player,
-            clonedEntity.entityBoundingBox().grow(0.13),
-            clonedEntity.position, null,
+            clonedEntity,
             false,
             movementData.lastPositionX, movementData.lastPositionY, movementData.lastPositionZ,
-            lastRotationYaw, movementData.rotationPitch
+            lastRotationYaw, movementData.rotationPitch,
+            0.13f
           );
         }
 

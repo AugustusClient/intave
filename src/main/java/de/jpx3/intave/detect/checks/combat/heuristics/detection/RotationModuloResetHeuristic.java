@@ -90,7 +90,8 @@ public final class RotationModuloResetHeuristic extends IntaveMetaCheckPart<Heur
       movementData.lastPositionY,
       movementData.lastPositionZ,
       movementData.rotationYaw,
-      movementData.rotationPitch
+      movementData.rotationPitch,
+      0.1f
     );
     return rayTraceResult != 10;
   }

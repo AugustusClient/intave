@@ -51,7 +51,8 @@ public final class Raytracer {
     Player player, WrappedEntity entity,
     boolean useAlternativePositionY,
     double prevPosX, double prevPosY, double prevPosZ,
-    float prevYaw, float pitch
+    float prevYaw, float pitch,
+    double expandBoundingBox
   ) {
     return distanceOf(
       player,
@@ -59,7 +60,8 @@ public final class Raytracer {
       entity.position, entity.alternativePosition,
       useAlternativePositionY,
       prevPosX, prevPosY, prevPosZ,
-      prevYaw, pitch
+      prevYaw, pitch,
+      expandBoundingBox
     );
   }
 
@@ -70,14 +72,15 @@ public final class Raytracer {
    * @return distance the distance between the entity and the eyes of the player 0 means the player is inside of the
    * entity -1 means the player hit outside of the hitbox of the entity >0 means the reach of the player
    */
-  public static double distanceOf(
+  private static double distanceOf(
     Player player,
     WrappedAxisAlignedBB entityBoundingBox,
     WrappedEntity.EntityPositionContext position,
     WrappedEntity.EntityPositionContext alternativePosition,
     boolean alternativePositionY,
     double prevPosX, double prevPosY, double prevPosZ,
-    float prevYaw, float pitch
+    float prevYaw, float pitch,
+    double expandBoundingBox
   ) {
     WrappedVector eyeVector = positionEyes(player, prevPosX, prevPosY, prevPosZ);
     double blockReachDistance = 6d;
@@ -94,7 +97,7 @@ public final class Raytracer {
         interpolatedLookVec.zCoord * blockReachDistance
       );
 
-      WrappedAxisAlignedBB hitBox = entityBoundingBox.expand(0.1f, 0.1f, 0.1f);
+      WrappedAxisAlignedBB hitBox = entityBoundingBox.expand(expandBoundingBox, expandBoundingBox, expandBoundingBox);
       if (alternativePositionY) {
         hitBox = hitBox.addJustMaxY(alternativePosition.posY - position.posY);
       }
