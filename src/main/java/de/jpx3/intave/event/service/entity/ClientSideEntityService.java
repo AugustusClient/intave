@@ -16,6 +16,7 @@ import de.jpx3.intave.reflect.hitbox.HitBoxBoundaries;
 import de.jpx3.intave.reflect.hitbox.ReflectiveEntityHitBoxAccess;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import de.jpx3.intave.user.User;
+import de.jpx3.intave.user.UserMetaMovementData;
 import de.jpx3.intave.user.UserMetaSynchronizeData;
 import de.jpx3.intave.user.UserRepository;
 import org.bukkit.Bukkit;
@@ -194,6 +195,11 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
     Player player = event.getPlayer();
     User user = UserRepository.userOf(player);
     UserMetaSynchronizeData synchronizeData = user.meta().synchronizeData();
+    UserMetaMovementData movementData = user.meta().movementData();
+
+    if(movementData.lastTeleport == 0) {
+      return;
+    }
     for (Map.Entry<Integer, WrappedEntity> entry : synchronizeData.synchronizedEntityMap().entrySet()) {
       WrappedEntity entity = entry.getValue();
       entity.onLivingUpdate();
