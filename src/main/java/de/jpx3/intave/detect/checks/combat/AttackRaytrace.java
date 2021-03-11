@@ -23,7 +23,6 @@ import org.bukkit.entity.Player;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static de.jpx3.intave.event.service.entity.ClientSideEntityService.entityByIdentifier;
 import static de.jpx3.intave.user.UserMetaClientData.PROTOCOL_VERSION_BOUNTIFUL_UPDATE;
@@ -205,7 +204,7 @@ public class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackRaytrac
         vl = 2;
         Synchronizer.synchronize(() -> {
           String sibylMessage = ChatColor.RED + "[R] " + player.getName() + " attacked " + entityName.toLowerCase();
-          Player p = playerByWrappedEntity(user, entity);
+          Player p = playerByWrappedEntity(entity);
           if(p != null) {
             int lastTeleport = userOf(p).meta().movementData().lastTeleport;
             sibylMessage += " last enemy TP " + (lastTeleport > 99 ? ">99" : lastTeleport);
@@ -236,7 +235,7 @@ public class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackRaytrac
         Synchronizer.synchronize(() -> {
           String sibylMessage = ChatColor.RED + "[R] " + player.getName() + " attacked " + entityName.toLowerCase() +
             " from " + displayReach;
-          Player p = playerByWrappedEntity(user, entity);
+          Player p = playerByWrappedEntity(entity);
           if(p != null) {
             int lastTeleport = userOf(p).meta().movementData().lastTeleport;
             sibylMessage += " last enemy TP " + (lastTeleport > 99 ? ">99" : lastTeleport);
@@ -266,14 +265,11 @@ public class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackRaytrac
     return true;
   }
 
-  private Player playerByWrappedEntity(User user, WrappedEntity wrappedEntity) {
-    for(Map.Entry<Integer, WrappedEntity> entry : user.meta().synchronizeData().synchronizedEntityMap().entrySet()) {
-      if(entry.getValue() == wrappedEntity) {
-        for (Player p : Bukkit.getServer().getOnlinePlayers()) {
-          if (p.getEntityId() == entry.getKey()) {
-            return p;
-          }
-        }
+  private Player playerByWrappedEntity(WrappedEntity wrappedEntity) {
+    int entityId = wrappedEntity.entityId();
+    for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+      if (player.getEntityId() == entityId) {
+        return player;
       }
     }
     return null;
