@@ -11,6 +11,7 @@ import de.jpx3.intave.connect.proxy.ProxyMessenger;
 import de.jpx3.intave.connect.shadow.LabymodShadowIntegration;
 import de.jpx3.intave.connect.sibyl.SibylIntegrationService;
 import de.jpx3.intave.detect.CheckService;
+import de.jpx3.intave.detect.checks.movement.physics.collider.Colliders;
 import de.jpx3.intave.event.EventService;
 import de.jpx3.intave.event.bukkit.BukkitEventLinker;
 import de.jpx3.intave.event.packet.PacketSubscriptionLinker;
@@ -42,6 +43,7 @@ import de.jpx3.intave.world.collision.BoundingBoxAccess;
 import de.jpx3.intave.world.collision.patches.BoundingBoxPatcher;
 import de.jpx3.intave.world.permission.InteractionPermissionService;
 import de.jpx3.intave.world.raytrace.Raytracer;
+import de.jpx3.intave.world.waterflow.Waterflow;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -150,12 +152,15 @@ public final class IntavePlugin extends JavaPlugin {
       ReflectiveAccess.setup();
       WrapperLinkage.setup();
       Raytracer.setup();
+      Colliders.setup();
+      Waterflow.setup();
       BlockAccessor.setup();
       BlockDataAccess.setup();
       ViaVersionAdapter.setup();
       BoundingBoxAccess.setup();
       InventoryUseItemHelper.setup();
       BoundingBoxPatcher.setup();
+
       // stage 7
       configurationService = new ConfigurationService(this);
       String configurationKey = configurationService.configurationKey();

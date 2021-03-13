@@ -1,7 +1,8 @@
-package de.jpx3.intave.detect.checks.movement.physics.pose;
+package de.jpx3.intave.detect.checks.movement.physics.simulators;
 
 import de.jpx3.intave.detect.checks.movement.Physics;
-import de.jpx3.intave.detect.checks.movement.physics.collision.collider.SimulationResult;
+import de.jpx3.intave.detect.checks.movement.physics.collider.Colliders;
+import de.jpx3.intave.detect.checks.movement.physics.collider.SimulationResult;
 import de.jpx3.intave.tools.client.PlayerEffectHelper;
 import de.jpx3.intave.tools.client.PlayerMovementHelper;
 import de.jpx3.intave.tools.client.PlayerMovementPoseHelper;
@@ -23,7 +24,7 @@ import org.bukkit.util.Vector;
 
 import static de.jpx3.intave.user.UserMetaClientData.PROTOCOL_VERSION_VILLAGE_UPDATE;
 
-public class PhysicsNormalPlayerMovement extends PhysicsPoseSimulator {
+public class DefaultPoseSimulator extends PoseSimulator {
   @Override
   public SimulationResult performSimulation(
     User user, Physics.PhysicsProcessorContext context,
@@ -75,7 +76,7 @@ public class PhysicsNormalPlayerMovement extends PhysicsPoseSimulator {
     if (waterUpdate && swimming) {
       double d3 = movementData.lookVector.getY();
       double d4 = d3 < -0.2D ? 0.085D : 0.06D;
-      boolean fluidStateEmpty = aquaticWaterMovementBase().fluidStateEmpty(user, positionX, positionY + 1.0 - 0.1, positionZ);
+      boolean fluidStateEmpty = waterflow().fluidStateEmpty(user, positionX, positionY + 1.0 - 0.1, positionZ);
       if (d3 <= 0.0D || jumped || !fluidStateEmpty) {
         context.motionY += (d3 - context.motionY) * d4;
       }
@@ -92,7 +93,7 @@ public class PhysicsNormalPlayerMovement extends PhysicsPoseSimulator {
       tryRelinkFlyingPosition(user, context);
     }
 
-    SimulationResult collisionResult = entityCollisionRepository().resolveEntityCollisionOf(
+    SimulationResult collisionResult = Colliders.collide(
       user, context, movementData.inWeb,
       positionX, positionY, positionZ
     );
@@ -387,11 +388,11 @@ public class PhysicsNormalPlayerMovement extends PhysicsPoseSimulator {
       }
     }
 
-    blockCollisionRepository().fallenUpon(user, block);
+    customBlocks().fallenUpon(user, block);
 
     // onLanded
     if (movementData.collidedVertically) {
-      Vector collisionVector = blockCollisionRepository().blockLanded(
+      Vector collisionVector = customBlocks().blockLanded(
         user, block,
         context.motionX, movementData.physicsMotionY, context.motionZ
       );
@@ -406,7 +407,7 @@ public class PhysicsNormalPlayerMovement extends PhysicsPoseSimulator {
 
     // EntityCollidedWithBlock
     if (movementData.onGround && !movementData.sneaking) {
-      Vector collisionVector = blockCollisionRepository().entityCollision(
+      Vector collisionVector = customBlocks().entityCollision(
         user, block,
         context.motionX, context.motionY, context.motionZ
       );
@@ -431,7 +432,7 @@ public class PhysicsNormalPlayerMovement extends PhysicsPoseSimulator {
         for (int z = blockPositionStartZ; z <= blockPositionEndZ; z++) {
           Location location = new Location(world, x, y, z);
           Material material = BlockAccessor.cacheAppliedTypeAccess(user, world, x, y, z);
-          Vector collisionVector = blockCollisionRepository().entityCollision(
+          Vector collisionVector = customBlocks().entityCollision(
             user, material,
             location,
             blockCollisionFrom,
@@ -451,7 +452,7 @@ public class PhysicsNormalPlayerMovement extends PhysicsPoseSimulator {
       if (soulSandModifier == 0) {
         Block blockAccess = BlockAccessor.blockAccess(world, positionX, positionY - 0.5000001, positionZ);
         Material material = blockAccess.getType();
-        Vector speedFactor = blockCollisionRepository().speedFactor(user, material, context.motionX, context.motionY, context.motionZ);
+        Vector speedFactor = customBlocks().speedFactor(user, material, context.motionX, context.motionY, context.motionZ);
         if (speedFactor != null) {
           context.motionX = speedFactor.getX();
           context.motionY = speedFactor.getY();

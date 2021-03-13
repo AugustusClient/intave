@@ -1,4 +1,4 @@
-package de.jpx3.intave.detect.checks.movement.physics.collision;
+package de.jpx3.intave.detect.checks.movement.physics.custom;
 
 import com.comphenix.protocol.utility.MinecraftVersion;
 import de.jpx3.intave.tools.annotate.Nullable;
@@ -9,7 +9,7 @@ import org.bukkit.util.Vector;
 
 import java.util.List;
 
-public interface PhysicsBlockCollision {
+public interface CustomBlock {
   void setup(MinecraftVersion serverVersion);
 
   @Nullable

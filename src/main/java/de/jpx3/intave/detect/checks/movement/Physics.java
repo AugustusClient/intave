@@ -6,13 +6,12 @@ import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.adapter.ProtocolLibAdapter;
 import de.jpx3.intave.detect.CheckViolationLevelDecrementer;
 import de.jpx3.intave.detect.IntaveCheck;
-import de.jpx3.intave.detect.checks.movement.physics.PhysicsSimulationEngine;
-import de.jpx3.intave.detect.checks.movement.physics.collision.block.BlockCollisionRepository;
-import de.jpx3.intave.detect.checks.movement.physics.collision.collider.Colliders;
-import de.jpx3.intave.detect.checks.movement.physics.collision.collider.SimulationResult;
-import de.jpx3.intave.detect.checks.movement.physics.pose.PhysicsMovementPose;
-import de.jpx3.intave.detect.checks.movement.physics.pose.PhysicsPoseSimulator;
-import de.jpx3.intave.detect.checks.movement.physics.water.WaterMovementLegacyResolver;
+import de.jpx3.intave.detect.checks.movement.physics.LegacyWaterPhysics;
+import de.jpx3.intave.detect.checks.movement.physics.Pose;
+import de.jpx3.intave.detect.checks.movement.physics.SimulationProcessor;
+import de.jpx3.intave.detect.checks.movement.physics.collider.SimulationResult;
+import de.jpx3.intave.detect.checks.movement.physics.custom.CustomBlocks;
+import de.jpx3.intave.detect.checks.movement.physics.simulators.PoseSimulator;
 import de.jpx3.intave.diagnostics.timings.Timings;
 import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.tools.MathHelper;
@@ -40,7 +39,6 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.List;
 
-import static de.jpx3.intave.detect.checks.movement.physics.PhysicsHelper.resolveKeysFromInput;
 import static de.jpx3.intave.tools.MathHelper.formatDouble;
 import static de.jpx3.intave.tools.MathHelper.formatPosition;
 import static de.jpx3.intave.user.UserMetaClientData.PROTOCOL_VERSION_AQUATIC_UPDATE;
@@ -52,24 +50,22 @@ public final class Physics extends IntaveCheck {
   private final CheckViolationLevelDecrementer decrementer;
   private MethodHandle fallDamageInvokeMethod;
 
-  private final PhysicsSimulationEngine simulationService;
+  private final SimulationProcessor simulationService;
   private final AbstractWaterflow abstractWaterflow;
-  private final Colliders colliders;
-  private final BlockCollisionRepository blockCollisionRepository;
+  private final CustomBlocks customBlocks;
 
   public Physics(IntavePlugin plugin) {
     super("Physics", "physics");
     this.plugin = plugin;
     this.decrementer = new CheckViolationLevelDecrementer(this, VL_DECREMENT_PER_VALID_MOVE * 20);
-    this.simulationService = new PhysicsSimulationEngine();
-    this.colliders = new Colliders();
-    this.blockCollisionRepository = new BlockCollisionRepository();
+    this.simulationService = new SimulationProcessor();
+    this.customBlocks = new CustomBlocks();
     this.abstractWaterflow = Waterflow.engine();
-    linkFallDamageInvokeMethod();
+    searchFallDamageApplier();
     linkCheckToPoseSimulators();
   }
 
-  private void linkFallDamageInvokeMethod() {
+  private void searchFallDamageApplier() {
     Class<?> entityLivingClass = ReflectiveAccess.lookupServerClass("EntityLiving");
     String methodName = "e";
     if (ProtocolLibAdapter.VILLAGE_UPDATE.atOrAbove()) {
@@ -78,17 +74,14 @@ public final class Physics extends IntaveCheck {
       methodName = "c";
     }
     try {
-      fallDamageInvokeMethod =
-        MethodHandles
-          .publicLookup()
-          .findVirtual(entityLivingClass, methodName, MethodType.methodType(Void.TYPE, Float.TYPE, Float.TYPE));
+      fallDamageInvokeMethod = MethodHandles.publicLookup().findVirtual(entityLivingClass, methodName, MethodType.methodType(Void.TYPE, Float.TYPE, Float.TYPE));
     } catch (NoSuchMethodException | IllegalAccessException e) {
       throw new IllegalStateException(e);
     }
   }
 
   private void linkCheckToPoseSimulators() {
-    for (PhysicsMovementPose pose : PhysicsMovementPose.values()) {
+    for (Pose pose : Pose.values()) {
       pose.simulator().checkLinkage(this);
     }
   }
@@ -117,47 +110,10 @@ public final class Physics extends IntaveCheck {
 
   @DispatchCrossCall
   public void receiveMovement(User user) {
-    UserMetaMovementData movementData = user.meta().movementData();
-    PhysicsMovementPose movementPoseType = resolveMovementPose(user);
-    movementData.setMovementPoseType(movementPoseType);
-    processMovement(user);
-  }
-
-  private PhysicsMovementPose resolveMovementPose(User user) {
-    Player player = user.player();
-    if (player.getVehicle() != null) {
-      return PhysicsMovementPose.PHYSICS_VEHICLE_MOVEMENT;
-    } else if (PlayerMovementPoseHelper.flyingWithElytra(player)) {
-      return PhysicsMovementPose.PHYSICS_ELYTRA_MOVEMENT;
-    }
-    return PhysicsMovementPose.PHYSICS_NORMAL_MOVEMENT;
-  }
-
-  @DispatchCrossCall
-  public void endMovement(User user, boolean hasMovement) {
-    UserMetaMovementData movementData = user.meta().movementData();
-    double motionX = movementData.motionX();
-    double motionY = movementData.motionY();
-    double motionZ = movementData.motionZ();
-    if (hasMovement) {
-      PhysicsMovementPose movementPoseType = movementData.movementPoseType();
-      PhysicsPoseSimulator calculationPart = movementPoseType.simulator();
-
-      if (movementData.pastVelocity == 0) {
-        if (movementData.physicsJumped) {
-          movementData.physicsJumpedOverrideVL++;
-        } else if (movementData.physicsJumpedOverrideVL > 0) {
-          movementData.physicsJumpedOverrideVL--;
-        }
-      }
-
-      calculationPart.prepareNextTick(user, movementData.positionX, movementData.positionY, movementData.positionZ, motionX, motionY, motionZ);
-    }
-  }
-
-  private void processMovement(User user) {
     User.UserMeta meta = user.meta();
     UserMetaMovementData movementData = meta.movementData();
+
+    movementData.setMovementPoseType(poseOf(user));
     updateAquatics(user);
     simulateMotionClamp(user);
 
@@ -176,6 +132,36 @@ public final class Physics extends IntaveCheck {
     evaluateBestSimulation(user, predictedMovement);
     Timings.CHECK_PHYSICS_EVAL.stop();
     movementData.pastRiptideSpin++;
+  }
+
+  private Pose poseOf(User user) {
+    Player player = user.player();
+    if (player.getVehicle() != null) {
+      return Pose.VEHICLE;
+    } else if (PlayerMovementPoseHelper.flyingWithElytra(player)) {
+      return Pose.ELYTRA;
+    }
+    return Pose.DEFAULT;
+  }
+
+  @DispatchCrossCall
+  public void endMovement(User user, boolean hasMovement) {
+    UserMetaMovementData movementData = user.meta().movementData();
+    double motionX = movementData.motionX();
+    double motionY = movementData.motionY();
+    double motionZ = movementData.motionZ();
+    if (hasMovement) {
+      Pose movementPoseType = movementData.movementPoseType();
+      PoseSimulator calculationPart = movementPoseType.simulator();
+      if (movementData.pastVelocity == 0) {
+        if (movementData.physicsJumped) {
+          movementData.physicsJumpedOverrideVL++;
+        } else if (movementData.physicsJumpedOverrideVL > 0) {
+          movementData.physicsJumpedOverrideVL--;
+        }
+      }
+      calculationPart.prepareNextTick(user, movementData.positionX, movementData.positionY, movementData.positionZ, motionX, motionY, motionZ);
+    }
   }
 
   private void predictFlyingPacketBeforeVelocity(User user) {
@@ -227,7 +213,7 @@ public final class Physics extends IntaveCheck {
       WrappedAxisAlignedBB checkableBoundingBox = entityBoundingBox
         .expand(0.0D, -0.4000000059604645D, 0.0D)
         .contract(0.001D, 0.001D, 0.001D);
-      movementData.inWater = WaterMovementLegacyResolver.handleMaterialAcceleration(user, checkableBoundingBox);
+      movementData.inWater = LegacyWaterPhysics.handleMaterialAcceleration(user, checkableBoundingBox);
     }
     if (movementData.inWater) {
       movementData.pastWaterMovement = 0;
@@ -478,6 +464,21 @@ public final class Physics extends IntaveCheck {
     }
   }
 
+  public static String resolveKeysFromInput(int forward, int strafe) {
+    String key = "";
+    if (forward == 1) {
+      key += "W";
+    } else if (forward == -1) {
+      key += "S";
+    }
+    if (strafe == 1) {
+      key += "A";
+    } else if (strafe == -1) {
+      key += "D";
+    }
+    return key;
+  }
+
   private boolean containsBoundingBoxAny(
     List<WrappedAxisAlignedBB> intersectionBoundingBoxesCurrent,
     WrappedAxisAlignedBB compareBoundingBox
@@ -585,7 +586,7 @@ public final class Physics extends IntaveCheck {
     UserMetaViolationLevelData violationLevelData = meta.violationLevelData();
     UserMetaMovementData movementData = meta.movementData();
 
-    PhysicsMovementPose movementPoseType = movementData.movementPoseType();
+    Pose movementPoseType = movementData.movementPoseType();
     double motionX = movementData.motionX();
     double motionZ = movementData.motionZ();
     double distanceMoved = MathHelper.resolveHorizontalDistance(
@@ -594,7 +595,7 @@ public final class Physics extends IntaveCheck {
     );
     double predictedDistanceMoved = Math.hypot(predictedX, predictedZ);
 
-    if (movementPoseType == PhysicsMovementPose.PHYSICS_VEHICLE_MOVEMENT) {
+    if (movementPoseType == Pose.VEHICLE) {
 
 //      user.player().sendMessage(distanceMoved + " " + predictedDistanceMoved);
 
@@ -721,12 +722,8 @@ public final class Physics extends IntaveCheck {
     return abstractWaterflow;
   }
 
-  public Colliders entityCollisionRepository() {
-    return colliders;
-  }
-
-  public BlockCollisionRepository blockCollisionRepository() {
-    return blockCollisionRepository;
+  public CustomBlocks blockCollisionRepository() {
+    return customBlocks;
   }
 
   public static final class PhysicsProcessorContext {

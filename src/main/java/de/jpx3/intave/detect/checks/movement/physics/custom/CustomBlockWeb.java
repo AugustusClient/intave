@@ -1,7 +1,6 @@
-package de.jpx3.intave.detect.checks.movement.physics.collision.block;
+package de.jpx3.intave.detect.checks.movement.physics.custom;
 
 import com.comphenix.protocol.utility.MinecraftVersion;
-import de.jpx3.intave.detect.checks.movement.physics.collision.PhysicsBlockCollision;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaClientData;
 import de.jpx3.intave.user.UserMetaMovementData;
@@ -15,7 +14,7 @@ import java.util.List;
 
 import static de.jpx3.intave.user.UserMetaClientData.PROTOCOL_VERSION_BEE_UPDATE;
 
-final class BlockCollisionWeb implements PhysicsBlockCollision {
+final class CustomBlockWeb implements CustomBlock {
   private List<Material> material;
 
   @Override

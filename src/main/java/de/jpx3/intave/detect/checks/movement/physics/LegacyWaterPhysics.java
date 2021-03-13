@@ -1,4 +1,4 @@
-package de.jpx3.intave.detect.checks.movement.physics.water;
+package de.jpx3.intave.detect.checks.movement.physics;
 
 import de.jpx3.intave.tools.client.ClientBlockHelper;
 import de.jpx3.intave.tools.wrapper.*;
@@ -11,7 +11,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 
-public final class WaterMovementLegacyResolver {
+public final class LegacyWaterPhysics {
   public static boolean handleMaterialAcceleration(User user, WrappedAxisAlignedBB boundingBox) {
     Player player = user.player();
     World world = player.getWorld();
@@ -24,7 +24,6 @@ public final class WaterMovementLegacyResolver {
     int maxZ = WrappedMathHelper.floor(boundingBox.maxZ + 1.0D);
     boolean inWater = false;
     WrappedVector flowVector = new WrappedVector(0, 0, 0);
-
     for (int x = minX; x < maxX; ++x) {
       for (int y = minY; y < maxY; ++y) {
         for (int z = minZ; z < maxZ; ++z) {
@@ -63,15 +62,12 @@ public final class WaterMovementLegacyResolver {
   private static WrappedVector flowVector(World worldIn, WrappedBlockPosition pos) {
     WrappedVector vec3 = new WrappedVector(0.0D, 0.0D, 0.0D);
     int i = resolveEffectiveFlowDecay(worldIn, pos);
-
     for (WrappedEnumDirection enumDirection : WrappedEnumDirection.Plane.HORIZONTAL) {
       WrappedBlockPosition position = pos.offset(enumDirection);
       int j = resolveEffectiveFlowDecay(worldIn, position);
-
       if (j < 0) {
         if (!blocksMovement(worldIn, pos)) {
           j = resolveEffectiveFlowDecay(worldIn, position.down());
-
           if (j >= 0) {
             int k = j - (i - 8);
             vec3 = vec3.addVector((position.xCoord - pos.xCoord) * k, (position.yCoord - pos.yCoord) * k, (position.zCoord - pos.zCoord) * k);

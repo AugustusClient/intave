@@ -1,9 +1,8 @@
 package de.jpx3.intave.detect.checks.movement.physics;
 
 import de.jpx3.intave.detect.checks.movement.Physics;
-import de.jpx3.intave.detect.checks.movement.physics.collision.collider.SimulationResult;
-import de.jpx3.intave.detect.checks.movement.physics.pose.PhysicsMovementPose;
-import de.jpx3.intave.detect.checks.movement.physics.pose.PhysicsPoseSimulator;
+import de.jpx3.intave.detect.checks.movement.physics.collider.SimulationResult;
+import de.jpx3.intave.detect.checks.movement.physics.simulators.PoseSimulator;
 import de.jpx3.intave.diagnostics.timings.Timings;
 import de.jpx3.intave.event.dispatch.AttackDispatcher;
 import de.jpx3.intave.reflect.ReflectiveDataWatcherAccess;
@@ -17,14 +16,14 @@ import org.bukkit.inventory.ItemStack;
 
 import static de.jpx3.intave.reflect.ReflectiveDataWatcherAccess.DATA_WATCHER_BLOCKING_ID;
 
-public final class PhysicsSimulationEngine {
-  public SimulationResult simulate(User user, PhysicsMovementPose poseType) {
+public final class SimulationProcessor {
+  public SimulationResult simulate(User user, Pose pose) {
     User.UserMeta meta = user.meta();
     UserMetaMovementData movementData = meta.movementData();
     UserMetaInventoryData inventoryData = meta.inventoryData();
 
-    PhysicsPoseSimulator calculationPart = poseType.simulator();
-    boolean keyCalculation = calculationPart.requiresKeyCalculation();
+    PoseSimulator simulator = pose.simulator();
+    boolean keyCalculation = simulator.requiresKeyCalculation();
 
     if (keyCalculation) {
       SimulationResult predictedMovement;
@@ -70,7 +69,7 @@ public final class PhysicsSimulationEngine {
   public SimulationResult simulateMovementWithoutKeyPress(User user) {
     User.UserMeta meta = user.meta();
     UserMetaMovementData movementData = meta.movementData();
-    PhysicsMovementPose movementPoseType = movementData.movementPoseType();
+    Pose movementPoseType = movementData.movementPoseType();
     Physics.PhysicsProcessorContext context = Physics.PhysicsProcessorContext.from(movementData.physicsProcessorContext);
     context.resetTo(movementData);
     return movementPoseType.simulator().performSimulation(
@@ -83,8 +82,8 @@ public final class PhysicsSimulationEngine {
   private SimulationResult simulateMovementBiased(User user) {
     UserMetaMovementData movementData = user.meta().movementData();
     UserMetaInventoryData inventoryData = user.meta().inventoryData();
-    PhysicsMovementPose movementPoseType = movementData.movementPoseType();
-    PhysicsPoseSimulator calculationPart = movementPoseType.simulator();
+    Pose movementPoseType = movementData.movementPoseType();
+    PoseSimulator calculationPart = movementPoseType.simulator();
     Physics.PhysicsProcessorContext context = movementData.physicsProcessorContext;
     int keyForward = movementData.keyForward;
     int keyStrafe = movementData.keyStrafe;
@@ -119,8 +118,8 @@ public final class PhysicsSimulationEngine {
     User.UserMeta meta = user.meta();
     UserMetaMovementData movementData = meta.movementData();
     UserMetaInventoryData inventoryData = meta.inventoryData();
-    PhysicsMovementPose movementPoseType = movementData.movementPoseType();
-    PhysicsPoseSimulator simulator = movementPoseType.simulator();
+    Pose movementPoseType = movementData.movementPoseType();
+    PoseSimulator simulator = movementPoseType.simulator();
 
     double receivedMotionX = movementData.motionX();
     double receivedMotionY = movementData.motionY();

@@ -1,7 +1,6 @@
-package de.jpx3.intave.detect.checks.movement.physics.collision.collider;
+package de.jpx3.intave.detect.checks.movement.physics.collider;
 
 import de.jpx3.intave.detect.checks.movement.Physics;
-import de.jpx3.intave.detect.checks.movement.physics.collision.PhysicsEntityCollision;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaMovementData;
@@ -10,9 +9,9 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public final class LegacyCollider implements PhysicsEntityCollision {
+public final class LegacyCollider implements Collider {
   @Override
-  public SimulationResult resolveCollision(User user, Physics.PhysicsProcessorContext context, boolean inWeb, double positionX, double positionY, double positionZ) {
+  public SimulationResult collide(User user, Physics.PhysicsProcessorContext context, boolean inWeb, double positionX, double positionY, double positionZ) {
     Player player = user.player();
     User.UserMeta meta = user.meta();
     UserMetaMovementData movementData = meta.movementData();

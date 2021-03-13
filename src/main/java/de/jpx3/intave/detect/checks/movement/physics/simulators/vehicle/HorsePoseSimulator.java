@@ -1,12 +1,12 @@
-package de.jpx3.intave.detect.checks.movement.physics.pose.vehicle;
+package de.jpx3.intave.detect.checks.movement.physics.simulators.vehicle;
 
 import de.jpx3.intave.detect.checks.movement.Physics;
-import de.jpx3.intave.detect.checks.movement.physics.collision.collider.SimulationResult;
-import de.jpx3.intave.detect.checks.movement.physics.pose.PhysicsNormalPlayerMovement;
+import de.jpx3.intave.detect.checks.movement.physics.collider.SimulationResult;
+import de.jpx3.intave.detect.checks.movement.physics.simulators.DefaultPoseSimulator;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaMovementData;
 
-public final class PhysicsHorseMovement extends PhysicsNormalPlayerMovement {
+public final class HorsePoseSimulator extends DefaultPoseSimulator {
   private final static double MAXIMUM_HORSE_MOVEMENT_SPEED = 0.22499999403953552D;//0.3374999970197678;
 
   @Override

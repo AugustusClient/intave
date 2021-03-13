@@ -1,8 +1,8 @@
 package de.jpx3.intave.world.waterflow;
 
 import com.comphenix.protocol.utility.MinecraftVersion;
+import de.jpx3.intave.access.IntaveInternalException;
 import de.jpx3.intave.adapter.ProtocolLibAdapter;
-import de.jpx3.intave.reflect.ReflectionFailureException;
 import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import de.jpx3.intave.tools.wrapper.WrappedVector;
@@ -120,7 +120,7 @@ final class BeeUpdateWaterflow extends AbstractWaterflow {
     try {
       return (boolean) worldTypeMethodHandle.invoke(fluidState);
     } catch (Throwable t) {
-      throw new ReflectionFailureException(t);
+      throw new IntaveInternalException(t);
     }
   }
 
@@ -131,7 +131,7 @@ final class BeeUpdateWaterflow extends AbstractWaterflow {
     try {
       return blockPositionClass.getConstructor(BLOCK_POSITION_CONSTRUCTOR).newInstance(x, y, z);
     } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-      throw new ReflectionFailureException(e);
+      throw new IntaveInternalException(e);
     }
   }
 
@@ -142,7 +142,7 @@ final class BeeUpdateWaterflow extends AbstractWaterflow {
     try {
       return fluidMethodHandle.invoke(world, blockPosition);
     } catch (Throwable t) {
-      throw new ReflectionFailureException(t);
+      throw new IntaveInternalException(t);
     }
   }
 
@@ -151,7 +151,7 @@ final class BeeUpdateWaterflow extends AbstractWaterflow {
     try {
       return (boolean) fluidTaggedMethodHandle.invoke(fluidState, fluidTagWater);
     } catch (Throwable t) {
-      throw new ReflectionFailureException(t);
+      throw new IntaveInternalException(t);
     }
   }
 
@@ -160,7 +160,7 @@ final class BeeUpdateWaterflow extends AbstractWaterflow {
     try {
       return (float) fluidHeightMethodHandle.invoke(fluidState);
     } catch (Throwable t) {
-      throw new ReflectionFailureException(t);
+      throw new IntaveInternalException(t);
     }
   }
 
@@ -170,7 +170,7 @@ final class BeeUpdateWaterflow extends AbstractWaterflow {
       Object vector = fluidFlowMethodHandle.invoke(fluidState, world, blockPosition);
       return WrapperLinkage.vectorOf(vector);
     } catch (Throwable t) {
-      throw new ReflectionFailureException(t);
+      throw new IntaveInternalException(t);
     }
   }
 

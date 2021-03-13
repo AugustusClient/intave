@@ -35,6 +35,11 @@ public final class Waterflow {
   private static void selectAppropriateEngine() {
     MinecraftVersion currentVersion = ProtocolLibAdapter.serverVersion();
     engine = availableEngines.stream().filter(availableEngine -> availableEngine.appliesToAtLeast(currentVersion)).findFirst().orElse(engine);
+    try {
+      engine.setup();
+    } catch (Exception exception) {
+      exception.printStackTrace();
+    }
     availableEngines = Collections.emptyList();
   }
 

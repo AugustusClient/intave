@@ -1,13 +1,14 @@
-package de.jpx3.intave.detect.checks.movement.physics.pose;
+package de.jpx3.intave.detect.checks.movement.physics.simulators;
 
 import de.jpx3.intave.detect.checks.movement.Physics;
-import de.jpx3.intave.detect.checks.movement.physics.collision.collider.SimulationResult;
+import de.jpx3.intave.detect.checks.movement.physics.collider.Colliders;
+import de.jpx3.intave.detect.checks.movement.physics.collider.SimulationResult;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaMovementData;
 import org.bukkit.util.Vector;
 
-public final class PhysicsElytraMovement extends PhysicsNormalPlayerMovement {
+public final class ElytraPoseSimulator extends DefaultPoseSimulator {
   @Override
   public SimulationResult performSimulation(
     User user, Physics.PhysicsProcessorContext context,
@@ -68,7 +69,7 @@ public final class PhysicsElytraMovement extends PhysicsNormalPlayerMovement {
     context.motionY *= 0.98f;
     context.motionZ *= 0.99f;
 
-    SimulationResult collisionResult = entityCollisionRepository().resolveEntityCollisionOf(
+    SimulationResult collisionResult = Colliders.collide(
       user, context, movementData.inWeb,
       positionX, positionY, positionZ
     );

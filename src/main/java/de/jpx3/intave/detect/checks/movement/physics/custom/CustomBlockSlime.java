@@ -1,7 +1,6 @@
-package de.jpx3.intave.detect.checks.movement.physics.collision.block;
+package de.jpx3.intave.detect.checks.movement.physics.custom;
 
 import com.comphenix.protocol.utility.MinecraftVersion;
-import de.jpx3.intave.detect.checks.movement.physics.collision.PhysicsBlockCollision;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaMovementData;
 import org.bukkit.Material;
@@ -10,7 +9,7 @@ import org.bukkit.util.Vector;
 import java.util.Collections;
 import java.util.List;
 
-final class BlockCollisionSlime implements PhysicsBlockCollision {
+final class CustomBlockSlime implements CustomBlock {
   private List<Material> material;
 
   @Override

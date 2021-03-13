@@ -1,4 +1,4 @@
-package de.jpx3.intave.detect.checks.movement.physics.collision.collider;
+package de.jpx3.intave.detect.checks.movement.physics.collider;
 
 import de.jpx3.intave.detect.checks.movement.Physics;
 

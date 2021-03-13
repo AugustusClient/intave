@@ -1,13 +1,12 @@
-package de.jpx3.intave.detect.checks.movement.physics.pose;
+package de.jpx3.intave.detect.checks.movement.physics.simulators;
 
 import de.jpx3.intave.detect.checks.movement.Physics;
-import de.jpx3.intave.detect.checks.movement.physics.collision.block.BlockCollisionRepository;
-import de.jpx3.intave.detect.checks.movement.physics.collision.collider.Colliders;
-import de.jpx3.intave.detect.checks.movement.physics.collision.collider.SimulationResult;
+import de.jpx3.intave.detect.checks.movement.physics.collider.SimulationResult;
+import de.jpx3.intave.detect.checks.movement.physics.custom.CustomBlocks;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.world.waterflow.AbstractWaterflow;
 
-public abstract class PhysicsPoseSimulator {
+public abstract class PoseSimulator {
   private Physics physics;
 
   public final void checkLinkage(Physics physics) {
@@ -30,15 +29,11 @@ public abstract class PhysicsPoseSimulator {
     return physics;
   }
 
-  public Colliders entityCollisionRepository() {
-    return physics.entityCollisionRepository();
-  }
-
-  public AbstractWaterflow aquaticWaterMovementBase() {
+  public AbstractWaterflow waterflow() {
     return physics.aquaticWaterMovementBase();
   }
 
-  public BlockCollisionRepository blockCollisionRepository() {
+  public CustomBlocks customBlocks() {
     return physics.blockCollisionRepository();
   }
 

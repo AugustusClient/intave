@@ -1,7 +1,7 @@
 package de.jpx3.intave.world.waterflow;
 
 import com.comphenix.protocol.utility.MinecraftVersion;
-import de.jpx3.intave.detect.checks.movement.physics.water.WaterMovementLegacyResolver;
+import de.jpx3.intave.detect.checks.movement.physics.LegacyWaterPhysics;
 import de.jpx3.intave.tools.client.ClientBlockHelper;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.tools.wrapper.WrappedBlockPosition;
@@ -50,12 +50,12 @@ final class UnknownWaterflow extends AbstractWaterflow {
           boolean waterServerSide = ClientBlockHelper.isWater(block.getType());
           boolean waterClientSide = ClientBlockHelper.isWater(clientSideBlock);
           if (waterServerSide) {
-            double height = 1 - WaterMovementLegacyResolver.resolveLiquidHeightPercentage(block.getData());
+            double height = 1 - LegacyWaterPhysics.resolveLiquidHeightPercentage(block.getData());
             double d1 = (float) y + height;
             if (d1 >= entityBoundingBox.minY) {
               inWater = true;
               d0 = Math.max(d1 - entityBoundingBox.minY, d0);
-              WrappedVector flowVector = WaterMovementLegacyResolver.modifyAcceleration(user, new WrappedBlockPosition(x, y, z), new WrappedVector(0, 0, 0));
+              WrappedVector flowVector = LegacyWaterPhysics.modifyAcceleration(user, new WrappedBlockPosition(x, y, z), new WrappedVector(0, 0, 0));
               if (d0 < 0.4) {
                 flowVector = flowVector.scale(d0);
               }
@@ -96,7 +96,7 @@ final class UnknownWaterflow extends AbstractWaterflow {
     WrappedVector vector3d = new WrappedVector(positionX, d0, positionZ);
     Block block = BlockAccessor.blockAccess(world, vector3d.xCoord, vector3d.yCoord, vector3d.zCoord);
     if (ClientBlockHelper.isWater(block.getType())) {
-      double d1 = vector3d.yCoord + 1 - WaterMovementLegacyResolver.resolveLiquidHeightPercentage(block.getData());
+      double d1 = vector3d.yCoord + 1 - LegacyWaterPhysics.resolveLiquidHeightPercentage(block.getData());
       return d1 > d0;
     }
     return false;

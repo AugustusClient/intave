@@ -4,7 +4,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.reflect.StructureModifier;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.detect.checks.movement.Physics;
-import de.jpx3.intave.detect.checks.movement.physics.pose.PhysicsMovementPose;
+import de.jpx3.intave.detect.checks.movement.physics.Pose;
 import de.jpx3.intave.reflect.ReflectiveHandleAccess;
 import de.jpx3.intave.tools.client.*;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
@@ -46,7 +46,7 @@ public final class UserMetaMovementData {
   private float yawSine, yawCosine, friction;
   public float rotationYaw, rotationPitch;
   public float lastRotationYaw, lastRotationPitch;
-  private PhysicsMovementPose movementPoseType = PhysicsMovementPose.PHYSICS_NORMAL_MOVEMENT;
+  private Pose movementPoseType = Pose.DEFAULT;
 
   private volatile WrappedAxisAlignedBB boundingBox;
   public Vector emulationVelocity;
@@ -352,7 +352,7 @@ public final class UserMetaMovementData {
     return pastFlyingPacketAccurate;
   }
 
-  public PhysicsMovementPose movementPoseType() {
+  public Pose movementPoseType() {
     return movementPoseType;
   }
 
@@ -395,7 +395,7 @@ public final class UserMetaMovementData {
     this.verifiedLocation = verifiedLocation;
   }
 
-  public void setMovementPoseType(PhysicsMovementPose movementPoseType) {
+  public void setMovementPoseType(Pose movementPoseType) {
     this.movementPoseType = movementPoseType;
   }
 

@@ -1,0 +1,22 @@
+package de.jpx3.intave.detect.checks.movement.physics;
+
+import de.jpx3.intave.detect.checks.movement.physics.simulators.DefaultPoseSimulator;
+import de.jpx3.intave.detect.checks.movement.physics.simulators.ElytraPoseSimulator;
+import de.jpx3.intave.detect.checks.movement.physics.simulators.PoseSimulator;
+import de.jpx3.intave.detect.checks.movement.physics.simulators.vehicle.HorsePoseSimulator;
+
+public enum Pose {
+  DEFAULT(new DefaultPoseSimulator()),
+  ELYTRA(new ElytraPoseSimulator()),
+  VEHICLE(new HorsePoseSimulator());
+
+  private final PoseSimulator calculationPart;
+
+  Pose(PoseSimulator calculationPart) {
+    this.calculationPart = calculationPart;
+  }
+
+  public PoseSimulator simulator() {
+    return calculationPart;
+  }
+}
