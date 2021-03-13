@@ -1,5 +1,6 @@
-package de.jpx3.intave.detect.checks.movement.physics.water;
+package de.jpx3.intave.world.waterflow;
 
+import com.comphenix.protocol.utility.MinecraftVersion;
 import de.jpx3.intave.tools.client.ClientBlockHelper;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
@@ -10,7 +11,7 @@ import de.jpx3.intave.world.BlockAccessor;
 import org.bukkit.Material;
 import org.bukkit.World;
 
-public abstract class AquaticWaterMovementBase {
+public abstract class AbstractWaterflow {
   public void setup() throws Exception {}
   public abstract boolean fluidStateEmpty(User user, double x, double y, double z);
 
@@ -86,10 +87,10 @@ public abstract class AquaticWaterMovementBase {
 //      && blockPlayerViewPositionY < blockY + fluidHeight(fluidState) + 0.11111111F
       ;
   }
-
   public abstract boolean fluidTaggedWithWater(Object fluidState);
   public abstract Object blockPositionOf(int x, int y, int z);
   public abstract Object fluidState(User user, Object blockPosition);
   public abstract float fluidHeight(Object fluidState);
   public abstract WrappedVector resolveFlowVector(Object fluidState, Object world, Object blockPosition);
+  public abstract boolean appliesToAtLeast(MinecraftVersion currentVersion);
 }

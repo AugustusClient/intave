@@ -2,15 +2,15 @@ package de.jpx3.intave.detect.checks.movement.physics.pose;
 
 import de.jpx3.intave.detect.checks.movement.Physics;
 import de.jpx3.intave.detect.checks.movement.physics.collision.block.BlockCollisionRepository;
-import de.jpx3.intave.detect.checks.movement.physics.collision.entity.EntityCollisionRepository;
-import de.jpx3.intave.detect.checks.movement.physics.collision.entity.SimulationResult;
-import de.jpx3.intave.detect.checks.movement.physics.water.AquaticWaterMovementBase;
+import de.jpx3.intave.detect.checks.movement.physics.collision.collider.Colliders;
+import de.jpx3.intave.detect.checks.movement.physics.collision.collider.SimulationResult;
 import de.jpx3.intave.user.User;
+import de.jpx3.intave.world.waterflow.AbstractWaterflow;
 
-public abstract class PhysicsCalculationPart {
+public abstract class PhysicsPoseSimulator {
   private Physics physics;
 
-  public final void setup(Physics physics) {
+  public final void checkLinkage(Physics physics) {
     this.physics = physics;
   }
 
@@ -30,11 +30,11 @@ public abstract class PhysicsCalculationPart {
     return physics;
   }
 
-  public EntityCollisionRepository entityCollisionRepository() {
+  public Colliders entityCollisionRepository() {
     return physics.entityCollisionRepository();
   }
 
-  public AquaticWaterMovementBase aquaticWaterMovementBase() {
+  public AbstractWaterflow aquaticWaterMovementBase() {
     return physics.aquaticWaterMovementBase();
   }
 

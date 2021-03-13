@@ -45,6 +45,10 @@ public final class RotationLHeuristics extends IntaveMetaCheckPart<Heuristics, R
     }
     WrappedEntity entity = attackData.lastAttackedEntity();
 
+    if(entity == null) {
+      return;
+    }
+
     double distanceToPerfectYaw = MathHelper.distanceInDegrees(attackData.perfectYaw(), movementData.rotationYaw);
     float yawSpeed = MathHelper.distanceInDegrees(movementData.rotationYaw, movementData.lastRotationYaw);
 

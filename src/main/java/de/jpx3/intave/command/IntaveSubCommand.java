@@ -15,7 +15,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public final class IntaveSubCommand {
   private final CommandStage stage;
@@ -101,7 +103,7 @@ public final class IntaveSubCommand {
     String[] args = executedCommand.split(" ");
 
     if(sender instanceof Player && permission.equalsIgnoreCase("sibyl") && !IntavePlugin.singletonInstance().sibylIntegrationService().isAuthenticated(((Player) sender).getPlayer())) {
-      sender.sendMessage(ChatColor.RED + "Unauthorized, internal command");
+      sender.sendMessage(NO_PERMISSION_MESSAGE);
       return null;
     } else if(sender instanceof Player && !permission.equals("none") && !permission.equalsIgnoreCase("sibyl") && !PermissionCheck.permissionCheck(sender, permission)) {
       sender.sendMessage(NO_PERMISSION_MESSAGE);
@@ -113,14 +115,15 @@ public final class IntaveSubCommand {
     }
 
     if(args.length < requiredTypes.length /*|| args.length > allTypes.length*/) {
-      StringBuilder command = new StringBuilder();
+      List<String> commandPath = new ArrayList<>();
       CommandStage currentStage = stage;
       do {
-        command.append(currentStage.name()).append(" ");
+        commandPath.add(currentStage.name());
       } while ((currentStage = currentStage.parent()) != null);
-      command.append(selectors[0]);
-
-      sender.sendMessage(prefix + "Usage: " + command + " " + usage);
+      Collections.reverse(commandPath);
+      commandPath.add(selectors[0]);
+      String commandPathAsString = commandPath.stream().map(s -> s + " ").collect(Collectors.joining());
+      sender.sendMessage(prefix + "Usage: " + commandPathAsString + usage);
       return null;
     }
 

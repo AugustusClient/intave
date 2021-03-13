@@ -1,8 +1,7 @@
-package de.jpx3.intave.detect.checks.movement.physics.water.aquatics;
+package de.jpx3.intave.world.waterflow;
 
 import com.comphenix.protocol.utility.MinecraftVersion;
 import de.jpx3.intave.adapter.ProtocolLibAdapter;
-import de.jpx3.intave.detect.checks.movement.physics.water.AquaticWaterMovementBase;
 import de.jpx3.intave.reflect.ReflectionFailureException;
 import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
@@ -16,7 +15,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationTargetException;
 
-public final class AquaticNetherUpdateMovementResolver extends AquaticWaterMovementBase {
+final class BeeUpdateWaterflow extends AbstractWaterflow {
   private MethodHandle fluidMethodHandle;
   private MethodHandle fluidTaggedMethodHandle;
   private MethodHandle fluidHeightMethodHandle;
@@ -25,13 +24,7 @@ public final class AquaticNetherUpdateMovementResolver extends AquaticWaterMovem
   private Object fluidTagWater;
   private Class<?> blockPositionClass;
 
-  public AquaticNetherUpdateMovementResolver() {
-    try {
-      setup();
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new ReflectionFailureException(e);
-    }
+  public BeeUpdateWaterflow() {
   }
 
   @Override
@@ -89,7 +82,7 @@ public final class AquaticNetherUpdateMovementResolver extends AquaticWaterMovem
     Class<?> fluidClass = ReflectiveAccess.lookupServerClass("Fluid");
     fluidHeightMethodHandle = MethodHandles
       .lookup()
-      .findVirtual(fluidClass, "d", MethodType.methodType(Float.TYPE));
+      .findVirtual(fluidClass, "f", MethodType.methodType(Float.TYPE));
   }
 
   private void loadFluidFlowMethodHandle() throws NoSuchMethodException, IllegalAccessException {
@@ -179,5 +172,10 @@ public final class AquaticNetherUpdateMovementResolver extends AquaticWaterMovem
     } catch (Throwable t) {
       throw new ReflectionFailureException(t);
     }
+  }
+
+  @Override
+  public boolean appliesToAtLeast(MinecraftVersion currentVersion) {
+    return currentVersion.isAtLeast(ProtocolLibAdapter.BEE_UPDATE);
   }
 }

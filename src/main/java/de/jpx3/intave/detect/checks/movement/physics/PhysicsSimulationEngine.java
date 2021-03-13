@@ -1,9 +1,9 @@
 package de.jpx3.intave.detect.checks.movement.physics;
 
 import de.jpx3.intave.detect.checks.movement.Physics;
-import de.jpx3.intave.detect.checks.movement.physics.collision.entity.SimulationResult;
-import de.jpx3.intave.detect.checks.movement.physics.pose.PhysicsCalculationPart;
+import de.jpx3.intave.detect.checks.movement.physics.collision.collider.SimulationResult;
 import de.jpx3.intave.detect.checks.movement.physics.pose.PhysicsMovementPose;
+import de.jpx3.intave.detect.checks.movement.physics.pose.PhysicsPoseSimulator;
 import de.jpx3.intave.diagnostics.timings.Timings;
 import de.jpx3.intave.event.dispatch.AttackDispatcher;
 import de.jpx3.intave.reflect.ReflectiveDataWatcherAccess;
@@ -17,13 +17,13 @@ import org.bukkit.inventory.ItemStack;
 
 import static de.jpx3.intave.reflect.ReflectiveDataWatcherAccess.DATA_WATCHER_BLOCKING_ID;
 
-public final class PhysicsSimulator {
+public final class PhysicsSimulationEngine {
   public SimulationResult simulate(User user, PhysicsMovementPose poseType) {
     User.UserMeta meta = user.meta();
     UserMetaMovementData movementData = meta.movementData();
     UserMetaInventoryData inventoryData = meta.inventoryData();
 
-    PhysicsCalculationPart calculationPart = poseType.calculationPart();
+    PhysicsPoseSimulator calculationPart = poseType.simulator();
     boolean keyCalculation = calculationPart.requiresKeyCalculation();
 
     if (keyCalculation) {
@@ -73,7 +73,7 @@ public final class PhysicsSimulator {
     PhysicsMovementPose movementPoseType = movementData.movementPoseType();
     Physics.PhysicsProcessorContext context = Physics.PhysicsProcessorContext.from(movementData.physicsProcessorContext);
     context.resetTo(movementData);
-    return movementPoseType.calculationPart().performSimulation(
+    return movementPoseType.simulator().performSimulation(
       user, context,
       0, 0, false, false,
       meta.inventoryData().handActive()
@@ -84,7 +84,7 @@ public final class PhysicsSimulator {
     UserMetaMovementData movementData = user.meta().movementData();
     UserMetaInventoryData inventoryData = user.meta().inventoryData();
     PhysicsMovementPose movementPoseType = movementData.movementPoseType();
-    PhysicsCalculationPart calculationPart = movementPoseType.calculationPart();
+    PhysicsPoseSimulator calculationPart = movementPoseType.simulator();
     Physics.PhysicsProcessorContext context = movementData.physicsProcessorContext;
     int keyForward = movementData.keyForward;
     int keyStrafe = movementData.keyStrafe;
@@ -120,7 +120,7 @@ public final class PhysicsSimulator {
     UserMetaMovementData movementData = meta.movementData();
     UserMetaInventoryData inventoryData = meta.inventoryData();
     PhysicsMovementPose movementPoseType = movementData.movementPoseType();
-    PhysicsCalculationPart calculationPart = movementPoseType.calculationPart();
+    PhysicsPoseSimulator simulator = movementPoseType.simulator();
 
     double receivedMotionX = movementData.motionX();
     double receivedMotionY = movementData.motionY();
@@ -170,7 +170,7 @@ public final class PhysicsSimulator {
             float moveForward = keyForward * 0.98f;
             float moveStrafe = keyStrafe * 0.98f;
             context.resetTo(movementData);
-            SimulationResult collisionResult = calculationPart.performSimulation(
+            SimulationResult collisionResult = simulator.performSimulation(
               user, context, moveForward, moveStrafe,
               attackReduce, jumped, inventoryData.handActive()
             );
@@ -191,7 +191,7 @@ public final class PhysicsSimulator {
             if (distance < 5e-4 && fastMovementProcess) {
               break LOOP;
             }
-            if (!calculationPart.requiresKeyCalculation()) {
+            if (!simulator.requiresKeyCalculation()) {
               break LOOP;
             }
           }

@@ -100,7 +100,7 @@ public final class IntaveInternalsStage extends CommandStage {
     return watcher;
   }
 
-  @SubCommand(
+/*  @SubCommand(
     selectors = "timeout",
     usage = "<player>",
     permission = "intave.command.internals.timeout",
@@ -112,7 +112,7 @@ public final class IntaveInternalsStage extends CommandStage {
 
 
     commandSender.sendMessage(IntavePlugin.prefix() + ChatColor.RED + target.getName() + " " + IntavePlugin.defaultColor() + "has timed");
-  }
+  }*/
 
   public static IntaveInternalsStage singletonInstance() {
     if(singletonInstance == null) {

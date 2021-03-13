@@ -119,8 +119,9 @@ public final class IntavePlugin extends JavaPlugin {
 
     prefix = ChatColor.translateAlternateColorCodes('&', prefix);
 
-    if(System.getSecurityManager() != null) {
-      logger.error("A security manager is present, unable to start");
+    SecurityManager securityManager = System.getSecurityManager();
+    if(securityManager != null) {
+      logger.error("A security manager of class " + securityManager.getClass().getName() + " is present, unable to start");
       return;
     }
 
@@ -213,53 +214,46 @@ public final class IntavePlugin extends JavaPlugin {
           response = "timeout";
         }
 
-        String message = null;
+        String message = "";
         boolean bad = false;
         boolean clearReloCache = false;
 
-        switch (response) {
-          case "banned":
-          case "invalid":
-            message = "Unable to boot: Something went wrong verifying integrity";
-            bad = true;
-            clearReloCache = true;
-            break;
-          case "hwid":
-            message = "Unable to boot: Hardware identification failed";
-            bad = true;
-            clearReloCache = true;
-            break;
-          case "hwidr":
-            message = "Unable to boot: You need to complete your setup (see website)";
-            bad = true;
-            break;
-          case "expired":
-            message = "Unable to boot: Buy Intave for continued use";
-            bad = true;
-            clearReloCache = true;
-            break;
-          case "timeout":
-            message = "Unable to connect to service";
-            break;
-          default:
-            break;
+        // VMProtect doesn't like switches :(
+        if ("banned".equals(response) || "invalid".equals(response)) {
+          message = "Unable to boot: Something went wrong verifying integrity";
+          bad = true;
+          clearReloCache = true;
+        } else if ("hwid".equals(response)) {
+          message = "Unable to boot: Hardware identification failed";
+          bad = true;
+          clearReloCache = true;
+        } else if ("hwidr".equals(response)) {
+          message = "Unable to boot: You need to complete your setup (see website)";
+          bad = true;
+        } else if ("expired".equals(response)) {
+          message = "Unable to boot: Buy Intave for continued use";
+          bad = true;
+          clearReloCache = true;
+        } else if ("timeout".equals(response)) {
+          message = "Unable to connect to service";
         }
 
-        if (message != null) {
+        if (!message.isEmpty()) {
           logger.error(message);
         }
 
         if(clearReloCache) {
           String operatingSystem = System.getProperty("os.name").toLowerCase(Locale.ROOT);
-          String filePath = "";
+          String filePath = null;
           if(operatingSystem.contains("win")) {
             filePath = System.getenv("APPDATA") + "/Intave/Relocator/";
           } else {
             filePath = "/home/.intave/relocator/";
           }
           File workDirectory = new File(filePath);
-          if(workDirectory.exists() && workDirectory.listFiles() != null) {
-            for (File file : workDirectory.listFiles()) {
+          File[] files = workDirectory.listFiles();
+          if(workDirectory.exists() && files != null) {
+            for (File file : files) {
               file.delete();
             }
           }
@@ -354,8 +348,6 @@ public final class IntavePlugin extends JavaPlugin {
           return;
         }
 
-        // check if Intave even has internet connection
-
         if(!allowLeniency) {
           logger().error("Unable to boot: Internet connection required to proceed");
           boolFailure();
@@ -373,7 +365,7 @@ public final class IntavePlugin extends JavaPlugin {
       VersionInformation versionInformation = versionList.versionInformation(version());
 
       if (versionInformation == null) {
-        logger().info("This version of Intave is not listed in the official index");
+        logger().info("This version of Intave is not listed in the official version index");
       } else {
         long duration = AccessHelper.now() - versionInformation.release();
         String durationAsString = DurationTranslator.translateDuration(duration);

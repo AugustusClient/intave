@@ -1,8 +1,7 @@
-package de.jpx3.intave.detect.checks.movement.physics.water.aquatics;
+package de.jpx3.intave.world.waterflow;
 
 import com.comphenix.protocol.utility.MinecraftVersion;
 import de.jpx3.intave.adapter.ProtocolLibAdapter;
-import de.jpx3.intave.detect.checks.movement.physics.water.AquaticWaterMovementBase;
 import de.jpx3.intave.reflect.ReflectionFailureException;
 import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
@@ -16,7 +15,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationTargetException;
 
-public final class AquaticAquaticUpdateMovementResolver extends AquaticWaterMovementBase {
+final class VillageUpdateWaterflow extends AbstractWaterflow {
   private MethodHandle fluidMethodHandle;
   private MethodHandle fluidTaggedMethodHandle;
   private MethodHandle fluidHeightMethodHandle;
@@ -25,7 +24,7 @@ public final class AquaticAquaticUpdateMovementResolver extends AquaticWaterMove
   private Object fluidTagWater;
   private Class<?> blockPositionClass;
 
-  public AquaticAquaticUpdateMovementResolver() {
+  public VillageUpdateWaterflow() {
     try {
       setup();
     } catch (Exception e) {
@@ -89,17 +88,17 @@ public final class AquaticAquaticUpdateMovementResolver extends AquaticWaterMove
     Class<?> fluidClass = ReflectiveAccess.lookupServerClass("Fluid");
     fluidHeightMethodHandle = MethodHandles
       .lookup()
-      .findVirtual(fluidClass, "getHeight", MethodType.methodType(Float.TYPE));
+      .findVirtual(fluidClass, "f", MethodType.methodType(Float.TYPE));
   }
 
   private void loadFluidFlowMethodHandle() throws NoSuchMethodException, IllegalAccessException {
     Class<?> fluidClass = ReflectiveAccess.lookupServerClass("Fluid");
     Class<?> vector = ReflectiveAccess.lookupServerClass("Vec3D");
     Class<?> blockPosition = ReflectiveAccess.lookupServerClass("BlockPosition");
-    Class<?> worldReader = ReflectiveAccess.lookupServerClass("IWorldReader");
+    Class<?> blockAccess = ReflectiveAccess.lookupServerClass("IBlockAccess");
     fluidFlowMethodHandle = MethodHandles
       .lookup()
-      .findVirtual(fluidClass, "a", MethodType.methodType(vector, worldReader, blockPosition));
+      .findVirtual(fluidClass, "c", MethodType.methodType(vector, blockAccess, blockPosition));
   }
 
   private void loadWorldTypeMethodHandle() throws NoSuchMethodException, IllegalAccessException {
@@ -115,7 +114,7 @@ public final class AquaticAquaticUpdateMovementResolver extends AquaticWaterMove
     Class<?> fluidClass = ReflectiveAccess.lookupServerClass("Fluid");
     worldTypeMethodHandle = MethodHandles
       .lookup()
-      .findVirtual(fluidClass, "e", MethodType.methodType(Boolean.TYPE));
+      .findVirtual(fluidClass, "isEmpty", MethodType.methodType(Boolean.TYPE));
   }
 
   @Override
@@ -179,5 +178,10 @@ public final class AquaticAquaticUpdateMovementResolver extends AquaticWaterMove
     } catch (Throwable t) {
       throw new ReflectionFailureException(t);
     }
+  }
+
+  @Override
+  public boolean appliesToAtLeast(MinecraftVersion currentVersion) {
+    return currentVersion.isAtLeast(ProtocolLibAdapter.VILLAGE_UPDATE);
   }
 }

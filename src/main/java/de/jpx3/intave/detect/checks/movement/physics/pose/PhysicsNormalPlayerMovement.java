@@ -1,7 +1,7 @@
 package de.jpx3.intave.detect.checks.movement.physics.pose;
 
 import de.jpx3.intave.detect.checks.movement.Physics;
-import de.jpx3.intave.detect.checks.movement.physics.collision.entity.SimulationResult;
+import de.jpx3.intave.detect.checks.movement.physics.collision.collider.SimulationResult;
 import de.jpx3.intave.tools.client.PlayerEffectHelper;
 import de.jpx3.intave.tools.client.PlayerMovementHelper;
 import de.jpx3.intave.tools.client.PlayerMovementPoseHelper;
@@ -23,7 +23,7 @@ import org.bukkit.util.Vector;
 
 import static de.jpx3.intave.user.UserMetaClientData.PROTOCOL_VERSION_VILLAGE_UPDATE;
 
-public class PhysicsNormalPlayerMovement extends PhysicsCalculationPart {
+public class PhysicsNormalPlayerMovement extends PhysicsPoseSimulator {
   @Override
   public SimulationResult performSimulation(
     User user, Physics.PhysicsProcessorContext context,

@@ -7,13 +7,13 @@ public enum PhysicsMovementPose {
   PHYSICS_ELYTRA_MOVEMENT(new PhysicsElytraMovement()),
   PHYSICS_VEHICLE_MOVEMENT(new PhysicsHorseMovement());
 
-  private final PhysicsCalculationPart calculationPart;
+  private final PhysicsPoseSimulator calculationPart;
 
-  PhysicsMovementPose(PhysicsCalculationPart calculationPart) {
+  PhysicsMovementPose(PhysicsPoseSimulator calculationPart) {
     this.calculationPart = calculationPart;
   }
 
-  public PhysicsCalculationPart calculationPart() {
+  public PhysicsPoseSimulator simulator() {
     return calculationPart;
   }
 }

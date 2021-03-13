@@ -142,7 +142,7 @@ public final class IntaveCommandStage extends CommandStage {
   @SubCommand(
     selectors = "internals",
     usage = "",
-    description = "",
+    description = "Console-reserved commands",
     permission = "intave.command.internals.*"
   )
   @Forward(

@@ -1,8 +1,7 @@
-package de.jpx3.intave.detect.checks.movement.physics.water.aquatics;
+package de.jpx3.intave.world.waterflow;
 
 import com.comphenix.protocol.utility.MinecraftVersion;
 import de.jpx3.intave.adapter.ProtocolLibAdapter;
-import de.jpx3.intave.detect.checks.movement.physics.water.AquaticWaterMovementBase;
 import de.jpx3.intave.reflect.ReflectionFailureException;
 import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
@@ -16,7 +15,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationTargetException;
 
-public final class AquaticVillageUpdateMovementResolver extends AquaticWaterMovementBase {
+final class NetherUpdateWaterflow extends AbstractWaterflow {
   private MethodHandle fluidMethodHandle;
   private MethodHandle fluidTaggedMethodHandle;
   private MethodHandle fluidHeightMethodHandle;
@@ -25,7 +24,7 @@ public final class AquaticVillageUpdateMovementResolver extends AquaticWaterMove
   private Object fluidTagWater;
   private Class<?> blockPositionClass;
 
-  public AquaticVillageUpdateMovementResolver() {
+  public NetherUpdateWaterflow() {
     try {
       setup();
     } catch (Exception e) {
@@ -89,7 +88,7 @@ public final class AquaticVillageUpdateMovementResolver extends AquaticWaterMove
     Class<?> fluidClass = ReflectiveAccess.lookupServerClass("Fluid");
     fluidHeightMethodHandle = MethodHandles
       .lookup()
-      .findVirtual(fluidClass, "f", MethodType.methodType(Float.TYPE));
+      .findVirtual(fluidClass, "d", MethodType.methodType(Float.TYPE));
   }
 
   private void loadFluidFlowMethodHandle() throws NoSuchMethodException, IllegalAccessException {
@@ -179,5 +178,10 @@ public final class AquaticVillageUpdateMovementResolver extends AquaticWaterMove
     } catch (Throwable t) {
       throw new ReflectionFailureException(t);
     }
+  }
+
+  @Override
+  public boolean appliesToAtLeast(MinecraftVersion currentVersion) {
+    return currentVersion.isAtLeast(ProtocolLibAdapter.NETHER_UPDATE);
   }
 }

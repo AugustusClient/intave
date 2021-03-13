@@ -1,21 +1,21 @@
-package de.jpx3.intave.detect.checks.movement.physics.collision.entity;
+package de.jpx3.intave.detect.checks.movement.physics.collision.collider;
 
 import de.jpx3.intave.detect.checks.movement.Physics;
 import de.jpx3.intave.detect.checks.movement.physics.collision.PhysicsEntityCollision;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaClientData;
 
-public final class EntityCollisionRepository {
+public final class Colliders {
   private PhysicsEntityCollision legacyCollisionResolver;
   private PhysicsEntityCollision newCollisionResolver;
 
-  public EntityCollisionRepository() {
+  public Colliders() {
     setup();
   }
 
   private void setup() {
-    legacyCollisionResolver = new EntityCollisionLegacyResolver();
-    newCollisionResolver = new EntityCollisionNewResolver();
+    legacyCollisionResolver = new LegacyCollider();
+    newCollisionResolver = new NewCollider();
   }
 
   public SimulationResult resolveEntityCollisionOf(

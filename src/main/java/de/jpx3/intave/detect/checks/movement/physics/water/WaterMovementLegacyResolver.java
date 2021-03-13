@@ -57,10 +57,10 @@ public final class WaterMovementLegacyResolver {
   }
 
   public static WrappedVector modifyAcceleration(User user, WrappedBlockPosition pos, WrappedVector motion) {
-    return motion.add(getFlowVector(user.player().getWorld(), pos));
+    return motion.add(flowVector(user.player().getWorld(), pos));
   }
 
-  private static WrappedVector getFlowVector(World worldIn, WrappedBlockPosition pos) {
+  private static WrappedVector flowVector(World worldIn, WrappedBlockPosition pos) {
     WrappedVector vec3 = new WrappedVector(0.0D, 0.0D, 0.0D);
     int i = resolveEffectiveFlowDecay(worldIn, pos);
 
@@ -82,18 +82,15 @@ public final class WaterMovementLegacyResolver {
         vec3 = vec3.addVector((position.xCoord - pos.xCoord) * l, (position.yCoord - pos.yCoord) * l, (position.zCoord - pos.zCoord) * l);
       }
     }
-
     if (resolveLevel(worldIn, pos) >= 8) {
       for (WrappedEnumDirection enumfacing1 : WrappedEnumDirection.Plane.HORIZONTAL) {
         WrappedBlockPosition blockpos1 = pos.offset(enumfacing1);
-
         if (isBlockSolid(worldIn, blockpos1, enumfacing1) || isBlockSolid(worldIn, blockpos1.up(), enumfacing1)) {
           vec3 = vec3.normalize().addVector(0.0D, -6.0D, 0.0D);
           break;
         }
       }
     }
-
     return vec3.normalize();
   }
 

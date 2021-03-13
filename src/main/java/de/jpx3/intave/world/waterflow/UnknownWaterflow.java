@@ -1,6 +1,6 @@
-package de.jpx3.intave.detect.checks.movement.physics.water.aquatics;
+package de.jpx3.intave.world.waterflow;
 
-import de.jpx3.intave.detect.checks.movement.physics.water.AquaticWaterMovementBase;
+import com.comphenix.protocol.utility.MinecraftVersion;
 import de.jpx3.intave.detect.checks.movement.physics.water.WaterMovementLegacyResolver;
 import de.jpx3.intave.tools.client.ClientBlockHelper;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
@@ -15,7 +15,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-public final class AquaticUnknownMovementResolver extends AquaticWaterMovementBase {
+final class UnknownWaterflow extends AbstractWaterflow {
   @Override
   public boolean fluidStateEmpty(User user, double x, double y, double z) {
     World world = user.player().getWorld();
@@ -130,5 +130,10 @@ public final class AquaticUnknownMovementResolver extends AquaticWaterMovementBa
   @Deprecated
   public WrappedVector resolveFlowVector(Object fluidState, Object world, Object blockPosition) {
     return null;
+  }
+
+  @Override
+  public boolean appliesToAtLeast(MinecraftVersion currentVersion) {
+    return true;
   }
 }

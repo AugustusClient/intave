@@ -28,12 +28,17 @@ public abstract class CommandStage {
 
   private void load() {
     Arrays.stream(getClass().getMethods()).forEach(this::processMethod);
+    orderSubCommands();
   }
 
   public void processMethod(Method method) {
     if(method.getDeclaredAnnotation(SubCommand.class) != null) {
       subCommandList.add(new IntaveSubCommand(this, method));
     }
+  }
+
+  public void orderSubCommands() {
+    subCommandList.sort(Comparator.comparing(intaveSubCommand -> intaveSubCommand.selectors()[0]));
   }
 
   private final static String NO_PERMISSION_MESSAGE = ChatColor.RED + "I'm sorry, but you do not have permission to perform this command. Please contact the server administrators if you believe that this is in error.";
@@ -110,6 +115,7 @@ public abstract class CommandStage {
     } while ((currentStage = currentStage.parent()) != null);
     Collections.reverse(commandPath);
     String commandPathAsString = commandPath.stream().map(s -> s + " ").collect(Collectors.joining());
+
     for (IntaveSubCommand intaveSubCommand : subCommandList) {
       if(intaveSubCommand.hideInHelp()) {
         continue;

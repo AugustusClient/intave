@@ -1,5 +1,5 @@
 name: Intave
-authors: [DarkAndBlue, vento, Jpx3]
+authors: [DarkAndBlue, Jpx3, vento]
 version: @VERSION@
 api-version: 1.13
 description: @DESCRIPTION@

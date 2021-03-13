@@ -1,7 +1,7 @@
 package de.jpx3.intave.detect.checks.movement.physics.pose;
 
 import de.jpx3.intave.detect.checks.movement.Physics;
-import de.jpx3.intave.detect.checks.movement.physics.collision.entity.SimulationResult;
+import de.jpx3.intave.detect.checks.movement.physics.collision.collider.SimulationResult;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaMovementData;

@@ -5,12 +5,9 @@ import de.jpx3.intave.command.CommandStage;
 import de.jpx3.intave.command.SubCommand;
 import de.jpx3.intave.detect.CheckStatistics;
 import de.jpx3.intave.detect.IntaveCheck;
-import de.jpx3.intave.diagnostics.timings.Timing;
-import de.jpx3.intave.diagnostics.timings.Timings;
 import de.jpx3.intave.tools.MathHelper;
-import de.jpx3.intave.user.User;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
+import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -31,26 +28,26 @@ public final class IntaveDiagnosticsStage extends CommandStage {
     description = "Output performance data",
     permission = "intave.command.diagnostics.performance"
   )
-  public void timingsCommand(User user) {
-    Player player = user.player();
-    player.sendMessage(IntavePlugin.prefix() + "Service status");
-    List<Timing> timings = new ArrayList<>(Timings.timingPool());
-    timings.sort(Timing::compareTo);
-
-    timings.forEach(timing -> {
-      boolean suspicious = timing.getAverageCallDurationInMillis() > 0.5d;
-      boolean dumping = timing.getAverageCallDurationInMillis() > 1.5d;
-      String type;
-      if (suspicious) {
-        type = ChatColor.GOLD + "SUSPICIOUS";
-      } else if (dumping) {
-        type = ChatColor.RED + "CRITICAL";
-      } else {
-        type = ChatColor.GREEN + "HEALTHY";
-      }
-      String message = type + " " + ChatColor.GRAY + timing.getTimingName();
-      player.sendMessage(message);
-    });
+  public void timingsCommand(CommandSender sender) {
+    sender.sendMessage(IntavePlugin.prefix() + ChatColor.RED + "Currently unavailable");
+//    sender.sendMessage(IntavePlugin.prefix() + "Service status");
+//    List<Timing> timings = new ArrayList<>(Timings.timingPool());
+//    timings.sort(Timing::compareTo);
+//
+//    timings.forEach(timing -> {
+//      boolean suspicious = timing.getAverageCallDurationInMillis() > 0.5d;
+//      boolean dumping = timing.getAverageCallDurationInMillis() > 1.5d;
+//      String type;
+//      if (suspicious) {
+//        type = ChatColor.GOLD + "SUSPICIOUS";
+//      } else if (dumping) {
+//        type = ChatColor.RED + "CRITICAL";
+//      } else {
+//        type = ChatColor.GREEN + "HEALTHY";
+//      }
+//      String message = type + " " + ChatColor.GRAY + timing.getTimingName();
+//      sender.sendMessage(message);
+//    });
   }
 
   @SubCommand(
@@ -59,9 +56,8 @@ public final class IntaveDiagnosticsStage extends CommandStage {
     permission = "intave.command.diagnostics.statistics",
     description = "Output check statistics"
   )
-  public void checkStatisticsCommand(User user) {
-    Player player = user.player();
-    player.sendMessage(IntavePlugin.prefix() + "Loading check statistics...");
+  public void checkStatisticsCommand(CommandSender sender) {
+    sender.sendMessage(IntavePlugin.prefix() + "Loading check statistics...");
     List<IntaveCheck> checks = new ArrayList<>(plugin.checkService().checks());
     checks.sort(Comparator.comparing(check -> check.statistics().totalFails()));
     for (IntaveCheck check : checks) {
@@ -74,7 +70,7 @@ public final class IntaveDiagnosticsStage extends CommandStage {
       String violatedRate = MathHelper.formatDouble((((double) violations / (double) processed)) * 100d, 5);
       String checkFormat = ChatColor.RED + check.name();
       String message = checkFormat + ChatColor.GRAY + ": " + violations + " detections in " + processed + " processes (" + violatedRate + "%)";
-      player.sendMessage(message);
+      sender.sendMessage(message);
     }
   }
 

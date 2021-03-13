@@ -1,21 +1,18 @@
 package de.jpx3.intave.detect.checks.movement;
 
-import com.comphenix.protocol.utility.MinecraftVersion;
 import com.google.common.collect.ImmutableList;
 import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.adapter.ProtocolLibAdapter;
 import de.jpx3.intave.detect.CheckViolationLevelDecrementer;
 import de.jpx3.intave.detect.IntaveCheck;
-import de.jpx3.intave.detect.checks.movement.physics.PhysicsSimulator;
+import de.jpx3.intave.detect.checks.movement.physics.PhysicsSimulationEngine;
 import de.jpx3.intave.detect.checks.movement.physics.collision.block.BlockCollisionRepository;
-import de.jpx3.intave.detect.checks.movement.physics.collision.entity.EntityCollisionRepository;
-import de.jpx3.intave.detect.checks.movement.physics.collision.entity.SimulationResult;
-import de.jpx3.intave.detect.checks.movement.physics.pose.PhysicsCalculationPart;
+import de.jpx3.intave.detect.checks.movement.physics.collision.collider.Colliders;
+import de.jpx3.intave.detect.checks.movement.physics.collision.collider.SimulationResult;
 import de.jpx3.intave.detect.checks.movement.physics.pose.PhysicsMovementPose;
-import de.jpx3.intave.detect.checks.movement.physics.water.AquaticWaterMovementBase;
+import de.jpx3.intave.detect.checks.movement.physics.pose.PhysicsPoseSimulator;
 import de.jpx3.intave.detect.checks.movement.physics.water.WaterMovementLegacyResolver;
-import de.jpx3.intave.detect.checks.movement.physics.water.aquatics.*;
 import de.jpx3.intave.diagnostics.timings.Timings;
 import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.tools.MathHelper;
@@ -28,6 +25,8 @@ import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import de.jpx3.intave.user.*;
 import de.jpx3.intave.world.BlockAccessor;
 import de.jpx3.intave.world.collision.Collision;
+import de.jpx3.intave.world.waterflow.AbstractWaterflow;
+import de.jpx3.intave.world.waterflow.Waterflow;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -53,21 +52,21 @@ public final class Physics extends IntaveCheck {
   private final CheckViolationLevelDecrementer decrementer;
   private MethodHandle fallDamageInvokeMethod;
 
-  private final PhysicsSimulator simulationService;
-  private final AquaticWaterMovementBase aquaticWaterMovementBase;
-  private final EntityCollisionRepository entityCollisionRepository;
+  private final PhysicsSimulationEngine simulationService;
+  private final AbstractWaterflow abstractWaterflow;
+  private final Colliders colliders;
   private final BlockCollisionRepository blockCollisionRepository;
 
   public Physics(IntavePlugin plugin) {
     super("Physics", "physics");
     this.plugin = plugin;
     this.decrementer = new CheckViolationLevelDecrementer(this, VL_DECREMENT_PER_VALID_MOVE * 20);
-    this.simulationService = new PhysicsSimulator();
-    this.entityCollisionRepository = new EntityCollisionRepository();
+    this.simulationService = new PhysicsSimulationEngine();
+    this.colliders = new Colliders();
     this.blockCollisionRepository = new BlockCollisionRepository();
-    this.aquaticWaterMovementBase = resolveAquaticMovement();
+    this.abstractWaterflow = Waterflow.engine();
     linkFallDamageInvokeMethod();
-    setupPoseTypes();
+    linkCheckToPoseSimulators();
   }
 
   private void linkFallDamageInvokeMethod() {
@@ -88,31 +87,10 @@ public final class Physics extends IntaveCheck {
     }
   }
 
-  private void setupPoseTypes() {
+  private void linkCheckToPoseSimulators() {
     for (PhysicsMovementPose pose : PhysicsMovementPose.values()) {
-      setupPose(pose.calculationPart());
+      pose.simulator().checkLinkage(this);
     }
-  }
-
-  private void setupPose(PhysicsCalculationPart poseType) {
-    poseType.setup(this);
-  }
-
-  private AquaticWaterMovementBase resolveAquaticMovement() {
-    MinecraftVersion minecraftVersion = ProtocolLibAdapter.serverVersion();
-    AquaticWaterMovementBase aquaticWaterMovement;
-    if (minecraftVersion.isAtLeast(ProtocolLibAdapter.NETHER_UPDATE)) {
-      aquaticWaterMovement = new AquaticNetherUpdateMovementResolver();
-    } else if (minecraftVersion.isAtLeast(ProtocolLibAdapter.BEE_UPDATE)) {
-      aquaticWaterMovement = new AquaticBeeUpdateMovementResolver();
-    } else if (minecraftVersion.isAtLeast(ProtocolLibAdapter.VILLAGE_UPDATE)) {
-      aquaticWaterMovement = new AquaticVillageUpdateMovementResolver();
-    } else if (minecraftVersion.isAtLeast(ProtocolLibAdapter.AQUATIC_UPDATE)) {
-      aquaticWaterMovement = new AquaticAquaticUpdateMovementResolver();
-    } else {
-      aquaticWaterMovement = new AquaticUnknownMovementResolver();
-    }
-    return aquaticWaterMovement;
   }
 
   public void applyFallDamageUpdate(User user) {
@@ -163,7 +141,7 @@ public final class Physics extends IntaveCheck {
     double motionZ = movementData.motionZ();
     if (hasMovement) {
       PhysicsMovementPose movementPoseType = movementData.movementPoseType();
-      PhysicsCalculationPart calculationPart = movementPoseType.calculationPart();
+      PhysicsPoseSimulator calculationPart = movementPoseType.simulator();
 
       if (movementData.pastVelocity == 0) {
         if (movementData.physicsJumped) {
@@ -235,7 +213,7 @@ public final class Physics extends IntaveCheck {
 
   private void updateEyesInWater(User user) {
     UserMetaMovementData movementData = user.meta().movementData();
-    movementData.eyesInWater = aquaticWaterMovementBase.areEyesInFluid(user, movementData.positionX, movementData.positionY, movementData.positionZ);
+    movementData.eyesInWater = abstractWaterflow.areEyesInFluid(user, movementData.positionX, movementData.positionY, movementData.positionZ);
   }
 
   private void updateInWater(User user) {
@@ -243,7 +221,7 @@ public final class Physics extends IntaveCheck {
     UserMetaClientData clientData = meta.clientData();
     UserMetaMovementData movementData = meta.movementData();
     if (clientData.protocolVersion() >= PROTOCOL_VERSION_AQUATIC_UPDATE) {
-      movementData.inWater = aquaticWaterMovementBase.handleFluidAcceleration(user, movementData.boundingBox());
+      movementData.inWater = abstractWaterflow.handleFluidAcceleration(user, movementData.boundingBox());
     } else {
       WrappedAxisAlignedBB entityBoundingBox = movementData.boundingBox();
       WrappedAxisAlignedBB checkableBoundingBox = entityBoundingBox
@@ -739,12 +717,12 @@ public final class Physics extends IntaveCheck {
     }
   }
 
-  public AquaticWaterMovementBase aquaticWaterMovementBase() {
-    return aquaticWaterMovementBase;
+  public AbstractWaterflow aquaticWaterMovementBase() {
+    return abstractWaterflow;
   }
 
-  public EntityCollisionRepository entityCollisionRepository() {
-    return entityCollisionRepository;
+  public Colliders entityCollisionRepository() {
+    return colliders;
   }
 
   public BlockCollisionRepository blockCollisionRepository() {
