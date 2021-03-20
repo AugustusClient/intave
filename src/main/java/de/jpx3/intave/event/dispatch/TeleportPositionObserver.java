@@ -93,6 +93,15 @@ public final class TeleportPositionObserver implements PacketEventSubscriber {
       if (TELEPORTATION_DEBUG) {
         Bukkit.broadcastMessage("[Intave] " + player.getName() + " accepted teleportation request");
       }
+
+      double teleportLength = MathHelper.resolveHorizontalDistance(
+        movementData.lastPositionX, movementData.lastPositionZ,
+        teleportLocation.getX(), teleportLocation.getZ()
+      );
+      if (teleportLength > 20) {
+        movementData.pastLongTeleport = 0;
+      }
+
     } else {
       if (TELEPORTATION_DEBUG) {
         Bukkit.broadcastMessage("[Intave] Potential teleportation requested of " + player.getName() + "was evaluated as invalid");
@@ -210,11 +219,9 @@ public final class TeleportPositionObserver implements PacketEventSubscriber {
     movementData.verifiedPositionY = positionY;
     movementData.verifiedPositionZ = positionZ;
 
-    //if (movementData.onGround) {
-      movementData.physicsMotionX = 0.0;
-      movementData.physicsMotionY = 0.0;
-      movementData.physicsMotionZ = 0.0;
-    //}
+    movementData.physicsMotionX = 0.0;
+    movementData.physicsMotionY = 0.0;
+    movementData.physicsMotionZ = 0.0;
 
     movementData.lastOnGround = false;
 

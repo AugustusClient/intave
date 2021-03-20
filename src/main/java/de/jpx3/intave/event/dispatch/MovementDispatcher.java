@@ -363,6 +363,7 @@ public final class MovementDispatcher implements EventProcessor {
     movementData.pastVelocity++;
     movementData.ignoredAttackReduce = false;
     movementData.pastExternalVelocity++;
+    movementData.pastLongTeleport++;
     movementData.physicsUnpredictableVelocityExpected = false;
     movementData.step = false;
     movementData.lastSprinting = movementData.sprintingAllowed();

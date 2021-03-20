@@ -578,6 +578,14 @@ public final class Physics extends IntaveCheck {
       abuseVertically = 0;
     }
 
+    // Long teleport
+    if (movementData.pastLongTeleport <= 5 && movementData.motionY() < 0.0 && movementData.motionY() > -0.1) {
+      double horizontalDistance = Math.hypot(movementData.motionX(), movementData.motionZ());
+      if (horizontalDistance < 0.2) {
+        abuseVertically = 0;
+      }
+    }
+
     return abuseVertically * multiplier;
   }
 
