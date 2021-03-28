@@ -2,6 +2,7 @@ package de.jpx3.intave.command.translator;
 
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.command.TypeTranslator;
+import de.jpx3.intave.tools.AccessHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -22,7 +23,7 @@ public final class PlayerArrayTranslator extends TypeTranslator<Player[]> {
     List<Player> players = new ArrayList<>();
     for (String playerName : playerNames) {
       Player player = Bukkit.getPlayer(playerName);
-      if(player == null || !player.isOnline()) {
+      if(!AccessHelper.isOnline(player)) {
         commandSender.sendMessage(IntavePlugin.prefix() + ChatColor.RED + "Invalid argument \""+playerName+"\": Unable to locate player");
         return null;
       }

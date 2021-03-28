@@ -2,16 +2,16 @@ package de.jpx3.intave.detect.checks.movement.physics;
 
 import de.jpx3.intave.user.UserMetaMovementData;
 
-public final class ProcessorMotionContext {
+public final class MotionVector {
   public double motionX;
   public double motionY;
   public double motionZ;
 
-  public ProcessorMotionContext() {
+  public MotionVector() {
     this(0.0, 0.0, 0.0);
   }
 
-  public ProcessorMotionContext(double motionX, double motionY, double motionZ) {
+  public MotionVector(double motionX, double motionY, double motionZ) {
     this.motionX = motionX;
     this.motionY = motionY;
     this.motionZ = motionZ;
@@ -27,7 +27,7 @@ public final class ProcessorMotionContext {
     reset(data.physicsMotionX, data.physicsMotionY, data.physicsMotionZ);
   }
 
-  public static ProcessorMotionContext from(ProcessorMotionContext context) {
-    return new ProcessorMotionContext(context.motionX, context.motionY, context.motionZ);
+  public static MotionVector from(MotionVector context) {
+    return new MotionVector(context.motionX, context.motionY, context.motionZ);
   }
 }

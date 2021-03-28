@@ -40,16 +40,20 @@ import java.util.Map;
  */
 public class MultiANewArrayInsnNode extends AbstractInsnNode {
 
-  /** An array type descriptor (see {@link Type}). */
+  /**
+   * An array type descriptor (see {@link Type}).
+   */
   public String desc;
 
-  /** Number of dimensions of the array to allocate. */
+  /**
+   * Number of dimensions of the array to allocate.
+   */
   public int dims;
 
   /**
    * Constructs a new {@link MultiANewArrayInsnNode}.
    *
-   * @param descriptor an array type descriptor (see {@link Type}).
+   * @param descriptor    an array type descriptor (see {@link Type}).
    * @param numDimensions the number of dimensions of the array to allocate.
    */
   public MultiANewArrayInsnNode(final String descriptor, final int numDimensions) {

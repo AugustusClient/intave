@@ -14,7 +14,7 @@ import de.jpx3.intave.event.packet.*;
 import de.jpx3.intave.reflect.ReflectiveEntityAccess;
 import de.jpx3.intave.tools.MathHelper;
 import de.jpx3.intave.tools.annotate.Relocate;
-import de.jpx3.intave.tools.client.PlayerMovementPoseHelper;
+import de.jpx3.intave.tools.client.PoseHelper;
 import de.jpx3.intave.tools.packet.PlayerAction;
 import de.jpx3.intave.tools.packet.PlayerActionResolver;
 import de.jpx3.intave.tools.sync.Synchronizer;
@@ -135,7 +135,9 @@ public final class MovementDispatcher implements EventProcessor {
   )
   public void sentRespawn(PacketEvent event) {
     Player player = event.getPlayer();
-    Synchronizer.synchronizeDelayed(() -> synchronizeRespawn(player), 1);
+    synchronizeRespawn(player);
+//    Synchronizer.synchronizeDelayed(() -> {
+//    }, 1);
   }
 
   private void synchronizeRespawn(Player player) {
@@ -145,6 +147,9 @@ public final class MovementDispatcher implements EventProcessor {
       .requestPong(player, user.meta().movementData(), (p, movementData) -> {
         movementData.sneaking = false;
         movementData.sprinting = false;
+        movementData.physicsMotionX = 0;
+        movementData.physicsMotionY = 0;
+        movementData.physicsMotionZ = 0;
       });
   }
 
@@ -261,7 +266,7 @@ public final class MovementDispatcher implements EventProcessor {
 
       if (!vehicleMove) {
         movementData.applyGroundInformationToPacket(packet);
-        ReflectiveEntityAccess.setOnGround(player, movementData.onGround);
+        ReflectiveEntityAccess.setOnGround(player, /*movementData.onGround*/true);
       }
 
       if (movementData.onGround && !clientOnGround && movementData.step) {
@@ -346,7 +351,7 @@ public final class MovementDispatcher implements EventProcessor {
     movementData.suspiciousMovement = false;
     movementData.isTeleportConfirmationPacket = false;
 
-    boolean flyingWithElytra = PlayerMovementPoseHelper.flyingWithElytra(player);
+    boolean flyingWithElytra = PoseHelper.flyingWithElytra(player);
     if (flyingWithElytra) {
       movementData.pastElytraFlying = 0;
     } else {

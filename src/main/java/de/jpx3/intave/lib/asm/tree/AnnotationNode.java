@@ -41,7 +41,9 @@ import java.util.List;
  */
 public class AnnotationNode extends AnnotationVisitor {
 
-  /** The class descriptor of the annotation class. */
+  /**
+   * The class descriptor of the annotation class.
+   */
   public String desc;
 
   /**
@@ -71,8 +73,8 @@ public class AnnotationNode extends AnnotationVisitor {
   /**
    * Constructs a new {@link AnnotationNode}.
    *
-   * @param api the ASM API version implemented by this visitor. Must be one of {@link
-   *     Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
+   * @param api        the ASM API version implemented by this visitor. Must be one of {@link
+   *                   Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
    * @param descriptor the class descriptor of the annotation class.
    */
   public AnnotationNode(final int api, final String descriptor) {
@@ -93,6 +95,35 @@ public class AnnotationNode extends AnnotationVisitor {
   // ------------------------------------------------------------------------
   // Implementation of the AnnotationVisitor abstract class
   // ------------------------------------------------------------------------
+
+  /**
+   * Makes the given visitor visit a given annotation value.
+   *
+   * @param annotationVisitor an annotation visitor. Maybe {@literal null}.
+   * @param name              the value name.
+   * @param value             the actual value.
+   */
+  static void accept(
+    final AnnotationVisitor annotationVisitor, final String name, final Object value) {
+    if (annotationVisitor != null) {
+      if (value instanceof String[]) {
+        String[] typeValue = (String[]) value;
+        annotationVisitor.visitEnum(name, typeValue[0], typeValue[1]);
+      } else if (value instanceof AnnotationNode) {
+        AnnotationNode annotationValue = (AnnotationNode) value;
+        annotationValue.accept(annotationVisitor.visitAnnotation(name, annotationValue.desc));
+      } else if (value instanceof List) {
+        AnnotationVisitor arrayAnnotationVisitor = annotationVisitor.visitArray(name);
+        if (arrayAnnotationVisitor != null) {
+          List<?> arrayValue = (List<?>) value;
+          arrayValue.forEach(o -> accept(arrayAnnotationVisitor, null, o));
+          arrayAnnotationVisitor.visitEnd();
+        }
+      } else {
+        annotationVisitor.visit(name, value);
+      }
+    }
+  }
 
   @Override
   public void visit(final String name, final Object value) {
@@ -131,7 +162,7 @@ public class AnnotationNode extends AnnotationVisitor {
     if (this.desc != null) {
       values.add(name);
     }
-    values.add(new String[] {descriptor, value});
+    values.add(new String[]{descriptor, value});
   }
 
   @Override
@@ -155,19 +186,19 @@ public class AnnotationNode extends AnnotationVisitor {
     if (this.desc != null) {
       values.add(name);
     }
-    List<Object> array = new ArrayList<>();;
+    List<Object> array = new ArrayList<>();
     values.add(array);
     return new AnnotationNode(array);
-  }
-
-  @Override
-  public void visitEnd() {
-    // Nothing to do.
   }
 
   // ------------------------------------------------------------------------
   // Accept methods
   // ------------------------------------------------------------------------
+
+  @Override
+  public void visitEnd() {
+    // Nothing to do.
+  }
 
   /**
    * Checks that this annotation node is compatible with the given ASM API version. This method
@@ -175,7 +206,7 @@ public class AnnotationNode extends AnnotationVisitor {
    * introduced in more recent versions of the ASM API than the given version.
    *
    * @param api an ASM API version. Must be one of {@link Opcodes#ASM4}, {@link Opcodes#ASM5},
-   *     {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
+   *            {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
    */
   public void check(final int api) {
     // nothing to do
@@ -196,35 +227,6 @@ public class AnnotationNode extends AnnotationVisitor {
         }
       }
       annotationVisitor.visitEnd();
-    }
-  }
-
-  /**
-   * Makes the given visitor visit a given annotation value.
-   *
-   * @param annotationVisitor an annotation visitor. Maybe {@literal null}.
-   * @param name the value name.
-   * @param value the actual value.
-   */
-  static void accept(
-      final AnnotationVisitor annotationVisitor, final String name, final Object value) {
-    if (annotationVisitor != null) {
-      if (value instanceof String[]) {
-        String[] typeValue = (String[]) value;
-        annotationVisitor.visitEnum(name, typeValue[0], typeValue[1]);
-      } else if (value instanceof AnnotationNode) {
-        AnnotationNode annotationValue = (AnnotationNode) value;
-        annotationValue.accept(annotationVisitor.visitAnnotation(name, annotationValue.desc));
-      } else if (value instanceof List) {
-        AnnotationVisitor arrayAnnotationVisitor = annotationVisitor.visitArray(name);
-        if (arrayAnnotationVisitor != null) {
-          List<?> arrayValue = (List<?>) value;
-          arrayValue.forEach(o -> accept(arrayAnnotationVisitor, null, o));
-          arrayAnnotationVisitor.visitEnd();
-        }
-      } else {
-        annotationVisitor.visit(name, value);
-      }
     }
   }
 }

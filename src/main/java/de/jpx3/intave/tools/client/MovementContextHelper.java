@@ -17,7 +17,7 @@ import org.bukkit.material.Openable;
 
 import java.util.List;
 
-public final class PlayerMovementHelper {
+public final class MovementContextHelper {
   public static double jumpMotionFor(Player player) {
     User user = UserRepository.userOf(player);
     UserMetaPotionData potionData = user.meta().potionData();
@@ -60,7 +60,7 @@ public final class PlayerMovementHelper {
         WrappedMathHelper.floor(positionY - movementData.frictionPosSubtraction()),
         WrappedMathHelper.floor(positionZ)
       );
-      float slipperiness = PlayerMovementHelper.resolveSlipperiness(user, location);
+      float slipperiness = resolveSlipperiness(user, location);
       float var4 = 0.16277136f / (slipperiness * slipperiness * slipperiness);
       speed = movementData.aiMoveSpeed() * var4;
     } else {

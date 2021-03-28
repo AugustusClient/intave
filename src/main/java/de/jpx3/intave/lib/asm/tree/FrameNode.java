@@ -77,24 +77,24 @@ public class FrameNode extends AbstractInsnNode {
   /**
    * Constructs a new {@link FrameNode}.
    *
-   * @param type the type of this frame. Must be {@link Opcodes#F_NEW} for expanded frames, or
-   *     {@link Opcodes#F_FULL}, {@link Opcodes#F_APPEND}, {@link Opcodes#F_CHOP}, {@link
-   *     Opcodes#F_SAME} or {@link Opcodes#F_APPEND}, {@link Opcodes#F_SAME1} for compressed frames.
+   * @param type     the type of this frame. Must be {@link Opcodes#F_NEW} for expanded frames, or
+   *                 {@link Opcodes#F_FULL}, {@link Opcodes#F_APPEND}, {@link Opcodes#F_CHOP}, {@link
+   *                 Opcodes#F_SAME} or {@link Opcodes#F_APPEND}, {@link Opcodes#F_SAME1} for compressed frames.
    * @param numLocal number of local variables of this stack map frame.
-   * @param local the types of the local variables of this stack map frame. Elements of this list
-   *     can be Integer, String or LabelNode objects (for primitive, reference and uninitialized
-   *     types respectively - see {@link MethodVisitor}).
+   * @param local    the types of the local variables of this stack map frame. Elements of this list
+   *                 can be Integer, String or LabelNode objects (for primitive, reference and uninitialized
+   *                 types respectively - see {@link MethodVisitor}).
    * @param numStack number of operand stack elements of this stack map frame.
-   * @param stack the types of the operand stack elements of this stack map frame. Elements of this
-   *     list can be Integer, String or LabelNode objects (for primitive, reference and
-   *     uninitialized types respectively - see {@link MethodVisitor}).
+   * @param stack    the types of the operand stack elements of this stack map frame. Elements of this
+   *                 list can be Integer, String or LabelNode objects (for primitive, reference and
+   *                 uninitialized types respectively - see {@link MethodVisitor}).
    */
   public FrameNode(
-      final int type,
-      final int numLocal,
-      final Object[] local,
-      final int numStack,
-      final Object[] stack) {
+    final int type,
+    final int numLocal,
+    final Object[] local,
+    final int numStack,
+    final Object[] stack) {
     super(-1);
     this.type = type;
     switch (type) {
@@ -117,6 +117,18 @@ public class FrameNode extends AbstractInsnNode {
       default:
         throw new IllegalArgumentException();
     }
+  }
+
+  private static Object[] asArray(final List<Object> list) {
+    Object[] array = new Object[list.size()];
+    for (int i = 0, n = array.length; i < n; ++i) {
+      Object o = list.get(i);
+      if (o instanceof LabelNode) {
+        o = ((LabelNode) o).getLabel();
+      }
+      array[i] = o;
+    }
+    return array;
   }
 
   @Override
@@ -153,7 +165,7 @@ public class FrameNode extends AbstractInsnNode {
     FrameNode clone = new FrameNode();
     clone.type = type;
     if (local != null) {
-      clone.local = new ArrayList<>();;
+      clone.local = new ArrayList<>();
       for (int i = 0, n = local.size(); i < n; ++i) {
         Object localElement = local.get(i);
         if (localElement instanceof LabelNode) {
@@ -163,7 +175,7 @@ public class FrameNode extends AbstractInsnNode {
       }
     }
     if (stack != null) {
-      clone.stack = new ArrayList<>();;
+      clone.stack = new ArrayList<>();
       for (int i = 0, n = stack.size(); i < n; ++i) {
         Object stackElement = stack.get(i);
         if (stackElement instanceof LabelNode) {
@@ -173,17 +185,5 @@ public class FrameNode extends AbstractInsnNode {
       }
     }
     return clone;
-  }
-
-  private static Object[] asArray(final List<Object> list) {
-    Object[] array = new Object[list.size()];
-    for (int i = 0, n = array.length; i < n; ++i) {
-      Object o = list.get(i);
-      if (o instanceof LabelNode) {
-        o = ((LabelNode) o).getLabel();
-      }
-      array[i] = o;
-    }
-    return array;
   }
 }

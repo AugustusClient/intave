@@ -44,13 +44,19 @@ public class FieldNode extends FieldVisitor {
    */
   public int access;
 
-  /** The field's name. */
+  /**
+   * The field's name.
+   */
   public String name;
 
-  /** The field's descriptor (see {@link Type}). */
+  /**
+   * The field's descriptor (see {@link Type}).
+   */
   public String desc;
 
-  /** The field's signature. May be {@literal null}. */
+  /**
+   * The field's signature. May be {@literal null}.
+   */
   public String signature;
 
   /**
@@ -60,41 +66,51 @@ public class FieldNode extends FieldVisitor {
    */
   public Object value;
 
-  /** The runtime visible annotations of this field. May be {@literal null}. */
+  /**
+   * The runtime visible annotations of this field. May be {@literal null}.
+   */
   public List<AnnotationNode> visibleAnnotations;
 
-  /** The runtime invisible annotations of this field. May be {@literal null}. */
+  /**
+   * The runtime invisible annotations of this field. May be {@literal null}.
+   */
   public List<AnnotationNode> invisibleAnnotations;
 
-  /** The runtime visible type annotations of this field. May be {@literal null}. */
+  /**
+   * The runtime visible type annotations of this field. May be {@literal null}.
+   */
   public List<TypeAnnotationNode> visibleTypeAnnotations;
 
-  /** The runtime invisible type annotations of this field. May be {@literal null}. */
+  /**
+   * The runtime invisible type annotations of this field. May be {@literal null}.
+   */
   public List<TypeAnnotationNode> invisibleTypeAnnotations;
 
-  /** The non standard attributes of this field. * May be {@literal null}. */
+  /**
+   * The non standard attributes of this field. * May be {@literal null}.
+   */
   public List<Attribute> attrs;
 
   /**
    * Constructs a new {@link FieldNode}. <i>Subclasses must not use this constructor</i>. Instead,
    * they must use the {@link #FieldNode(int, int, String, String, String, Object)} version.
    *
-   * @param access the field's access flags (see {@link Opcodes}). This parameter
-   *     also indicates if the field is synthetic and/or deprecated.
-   * @param name the field's name.
+   * @param access     the field's access flags (see {@link Opcodes}). This parameter
+   *                   also indicates if the field is synthetic and/or deprecated.
+   * @param name       the field's name.
    * @param descriptor the field's descriptor (see {@link Type}).
-   * @param signature the field's signature.
-   * @param value the field's initial value. This parameter, which may be {@literal null} if the
-   *     field does not have an initial value, must be an {@link Integer}, a {@link Float}, a {@link
-   *     Long}, a {@link Double} or a {@link String}.
+   * @param signature  the field's signature.
+   * @param value      the field's initial value. This parameter, which may be {@literal null} if the
+   *                   field does not have an initial value, must be an {@link Integer}, a {@link Float}, a {@link
+   *                   Long}, a {@link Double} or a {@link String}.
    * @throws IllegalStateException If a subclass calls this constructor.
    */
   public FieldNode(
-      final int access,
-      final String name,
-      final String descriptor,
-      final String signature,
-      final Object value) {
+    final int access,
+    final String name,
+    final String descriptor,
+    final String signature,
+    final Object value) {
     this(/* latest api = */ Opcodes.ASM7, access, name, descriptor, signature, value);
     if (getClass() != FieldNode.class) {
       throw new IllegalStateException();
@@ -104,24 +120,24 @@ public class FieldNode extends FieldVisitor {
   /**
    * Constructs a new {@link FieldNode}.
    *
-   * @param api the ASM API version implemented by this visitor. Must be one of {@link Opcodes#ASM4}
-   *     or {@link Opcodes#ASM5}.
-   * @param access the field's access flags (see {@link Opcodes}). This parameter
-   *     also indicates if the field is synthetic and/or deprecated.
-   * @param name the field's name.
+   * @param api        the ASM API version implemented by this visitor. Must be one of {@link Opcodes#ASM4}
+   *                   or {@link Opcodes#ASM5}.
+   * @param access     the field's access flags (see {@link Opcodes}). This parameter
+   *                   also indicates if the field is synthetic and/or deprecated.
+   * @param name       the field's name.
    * @param descriptor the field's descriptor (see {@link Type}).
-   * @param signature the field's signature.
-   * @param value the field's initial value. This parameter, which may be {@literal null} if the
-   *     field does not have an initial value, must be an {@link Integer}, a {@link Float}, a {@link
-   *     Long}, a {@link Double} or a {@link String}.
+   * @param signature  the field's signature.
+   * @param value      the field's initial value. This parameter, which may be {@literal null} if the
+   *                   field does not have an initial value, must be an {@link Integer}, a {@link Float}, a {@link
+   *                   Long}, a {@link Double} or a {@link String}.
    */
   public FieldNode(
-      final int api,
-      final int access,
-      final String name,
-      final String descriptor,
-      final String signature,
-      final Object value) {
+    final int api,
+    final int access,
+    final String name,
+    final String descriptor,
+    final String signature,
+    final Object value) {
     super(api);
     this.access = access;
     this.name = name;
@@ -147,7 +163,7 @@ public class FieldNode extends FieldVisitor {
 
   @Override
   public AnnotationVisitor visitTypeAnnotation(
-      final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
+    final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     TypeAnnotationNode typeAnnotation = new TypeAnnotationNode(typeRef, typePath, descriptor);
     if (visible) {
       visibleTypeAnnotations = Util.add(visibleTypeAnnotations, typeAnnotation);
@@ -177,7 +193,7 @@ public class FieldNode extends FieldVisitor {
    * in more recent versions of the ASM API than the given version.
    *
    * @param api an ASM API version. Must be one of {@link Opcodes#ASM4}, {@link Opcodes#ASM5},
-   *     {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
+   *            {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
    */
   public void check(final int api) {
     if (api == Opcodes.ASM4) {
@@ -217,16 +233,16 @@ public class FieldNode extends FieldVisitor {
       for (int i = 0, n = visibleTypeAnnotations.size(); i < n; ++i) {
         TypeAnnotationNode typeAnnotation = visibleTypeAnnotations.get(i);
         typeAnnotation.accept(
-            fieldVisitor.visitTypeAnnotation(
-                typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, true));
+          fieldVisitor.visitTypeAnnotation(
+            typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, true));
       }
     }
     if (invisibleTypeAnnotations != null) {
       for (int i = 0, n = invisibleTypeAnnotations.size(); i < n; ++i) {
         TypeAnnotationNode typeAnnotation = invisibleTypeAnnotations.get(i);
         typeAnnotation.accept(
-            fieldVisitor.visitTypeAnnotation(
-                typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, false));
+          fieldVisitor.visitTypeAnnotation(
+            typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, false));
       }
     }
     // Visit the non standard attributes.

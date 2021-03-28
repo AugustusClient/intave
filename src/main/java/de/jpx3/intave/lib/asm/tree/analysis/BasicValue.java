@@ -37,29 +37,45 @@ import de.jpx3.intave.lib.asm.Type;
  */
 public class BasicValue implements Value {
 
-  /** An uninitialized value. */
+  /**
+   * An uninitialized value.
+   */
   public static final BasicValue UNINITIALIZED_VALUE = new BasicValue(null);
 
-  /** A byte, boolean, char, short, or int value. */
+  /**
+   * A byte, boolean, char, short, or int value.
+   */
   public static final BasicValue INT_VALUE = new BasicValue(Type.INT_TYPE);
 
-  /** A float value. */
+  /**
+   * A float value.
+   */
   public static final BasicValue FLOAT_VALUE = new BasicValue(Type.FLOAT_TYPE);
 
-  /** A long value. */
+  /**
+   * A long value.
+   */
   public static final BasicValue LONG_VALUE = new BasicValue(Type.LONG_TYPE);
 
-  /** A double value. */
+  /**
+   * A double value.
+   */
   public static final BasicValue DOUBLE_VALUE = new BasicValue(Type.DOUBLE_TYPE);
 
-  /** An object or array reference value. */
+  /**
+   * An object or array reference value.
+   */
   public static final BasicValue REFERENCE_VALUE =
-      new BasicValue(Type.getObjectType("java/lang/Object"));
+    new BasicValue(Type.getObjectType("java/lang/Object"));
 
-  /** A return address value (produced by a jsr instruction). */
+  /**
+   * A return address value (produced by a jsr instruction).
+   */
   public static final BasicValue RETURNADDRESS_VALUE = new BasicValue(Type.VOID_TYPE);
 
-  /** The {@link Type} of this value, or {@literal null} for uninitialized values. */
+  /**
+   * The {@link Type} of this value, or {@literal null} for uninitialized values.
+   */
   private final Type type;
 
   /**

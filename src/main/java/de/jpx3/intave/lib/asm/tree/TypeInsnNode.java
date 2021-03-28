@@ -49,10 +49,10 @@ public class TypeInsnNode extends AbstractInsnNode {
   /**
    * Constructs a new {@link TypeInsnNode}.
    *
-   * @param opcode the opcode of the type instruction to be constructed. This opcode must be NEW,
-   *     ANEWARRAY, CHECKCAST or INSTANCEOF.
+   * @param opcode     the opcode of the type instruction to be constructed. This opcode must be NEW,
+   *                   ANEWARRAY, CHECKCAST or INSTANCEOF.
    * @param descriptor the operand of the instruction to be constructed. This operand is an internal
-   *     name (see {@link Type}).
+   *                   name (see {@link Type}).
    */
   public TypeInsnNode(final int opcode, final String descriptor) {
     super(opcode);
@@ -63,7 +63,7 @@ public class TypeInsnNode extends AbstractInsnNode {
    * Sets the opcode of this instruction.
    *
    * @param opcode the new instruction opcode. This opcode must be NEW, ANEWARRAY, CHECKCAST or
-   *     INSTANCEOF.
+   *               INSTANCEOF.
    */
   public void setOpcode(final int opcode) {
     this.opcode = opcode;

@@ -5,7 +5,7 @@ import de.jpx3.intave.detect.checks.combat.AttackRaytrace;
 import de.jpx3.intave.event.service.entity.WrappedEntity;
 import de.jpx3.intave.patchy.PatchyLoadingInjector;
 import de.jpx3.intave.reflect.ReflectiveAccess;
-import de.jpx3.intave.tools.client.PlayerRotationHelper;
+import de.jpx3.intave.tools.client.RotationHelper;
 import de.jpx3.intave.tools.client.SinusCache;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.tools.wrapper.WrappedMovingObjectPosition;
@@ -93,7 +93,7 @@ public final class Raytracer {
       if(lastReach < attackReachDistance)
         break;
 
-      WrappedVector interpolatedLookVec = PlayerRotationHelper.wrappedVectorForRotation(pitch, prevYaw, fastMath);
+      WrappedVector interpolatedLookVec = RotationHelper.wrappedVectorForRotation(pitch, prevYaw, fastMath);
       WrappedVector lookVector = eyeVector.addVector(
         interpolatedLookVec.xCoord * blockReachDistance,
         interpolatedLookVec.yCoord * blockReachDistance,

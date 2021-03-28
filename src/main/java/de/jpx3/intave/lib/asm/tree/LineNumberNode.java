@@ -39,17 +39,21 @@ import java.util.Map;
  */
 public class LineNumberNode extends AbstractInsnNode {
 
-  /** A line number. This number refers to the source file from which the class was compiled. */
+  /**
+   * A line number. This number refers to the source file from which the class was compiled.
+   */
   public int line;
 
-  /** The first instruction corresponding to this line number. */
+  /**
+   * The first instruction corresponding to this line number.
+   */
   public LabelNode start;
 
   /**
    * Constructs a new {@link LineNumberNode}.
    *
-   * @param line a line number. This number refers to the source file from which the class was
-   *     compiled.
+   * @param line  a line number. This number refers to the source file from which the class was
+   *              compiled.
    * @param start the first instruction corresponding to this line number.
    */
   public LineNumberNode(final int line, final LabelNode start) {

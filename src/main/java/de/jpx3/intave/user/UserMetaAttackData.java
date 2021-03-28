@@ -8,11 +8,13 @@ import de.jpx3.intave.event.service.entity.ClientSideEntityService;
 import de.jpx3.intave.event.service.entity.WrappedEntity;
 import de.jpx3.intave.tools.AccessHelper;
 import de.jpx3.intave.tools.annotate.Nullable;
-import de.jpx3.intave.tools.client.PlayerRotationHelper;
+import de.jpx3.intave.tools.annotate.Relocate;
+import de.jpx3.intave.tools.client.RotationHelper;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
 
+@Relocate
 public final class UserMetaAttackData {
   private final Player player;
   private double lastReach;
@@ -46,8 +48,8 @@ public final class UserMetaAttackData {
     // Set prefect yaw & pitch
     if (lastAttackedEntity != null) {
       WrappedEntity.EntityPositionContext positions = lastAttackedEntity.position;
-      perfectYaw = PlayerRotationHelper.resolveYawRotation(positions, positionX, positionZ);
-      perfectPitch = PlayerRotationHelper.resolvePitchRotation(positions, positionX, positionY, positionZ);
+      perfectYaw = RotationHelper.resolveYawRotation(positions, positionX, positionZ);
+      perfectPitch = RotationHelper.resolvePitchRotation(positions, positionX, positionY, positionZ);
     }
   }
 

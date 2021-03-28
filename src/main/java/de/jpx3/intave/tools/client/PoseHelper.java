@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 import static de.jpx3.intave.user.UserMetaClientData.PROTOCOL_VERSION_AQUATIC_UPDATE;
 
-public final class PlayerMovementPoseHelper {
+public final class PoseHelper {
   private final static boolean ELYTRA_ENABLED = ProtocolLibAdapter.serverVersion().isAtLeast(ProtocolLibAdapter.COMBAT_UPDATE);
 
   public static boolean flyingWithElytra(Player player) {

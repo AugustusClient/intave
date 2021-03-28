@@ -3,8 +3,8 @@ package de.jpx3.intave.user;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.reflect.StructureModifier;
 import de.jpx3.intave.IntavePlugin;
+import de.jpx3.intave.detect.checks.movement.physics.MotionVector;
 import de.jpx3.intave.detect.checks.movement.physics.Pose;
-import de.jpx3.intave.detect.checks.movement.physics.ProcessorMotionContext;
 import de.jpx3.intave.reflect.ReflectiveHandleAccess;
 import de.jpx3.intave.tools.client.*;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
@@ -36,7 +36,7 @@ public final class UserMetaMovementData {
   public boolean allowFallDamage;
   public double gravity;
 
-  public ProcessorMotionContext processorMotionContext = new ProcessorMotionContext();
+  public MotionVector motionVector = new MotionVector();
   public Vector lookVector;
   public double verifiedPositionX, verifiedPositionY, verifiedPositionZ;
   public double lastPositionX, lastPositionY, lastPositionZ;
@@ -159,7 +159,7 @@ public final class UserMetaMovementData {
       setupDefaults();
     }
 
-    jumpUpwardsMotion = PlayerMovementHelper.jumpMotionFor(player);
+    jumpUpwardsMotion = MovementContextHelper.jumpMotionFor(player);
     lastPositionX = positionX;
     lastPositionY = positionY;
     lastPositionZ = positionZ;
@@ -170,10 +170,10 @@ public final class UserMetaMovementData {
       positionY = modifier.read(1);
       positionZ = modifier.read(2);
 
-      swimming = PlayerMovementPoseHelper.isSwimming(player);
-      elytraFlying = PlayerMovementPoseHelper.flyingWithElytra(player);
+      swimming = PoseHelper.isSwimming(player);
+      elytraFlying = PoseHelper.flyingWithElytra(player);
       boolean falling = motionY() <= 0.0D;
-      if (falling && PlayerEffectHelper.isPotionSlowFallingActive(player)) {
+      if (falling && EffectLogic.isPotionSlowFallingActive(player)) {
         gravity = 0.01D;
       } else {
         gravity = 0.08D;
@@ -189,7 +189,7 @@ public final class UserMetaMovementData {
       StructureModifier<Float> modifier = packet.getFloat();
       rotationYaw = modifier.read(0);
       rotationPitch = modifier.read(1);
-      lookVector = PlayerRotationHelper.vectorForRotation(rotationPitch, rotationYaw);
+      lookVector = RotationHelper.vectorForRotation(rotationPitch, rotationYaw);
       yawSine = SinusCache.sin(rotationYaw * (float) Math.PI / 180.0F, false);
       yawCosine = SinusCache.cos(rotationYaw * (float) Math.PI / 180.0F, false);
     }
@@ -209,7 +209,7 @@ public final class UserMetaMovementData {
   }
 
   public void applyGroundInformationToPacket(PacketContainer packet) {
-    packet.getBooleans().write(0, onGround);
+    packet.getBooleans().write(0, true);
   }
 
   private void updateMovementMetaData() {
@@ -231,7 +231,7 @@ public final class UserMetaMovementData {
     if (abilityData.flying()) {
       this.jumpMovementFactor = abilityData.flySpeed() * (float) (lastSprinting ? 2 : 1);
     }
-    friction = PlayerMovementHelper.resolveFriction(user, verifiedPositionX, verifiedPositionY, verifiedPositionZ);
+    friction = MovementContextHelper.resolveFriction(user, verifiedPositionX, verifiedPositionY, verifiedPositionZ);
   }
 
   private void updateEntityActionStates() {
@@ -260,7 +260,7 @@ public final class UserMetaMovementData {
       -0.4000000059604645D,
       -0.1f
     );
-    return PlayerMovementHelper.isLavaInBB(player.getWorld(), lavaBoundingBox);
+    return MovementContextHelper.isLavaInBB(player.getWorld(), lavaBoundingBox);
   }
 
   public boolean recentlyEncounteredFlyingPacket(int ticks) {

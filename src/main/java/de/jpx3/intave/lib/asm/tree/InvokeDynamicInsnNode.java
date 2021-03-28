@@ -41,34 +41,42 @@ import java.util.Map;
  */
 public class InvokeDynamicInsnNode extends AbstractInsnNode {
 
-  /** The method's name. */
+  /**
+   * The method's name.
+   */
   public String name;
 
-  /** The method's descriptor (see {@link Type}). */
+  /**
+   * The method's descriptor (see {@link Type}).
+   */
   public String desc;
 
-  /** The bootstrap method. */
+  /**
+   * The bootstrap method.
+   */
   public Handle bsm;
 
-  /** The bootstrap method constant arguments. */
+  /**
+   * The bootstrap method constant arguments.
+   */
   public Object[] bsmArgs;
 
   /**
    * Constructs a new {@link InvokeDynamicInsnNode}.
    *
-   * @param name the method's name.
-   * @param descriptor the method's descriptor (see {@link Type}).
-   * @param bootstrapMethodHandle the bootstrap method.
+   * @param name                     the method's name.
+   * @param descriptor               the method's descriptor (see {@link Type}).
+   * @param bootstrapMethodHandle    the bootstrap method.
    * @param bootstrapMethodArguments the bootstrap method constant arguments. Each argument must be
-   *     an {@link Integer}, {@link Float}, {@link Long}, {@link Double}, {@link String}, {@link
-   *     Type} or {@link Handle} value. This method is allowed to modify the
-   *     content of the array so a caller should expect that this array may change.
+   *                                 an {@link Integer}, {@link Float}, {@link Long}, {@link Double}, {@link String}, {@link
+   *                                 Type} or {@link Handle} value. This method is allowed to modify the
+   *                                 content of the array so a caller should expect that this array may change.
    */
   public InvokeDynamicInsnNode(
-      final String name,
-      final String descriptor,
-      final Handle bootstrapMethodHandle,
-      final Object... bootstrapMethodArguments) { // NOPMD(ArrayIsStoredDirectly): public field.
+    final String name,
+    final String descriptor,
+    final Handle bootstrapMethodHandle,
+    final Object... bootstrapMethodArguments) { // NOPMD(ArrayIsStoredDirectly): public field.
     super(Opcodes.INVOKEDYNAMIC);
     this.name = name;
     this.desc = descriptor;

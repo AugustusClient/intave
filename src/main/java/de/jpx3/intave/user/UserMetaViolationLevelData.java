@@ -2,9 +2,11 @@ package de.jpx3.intave.user;
 
 import com.google.common.collect.Maps;
 import de.jpx3.intave.access.player.trust.TrustFactor;
+import de.jpx3.intave.tools.annotate.Relocate;
 
 import java.util.Map;
 
+@Relocate
 public final class UserMetaViolationLevelData {
   public double physicsVL;
   public double physicsInvalidMovementsInRow;

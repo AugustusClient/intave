@@ -32,7 +32,9 @@ import de.jpx3.intave.lib.asm.MethodVisitor;
 
 import java.util.Map;
 
-/** An {@link AbstractInsnNode} that encapsulates a {@link Label}. */
+/**
+ * An {@link AbstractInsnNode} that encapsulates a {@link Label}.
+ */
 public class LabelNode extends AbstractInsnNode {
 
   private Label value;

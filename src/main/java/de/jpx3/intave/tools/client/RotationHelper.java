@@ -5,7 +5,7 @@ import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import de.jpx3.intave.tools.wrapper.WrappedVector;
 import org.bukkit.util.Vector;
 
-public final class PlayerRotationHelper {
+public final class RotationHelper {
   public static Vector vectorForRotation(float pitch, float yaw) {
     float f = pitch * ((float)Math.PI / 180F);
     float f1 = -yaw * ((float)Math.PI / 180F);

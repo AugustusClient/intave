@@ -58,11 +58,18 @@ public class SourceInterpreter extends Interpreter<SourceValue> implements Opcod
    * Constructs a new {@link SourceInterpreter}.
    *
    * @param api the ASM API version supported by this interpreter. Must be one of {@link
-   *     Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link
-   *     Opcodes#ASM6} or {@link Opcodes#ASM7}.
+   *            Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link
+   *            Opcodes#ASM6} or {@link Opcodes#ASM7}.
    */
   protected SourceInterpreter(final int api) {
     super(api);
+  }
+
+  private static <E> boolean containsAll(final Set<E> self, final Set<E> other) {
+    if (self.size() < other.size()) {
+      return false;
+    }
+    return self.containsAll(other);
   }
 
   @Override
@@ -128,7 +135,7 @@ public class SourceInterpreter extends Interpreter<SourceValue> implements Opcod
 
   @Override
   public SourceValue binaryOperation(
-      final AbstractInsnNode insn, final SourceValue value1, final SourceValue value2) {
+    final AbstractInsnNode insn, final SourceValue value1, final SourceValue value2) {
     int size;
     switch (insn.getOpcode()) {
       case LALOAD:
@@ -160,16 +167,16 @@ public class SourceInterpreter extends Interpreter<SourceValue> implements Opcod
 
   @Override
   public SourceValue ternaryOperation(
-      final AbstractInsnNode insn,
-      final SourceValue value1,
-      final SourceValue value2,
-      final SourceValue value3) {
+    final AbstractInsnNode insn,
+    final SourceValue value1,
+    final SourceValue value2,
+    final SourceValue value3) {
     return new SourceValue(1, insn);
   }
 
   @Override
   public SourceValue naryOperation(
-      final AbstractInsnNode insn, final List<? extends SourceValue> values) {
+    final AbstractInsnNode insn, final List<? extends SourceValue> values) {
     int size;
     int opcode = insn.getOpcode();
     if (opcode == MULTIANEWARRAY) {
@@ -184,7 +191,7 @@ public class SourceInterpreter extends Interpreter<SourceValue> implements Opcod
 
   @Override
   public void returnOperation(
-      final AbstractInsnNode insn, final SourceValue value, final SourceValue expected) {
+    final AbstractInsnNode insn, final SourceValue value, final SourceValue expected) {
     // Nothing to do.
   }
 
@@ -192,8 +199,8 @@ public class SourceInterpreter extends Interpreter<SourceValue> implements Opcod
   public SourceValue merge(final SourceValue value1, final SourceValue value2) {
     if (value1.insns instanceof SmallSet && value2.insns instanceof SmallSet) {
       Set<AbstractInsnNode> setUnion =
-          ((SmallSet<AbstractInsnNode>) value1.insns)
-              .union((SmallSet<AbstractInsnNode>) value2.insns);
+        ((SmallSet<AbstractInsnNode>) value1.insns)
+          .union((SmallSet<AbstractInsnNode>) value2.insns);
       if (setUnion == value1.insns && value1.size == value2.size) {
         return value1;
       } else {
@@ -207,12 +214,5 @@ public class SourceInterpreter extends Interpreter<SourceValue> implements Opcod
       return new SourceValue(Math.min(value1.size, value2.size), setUnion);
     }
     return value1;
-  }
-
-  private static <E> boolean containsAll(final Set<E> self, final Set<E> other) {
-    if (self.size() < other.size()) {
-      return false;
-    }
-    return self.containsAll(other);
   }
 }

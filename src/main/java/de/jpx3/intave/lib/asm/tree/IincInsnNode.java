@@ -39,16 +39,20 @@ import java.util.Map;
  */
 public class IincInsnNode extends AbstractInsnNode {
 
-  /** Index of the local variable to be incremented. */
+  /**
+   * Index of the local variable to be incremented.
+   */
   public int var;
 
-  /** Amount to increment the local variable by. */
+  /**
+   * Amount to increment the local variable by.
+   */
   public int incr;
 
   /**
    * Constructs a new {@link IincInsnNode}.
    *
-   * @param var index of the local variable to be incremented.
+   * @param var  index of the local variable to be incremented.
    * @param incr increment amount to increment the local variable by.
    */
   public IincInsnNode(final int var, final int incr) {

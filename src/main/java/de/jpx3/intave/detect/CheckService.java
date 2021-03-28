@@ -14,11 +14,13 @@ import de.jpx3.intave.detect.checks.world.BreakSpeedLimiter;
 import de.jpx3.intave.detect.checks.world.InteractionRaytrace;
 import de.jpx3.intave.event.bukkit.BukkitEventLinker;
 import de.jpx3.intave.event.packet.PacketSubscriptionLinker;
+import de.jpx3.intave.tools.annotate.Relocate;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.util.*;
 
+@Relocate
 public final class CheckService {
   private final IntavePlugin plugin;
   private List<IntaveCheck> checks = new ArrayList<>();

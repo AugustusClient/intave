@@ -1,5 +1,6 @@
 package de.jpx3.intave.user;
 
+import de.jpx3.intave.tools.annotate.Relocate;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
@@ -7,6 +8,7 @@ import java.util.Collection;
 
 import static de.jpx3.intave.event.dispatch.PotionEffectEvaluator.*;
 
+@Relocate
 public final class UserMetaPotionData {
   private int potionEffectSpeedAmplifier = 0;
   public int potionEffectSpeedDuration = 0;

@@ -59,8 +59,8 @@ public class BasicVerifier extends BasicInterpreter {
    * Constructs a new {@link BasicVerifier}.
    *
    * @param api the ASM API version supported by this interpreter. Must be one of {@link
-   *     Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link
-   *     Opcodes#ASM6} or {@link Opcodes#ASM7}.
+   *            Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link
+   *            Opcodes#ASM6} or {@link Opcodes#ASM7}.
    */
   protected BasicVerifier(final int api) {
     super(api);
@@ -68,7 +68,7 @@ public class BasicVerifier extends BasicInterpreter {
 
   @Override
   public BasicValue copyOperation(final AbstractInsnNode insn, final BasicValue value)
-      throws AnalyzerException {
+    throws AnalyzerException {
     Value expected;
     switch (insn.getOpcode()) {
       case Opcodes.ILOAD:
@@ -108,7 +108,7 @@ public class BasicVerifier extends BasicInterpreter {
 
   @Override
   public BasicValue unaryOperation(final AbstractInsnNode insn, final BasicValue value)
-      throws AnalyzerException {
+    throws AnalyzerException {
     BasicValue expected;
     switch (insn.getOpcode()) {
       case Opcodes.INEG:
@@ -187,8 +187,8 @@ public class BasicVerifier extends BasicInterpreter {
 
   @Override
   public BasicValue binaryOperation(
-      final AbstractInsnNode insn, final BasicValue value1, final BasicValue value2)
-      throws AnalyzerException {
+    final AbstractInsnNode insn, final BasicValue value1, final BasicValue value2)
+    throws AnalyzerException {
     BasicValue expected1;
     BasicValue expected2;
     switch (insn.getOpcode()) {
@@ -313,11 +313,11 @@ public class BasicVerifier extends BasicInterpreter {
 
   @Override
   public BasicValue ternaryOperation(
-      final AbstractInsnNode insn,
-      final BasicValue value1,
-      final BasicValue value2,
-      final BasicValue value3)
-      throws AnalyzerException {
+    final AbstractInsnNode insn,
+    final BasicValue value1,
+    final BasicValue value2,
+    final BasicValue value3)
+    throws AnalyzerException {
     BasicValue expected1;
     BasicValue expected3;
     switch (insn.getOpcode()) {
@@ -362,7 +362,7 @@ public class BasicVerifier extends BasicInterpreter {
     }
     if (!isSubTypeOf(value1, expected1)) {
       throw new AnalyzerException(
-          insn, "First argument", "a " + expected1 + " array reference", value1);
+        insn, "First argument", "a " + expected1 + " array reference", value1);
     } else if (!BasicValue.INT_VALUE.equals(value2)) {
       throw new AnalyzerException(insn, "Second argument", BasicValue.INT_VALUE, value2);
     } else if (!isSubTypeOf(value3, expected3)) {
@@ -373,8 +373,8 @@ public class BasicVerifier extends BasicInterpreter {
 
   @Override
   public BasicValue naryOperation(
-      final AbstractInsnNode insn, final List<? extends BasicValue> values)
-      throws AnalyzerException {
+    final AbstractInsnNode insn, final List<? extends BasicValue> values)
+    throws AnalyzerException {
     int opcode = insn.getOpcode();
     if (opcode == Opcodes.MULTIANEWARRAY) {
       for (BasicValue value : values) {
@@ -392,9 +392,9 @@ public class BasicVerifier extends BasicInterpreter {
         }
       }
       String methodDescriptor =
-          (opcode == Opcodes.INVOKEDYNAMIC)
-              ? ((InvokeDynamicInsnNode) insn).desc
-              : ((MethodInsnNode) insn).desc;
+        (opcode == Opcodes.INVOKEDYNAMIC)
+          ? ((InvokeDynamicInsnNode) insn).desc
+          : ((MethodInsnNode) insn).desc;
       Type[] args = Type.getArgumentTypes(methodDescriptor);
       while (i < values.size()) {
         BasicValue expected = newValue(args[j++]);
@@ -409,8 +409,8 @@ public class BasicVerifier extends BasicInterpreter {
 
   @Override
   public void returnOperation(
-      final AbstractInsnNode insn, final BasicValue value, final BasicValue expected)
-      throws AnalyzerException {
+    final AbstractInsnNode insn, final BasicValue value, final BasicValue expected)
+    throws AnalyzerException {
     if (!isSubTypeOf(value, expected)) {
       throw new AnalyzerException(insn, "Incompatible return type", expected, value);
     }
@@ -441,10 +441,10 @@ public class BasicVerifier extends BasicInterpreter {
    * Returns whether the type corresponding to the first argument is a subtype of the type
    * corresponding to the second argument.
    *
-   * @param value a value.
+   * @param value    a value.
    * @param expected another value.
    * @return whether the type corresponding to 'value' is a subtype of the type corresponding to
-   *     'expected'.
+   * 'expected'.
    */
   protected boolean isSubTypeOf(final BasicValue value, final BasicValue expected) {
     return value.equals(expected);

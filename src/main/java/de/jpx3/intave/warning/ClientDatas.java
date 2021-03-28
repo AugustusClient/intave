@@ -1,0 +1,46 @@
+package de.jpx3.intave.warning;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
+import de.jpx3.intave.tools.CachedResource;
+
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
+
+public final class ClientDatas {
+  private final static CachedResource CACHED_RESOURCE = new CachedResource("clientdata", "https://intave.de/api/clientdata.json", TimeUnit.DAYS.toMillis(1));
+  private final List<ClientData> content;
+
+  public ClientDatas(List<ClientData> content) {
+    this.content = content;
+  }
+
+  public List<ClientData> content() {
+    return content;
+  }
+
+  public static ClientDatas generate() {
+    Scanner scanner = new Scanner(CACHED_RESOURCE.read());
+    StringBuilder stringBuilder = new StringBuilder();
+    while (scanner.hasNextLine()) {
+      stringBuilder.append(scanner.nextLine());
+    }
+    return new ClientDatas(parseClientData(stringBuilder.toString()));
+  }
+
+  private static List<ClientData> parseClientData(String rawJson) {
+    List<ClientData> content = new ArrayList<>();
+    JsonReader jsonReader = new JsonReader(new StringReader(rawJson));
+    jsonReader.setLenient(true);
+    JsonArray jsonArray = new JsonParser().parse(jsonReader).getAsJsonArray();
+    for (JsonElement jsonElement : jsonArray) {
+      content.add(ClientData.parseFrom(jsonElement));
+    }
+    return content;
+  }
+}

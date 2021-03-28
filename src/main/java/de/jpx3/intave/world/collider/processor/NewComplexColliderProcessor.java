@@ -1,6 +1,6 @@
 package de.jpx3.intave.world.collider.processor;
 
-import de.jpx3.intave.detect.checks.movement.physics.ProcessorMotionContext;
+import de.jpx3.intave.detect.checks.movement.physics.MotionVector;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaMovementData;
@@ -12,7 +12,7 @@ import java.util.List;
 
 public final class NewComplexColliderProcessor implements ComplexColliderProcessor {
   @Override
-  public ComplexColliderSimulationResult simulateCollision(User user, ProcessorMotionContext context, boolean inWeb, double positionX, double positionY, double positionZ) {
+  public ComplexColliderSimulationResult simulateCollision(User user, MotionVector context, boolean inWeb, double positionX, double positionY, double positionZ) {
     Player player = user.player();
     User.UserMeta meta = user.meta();
     UserMetaMovementData movementData = meta.movementData();
@@ -105,15 +105,15 @@ public final class NewComplexColliderProcessor implements ComplexColliderProcess
         d9 = axisalignedbb6.calculateYOffset(axisalignedbb5, d9);
       }
       axisalignedbb4 = axisalignedbb4.offset(0.0D, d9, 0.0D);
+      double d15 = startMotionX;
+      for (WrappedAxisAlignedBB axisalignedbb7 : list) {
+        d15 = axisalignedbb7.calculateXOffset(axisalignedbb4, d15);
+      }
       double d16 = startMotionZ;
       for (WrappedAxisAlignedBB axisalignedbb8 : list) {
         d16 = axisalignedbb8.calculateZOffset(axisalignedbb4, d16);
       }
       axisalignedbb4 = axisalignedbb4.offset(0.0D, 0.0D, d16);
-      double d15 = startMotionX;
-      for (WrappedAxisAlignedBB axisalignedbb7 : list) {
-        d15 = axisalignedbb7.calculateXOffset(axisalignedbb4, d15);
-      }
       axisalignedbb4 = axisalignedbb4.offset(d15, 0.0D, 0.0D);
       WrappedAxisAlignedBB axisalignedbb14 = entityBoundingBox;
       double d17 = context.motionY;
@@ -169,13 +169,13 @@ public final class NewComplexColliderProcessor implements ComplexColliderProcess
     context.motionY = newPositionY - positionY;
     context.motionZ = newPositionZ - positionZ;
     return new ComplexColliderSimulationResult(
-      ProcessorMotionContext.from(context), onGround,
+      MotionVector.from(context), onGround,
       collidedHorizontally, collidedVertically,
       moveResetX, moveResetZ, step
     );
   }
 
-  private void calculateBackOffFromEdge(User user, double length, ProcessorMotionContext context) {
+  private void calculateBackOffFromEdge(User user, double length, MotionVector context) {
     Player player = user.player();
     UserMetaMovementData movementData = user.meta().movementData();
     WrappedAxisAlignedBB boundingBox = movementData.boundingBox();

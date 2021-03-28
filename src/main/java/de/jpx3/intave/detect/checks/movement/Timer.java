@@ -40,6 +40,18 @@ public final class Timer extends IntaveMetaCheck<Timer.TimerData> {
     }
   }
 
+
+  @PacketSubscription(
+    packets = {
+      @PacketDescriptor(sender = Sender.SERVER, packetName = "RESPAWN")
+    }
+  )
+  public void respawnTolerance(PacketEvent event) {
+    Player player = event.getPlayer();
+    metaOf(player).lastRespawn = AccessHelper.now();
+    metaOf(player).timerBalance -= 20.0;
+  }
+
   @PacketSubscription(
     packets = {
       @PacketDescriptor(sender = Sender.SERVER, packetName = "POSITION")
@@ -78,8 +90,12 @@ public final class Timer extends IntaveMetaCheck<Timer.TimerData> {
 //    }
 
     int allowedLagInSeconds = trustFactorSetting("buffer-size", player);
-    int packetLimit = allowedLagInSeconds * -(20 * 10);
 
+    if(AccessHelper.now() - timerData.lastRespawn < 6000) {
+      allowedLagInSeconds = Math.max(allowedLagInSeconds, 8);
+    }
+
+    int packetLimit = allowedLagInSeconds * -(20 * 10);
     timerData.timerBalance = MathHelper.minmax(packetLimit, timerData.timerBalance, 200);
 
     if (delta > 500) {
@@ -119,7 +135,7 @@ public final class Timer extends IntaveMetaCheck<Timer.TimerData> {
       }
       timerData.lastTimerFlag = AccessHelper.now();
       // leniency
-      timerData.timerBalance -= 5.5;
+      timerData.timerBalance -= 2.5;
     } else {
       statistics().increasePasses();
       if (timerData.timerBalance > 0) {
@@ -182,6 +198,7 @@ public final class Timer extends IntaveMetaCheck<Timer.TimerData> {
     public long lastFlyingPacket;
     public long lastTimerFlag;
     public long lastLagSpike;
+    public long lastRespawn;
     public boolean flagTick;
   }
 }

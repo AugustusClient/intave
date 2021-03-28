@@ -5,6 +5,7 @@ import de.jpx3.intave.diagnostics.timings.Timings;
 import de.jpx3.intave.event.dispatch.AttackDispatcher;
 import de.jpx3.intave.reflect.ReflectiveDataWatcherAccess;
 import de.jpx3.intave.tools.MathHelper;
+import de.jpx3.intave.tools.annotate.Relocate;
 import de.jpx3.intave.tools.items.InventoryUseItemHelper;
 import de.jpx3.intave.tools.sync.Synchronizer;
 import de.jpx3.intave.user.User;
@@ -15,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 
 import static de.jpx3.intave.reflect.ReflectiveDataWatcherAccess.DATA_WATCHER_BLOCKING_ID;
 
+@Relocate
 public final class SimulationProcessor {
   public ComplexColliderSimulationResult simulate(User user, Pose pose) {
     User.UserMeta meta = user.meta();
@@ -69,10 +71,10 @@ public final class SimulationProcessor {
     User.UserMeta meta = user.meta();
     UserMetaMovementData movementData = meta.movementData();
     Pose movementPoseType = movementData.movementPoseType();
-    ProcessorMotionContext context = ProcessorMotionContext.from(movementData.processorMotionContext);
-    context.resetTo(movementData);
+    MotionVector motionVector = MotionVector.from(movementData.motionVector);
+    motionVector.resetTo(movementData);
     return movementPoseType.simulator().performSimulation(
-      user, context,
+      user, motionVector,
       0, 0, false, false,
       meta.inventoryData().handActive()
     );
@@ -83,7 +85,7 @@ public final class SimulationProcessor {
     UserMetaInventoryData inventoryData = user.meta().inventoryData();
     Pose movementPoseType = movementData.movementPoseType();
     PoseSimulator calculationPart = movementPoseType.simulator();
-    ProcessorMotionContext context = movementData.processorMotionContext;
+    MotionVector motionVector = movementData.motionVector;
     int keyForward = movementData.keyForward;
     int keyStrafe = movementData.keyStrafe;
 
@@ -109,8 +111,8 @@ public final class SimulationProcessor {
     float moveForward = keyForward * 0.98f;
     float moveStrafe = keyStrafe * 0.98f;
     movementData.physicsJumped = jumped;
-    context.resetTo(movementData);
-    return calculationPart.performSimulation(user, context, moveForward, moveStrafe, attackReduce, jumped, handActive);
+    motionVector.resetTo(movementData);
+    return calculationPart.performSimulation(user, motionVector, moveForward, moveStrafe, attackReduce, jumped, handActive);
   }
 
   private ComplexColliderSimulationResult simulatePossibleMovement(User user) {
@@ -135,7 +137,7 @@ public final class SimulationProcessor {
     double mostAccurateDistance = Integer.MAX_VALUE;
     boolean reduceOnPlayerAttack = false;
 
-    ProcessorMotionContext context = movementData.processorMotionContext;
+    MotionVector motionVector = movementData.motionVector;
     ComplexColliderSimulationResult predictedMovement = null;
 
     LOOP:
@@ -167,12 +169,12 @@ public final class SimulationProcessor {
             }
             float moveForward = keyForward * 0.98f;
             float moveStrafe = keyStrafe * 0.98f;
-            context.resetTo(movementData);
+            motionVector.resetTo(movementData);
             ComplexColliderSimulationResult collisionResult = simulator.performSimulation(
-              user, context, moveForward, moveStrafe,
+              user, motionVector, moveForward, moveStrafe,
               attackReduce, jumped, inventoryData.handActive()
             );
-            ProcessorMotionContext collisionContext = collisionResult.context();
+            MotionVector collisionContext = collisionResult.context();
             double differenceX = collisionContext.motionX - receivedMotionX;
             double differenceY = collisionContext.motionY - receivedMotionY;
             double differenceZ = collisionContext.motionZ - receivedMotionZ;
@@ -211,7 +213,7 @@ public final class SimulationProcessor {
     return predictedMovement;
   }
 
-  private double calculateMovementDistance(User user, ProcessorMotionContext context) {
+  private double calculateMovementDistance(User user, MotionVector context) {
     UserMetaMovementData movementData = user.meta().movementData();
     return MathHelper.resolveDistance(
       context.motionX, context.motionY, context.motionZ,

@@ -9,7 +9,7 @@ import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.reflect.caller.CallerResolver;
 import de.jpx3.intave.reflect.caller.PluginInvocation;
 import de.jpx3.intave.tools.MathHelper;
-import de.jpx3.intave.tools.client.PlayerMovementHelper;
+import de.jpx3.intave.tools.client.MovementContextHelper;
 import de.jpx3.intave.tools.sync.Synchronizer;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.tools.wrapper.WrappedBlockPosition;
@@ -293,7 +293,7 @@ public final class MovementEmulationEngine {
     Player player = user.player();
     World world = player.getWorld();
     UserMetaMovementData movementData = user.meta().movementData();
-    movementData.inWater = PlayerMovementHelper.isAnyLiquid(world, movementData.boundingBox());
+    movementData.inWater = MovementContextHelper.isAnyLiquid(world, movementData.boundingBox());
   }
 
   private final static Set<Object> teleportFlags = new HashSet<>();

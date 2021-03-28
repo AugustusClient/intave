@@ -133,6 +133,10 @@ proxy:
 
   enable: false
 
+clientwarning:
+
+  enable: true
+
 filter:
 
   health: true

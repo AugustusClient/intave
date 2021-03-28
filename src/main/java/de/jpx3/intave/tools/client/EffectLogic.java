@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-public final class PlayerEffectHelper {
+public final class EffectLogic {
   public final static PotionEffectType EFFECT_LEVITATION = PotionEffectType.getByName("LEVITATION");
   private final static PotionEffectType EFFECT_SLOW_FALLING = PotionEffectType.getByName("SLOW_FALLING");
 
@@ -18,15 +18,6 @@ public final class PlayerEffectHelper {
       }
     }
     return 0;
-  }
-
-  public static boolean isPotionActive(Player player, PotionEffectType type) {
-    for (PotionEffect activePotionEffect : player.getActivePotionEffects()) {
-      if (activePotionEffect.getType().equals(type)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   public static boolean isPotionLevitationActive(Player player) {
@@ -45,5 +36,14 @@ public final class PlayerEffectHelper {
       return false;
     }
     return isPotionActive(player, EFFECT_SLOW_FALLING);
+  }
+
+  public static boolean isPotionActive(Player player, PotionEffectType type) {
+    for (PotionEffect activePotionEffect : player.getActivePotionEffects()) {
+      if (activePotionEffect.getType().equals(type)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

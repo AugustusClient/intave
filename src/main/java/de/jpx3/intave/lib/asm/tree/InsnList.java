@@ -38,20 +38,23 @@ import java.util.NoSuchElementException;
  */
 public class InsnList implements Iterable<AbstractInsnNode> {
 
-  /** The number of instructions in this list. */
-  private int size;
-
-  /** The first instruction in this list. May be {@literal null}. */
-  private AbstractInsnNode firstInsn;
-
-  /** The last instruction in this list. May be {@literal null}. */
-  private AbstractInsnNode lastInsn;
-
   /**
    * A cache of the instructions of this list. This cache is used to improve the performance of the
    * {@link #get} method.
    */
   AbstractInsnNode[] cache;
+  /**
+   * The number of instructions in this list.
+   */
+  private int size;
+  /**
+   * The first instruction in this list. May be {@literal null}.
+   */
+  private AbstractInsnNode firstInsn;
+  /**
+   * The last instruction in this list. May be {@literal null}.
+   */
+  private AbstractInsnNode lastInsn;
 
   /**
    * Returns the number of instructions in this list.
@@ -124,8 +127,8 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    *
    * @param insnNode an instruction <i>of this list</i>.
    * @return the index of the given instruction in this list. <i>The result of this method is
-   *     undefined if the given instruction does not belong to this list</i>. Use {@link #contains }
-   *     to test if an instruction belongs to an instruction list or not.
+   * undefined if the given instruction does not belong to this list</i>. Use {@link #contains }
+   * to test if an instruction belongs to an instruction list or not.
    */
   public int indexOf(final AbstractInsnNode insnNode) {
     if (cache == null) {
@@ -241,7 +244,7 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    * Adds the given instructions to the end of this list.
    *
    * @param insnList an instruction list, which is cleared during the process. This list must be
-   *     different from 'this'.
+   *                 different from 'this'.
    */
   public void add(final InsnList insnList) {
     if (insnList.size == 0) {
@@ -284,7 +287,7 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    * Inserts the given instructions at the beginning of this list.
    *
    * @param insnList an instruction list, which is cleared during the process. This list must be
-   *     different from 'this'.
+   *                 different from 'this'.
    */
   public void insert(final InsnList insnList) {
     if (insnList.size == 0) {
@@ -308,8 +311,8 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    * Inserts the given instruction after the specified instruction.
    *
    * @param previousInsn an instruction <i>of this list</i> after which insnNode must be inserted.
-   * @param insnNode the instruction to be inserted, <i>which must not belong to any {@link
-   *     InsnList}</i>.
+   * @param insnNode     the instruction to be inserted, <i>which must not belong to any {@link
+   *                     InsnList}</i>.
    */
   public void insert(final AbstractInsnNode previousInsn, final AbstractInsnNode insnNode) {
     ++size;
@@ -330,9 +333,9 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    * Inserts the given instructions after the specified instruction.
    *
    * @param previousInsn an instruction <i>of this list</i> after which the instructions must be
-   *     inserted.
-   * @param insnList the instruction list to be inserted, which is cleared during the process. This
-   *     list must be different from 'this'.
+   *                     inserted.
+   * @param insnList     the instruction list to be inserted, which is cleared during the process. This
+   *                     list must be different from 'this'.
    */
   public void insert(final AbstractInsnNode previousInsn, final InsnList insnList) {
     if (insnList.size == 0) {
@@ -359,7 +362,7 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    *
    * @param nextInsn an instruction <i>of this list</i> before which insnNode must be inserted.
    * @param insnNode the instruction to be inserted, <i>which must not belong to any {@link
-   *     InsnList}</i>.
+   *                 InsnList}</i>.
    */
   public void insertBefore(final AbstractInsnNode nextInsn, final AbstractInsnNode insnNode) {
     ++size;
@@ -380,9 +383,9 @@ public class InsnList implements Iterable<AbstractInsnNode> {
    * Inserts the given instructions before the specified instruction.
    *
    * @param nextInsn an instruction <i>of this list</i> before which the instructions must be
-   *     inserted.
+   *                 inserted.
    * @param insnList the instruction list to be inserted, which is cleared during the process. This
-   *     list must be different from 'this'.
+   *                 list must be different from 'this'.
    */
   public void insertBefore(final AbstractInsnNode nextInsn, final InsnList insnList) {
     if (insnList.size == 0) {
@@ -458,7 +461,9 @@ public class InsnList implements Iterable<AbstractInsnNode> {
     cache = null;
   }
 
-  /** Removes all the instructions of this list. */
+  /**
+   * Removes all the instructions of this list.
+   */
   public void clear() {
     removeAll(false);
   }

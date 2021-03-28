@@ -42,19 +42,29 @@ import java.util.List;
  */
 public class SimpleVerifier extends BasicVerifier {
 
-  /** The type of the class that is verified. */
+  /**
+   * The type of the class that is verified.
+   */
   private final Type currentClass;
 
-  /** The type of the super class of the class that is verified. */
+  /**
+   * The type of the super class of the class that is verified.
+   */
   private final Type currentSuperClass;
 
-  /** The types of the interfaces directly implemented by the class that is verified. */
+  /**
+   * The types of the interfaces directly implemented by the class that is verified.
+   */
   private final List<Type> currentClassInterfaces;
 
-  /** Whether the class that is verified is an interface. */
+  /**
+   * Whether the class that is verified is an interface.
+   */
   private final boolean isInterface;
 
-  /** The loader to use to load the referenced classes. */
+  /**
+   * The loader to use to load the referenced classes.
+   */
   private ClassLoader loader = getClass().getClassLoader();
 
   /**
@@ -70,12 +80,12 @@ public class SimpleVerifier extends BasicVerifier {
    * loaded into the JVM since it may be incorrect. <i>Subclasses must not use this constructor</i>.
    * Instead, they must use the {@link #SimpleVerifier(int, Type, Type, List, boolean)} version.
    *
-   * @param currentClass the type of the class to be verified.
+   * @param currentClass      the type of the class to be verified.
    * @param currentSuperClass the type of the super class of the class to be verified.
-   * @param isInterface whether the class to be verifier is an interface.
+   * @param isInterface       whether the class to be verifier is an interface.
    */
   public SimpleVerifier(
-      final Type currentClass, final Type currentSuperClass, final boolean isInterface) {
+    final Type currentClass, final Type currentSuperClass, final boolean isInterface) {
     this(currentClass, currentSuperClass, null, isInterface);
   }
 
@@ -84,23 +94,23 @@ public class SimpleVerifier extends BasicVerifier {
    * loaded into the JVM since it may be incorrect. <i>Subclasses must not use this constructor</i>.
    * Instead, they must use the {@link #SimpleVerifier(int, Type, Type, List, boolean)} version.
    *
-   * @param currentClass the type of the class to be verified.
-   * @param currentSuperClass the type of the super class of the class to be verified.
+   * @param currentClass           the type of the class to be verified.
+   * @param currentSuperClass      the type of the super class of the class to be verified.
    * @param currentClassInterfaces the types of the interfaces directly implemented by the class to
-   *     be verified.
-   * @param isInterface whether the class to be verifier is an interface.
+   *                               be verified.
+   * @param isInterface            whether the class to be verifier is an interface.
    */
   public SimpleVerifier(
-      final Type currentClass,
-      final Type currentSuperClass,
-      final List<Type> currentClassInterfaces,
-      final boolean isInterface) {
+    final Type currentClass,
+    final Type currentSuperClass,
+    final List<Type> currentClassInterfaces,
+    final boolean isInterface) {
     this(
-        /* latest api = */ ASM7,
-        currentClass,
-        currentSuperClass,
-        currentClassInterfaces,
-        isInterface);
+      /* latest api = */ ASM7,
+      currentClass,
+      currentSuperClass,
+      currentClassInterfaces,
+      isInterface);
     if (getClass() != SimpleVerifier.class) {
       throw new IllegalStateException();
     }
@@ -110,21 +120,21 @@ public class SimpleVerifier extends BasicVerifier {
    * Constructs a new {@link SimpleVerifier} to verify a specific class. This class will not be
    * loaded into the JVM since it may be incorrect.
    *
-   * @param api the ASM API version supported by this verifier. Must be one of {@link
-   *     Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link
-   *     Opcodes#ASM6} or {@link Opcodes#ASM7}.
-   * @param currentClass the type of the class to be verified.
-   * @param currentSuperClass the type of the super class of the class to be verified.
+   * @param api                    the ASM API version supported by this verifier. Must be one of {@link
+   *                               Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link
+   *                               Opcodes#ASM6} or {@link Opcodes#ASM7}.
+   * @param currentClass           the type of the class to be verified.
+   * @param currentSuperClass      the type of the super class of the class to be verified.
    * @param currentClassInterfaces the types of the interfaces directly implemented by the class to
-   *     be verified.
-   * @param isInterface whether the class to be verifier is an interface.
+   *                               be verified.
+   * @param isInterface            whether the class to be verifier is an interface.
    */
   protected SimpleVerifier(
-      final int api,
-      final Type currentClass,
-      final Type currentSuperClass,
-      final List<Type> currentClassInterfaces,
-      final boolean isInterface) {
+    final int api,
+    final Type currentClass,
+    final Type currentSuperClass,
+    final List<Type> currentClassInterfaces,
+    final boolean isInterface) {
     super(api);
     this.currentClass = currentClass;
     this.currentSuperClass = currentSuperClass;
@@ -236,9 +246,9 @@ public class SimpleVerifier extends BasicVerifier {
       Type type1 = value1.getType();
       Type type2 = value2.getType();
       if (type1 != null
-          && (type1.getSort() == Type.OBJECT || type1.getSort() == Type.ARRAY)
-          && type2 != null
-          && (type2.getSort() == Type.OBJECT || type2.getSort() == Type.ARRAY)) {
+        && (type1.getSort() == Type.OBJECT || type1.getSort() == Type.ARRAY)
+        && type2 != null
+        && (type2.getSort() == Type.OBJECT || type2.getSort() == Type.ARRAY)) {
         if (type1.equals(NULL_TYPE)) {
           return value2;
         }
@@ -253,10 +263,10 @@ public class SimpleVerifier extends BasicVerifier {
         }
         int numDimensions = 0;
         if (type1.getSort() == Type.ARRAY
-            && type2.getSort() == Type.ARRAY
-            && type1.getDimensions() == type2.getDimensions()
-            && type1.getElementType().getSort() == Type.OBJECT
-            && type2.getElementType().getSort() == Type.OBJECT) {
+          && type2.getSort() == Type.ARRAY
+          && type1.getDimensions() == type2.getDimensions()
+          && type1.getElementType().getSort() == Type.OBJECT
+          && type2.getElementType().getSort() == Type.OBJECT) {
           numDimensions = type1.getDimensions();
           type1 = type1.getElementType();
           type2 = type2.getElementType();
@@ -330,7 +340,7 @@ public class SimpleVerifier extends BasicVerifier {
    * @param type1 a type.
    * @param type2 another type.
    * @return whether the class corresponding to 'type1' is either the same as, or is a superclass or
-   *     superinterface of the class corresponding to 'type2'.
+   * superinterface of the class corresponding to 'type2'.
    */
   protected boolean isAssignableFrom(final Type type1, final Type type2) {
     if (type1.equals(type2)) {

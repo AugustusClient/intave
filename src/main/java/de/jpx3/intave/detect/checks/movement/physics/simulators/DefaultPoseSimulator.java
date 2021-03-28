@@ -1,11 +1,11 @@
 package de.jpx3.intave.detect.checks.movement.physics.simulators;
 
 import de.jpx3.intave.detect.checks.movement.physics.LegacyWaterPhysics;
-import de.jpx3.intave.detect.checks.movement.physics.ProcessorMotionContext;
+import de.jpx3.intave.detect.checks.movement.physics.MotionVector;
+import de.jpx3.intave.tools.client.EffectLogic;
 import de.jpx3.intave.tools.client.MaterialLogic;
-import de.jpx3.intave.tools.client.PlayerEffectHelper;
-import de.jpx3.intave.tools.client.PlayerMovementHelper;
-import de.jpx3.intave.tools.client.PlayerMovementPoseHelper;
+import de.jpx3.intave.tools.client.MovementContextHelper;
+import de.jpx3.intave.tools.client.PoseHelper;
 import de.jpx3.intave.tools.items.PlayerEnchantmentHelper;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
@@ -31,7 +31,7 @@ import static de.jpx3.intave.user.UserMetaClientData.PROTOCOL_VERSION_VILLAGE_UP
 public class DefaultPoseSimulator extends PoseSimulator {
   @Override
   public ComplexColliderSimulationResult performSimulation(
-    User user, ProcessorMotionContext context,
+    User user, MotionVector context,
     float forward, float strafe,
     boolean attackReduce, boolean jumped, boolean handActive
   ) {
@@ -120,7 +120,7 @@ public class DefaultPoseSimulator extends PoseSimulator {
   }
 
   private void performSimulationInWaterOfState(
-    User user, ProcessorMotionContext context,
+    User user, MotionVector context,
     float moveForward, float moveStrafe,
     float yawSine, float yawCosine
   ) {
@@ -141,7 +141,7 @@ public class DefaultPoseSimulator extends PoseSimulator {
   }
 
   private void performLavaSimulationOfState(
-    ProcessorMotionContext context,
+    MotionVector context,
     float moveForward, float moveStrafe,
     float yawSine, float yawCosine
   ) {
@@ -150,13 +150,13 @@ public class DefaultPoseSimulator extends PoseSimulator {
   }
 
   private void performDefaultMoveSimulationOfState(
-    User user, ProcessorMotionContext context,
+    User user, MotionVector context,
     float moveForward, float moveStrafe,
     float yawSine, float yawCosine
   ) {
     UserMetaMovementData movementData = user.meta().movementData();
     performRelativeMoveSimulationOfState(context, movementData.friction(), yawSine, yawCosine, moveForward, moveStrafe);
-    if (PlayerMovementHelper.isOnLadder(user, movementData.verifiedPositionX, movementData.verifiedPositionY, movementData.verifiedPositionZ)) {
+    if (MovementContextHelper.isOnLadder(user, movementData.verifiedPositionX, movementData.verifiedPositionY, movementData.verifiedPositionZ)) {
       float f6 = 0.15F;
       context.motionX = WrappedMathHelper.clamp_double(context.motionX, -f6, f6);
       context.motionZ = WrappedMathHelper.clamp_double(context.motionZ, -f6, f6);
@@ -170,7 +170,7 @@ public class DefaultPoseSimulator extends PoseSimulator {
   }
 
   private void performRelativeMoveSimulationOfState(
-    ProcessorMotionContext context, float friction,
+    MotionVector context, float friction,
     float yawSine, float yawCosine,
     float moveForward, float moveStrafe
   ) {
@@ -185,7 +185,7 @@ public class DefaultPoseSimulator extends PoseSimulator {
     }
   }
 
-  private void tryRelinkFlyingPosition(User user, ProcessorMotionContext context) {
+  private void tryRelinkFlyingPosition(User user, MotionVector context) {
     Player player = user.player();
     UserMetaMovementData movementData = user.meta().movementData();
 
@@ -195,7 +195,7 @@ public class DefaultPoseSimulator extends PoseSimulator {
 
     boolean onGround;
     Location location = new Location(player.getWorld(), positionX, positionY, positionZ);
-    double slipperiness = movementData.lastOnGround ? PlayerMovementHelper.resolveSlipperiness(user, location) : 0.91f;
+    double slipperiness = movementData.lastOnGround ? MovementContextHelper.resolveSlipperiness(user, location) : 0.91f;
     double resetMotion = movementData.resetMotion();
     double jumpUpwardsMotion = movementData.jumpUpwardsMotion();
 
@@ -270,7 +270,7 @@ public class DefaultPoseSimulator extends PoseSimulator {
   }
 
   private void applyCollidedMotionsToContext(
-    Player player, ProcessorMotionContext context,
+    Player player, MotionVector context,
     double positionX, double positionY, double positionZ,
     double motionX, double motionY, double motionZ
   ) {
@@ -282,7 +282,7 @@ public class DefaultPoseSimulator extends PoseSimulator {
 
   public void notePossibleFlyingPacket(User user, ComplexColliderSimulationResult collisionResult) {
     UserMetaMovementData movementData = user.meta().movementData();
-    ProcessorMotionContext context = collisionResult.context();
+    MotionVector context = collisionResult.context();
     if (flyingPacket(context.motionX, context.motionY, context.motionZ)) {
       movementData.resetFlyingPacketAccurate();
     }
@@ -306,10 +306,10 @@ public class DefaultPoseSimulator extends PoseSimulator {
     User.UserMeta meta = user.meta();
     UserMetaViolationLevelData violationLevelData = meta.violationLevelData();
     UserMetaMovementData movementData = meta.movementData();
-    ProcessorMotionContext context = movementData.processorMotionContext;
-    context.reset(motionX, motionY, motionZ);
+    MotionVector motionVector = movementData.motionVector;
+    motionVector.reset(motionX, motionY, motionZ);
 
-    boolean elytraFlying = PlayerMovementPoseHelper.flyingWithElytra(player);
+    boolean elytraFlying = PoseHelper.flyingWithElytra(player);
     boolean inWater = movementData.inWater;
     boolean inLava = movementData.inLava();
     boolean collidedHorizontally = movementData.collidedHorizontally;
@@ -320,7 +320,7 @@ public class DefaultPoseSimulator extends PoseSimulator {
       double blockPositionY = WrappedMathHelper.floor(movementData.verifiedPositionY - movementData.frictionPosSubtraction());
       double blockPositionZ = WrappedMathHelper.floor(movementData.verifiedPositionZ);
       Location blockBelow = new Location(world, blockPositionX, blockPositionY, blockPositionZ);
-      slipperiness = PlayerMovementHelper.resolveSlipperiness(user, blockBelow);
+      slipperiness = MovementContextHelper.resolveSlipperiness(user, blockBelow);
     } else {
       slipperiness = 0.91f;
     }
@@ -329,34 +329,34 @@ public class DefaultPoseSimulator extends PoseSimulator {
     movementData.setBoundingBox(boundingBox);
 
     if (movementData.inWeb) {
-      context.motionX = 0.0;
-      context.motionY = 0.0;
-      context.motionZ = 0.0;
+      motionVector.motionX = 0.0;
+      motionVector.motionY = 0.0;
+      motionVector.motionZ = 0.0;
       movementData.inWeb = false;
     }
 
     if (movementData.physicsResetMotionX) {
-      context.motionX = 0.0;
+      motionVector.motionX = 0.0;
     }
     if (movementData.physicsResetMotionZ) {
-      context.motionZ = 0.0;
+      motionVector.motionZ = 0.0;
     }
 
-    simulateMovementOfCollidedBlocks(user, context, boundingBox);
+    simulateMovementOfCollidedBlocks(user, motionVector, boundingBox);
     updateFallState(user, motionY, movementData.onGround);
 
     if (inWater) {
-      simulateWaterAfter(user, context, boundingBox, collidedHorizontally, gravity);
+      simulateWaterAfter(user, motionVector, boundingBox, collidedHorizontally, gravity);
     } else if (inLava) {
-      simulateLavaAfter(player, user, context, boundingBox, collidedHorizontally);
+      simulateLavaAfter(player, user, motionVector, boundingBox, collidedHorizontally);
     } else if (!elytraFlying) {
-      simulateNormalAfter(user, context, gravity, slipperiness);
+      simulateNormalAfter(user, motionVector, gravity, slipperiness);
     }
 
     if (!violationLevelData.isInActiveTeleportBundle) {
-      movementData.physicsMotionX = context.motionX;
-      movementData.physicsMotionY = context.motionY;
-      movementData.physicsMotionZ = context.motionZ;
+      movementData.physicsMotionX = motionVector.motionX;
+      movementData.physicsMotionY = motionVector.motionY;
+      movementData.physicsMotionZ = motionVector.motionZ;
     }
     movementData.increaseFlyingPacket();
     movementData.pastPlayerAttackPhysics++;
@@ -381,7 +381,7 @@ public class DefaultPoseSimulator extends PoseSimulator {
   }
 
   private void simulateMovementOfCollidedBlocks(
-    User user, ProcessorMotionContext context,
+    User user, MotionVector context,
     WrappedAxisAlignedBB entityBoundingBox
   ) {
     Player player = user.player();
@@ -481,7 +481,7 @@ public class DefaultPoseSimulator extends PoseSimulator {
   }
 
   private void simulateWaterAfter(
-    User user, ProcessorMotionContext context, WrappedAxisAlignedBB entityBoundingBox,
+    User user, MotionVector motionVector, WrappedAxisAlignedBB entityBoundingBox,
     boolean collidedHorizontally, double gravity
   ) {
     Player player = user.player();
@@ -506,36 +506,36 @@ public class DefaultPoseSimulator extends PoseSimulator {
 //        if (this.isPotionActive(MobEffects.DOLPHINS_GRACE)) {
 //          f1 = 0.96F;
 //        }
-    context.motionX *= f1;
-    context.motionY *= 0.8f;
-    context.motionZ *= f1;
+    motionVector.motionX *= f1;
+    motionVector.motionY *= 0.8f;
+    motionVector.motionZ *= f1;
     if (!clientData.waterUpdate()) {
-      context.motionY -= 0.02D;
+      motionVector.motionY -= 0.02D;
     }
     if (clientData.waterUpdate() && !movementData.sprinting) {
-      if (context.motionY <= 0.0D && Math.abs(context.motionY - 0.005D) >= 0.003D && Math.abs(context.motionY - gravity / 16.0D) < 0.003D) {
-        context.motionY = -0.003D;
+      if (motionVector.motionY <= 0.0D && Math.abs(motionVector.motionY - 0.005D) >= 0.003D && Math.abs(motionVector.motionY - gravity / 16.0D) < 0.003D) {
+        motionVector.motionY = -0.003D;
       } else {
-        context.motionY -= gravity / 16.0D;
+        motionVector.motionY -= gravity / 16.0D;
       }
     }
     double liquidPositionY;
     if (clientData.waterUpdate()) {
-      liquidPositionY = context.motionY + 0.6f - positionY + movementData.verifiedPositionY;
+      liquidPositionY = motionVector.motionY + 0.6f - positionY + movementData.verifiedPositionY;
     } else {
-      liquidPositionY = context.motionY + 0.6f;
+      liquidPositionY = motionVector.motionY + 0.6f;
     }
-    boolean offsetPositionInLiquid = PlayerMovementHelper.isOffsetPositionInLiquid(
-      player, entityBoundingBox, context.motionX, liquidPositionY, context.motionZ
+    boolean offsetPositionInLiquid = MovementContextHelper.isOffsetPositionInLiquid(
+      player, entityBoundingBox, motionVector.motionX, liquidPositionY, motionVector.motionZ
     );
     if (collidedHorizontally && offsetPositionInLiquid) {
-      context.motionY = 0.3f;
+      motionVector.motionY = 0.3f;
     }
   }
 
   private void simulateLavaAfter(
     Player player, User user,
-    ProcessorMotionContext context, WrappedAxisAlignedBB boundingBox,
+    MotionVector context, WrappedAxisAlignedBB boundingBox,
     boolean collidedHorizontally
   ) {
     UserMetaMovementData movementData = user.meta().movementData();
@@ -544,7 +544,7 @@ public class DefaultPoseSimulator extends PoseSimulator {
     context.motionY *= 0.5D;
     context.motionZ *= 0.5D;
     context.motionY -= 0.02D;
-    boolean offsetPositionInLiquid = PlayerMovementHelper.isOffsetPositionInLiquid(
+    boolean offsetPositionInLiquid = MovementContextHelper.isOffsetPositionInLiquid(
       player, boundingBox,
       context.motionX,
       context.motionY + 0.6f - positionY + movementData.verifiedPositionY,
@@ -555,10 +555,10 @@ public class DefaultPoseSimulator extends PoseSimulator {
     }
   }
 
-  private void simulateNormalAfter(User user, ProcessorMotionContext context, double gravity, double multiplier) {
+  private void simulateNormalAfter(User user, MotionVector context, double gravity, double multiplier) {
     Player player = user.player();
-    if (PlayerEffectHelper.isPotionLevitationActive(player)) {
-      int levitationAmplifier = PlayerEffectHelper.effectAmplifier(player, PlayerEffectHelper.EFFECT_LEVITATION);
+    if (EffectLogic.isPotionLevitationActive(player)) {
+      int levitationAmplifier = EffectLogic.effectAmplifier(player, EffectLogic.EFFECT_LEVITATION);
       context.motionY += (0.05D * (double) (levitationAmplifier + 1) - context.motionY) * 0.2D;
     } else {
       context.motionY -= gravity;

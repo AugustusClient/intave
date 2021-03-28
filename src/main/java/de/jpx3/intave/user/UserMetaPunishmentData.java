@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import de.jpx3.intave.event.punishment.AttackCancelType;
 import de.jpx3.intave.event.punishment.EntityNoDamageTickChanger;
 import de.jpx3.intave.tools.AccessHelper;
+import de.jpx3.intave.tools.annotate.Relocate;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
+@Relocate
 public final class UserMetaPunishmentData {
   public final static long DAMAGE_CANCEL_LIGHT_DURATION = 20_000;
   private final static long DAMAGE_CANCEL_MEDIUM_DURATION = 20_000;

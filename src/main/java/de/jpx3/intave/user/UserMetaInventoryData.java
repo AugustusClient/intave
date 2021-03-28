@@ -1,5 +1,6 @@
 package de.jpx3.intave.user;
 
+import de.jpx3.intave.tools.annotate.Relocate;
 import de.jpx3.intave.tools.items.InventoryUseItemHelper;
 import de.jpx3.intave.tools.items.PlayerEnchantmentHelper;
 import de.jpx3.intave.tools.sync.Synchronizer;
@@ -7,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+@Relocate
 public final class UserMetaInventoryData {
   private final Player player;
   private ItemStack heldItem;

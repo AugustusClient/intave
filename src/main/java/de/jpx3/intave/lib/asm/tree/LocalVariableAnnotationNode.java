@@ -63,53 +63,53 @@ public class LocalVariableAnnotationNode extends TypeAnnotationNode {
    * constructor</i>. Instead, they must use the {@link #LocalVariableAnnotationNode(int, TypePath,
    * LabelNode[], LabelNode[], int[], String)} version.
    *
-   * @param typeRef a reference to the annotated type. See {@link TypeReference}.
-   * @param typePath the path to the annotated type argument, wildcard bound, array element type, or
-   *     static inner type within 'typeRef'. May be {@literal null} if the annotation targets
-   *     'typeRef' as a whole.
-   * @param start the fist instructions corresponding to the continuous ranges that make the scope
-   *     of this local variable (inclusive).
-   * @param end the last instructions corresponding to the continuous ranges that make the scope of
-   *     this local variable (exclusive). This array must have the same size as the 'start' array.
-   * @param index the local variable's index in each range. This array must have the same size as
-   *     the 'start' array.
+   * @param typeRef    a reference to the annotated type. See {@link TypeReference}.
+   * @param typePath   the path to the annotated type argument, wildcard bound, array element type, or
+   *                   static inner type within 'typeRef'. May be {@literal null} if the annotation targets
+   *                   'typeRef' as a whole.
+   * @param start      the fist instructions corresponding to the continuous ranges that make the scope
+   *                   of this local variable (inclusive).
+   * @param end        the last instructions corresponding to the continuous ranges that make the scope of
+   *                   this local variable (exclusive). This array must have the same size as the 'start' array.
+   * @param index      the local variable's index in each range. This array must have the same size as
+   *                   the 'start' array.
    * @param descriptor the class descriptor of the annotation class.
    */
   public LocalVariableAnnotationNode(
-      final int typeRef,
-      final TypePath typePath,
-      final LabelNode[] start,
-      final LabelNode[] end,
-      final int[] index,
-      final String descriptor) {
+    final int typeRef,
+    final TypePath typePath,
+    final LabelNode[] start,
+    final LabelNode[] end,
+    final int[] index,
+    final String descriptor) {
     this(/* latest api = */ Opcodes.ASM7, typeRef, typePath, start, end, index, descriptor);
   }
 
   /**
    * Constructs a new {@link LocalVariableAnnotationNode}.
    *
-   * @param api the ASM API version implemented by this visitor. Must be one of {@link
-   *     Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
-   * @param typeRef a reference to the annotated type. See {@link TypeReference}.
-   * @param start the fist instructions corresponding to the continuous ranges that make the scope
-   *     of this local variable (inclusive).
-   * @param end the last instructions corresponding to the continuous ranges that make the scope of
-   *     this local variable (exclusive). This array must have the same size as the 'start' array.
-   * @param index the local variable's index in each range. This array must have the same size as
-   *     the 'start' array.
-   * @param typePath the path to the annotated type argument, wildcard bound, array element type, or
-   *     static inner type within 'typeRef'. May be {@literal null} if the annotation targets
-   *     'typeRef' as a whole.
+   * @param api        the ASM API version implemented by this visitor. Must be one of {@link
+   *                   Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
+   * @param typeRef    a reference to the annotated type. See {@link TypeReference}.
+   * @param start      the fist instructions corresponding to the continuous ranges that make the scope
+   *                   of this local variable (inclusive).
+   * @param end        the last instructions corresponding to the continuous ranges that make the scope of
+   *                   this local variable (exclusive). This array must have the same size as the 'start' array.
+   * @param index      the local variable's index in each range. This array must have the same size as
+   *                   the 'start' array.
+   * @param typePath   the path to the annotated type argument, wildcard bound, array element type, or
+   *                   static inner type within 'typeRef'. May be {@literal null} if the annotation targets
+   *                   'typeRef' as a whole.
    * @param descriptor the class descriptor of the annotation class.
    */
   public LocalVariableAnnotationNode(
-      final int api,
-      final int typeRef,
-      final TypePath typePath,
-      final LabelNode[] start,
-      final LabelNode[] end,
-      final int[] index,
-      final String descriptor) {
+    final int api,
+    final int typeRef,
+    final TypePath typePath,
+    final LabelNode[] start,
+    final LabelNode[] end,
+    final int[] index,
+    final String descriptor) {
     super(api, typeRef, typePath, descriptor);
     this.start = Util.asArrayList(start);
     this.end = Util.asArrayList(end);
@@ -120,7 +120,7 @@ public class LocalVariableAnnotationNode extends TypeAnnotationNode {
    * Makes the given visitor visit this type annotation.
    *
    * @param methodVisitor the visitor that must visit this annotation.
-   * @param visible {@literal true} if the annotation is visible at runtime.
+   * @param visible       {@literal true} if the annotation is visible at runtime.
    */
   public void accept(final MethodVisitor methodVisitor, final boolean visible) {
     Label[] startLabels = new Label[this.start.size()];
@@ -132,7 +132,7 @@ public class LocalVariableAnnotationNode extends TypeAnnotationNode {
       indices[i] = this.index.get(i);
     }
     accept(
-        methodVisitor.visitLocalVariableAnnotation(
-            typeRef, typePath, startLabels, endLabels, indices, desc, visible));
+      methodVisitor.visitLocalVariableAnnotation(
+        typeRef, typePath, startLabels, endLabels, indices, desc, visible));
   }
 }

@@ -38,7 +38,6 @@ public final class EquipmentFilter extends Filter {
       ItemStack itemStack = packet.getItemModifier().readSafely(0);
       ItemStack newItemStack = stripFromData(itemStack);
       packet.getItemModifier().write(0, newItemStack);
-
     } else {
       // 1.16+
       //noinspection unchecked

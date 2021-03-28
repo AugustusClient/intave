@@ -4,10 +4,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import de.jpx3.intave.event.service.entity.WrappedEntity;
 import de.jpx3.intave.event.service.transaction.TransactionCallBackData;
+import de.jpx3.intave.tools.annotate.Relocate;
 
 import java.util.List;
 import java.util.Map;
 
+@Relocate
 public final class UserMetaSynchronizeData {
   private final Map<Short, TransactionCallBackData<?>> transactionFeedBackMap = Maps.newConcurrentMap();
   private final Map<Integer, WrappedEntity> synchronizedEntityMap = Maps.newConcurrentMap();

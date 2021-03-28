@@ -45,28 +45,29 @@ import java.util.List;
 public class Frame<V extends Value> {
 
   /**
-   * The expected return type of the analyzed method, or {@literal null} if the method returns void.
-   */
-  private V returnValue;
-
-  /**
    * The local variables and the operand stack of this frame. The first {@link #numLocals} elements
    * correspond to the local variables. The following {@link #numStack} elements correspond to the
    * operand stack.
    */
   private final V[] values;
-
-  /** The number of local variables of this frame. */
+  /**
+   * The number of local variables of this frame.
+   */
   private final int numLocals;
-
-  /** The number of elements in the operand stack. */
+  /**
+   * The expected return type of the analyzed method, or {@literal null} if the method returns void.
+   */
+  private V returnValue;
+  /**
+   * The number of elements in the operand stack.
+   */
   private int numStack;
 
   /**
    * Constructs a new frame with the given size.
    *
    * @param numLocals the maximum number of local variables of the frame.
-   * @param numStack the maximum stack size of the frame.
+   * @param numStack  the maximum stack size of the frame.
    */
   @SuppressWarnings("unchecked")
   public Frame(final int numLocals, final int numStack) {
@@ -109,11 +110,11 @@ public class Frame<V extends Value> {
    * analyses.
    *
    * @param opcode the opcode of the jump instruction. Can be IFEQ, IFNE, IFLT, IFGE, IFGT, IFLE,
-   *     IF_ICMPEQ, IF_ICMPNE, IF_ICMPLT, IF_ICMPGE, IF_ICMPGT, IF_ICMPLE, IF_ACMPEQ, IF_ACMPNE,
-   *     GOTO, JSR, IFNULL, IFNONNULL, TABLESWITCH or LOOKUPSWITCH.
+   *               IF_ICMPEQ, IF_ICMPNE, IF_ICMPLT, IF_ICMPGE, IF_ICMPGT, IF_ICMPLE, IF_ACMPEQ, IF_ACMPNE,
+   *               GOTO, JSR, IFNULL, IFNONNULL, TABLESWITCH or LOOKUPSWITCH.
    * @param target a target of the jump instruction this frame corresponds to, or {@literal null} if
-   *     this frame corresponds to the successor of the jump instruction (i.e. the next instruction
-   *     in the instructions sequence).
+   *               this frame corresponds to the successor of the jump instruction (i.e. the next instruction
+   *               in the instructions sequence).
    */
   public void initJumpTarget(final int opcode, final LabelNode target) {
     // Does nothing by default.
@@ -123,7 +124,7 @@ public class Frame<V extends Value> {
    * Sets the expected return type of the analyzed method.
    *
    * @param v the expected return type of the analyzed method, or {@literal null} if the method
-   *     returns void.
+   *          returns void.
    */
   public void setReturn(final V v) {
     returnValue = v;
@@ -207,7 +208,9 @@ public class Frame<V extends Value> {
     values[numLocals + index] = value;
   }
 
-  /** Clears the operand stack of this frame. */
+  /**
+   * Clears the operand stack of this frame.
+   */
   public void clearStack() {
     numStack = 0;
   }
@@ -241,13 +244,13 @@ public class Frame<V extends Value> {
   /**
    * Simulates the execution of the given instruction on this execution stack frame.
    *
-   * @param insn the instruction to execute.
+   * @param insn        the instruction to execute.
    * @param interpreter the interpreter to use to compute values from other values.
    * @throws AnalyzerException if the instruction cannot be executed on this execution frame (e.g. a
-   *     POP on an empty operand stack).
+   *                           POP on an empty operand stack).
    */
   public void execute(final AbstractInsnNode insn, final Interpreter<V> interpreter)
-      throws AnalyzerException {
+    throws AnalyzerException {
     V value1;
     V value2;
     V value3;
@@ -568,7 +571,7 @@ public class Frame<V extends Value> {
         executeInvokeInsn(insn, ((InvokeDynamicInsnNode) insn).desc, interpreter);
         break;
       case Opcodes.MULTIANEWARRAY:
-        List<V> valueList = new ArrayList<>();;
+        List<V> valueList = new ArrayList<>();
         for (int i = ((MultiANewArrayInsnNode) insn).dims; i > 0; --i) {
           valueList.add(0, pop());
         }
@@ -580,8 +583,8 @@ public class Frame<V extends Value> {
   }
 
   private boolean executeDupX2(
-      final AbstractInsnNode insn, final V value1, final Interpreter<V> interpreter)
-      throws AnalyzerException {
+    final AbstractInsnNode insn, final V value1, final Interpreter<V> interpreter)
+    throws AnalyzerException {
     V value2 = pop();
     if (value2.getSize() == 1) {
       V value3 = pop();
@@ -602,9 +605,9 @@ public class Frame<V extends Value> {
   }
 
   private void executeInvokeInsn(
-      final AbstractInsnNode insn, final String methodDescriptor, final Interpreter<V> interpreter)
-      throws AnalyzerException {
-    List<V> valueList = new ArrayList<>();;
+    final AbstractInsnNode insn, final String methodDescriptor, final Interpreter<V> interpreter)
+    throws AnalyzerException {
+    List<V> valueList = new ArrayList<>();
     for (int i = Type.getArgumentTypes(methodDescriptor).length; i > 0; --i) {
       valueList.add(0, pop());
     }
@@ -621,14 +624,14 @@ public class Frame<V extends Value> {
   /**
    * Merges the given frame into this frame.
    *
-   * @param frame a frame. This frame is left unchanged by this method.
+   * @param frame       a frame. This frame is left unchanged by this method.
    * @param interpreter the interpreter used to merge values.
    * @return {@literal true} if this frame has been changed as a result of the merge operation, or
-   *     {@literal false} otherwise.
+   * {@literal false} otherwise.
    * @throws AnalyzerException if the frames have incompatible sizes.
    */
   public boolean merge(final Frame<? extends V> frame, final Interpreter<V> interpreter)
-      throws AnalyzerException {
+    throws AnalyzerException {
     if (numStack != frame.numStack) {
       throw new AnalyzerException(null, "Incompatible stack heights");
     }
@@ -647,12 +650,12 @@ public class Frame<V extends Value> {
    * Merges the given frame into this frame (case of a subroutine). The operand stacks are not
    * merged, and only the local variables that have not been used by the subroutine are merged.
    *
-   * @param frame a frame. This frame is left unchanged by this method.
+   * @param frame      a frame. This frame is left unchanged by this method.
    * @param localsUsed the local variables that are read or written by the subroutine. The i-th
-   *     element is true if and only if the local variable at index i is read or written by the
-   *     subroutine.
+   *                   element is true if and only if the local variable at index i is read or written by the
+   *                   subroutine.
    * @return {@literal true} if this frame has been changed as a result of the merge operation, or
-   *     {@literal false} otherwise.
+   * {@literal false} otherwise.
    */
   public boolean merge(final Frame<? extends V> frame, final boolean[] localsUsed) {
     boolean changed = false;

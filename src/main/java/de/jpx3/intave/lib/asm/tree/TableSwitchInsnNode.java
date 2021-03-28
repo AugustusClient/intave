@@ -41,29 +41,37 @@ import java.util.Map;
  */
 public class TableSwitchInsnNode extends AbstractInsnNode {
 
-  /** The minimum key value. */
+  /**
+   * The minimum key value.
+   */
   public int min;
 
-  /** The maximum key value. */
+  /**
+   * The maximum key value.
+   */
   public int max;
 
-  /** Beginning of the default handler block. */
+  /**
+   * Beginning of the default handler block.
+   */
   public LabelNode dflt;
 
-  /** Beginnings of the handler blocks. This list is a list of {@link LabelNode} objects. */
+  /**
+   * Beginnings of the handler blocks. This list is a list of {@link LabelNode} objects.
+   */
   public List<LabelNode> labels;
 
   /**
    * Constructs a new {@link TableSwitchInsnNode}.
    *
-   * @param min the minimum key value.
-   * @param max the maximum key value.
-   * @param dflt beginning of the default handler block.
+   * @param min    the minimum key value.
+   * @param max    the maximum key value.
+   * @param dflt   beginning of the default handler block.
    * @param labels beginnings of the handler blocks. {@code labels[i]} is the beginning of the
-   *     handler block for the {@code min + i} key.
+   *               handler block for the {@code min + i} key.
    */
   public TableSwitchInsnNode(
-      final int min, final int max, final LabelNode dflt, final LabelNode... labels) {
+    final int min, final int max, final LabelNode dflt, final LabelNode... labels) {
     super(Opcodes.TABLESWITCH);
     this.min = min;
     this.max = max;
@@ -89,6 +97,6 @@ public class TableSwitchInsnNode extends AbstractInsnNode {
   @Override
   public AbstractInsnNode clone(final Map<LabelNode, LabelNode> clonedLabels) {
     return new TableSwitchInsnNode(min, max, clone(dflt, clonedLabels), clone(labels, clonedLabels))
-        .cloneAnnotations(this);
+      .cloneAnnotations(this);
   }
 }

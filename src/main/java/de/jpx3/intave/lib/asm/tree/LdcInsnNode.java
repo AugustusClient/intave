@@ -51,7 +51,7 @@ public class LdcInsnNode extends AbstractInsnNode {
    * Constructs a new {@link LdcInsnNode}.
    *
    * @param value the constant to be loaded on the stack. This parameter must be a non null {@link
-   *     Integer}, a {@link Float}, a {@link Long}, a {@link Double} or a {@link String}.
+   *              Integer}, a {@link Float}, a {@link Long}, a {@link Double} or a {@link String}.
    */
   public LdcInsnNode(final Object value) {
     super(Opcodes.LDC);

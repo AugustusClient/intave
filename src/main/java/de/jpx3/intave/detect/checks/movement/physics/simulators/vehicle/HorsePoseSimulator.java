@@ -1,6 +1,6 @@
 package de.jpx3.intave.detect.checks.movement.physics.simulators.vehicle;
 
-import de.jpx3.intave.detect.checks.movement.physics.ProcessorMotionContext;
+import de.jpx3.intave.detect.checks.movement.physics.MotionVector;
 import de.jpx3.intave.detect.checks.movement.physics.simulators.DefaultPoseSimulator;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaMovementData;
@@ -11,7 +11,7 @@ public final class HorsePoseSimulator extends DefaultPoseSimulator {
 
   @Override
   public ComplexColliderSimulationResult performSimulation(
-    User user, ProcessorMotionContext context,
+    User user, MotionVector context,
     float forward, float strafe,
     boolean attackReduce, boolean jumped, boolean handActive
   ) {

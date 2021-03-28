@@ -36,7 +36,9 @@ import de.jpx3.intave.lib.asm.ModuleVisitor;
  */
 public class ModuleRequireNode {
 
-  /** The fully qualified name (using dots) of the dependence. */
+  /**
+   * The fully qualified name (using dots) of the dependence.
+   */
   public String module;
 
   /**
@@ -45,15 +47,17 @@ public class ModuleRequireNode {
    */
   public int access;
 
-  /** The module version at compile time, or {@literal null}. */
+  /**
+   * The module version at compile time, or {@literal null}.
+   */
   public String version;
 
   /**
    * Constructs a new {@link ModuleRequireNode}.
    *
-   * @param module the fully qualified name (using dots) of the dependence.
-   * @param access the access flag of the dependence among {@code ACC_TRANSITIVE}, {@code
-   *     ACC_STATIC_PHASE}, {@code ACC_SYNTHETIC} and {@code ACC_MANDATED}.
+   * @param module  the fully qualified name (using dots) of the dependence.
+   * @param access  the access flag of the dependence among {@code ACC_TRANSITIVE}, {@code
+   *                ACC_STATIC_PHASE}, {@code ACC_SYNTHETIC} and {@code ACC_MANDATED}.
    * @param version the module version at compile time, or {@literal null}.
    */
   public ModuleRequireNode(final String module, final int access, final String version) {

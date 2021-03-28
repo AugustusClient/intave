@@ -39,13 +39,15 @@ public class AnalyzerException extends Exception {
 
   private static final long serialVersionUID = 3154190448018943333L;
 
-  /** The bytecode instruction where the analysis failed. */
+  /**
+   * The bytecode instruction where the analysis failed.
+   */
   public final transient AbstractInsnNode node;
 
   /**
    * Constructs a new {@link AnalyzerException}.
    *
-   * @param insn the bytecode instruction where the analysis failed.
+   * @param insn    the bytecode instruction where the analysis failed.
    * @param message the reason why the analysis failed.
    */
   public AnalyzerException(final AbstractInsnNode insn, final String message) {
@@ -56,12 +58,12 @@ public class AnalyzerException extends Exception {
   /**
    * Constructs a new {@link AnalyzerException}.
    *
-   * @param insn the bytecode instruction where the analysis failed.
+   * @param insn    the bytecode instruction where the analysis failed.
    * @param message the reason why the analysis failed.
-   * @param cause the cause of the failure.
+   * @param cause   the cause of the failure.
    */
   public AnalyzerException(
-      final AbstractInsnNode insn, final String message, final Throwable cause) {
+    final AbstractInsnNode insn, final String message, final Throwable cause) {
     super(message, cause);
     this.node = insn;
   }
@@ -69,21 +71,21 @@ public class AnalyzerException extends Exception {
   /**
    * Constructs a new {@link AnalyzerException}.
    *
-   * @param insn the bytecode instruction where the analysis failed.
-   * @param message the reason why the analysis failed.
+   * @param insn     the bytecode instruction where the analysis failed.
+   * @param message  the reason why the analysis failed.
    * @param expected an expected value.
-   * @param actual the actual value, different from the expected one.
+   * @param actual   the actual value, different from the expected one.
    */
   public AnalyzerException(
-      final AbstractInsnNode insn,
-      final String message,
-      final Object expected,
-      final Value actual) {
+    final AbstractInsnNode insn,
+    final String message,
+    final Object expected,
+    final Value actual) {
     super(
-        (message == null ? "Expected " : message + ": expected ")
-            + expected
-            + ", but found "
-            + actual);
+      (message == null ? "Expected " : message + ": expected ")
+        + expected
+        + ", but found "
+        + actual);
     this.node = insn;
   }
 }

@@ -38,14 +38,16 @@ import java.util.Map;
  */
 public class IntInsnNode extends AbstractInsnNode {
 
-  /** The operand of this instruction. */
+  /**
+   * The operand of this instruction.
+   */
   public int operand;
 
   /**
    * Constructs a new {@link IntInsnNode}.
    *
-   * @param opcode the opcode of the instruction to be constructed. This opcode must be BIPUSH,
-   *     SIPUSH or NEWARRAY.
+   * @param opcode  the opcode of the instruction to be constructed. This opcode must be BIPUSH,
+   *                SIPUSH or NEWARRAY.
    * @param operand the operand of the instruction to be constructed.
    */
   public IntInsnNode(final int opcode, final int operand) {

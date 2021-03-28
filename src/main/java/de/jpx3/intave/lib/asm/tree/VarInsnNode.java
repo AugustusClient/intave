@@ -39,16 +39,18 @@ import java.util.Map;
  */
 public class VarInsnNode extends AbstractInsnNode {
 
-  /** The operand of this instruction. This operand is the index of a local variable. */
+  /**
+   * The operand of this instruction. This operand is the index of a local variable.
+   */
   public int var;
 
   /**
    * Constructs a new {@link VarInsnNode}.
    *
    * @param opcode the opcode of the local variable instruction to be constructed. This opcode must
-   *     be ILOAD, LLOAD, FLOAD, DLOAD, ALOAD, ISTORE, LSTORE, FSTORE, DSTORE, ASTORE or RET.
-   * @param var the operand of the instruction to be constructed. This operand is the index of a
-   *     local variable.
+   *               be ILOAD, LLOAD, FLOAD, DLOAD, ALOAD, ISTORE, LSTORE, FSTORE, DSTORE, ASTORE or RET.
+   * @param var    the operand of the instruction to be constructed. This operand is the index of a
+   *               local variable.
    */
   public VarInsnNode(final int opcode, final int var) {
     super(opcode);
@@ -59,7 +61,7 @@ public class VarInsnNode extends AbstractInsnNode {
    * Sets the opcode of this instruction.
    *
    * @param opcode the new instruction opcode. This opcode must be ILOAD, LLOAD, FLOAD, DLOAD,
-   *     ALOAD, ISTORE, LSTORE, FSTORE, DSTORE, ASTORE or RET.
+   *               ALOAD, ISTORE, LSTORE, FSTORE, DSTORE, ASTORE or RET.
    */
   public void setOpcode(final int opcode) {
     this.opcode = opcode;

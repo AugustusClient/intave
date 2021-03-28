@@ -40,7 +40,9 @@ import java.util.List;
  */
 final class Subroutine {
 
-  /** The start of this subroutine. */
+  /**
+   * The start of this subroutine.
+   */
   final LabelNode start;
 
   /**
@@ -49,20 +51,22 @@ final class Subroutine {
    */
   final boolean[] localsUsed;
 
-  /** The JSR instructions that jump to this subroutine. */
+  /**
+   * The JSR instructions that jump to this subroutine.
+   */
   final List<JumpInsnNode> callers;
 
   /**
    * Constructs a new {@link Subroutine}.
    *
-   * @param start the start of this subroutine.
+   * @param start     the start of this subroutine.
    * @param maxLocals the local variables that are read or written by this subroutine.
-   * @param caller a JSR instruction that jump to this subroutine.
+   * @param caller    a JSR instruction that jump to this subroutine.
    */
   Subroutine(final LabelNode start, final int maxLocals, final JumpInsnNode caller) {
     this.start = start;
     this.localsUsed = new boolean[maxLocals];
-    this.callers = new ArrayList<>();;
+    this.callers = new ArrayList<>();
     callers.add(caller);
   }
 

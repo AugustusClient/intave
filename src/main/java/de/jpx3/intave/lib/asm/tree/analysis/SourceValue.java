@@ -63,7 +63,7 @@ public class SourceValue implements Value {
    * Constructs a new {@link SourceValue}.
    *
    * @param size the size of this value, in 32 bits words. This size is 1 for byte, boolean, char,
-   *     short, int, float, object and array types, and 2 for long and double.
+   *             short, int, float, object and array types, and 2 for long and double.
    */
   public SourceValue(final int size) {
     this(size, new SmallSet<AbstractInsnNode>());
@@ -72,8 +72,8 @@ public class SourceValue implements Value {
   /**
    * Constructs a new {@link SourceValue}.
    *
-   * @param size the size of this value, in 32 bits words. This size is 1 for byte, boolean, char,
-   *     short, int, float, object and array types, and 2 for long and double.
+   * @param size     the size of this value, in 32 bits words. This size is 1 for byte, boolean, char,
+   *                 short, int, float, object and array types, and 2 for long and double.
    * @param insnNode an instruction that can produce this value.
    */
   public SourceValue(final int size, final AbstractInsnNode insnNode) {
@@ -84,8 +84,8 @@ public class SourceValue implements Value {
   /**
    * Constructs a new {@link SourceValue}.
    *
-   * @param size the size of this value, in 32 bits words. This size is 1 for byte, boolean, char,
-   *     short, int, float, object and array types, and 2 for long and double.
+   * @param size    the size of this value, in 32 bits words. This size is 1 for byte, boolean, char,
+   *                short, int, float, object and array types, and 2 for long and double.
    * @param insnSet the instructions that can produce this value.
    */
   public SourceValue(final int size, final Set<AbstractInsnNode> insnSet) {
@@ -97,7 +97,7 @@ public class SourceValue implements Value {
    * Returns the size of this value.
    *
    * @return the size of this value, in 32 bits words. This size is 1 for byte, boolean, char,
-   *     short, int, float, object and array types, and 2 for long and double.
+   * short, int, float, object and array types, and 2 for long and double.
    */
   @Override
   public int getSize() {

@@ -41,7 +41,9 @@ import java.util.List;
  */
 public class ModuleNode extends ModuleVisitor {
 
-  /** The fully qualified name (using dots) of this module. */
+  /**
+   * The fully qualified name (using dots) of this module.
+   */
   public String name;
 
   /**
@@ -50,37 +52,53 @@ public class ModuleNode extends ModuleVisitor {
    */
   public int access;
 
-  /** The version of this module. May be {@literal null}. */
+  /**
+   * The version of this module. May be {@literal null}.
+   */
   public String version;
 
-  /** The internal name of the main class of this module. May be {@literal null}. */
+  /**
+   * The internal name of the main class of this module. May be {@literal null}.
+   */
   public String mainClass;
 
-  /** The internal name of the packages declared by this module. May be {@literal null}. */
+  /**
+   * The internal name of the packages declared by this module. May be {@literal null}.
+   */
   public List<String> packages;
 
-  /** The dependencies of this module. May be {@literal null}. */
+  /**
+   * The dependencies of this module. May be {@literal null}.
+   */
   public List<ModuleRequireNode> requires;
 
-  /** The packages exported by this module. May be {@literal null}. */
+  /**
+   * The packages exported by this module. May be {@literal null}.
+   */
   public List<ModuleExportNode> exports;
 
-  /** The packages opened by this module. May be {@literal null}. */
+  /**
+   * The packages opened by this module. May be {@literal null}.
+   */
   public List<ModuleOpenNode> opens;
 
-  /** The internal names of the services used by this module. May be {@literal null}. */
+  /**
+   * The internal names of the services used by this module. May be {@literal null}.
+   */
   public List<String> uses;
 
-  /** The services provided by this module. May be {@literal null}. */
+  /**
+   * The services provided by this module. May be {@literal null}.
+   */
   public List<ModuleProvideNode> provides;
 
   /**
    * Constructs a {@link ModuleNode}. <i>Subclasses must not use this constructor</i>. Instead, they
-   * must use the {@link #ModuleNode(int,String,int,String,List,List,List,List,List)} version.
+   * must use the {@link #ModuleNode(int, String, int, String, List, List, List, List, List)} version.
    *
-   * @param name the fully qualified name (using dots) of the module.
-   * @param access the module access flags, among {@code ACC_OPEN}, {@code ACC_SYNTHETIC} and {@code
-   *     ACC_MANDATED}.
+   * @param name    the fully qualified name (using dots) of the module.
+   * @param access  the module access flags, among {@code ACC_OPEN}, {@code ACC_SYNTHETIC} and {@code
+   *                ACC_MANDATED}.
    * @param version the module version, or {@literal null}.
    * @throws IllegalStateException If a subclass calls this constructor.
    */
@@ -95,31 +113,32 @@ public class ModuleNode extends ModuleVisitor {
   }
 
   // TODO(forax): why is there no 'mainClass' and 'packages' parameters in this constructor?
+
   /**
    * Constructs a {@link ModuleNode}.
    *
-   * @param api the ASM API version implemented by this visitor. Must be one of {@link Opcodes#ASM6}
-   *     or {@link Opcodes#ASM7}.
-   * @param name the fully qualified name (using dots) of the module.
-   * @param access the module access flags, among {@code ACC_OPEN}, {@code ACC_SYNTHETIC} and {@code
-   *     ACC_MANDATED}.
-   * @param version the module version, or {@literal null}.
+   * @param api      the ASM API version implemented by this visitor. Must be one of {@link Opcodes#ASM6}
+   *                 or {@link Opcodes#ASM7}.
+   * @param name     the fully qualified name (using dots) of the module.
+   * @param access   the module access flags, among {@code ACC_OPEN}, {@code ACC_SYNTHETIC} and {@code
+   *                 ACC_MANDATED}.
+   * @param version  the module version, or {@literal null}.
    * @param requires The dependencies of this module. May be {@literal null}.
-   * @param exports The packages exported by this module. May be {@literal null}.
-   * @param opens The packages opened by this module. May be {@literal null}.
-   * @param uses The internal names of the services used by this module. May be {@literal null}.
+   * @param exports  The packages exported by this module. May be {@literal null}.
+   * @param opens    The packages opened by this module. May be {@literal null}.
+   * @param uses     The internal names of the services used by this module. May be {@literal null}.
    * @param provides The services provided by this module. May be {@literal null}.
    */
   public ModuleNode(
-      final int api,
-      final String name,
-      final int access,
-      final String version,
-      final List<ModuleRequireNode> requires,
-      final List<ModuleExportNode> exports,
-      final List<ModuleOpenNode> opens,
-      final List<String> uses,
-      final List<ModuleProvideNode> provides) {
+    final int api,
+    final String name,
+    final int access,
+    final String version,
+    final List<ModuleRequireNode> requires,
+    final List<ModuleExportNode> exports,
+    final List<ModuleOpenNode> opens,
+    final List<String> uses,
+    final List<ModuleProvideNode> provides) {
     super(api);
     this.name = name;
     this.access = access;

@@ -1,10 +1,12 @@
 package de.jpx3.intave.access.check;
 
+import de.jpx3.intave.tools.annotate.Relocate;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.Map;
 
+@Relocate
 public interface CheckAccess {
   String name();
   boolean enabled();

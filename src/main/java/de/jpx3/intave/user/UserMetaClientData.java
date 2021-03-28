@@ -1,8 +1,10 @@
 package de.jpx3.intave.user;
 
 import de.jpx3.intave.adapter.ViaVersionAdapter;
+import de.jpx3.intave.tools.annotate.Relocate;
 import org.bukkit.entity.Player;
 
+@Relocate
 public final class UserMetaClientData {
   public final static int PROTOCOL_VERSION_NETHER_UPDATE = 735; // 1.16
   public final static int PROTOCOL_VERSION_BEE_UPDATE = 573; // 1.15

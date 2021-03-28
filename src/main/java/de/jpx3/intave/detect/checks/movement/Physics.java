@@ -7,16 +7,17 @@ import de.jpx3.intave.adapter.ProtocolLibAdapter;
 import de.jpx3.intave.detect.CheckViolationLevelDecrementer;
 import de.jpx3.intave.detect.IntaveCheck;
 import de.jpx3.intave.detect.checks.movement.physics.LegacyWaterPhysics;
+import de.jpx3.intave.detect.checks.movement.physics.MotionVector;
 import de.jpx3.intave.detect.checks.movement.physics.Pose;
-import de.jpx3.intave.detect.checks.movement.physics.ProcessorMotionContext;
 import de.jpx3.intave.detect.checks.movement.physics.SimulationProcessor;
 import de.jpx3.intave.detect.checks.movement.physics.simulators.PoseSimulator;
 import de.jpx3.intave.diagnostics.timings.Timings;
 import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.tools.MathHelper;
 import de.jpx3.intave.tools.annotate.DispatchCrossCall;
-import de.jpx3.intave.tools.client.PlayerMovementHelper;
-import de.jpx3.intave.tools.client.PlayerMovementPoseHelper;
+import de.jpx3.intave.tools.annotate.Relocate;
+import de.jpx3.intave.tools.client.MovementContextHelper;
+import de.jpx3.intave.tools.client.PoseHelper;
 import de.jpx3.intave.tools.sync.Synchronizer;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
@@ -44,6 +45,7 @@ import static de.jpx3.intave.tools.MathHelper.formatDouble;
 import static de.jpx3.intave.tools.MathHelper.formatPosition;
 import static de.jpx3.intave.user.UserMetaClientData.PROTOCOL_VERSION_AQUATIC_UPDATE;
 
+@Relocate
 public final class Physics extends IntaveCheck {
   private final static double VL_DECREMENT_PER_VALID_MOVE = 0.05;
 
@@ -141,7 +143,7 @@ public final class Physics extends IntaveCheck {
     Player player = user.player();
     if (player.getVehicle() != null) {
       return Pose.VEHICLE;
-    } else if (PlayerMovementPoseHelper.flyingWithElytra(player)) {
+    } else if (PoseHelper.flyingWithElytra(player)) {
       return Pose.ELYTRA;
     }
     return Pose.DEFAULT;
@@ -237,7 +239,7 @@ public final class Physics extends IntaveCheck {
     UserMetaMovementData movementData = meta.movementData();
     UserMetaViolationLevelData violationLevelData = meta.violationLevelData();
     UserMetaAbilityData abilityData = meta.abilityData();
-    ProcessorMotionContext context = expectedMovement.context();
+    MotionVector context = expectedMovement.context();
 
     int keyForward = movementData.keyForward;
     int keyStrafe = movementData.keyStrafe;
@@ -266,9 +268,9 @@ public final class Physics extends IntaveCheck {
     double differenceZ = predictedZ - receivedMotionZ;
     double distance = MathHelper.resolveDistance(differenceX, differenceY, differenceZ);
 
-    boolean onLadder = PlayerMovementHelper.isOnLadder(user, positionX, positionY + 1.5, positionZ);
-    onLadder |= PlayerMovementHelper.isOnLadder(user, positionX, positionY - 0.5, positionZ);
-    onLadder |= PlayerMovementHelper.isOnLadder(user, positionX, positionY, positionZ);
+    boolean onLadder = MovementContextHelper.isOnLadder(user, positionX, positionY + 1.5, positionZ);
+    onLadder |= MovementContextHelper.isOnLadder(user, positionX, positionY - 0.5, positionZ);
+    onLadder |= MovementContextHelper.isOnLadder(user, positionX, positionY, positionZ);
     boolean onLadderLast = movementData.onLadderLast;
     movementData.onLadderLast = onLadder;
     onLadder = movementData.onLadderLast || onLadderLast;
@@ -292,7 +294,7 @@ public final class Physics extends IntaveCheck {
     if (distance > 1e-3) {
       movementData.suspiciousMovement = true;
       ComplexColliderSimulationResult entityCollisionResult = simulationService.simulateMovementWithoutKeyPress(user);
-      ProcessorMotionContext setbackContext = entityCollisionResult.context();
+      MotionVector setbackContext = entityCollisionResult.context();
       predictedX = setbackContext.motionX;
       predictedY = setbackContext.motionY;
       predictedZ = setbackContext.motionZ;
@@ -571,7 +573,7 @@ public final class Physics extends IntaveCheck {
     // Jump out of water
     if (movementData.inWater && abuseVertically > 1e-5 && receivedMotionY > 0.0 && receivedMotionY < 0.35) {
       if (Collision.nearBySolidBlock(player.getWorld(), movementData.boundingBox().grow(0.2))) {
-        boolean airAbove = !PlayerMovementHelper.isAllLiquid(player.getWorld(), movementData.boundingBox());
+        boolean airAbove = !MovementContextHelper.isAllLiquid(player.getWorld(), movementData.boundingBox());
         if (airAbove) {
           abuseVertically = 0;
         }

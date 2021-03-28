@@ -1,15 +1,15 @@
 package de.jpx3.intave.world.collider.result;
 
-import de.jpx3.intave.detect.checks.movement.physics.ProcessorMotionContext;
+import de.jpx3.intave.detect.checks.movement.physics.MotionVector;
 
 public final class ComplexColliderSimulationResult {
-  private final ProcessorMotionContext context;
+  private final MotionVector context;
   private final boolean onGround, collidedHorizontally, collidedVertically;
   private final boolean resetMotionX, resetMotionZ;
   private final boolean step;
 
   public ComplexColliderSimulationResult(
-    ProcessorMotionContext context, boolean onGround,
+    MotionVector context, boolean onGround,
     boolean collidedHorizontally, boolean collidedVertically,
     boolean resetMotionX, boolean resetMotionZ, boolean step
   ) {
@@ -25,7 +25,7 @@ public final class ComplexColliderSimulationResult {
     this.step = step;
   }
 
-  public ProcessorMotionContext context() {
+  public MotionVector context() {
     return context;
   }
 

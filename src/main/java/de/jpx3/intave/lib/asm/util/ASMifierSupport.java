@@ -38,10 +38,10 @@ public interface ASMifierSupport {
   /**
    * Generates the ASM code to create an attribute equal to this attribute.
    *
-   * @param outputBuilder where the generated code must be appended.
+   * @param outputBuilder       where the generated code must be appended.
    * @param visitorVariableName the name of the visitor variable in the produced code.
-   * @param labelNames the names of the labels in the generated code.
+   * @param labelNames          the names of the labels in the generated code.
    */
   void asmify(
-      StringBuilder outputBuilder, String visitorVariableName, Map<Label, String> labelNames);
+    StringBuilder outputBuilder, String visitorVariableName, Map<Label, String> labelNames);
 }

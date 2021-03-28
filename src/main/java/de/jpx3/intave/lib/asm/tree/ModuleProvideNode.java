@@ -38,18 +38,22 @@ import java.util.List;
  */
 public class ModuleProvideNode {
 
-  /** The internal name of the service. */
+  /**
+   * The internal name of the service.
+   */
   public String service;
 
-  /** The internal names of the implementations of the service (there is at least one provider). */
+  /**
+   * The internal names of the implementations of the service (there is at least one provider).
+   */
   public List<String> providers;
 
   /**
    * Constructs a new {@link ModuleProvideNode}.
    *
-   * @param service the internal name of the service.
+   * @param service   the internal name of the service.
    * @param providers the internal names of the implementations of the service (there is at least
-   *     one provider).
+   *                  one provider).
    */
   public ModuleProvideNode(final String service, final List<String> providers) {
     this.service = service;

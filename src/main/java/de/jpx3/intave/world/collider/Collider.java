@@ -1,6 +1,6 @@
 package de.jpx3.intave.world.collider;
 
-import de.jpx3.intave.detect.checks.movement.physics.ProcessorMotionContext;
+import de.jpx3.intave.detect.checks.movement.physics.MotionVector;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaClientData;
@@ -33,7 +33,7 @@ public final class Collider {
   }
 
   public static ComplexColliderSimulationResult simulateComplexCollision(
-    User user, ProcessorMotionContext context, boolean inWeb,
+    User user, MotionVector context, boolean inWeb,
     double positionX, double positionY, double positionZ
   ) {
     return user.colliderProcessor().simulateCollision(user, context, inWeb, positionX, positionY, positionZ);

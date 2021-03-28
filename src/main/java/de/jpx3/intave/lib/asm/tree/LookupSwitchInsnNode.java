@@ -41,22 +41,28 @@ import java.util.Map;
  */
 public class LookupSwitchInsnNode extends AbstractInsnNode {
 
-  /** Beginning of the default handler block. */
+  /**
+   * Beginning of the default handler block.
+   */
   public LabelNode dflt;
 
-  /** The values of the keys. */
+  /**
+   * The values of the keys.
+   */
   public List<Integer> keys;
 
-  /** Beginnings of the handler blocks. */
+  /**
+   * Beginnings of the handler blocks.
+   */
   public List<LabelNode> labels;
 
   /**
    * Constructs a new {@link LookupSwitchInsnNode}.
    *
-   * @param dflt beginning of the default handler block.
-   * @param keys the values of the keys.
+   * @param dflt   beginning of the default handler block.
+   * @param keys   the values of the keys.
    * @param labels beginnings of the handler blocks. {@code labels[i]} is the beginning of the
-   *     handler block for the {@code keys[i]} key.
+   *               handler block for the {@code keys[i]} key.
    */
   public LookupSwitchInsnNode(final LabelNode dflt, final int[] keys, final LabelNode[] labels) {
     super(Opcodes.LOOKUPSWITCH);
@@ -87,7 +93,7 @@ public class LookupSwitchInsnNode extends AbstractInsnNode {
   @Override
   public AbstractInsnNode clone(final Map<LabelNode, LabelNode> clonedLabels) {
     LookupSwitchInsnNode clone =
-        new LookupSwitchInsnNode(clone(dflt, clonedLabels), null, clone(labels, clonedLabels));
+      new LookupSwitchInsnNode(clone(dflt, clonedLabels), null, clone(labels, clonedLabels));
     clone.keys.addAll(keys);
     return clone.cloneAnnotations(this);
   }

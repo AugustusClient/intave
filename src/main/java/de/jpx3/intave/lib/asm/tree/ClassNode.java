@@ -51,10 +51,14 @@ public class ClassNode extends ClassVisitor {
    */
   public int access;
 
-  /** The internal name of this class (see {@link Type#getInternalName}). */
+  /**
+   * The internal name of this class (see {@link Type#getInternalName}).
+   */
   public String name;
 
-  /** The signature of this class. May be {@literal null}. */
+  /**
+   * The signature of this class. May be {@literal null}.
+   */
   public String signature;
 
   /**
@@ -70,7 +74,9 @@ public class ClassNode extends ClassVisitor {
    */
   public List<String> interfaces;
 
-  /** The name of the source file from which this class was compiled. May be {@literal null}. */
+  /**
+   * The name of the source file from which this class was compiled. May be {@literal null}.
+   */
   public String sourceFile;
 
   /**
@@ -78,10 +84,14 @@ public class ClassNode extends ClassVisitor {
    */
   public String sourceDebug;
 
-  /** The module stored in this class. May be {@literal null}. */
+  /**
+   * The module stored in this class. May be {@literal null}.
+   */
   public ModuleNode module;
 
-  /** The internal name of the enclosing class of this class. May be {@literal null}. */
+  /**
+   * The internal name of the enclosing class of this class. May be {@literal null}.
+   */
   public String outerClass;
 
   /**
@@ -96,28 +106,44 @@ public class ClassNode extends ClassVisitor {
    */
   public String outerMethodDesc;
 
-  /** The runtime visible annotations of this class. May be {@literal null}. */
+  /**
+   * The runtime visible annotations of this class. May be {@literal null}.
+   */
   public List<AnnotationNode> visibleAnnotations;
 
-  /** The runtime invisible annotations of this class. May be {@literal null}. */
+  /**
+   * The runtime invisible annotations of this class. May be {@literal null}.
+   */
   public List<AnnotationNode> invisibleAnnotations;
 
-  /** The runtime visible type annotations of this class. May be {@literal null}. */
+  /**
+   * The runtime visible type annotations of this class. May be {@literal null}.
+   */
   public List<TypeAnnotationNode> visibleTypeAnnotations;
 
-  /** The runtime invisible type annotations of this class. May be {@literal null}. */
+  /**
+   * The runtime invisible type annotations of this class. May be {@literal null}.
+   */
   public List<TypeAnnotationNode> invisibleTypeAnnotations;
 
-  /** The non standard attributes of this class. May be {@literal null}. */
+  /**
+   * The non standard attributes of this class. May be {@literal null}.
+   */
   public List<Attribute> attrs;
 
-  /** The inner classes of this class. */
+  /**
+   * The inner classes of this class.
+   */
   public List<InnerClassNode> innerClasses;
 
-  /** The internal name of the nest host class of this class. May be {@literal null}. */
+  /**
+   * The internal name of the nest host class of this class. May be {@literal null}.
+   */
   public String nestHostClass;
 
-  /** The internal names of the nest members of this class. May be {@literal null}. */
+  /**
+   * The internal names of the nest members of this class. May be {@literal null}.
+   */
   public List<String> nestMembers;
 
   /**
@@ -127,19 +153,25 @@ public class ClassNode extends ClassVisitor {
    *
    * @deprecated this API is experimental.
    */
-  @Deprecated public List<String> permittedSubtypesExperimental;
+  @Deprecated
+  public List<String> permittedSubtypesExperimental;
 
   /**
    * The record components of this class. May be {@literal null}.
    *
    * @deprecated this API is experimental.
    */
-  @Deprecated public List<RecordComponentNode> recordComponentsExperimental;
+  @Deprecated
+  public List<RecordComponentNode> recordComponentsExperimental;
 
-  /** The fields of this class. */
+  /**
+   * The fields of this class.
+   */
   public List<FieldNode> fields;
 
-  /** The methods of this class. */
+  /**
+   * The methods of this class.
+   */
   public List<MethodNode> methods;
 
   /**
@@ -159,14 +191,14 @@ public class ClassNode extends ClassVisitor {
    * Constructs a new {@link ClassNode}.
    *
    * @param api the ASM API version implemented by this visitor. Must be one of {@link
-   *     Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
+   *            Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
    */
   public ClassNode(final int api) {
     super(api);
-    this.interfaces = new ArrayList<>();;
-    this.innerClasses = new ArrayList<>();;
-    this.fields = new ArrayList<>();;
-    this.methods = new ArrayList<>();;
+    this.interfaces = new ArrayList<>();
+    this.innerClasses = new ArrayList<>();
+    this.fields = new ArrayList<>();
+    this.methods = new ArrayList<>();
   }
 
   // -----------------------------------------------------------------------------------------------
@@ -175,12 +207,12 @@ public class ClassNode extends ClassVisitor {
 
   @Override
   public void visit(
-      final int version,
-      final int access,
-      final String name,
-      final String signature,
-      final String superName,
-      final String[] interfaces) {
+    final int version,
+    final int access,
+    final String name,
+    final String signature,
+    final String superName,
+    final String[] interfaces) {
     this.version = version;
     this.access = access;
     this.name = name;
@@ -226,7 +258,7 @@ public class ClassNode extends ClassVisitor {
 
   @Override
   public AnnotationVisitor visitTypeAnnotation(
-      final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
+    final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
     TypeAnnotationNode typeAnnotation = new TypeAnnotationNode(typeRef, typePath, descriptor);
     if (visible) {
       visibleTypeAnnotations = Util.add(visibleTypeAnnotations, typeAnnotation);
@@ -253,27 +285,27 @@ public class ClassNode extends ClassVisitor {
 
   @Override
   public void visitInnerClass(
-      final String name, final String outerName, final String innerName, final int access) {
+    final String name, final String outerName, final String innerName, final int access) {
     InnerClassNode innerClass = new InnerClassNode(name, outerName, innerName, access);
     innerClasses.add(innerClass);
   }
 
   @Override
   public RecordComponentVisitor visitRecordComponentExperimental(
-      final int access, final String name, final String descriptor, final String signature) {
+    final int access, final String name, final String descriptor, final String signature) {
     RecordComponentNode recordComponent =
-        new RecordComponentNode(access, name, descriptor, signature);
+      new RecordComponentNode(access, name, descriptor, signature);
     recordComponentsExperimental = Util.add(recordComponentsExperimental, recordComponent);
     return recordComponent;
   }
 
   @Override
   public FieldVisitor visitField(
-      final int access,
-      final String name,
-      final String descriptor,
-      final String signature,
-      final Object value) {
+    final int access,
+    final String name,
+    final String descriptor,
+    final String signature,
+    final Object value) {
     FieldNode field = new FieldNode(access, name, descriptor, signature, value);
     fields.add(field);
     return field;
@@ -281,11 +313,11 @@ public class ClassNode extends ClassVisitor {
 
   @Override
   public MethodVisitor visitMethod(
-      final int access,
-      final String name,
-      final String descriptor,
-      final String signature,
-      final String[] exceptions) {
+    final int access,
+    final String name,
+    final String descriptor,
+    final String signature,
+    final String[] exceptions) {
     MethodNode method = new MethodNode(access, name, descriptor, signature, exceptions);
     methods.add(method);
     return method;
@@ -306,7 +338,7 @@ public class ClassNode extends ClassVisitor {
    * in more recent versions of the ASM API than the given version.
    *
    * @param api an ASM API version. Must be one of {@link Opcodes#ASM4}, {@link Opcodes#ASM5},
-   *     {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
+   *            {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
    */
   public void check(final int api) {
     if (api != Opcodes.ASM8_EXPERIMENTAL && permittedSubtypesExperimental != null) {

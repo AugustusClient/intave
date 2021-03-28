@@ -1,8 +1,10 @@
 package de.jpx3.intave.user;
 
 import de.jpx3.intave.event.dispatch.PlayerAbilityEvaluator;
+import de.jpx3.intave.tools.annotate.Relocate;
 import org.bukkit.entity.Player;
 
+@Relocate
 public final class UserMetaAbilityData {
   private boolean flying;
   private boolean allowFlying;

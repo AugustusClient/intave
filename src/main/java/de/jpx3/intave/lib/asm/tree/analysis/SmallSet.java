@@ -37,7 +37,9 @@ import java.util.*;
  */
 final class SmallSet<T> extends AbstractSet<T> {
 
-  /** The first element of this set, maybe {@literal null}. */
+  /**
+   * The first element of this set, maybe {@literal null}.
+   */
   private final T element1;
 
   /**
@@ -50,7 +52,9 @@ final class SmallSet<T> extends AbstractSet<T> {
   // Constructors
   // -----------------------------------------------------------------------------------------------
 
-  /** Constructs an empty set. */
+  /**
+   * Constructs an empty set.
+   */
   SmallSet() {
     this.element1 = null;
     this.element2 = null;
@@ -110,7 +114,7 @@ final class SmallSet<T> extends AbstractSet<T> {
   Set<T> union(final SmallSet<T> otherSet) {
     // If the two sets are equal, return this set.
     if ((otherSet.element1 == element1 && otherSet.element2 == element2)
-        || (otherSet.element1 == element2 && otherSet.element2 == element1)) {
+      || (otherSet.element1 == element2 && otherSet.element2 == element1)) {
       return this;
     }
     // If one set is empty, return the other.
@@ -155,7 +159,9 @@ final class SmallSet<T> extends AbstractSet<T> {
 
   static class IteratorImpl<T> implements Iterator<T> {
 
-    /** The next element to return in {@link #next}. Maybe {@literal null}. */
+    /**
+     * The next element to return in {@link #next}. Maybe {@literal null}.
+     */
     private T firstElement;
 
     /**
