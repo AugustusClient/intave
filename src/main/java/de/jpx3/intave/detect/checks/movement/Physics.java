@@ -246,9 +246,6 @@ public final class Physics extends IntaveCheck {
 
     boolean flying = abilityData.flying();
     String key = resolveKeysFromInput(keyForward, keyStrafe);
-    if (movementData.physicsJumped) {
-      key += key.isEmpty() ? "SPACE" : " | SPACE";
-    }
 
     double receivedMotionX = movementData.motionX();
     double receivedMotionY = movementData.motionY();
@@ -454,7 +451,8 @@ public final class Physics extends IntaveCheck {
       if (movementData.recentlyEncounteredFlyingPacket(0)) {
         debug += "f";
       }
-      debug += "(" + key + ") " + " " + violationLevelInfo;
+      debug += "(" + key + ")";
+      debug += " " + violationLevelInfo;
 
 //      debug += " (sneak " + movementData.sneaking + ")";
 //      debug += " (size:" + movementData.width + "," + movementData.height + ")";
@@ -468,6 +466,9 @@ public final class Physics extends IntaveCheck {
         debug += " bb-intersection";
       }
 
+      if (movementData.physicsJumped) {
+        debug += " jump";
+      }
 
       String finalDebug = debug;
       player.sendMessage(finalDebug);
@@ -661,7 +662,7 @@ public final class Physics extends IntaveCheck {
 
     boolean useBaseMoveSpeed = true;
 
-    if ((movementData.pastWaterMovement < 20 && movementData.pastPushedByWaterFlow > 5) || movementData.inWeb || movementData.inLava()) {
+    if ((movementData.pastWaterMovement < 20 && movementData.pastPushedByWaterFlow > 5) || movementData.inLava()) {
       useBaseMoveSpeed = false;
     }
 
