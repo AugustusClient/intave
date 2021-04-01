@@ -2,7 +2,10 @@ package de.jpx3.intave.user;
 
 import de.jpx3.intave.event.dispatch.PlayerAbilityEvaluator;
 import de.jpx3.intave.tools.annotate.Relocate;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+
+import java.util.Arrays;
 
 @Relocate
 public final class UserMetaAbilityData {
@@ -20,13 +23,27 @@ public final class UserMetaAbilityData {
     if(hasPlayer) {
       this.allowFlying = player.getAllowFlight();
       this.flying = player.isFlying();
+      setupDefaultGameMode(player.getGameMode());
     } else {
       this.allowFlying = this.flying = false;
     }
   }
 
+  private void setupDefaultGameMode(GameMode gameMode) {
+    int gameModeValue = gameMode.getValue();
+    this.gameMode = Arrays.stream(PlayerAbilityEvaluator.GameMode.values())
+      .filter(mode -> mode.id() == gameModeValue)
+      .findFirst()
+      .orElse(PlayerAbilityEvaluator.GameMode.NOT_SET);
+    this.pendingGameMode = this.gameMode;
+  }
+
   public boolean inGameModeIncludePending(PlayerAbilityEvaluator.GameMode gameMode) {
     return this.gameMode == gameMode || this.pendingGameMode == gameMode;
+  }
+
+  public boolean inGameMode(PlayerAbilityEvaluator.GameMode gameMode) {
+    return this.gameMode == gameMode;
   }
 
   public boolean flying() {

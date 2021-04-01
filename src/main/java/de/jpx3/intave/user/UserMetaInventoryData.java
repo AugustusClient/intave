@@ -66,7 +66,7 @@ public final class UserMetaInventoryData {
 
   public void activateHand() {
     this.handActive = true;
-    this.foodItem = InventoryUseItemHelper.foodItemRegistry().foodConsumable(player.getFoodLevel(), heldItemType());
+    this.foodItem = InventoryUseItemHelper.foodItemRegistry().foodConsumable(player, heldItemType());
     this.pastItemUsageTransition = 0;
     this.handActiveTicks = 0;
   }

@@ -56,7 +56,7 @@ public final class PlayerInventoryEvaluator implements PacketEventSubscriber, Bu
     User user = UserRepository.userOf(player);
     UserMetaInventoryData inventoryData = user.meta().inventoryData();
     if (foodLevel >= 20 && inventoryData.handActive() && inventoryData.foodItem()) {
-      if (!InventoryUseItemHelper.foodItemRegistry().foodConsumable(foodLevel, inventoryData.heldItemType())) {
+      if (!InventoryUseItemHelper.foodItemRegistry().foodConsumable(player, inventoryData.heldItemType())) {
         inventoryData.deactivateHand();
       }
     }

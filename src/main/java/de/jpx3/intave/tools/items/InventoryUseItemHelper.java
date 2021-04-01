@@ -84,7 +84,7 @@ public final class InventoryUseItemHelper {
     }
     boolean useItem = materialUseItemList.contains(type);
     boolean potion = materialPotionList.contains(type);
-    return useItem || potion || foodItemRegistry.foodConsumable(player.getFoodLevel(), type);
+    return useItem || potion || foodItemRegistry.foodConsumable(player, type);
   }
 
   public static boolean isSwordItem(Player player, @Nullable ItemStack itemStack) {

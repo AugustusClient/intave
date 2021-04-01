@@ -146,5 +146,9 @@ public final class PlayerAbilityEvaluator implements PacketEventSubscriber {
     GameMode(int id) {
       this.id = id;
     }
+
+    public int id() {
+      return id;
+    }
   }
 }
