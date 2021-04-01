@@ -74,7 +74,8 @@ public final class SimulationProcessor {
     inventoryData.setHandActive(false);
     ItemStack itemStack = inventoryData.heldItem();
     if (itemStack != null && !InventoryUseItemHelper.isSwordItem(user.player(), itemStack)) {
-      int threshold = itemStack.getType() == Material.BOW ? 5 : 1;
+      boolean hasShield = user.meta().clientData().combatUpdate();
+      int threshold = itemStack.getType() == Material.BOW || hasShield ? 5 : 1;
       if (movementData.physicsEatingSlotSwitchVL++ > threshold) {
         inventoryData.applySlotSwitch();
       } else {

@@ -70,6 +70,10 @@ public final class UserMetaClientData {
     return protocolVersion >= PROTOCOL_VERSION_AQUATIC_UPDATE;
   }
 
+  public boolean combatUpdate() {
+    return protocolVersion >= PROTOCOL_VERSION_COMBAT_UPDATE;
+  }
+
   public String versionAsString() {
     if (protocolVersion <= 47)
       return "1.8.x";
