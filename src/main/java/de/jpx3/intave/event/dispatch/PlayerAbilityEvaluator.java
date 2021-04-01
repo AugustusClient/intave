@@ -37,7 +37,7 @@ public final class PlayerAbilityEvaluator implements PacketEventSubscriber {
     boolean flying = requestedFlying(packet);
     if (abilityData.allowFlying()) {
       if (flying) {
-        abilityData.flying(true);
+        abilityData.setFlying(true);
       } else {
         movementData.disabledFlying = true;
       }

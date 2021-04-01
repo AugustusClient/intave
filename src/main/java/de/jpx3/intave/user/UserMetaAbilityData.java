@@ -62,7 +62,7 @@ public final class UserMetaAbilityData {
     return flySpeed;
   }
 
-  public void flying(boolean flying) {
+  public void setFlying(boolean flying) {
     this.flying = flying;
   }
 
@@ -79,6 +79,10 @@ public final class UserMetaAbilityData {
   }
 
   public void setGameMode(PlayerAbilityEvaluator.GameMode gameMode) {
+    if (this.gameMode == PlayerAbilityEvaluator.GameMode.SPECTATOR && gameMode == PlayerAbilityEvaluator.GameMode.CREATIVE) {
+      setAllowFlying(true);
+      setFlying(true);
+    }
     this.gameMode = gameMode;
   }
 

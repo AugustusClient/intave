@@ -392,7 +392,7 @@ public final class MovementDispatcher implements EventProcessor {
     }
 
     if (movementData.disabledFlying || !abilityData.allowFlying()) {
-      abilityData.flying(false);
+      abilityData.setFlying(false);
       movementData.disabledFlying = false;
     }
 
