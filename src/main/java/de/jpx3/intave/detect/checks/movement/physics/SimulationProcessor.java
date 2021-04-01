@@ -12,6 +12,7 @@ import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaInventoryData;
 import de.jpx3.intave.user.UserMetaMovementData;
 import de.jpx3.intave.world.collider.result.ComplexColliderSimulationResult;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -43,6 +44,7 @@ public final class SimulationProcessor {
     // Perform iterative simulation if biased fails
     //
     if (!forceBiased && movementDistance > VERIFY_DISTANCE) {
+      user.player().sendMessage(ChatColor.DARK_RED + "iterative calculation: " + movementDistance);
       Timings.CHECK_PHYSICS_PROC_ITR.start();
       IterativeSimulationResult iterativeSimulationResult = simulatePossibleMovement(user);
       predictedMovement = iterativeSimulationResult.collisionResult();
@@ -103,19 +105,29 @@ public final class SimulationProcessor {
     Pose movementPoseType = movementData.movementPoseType();
     PoseSimulator simulator = movementPoseType.simulator();
     MotionVector motionVector = movementData.motionVector;
-    int direction = directionFrom(movementData.motionX() - movementData.lastMotionX, movementData.motionZ() - movementData.lastMotionZ, movementData.rotationYaw);
-    int keyForward = forwardKeyFrom(direction);//movementData.keyForward;
-    int keyStrafe = strafeKeyFrom(direction);//movementData.keyStrafe;
-
-    user.player().sendMessage(forwardKeyFrom(direction) + " " + movementData.keyForward);
-    user.player().sendMessage(strafeKeyFrom(direction) + " " + movementData.keyStrafe);
-    boolean handActive = inventoryData.handActive();
-    boolean attackReduce = !AttackDispatcher.REDUCING_DISABLED && movementData.sprintingAllowed() && user.meta().movementData().pastPlayerAttackPhysics == 0;
+    double lastMotionX = movementData.physicsMotionX;
+    double lastMotionZ = movementData.physicsMotionZ;
     boolean jumped = false;
     if (movementData.lastOnGround && !movementData.denyJump()) {
       double motionY = movementData.motionY();
       jumped = Math.abs(motionY - 0.2) < 1e-5 || motionY == movementData.jumpUpwardsMotion();
+      if (jumped && movementData.sprinting) {
+        lastMotionX -= movementData.yawSine() * 0.2f;
+        lastMotionZ += movementData.yawCosine() * 0.2f;
+      }
     }
+    if (movementData.inWater) {
+      jumped = movementData.motionY() > 0.0;
+    }
+    double differenceX = movementData.motionX() - lastMotionX;
+    double differenceZ = movementData.motionZ() - lastMotionZ;
+    float yaw = movementData.rotationYaw;
+    int direction = directionFrom(differenceX, differenceZ, yaw);
+    int keyForward = forwardKeyFrom(direction);
+    int keyStrafe = strafeKeyFrom(direction);
+//    user.player().sendMessage(forwardKeyFrom(direction) + ", " + strafeKeyFrom(direction) + " DIRECTION=" + direction + " " + yaw);
+    boolean handActive = inventoryData.handActive();
+    boolean attackReduce = !AttackDispatcher.REDUCING_DISABLED && movementData.sprintingAllowed() && user.meta().movementData().pastPlayerAttackPhysics == 0;
     if (movementData.sprinting && keyForward != 1) {
       keyForward = 0;
       keyStrafe = 0;
@@ -128,39 +140,33 @@ public final class SimulationProcessor {
     float moveStrafe = keyStrafe * 0.98f;
     movementData.physicsJumped = jumped;
     motionVector.resetTo(movementData);
+    movementData.keyForward = keyForward;
+    movementData.keyStrafe = keyStrafe;
     return simulator.performSimulation(user, motionVector, moveForward, moveStrafe, attackReduce, jumped, handActive);
   }
 
-  private int directionFrom(double motionX, double motionZ, float yaw) {
-    if (Math.hypot(motionX, motionZ) > 0.0001) {
-      float direction;
-      direction = (float) (Math.atan2(motionZ, motionX) * 180f / (float) Math.PI - 90f);
+  private int directionFrom(double differenceX, double differenceZ, float yaw) {
+    if (Math.hypot(differenceX, differenceZ) > 0.001) {
+      double direction;
+      direction = Math.toDegrees(Math.atan2(differenceZ, differenceX)) - 90d;
       direction -= yaw;
       direction %= 360f;
       direction = Math.abs(direction);
       direction /= 45f;
-      return Math.round(direction);
+      return (int) Math.round(direction);
     }
     return -1;
   }
 
   private final int[] forwardKeys = {1,  1,  0, -1, -1, -1, 0, 1, 1};
-  private final int[] strafeKeys  = {0, -1, -1, -1,  0,  1, 1, 1, 0};
+  private final int[] strafeKeys  = {0, 1, 1, 1, 0, -1, -1, -1, 0};
 
   private int forwardKeyFrom(int direction) {
-    if(direction > 0) {
-      return forwardKeys[direction];
-    } else {
-      return 0;
-    }
+    return direction == -1 ? 0 : forwardKeys[direction];
   }
 
   private int strafeKeyFrom(int direction) {
-    if(direction > 0) {
-      return strafeKeys[direction];
-    } else {
-      return 0;
-    }
+    return direction == -1 ? 0 : strafeKeys[direction];
   }
 
   private final static boolean[] BOOLEAN_STATES_TF = new boolean[]{true, false};
