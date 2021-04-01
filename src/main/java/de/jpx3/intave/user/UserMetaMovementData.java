@@ -42,7 +42,7 @@ public final class UserMetaMovementData {
   public double verifiedPositionX, verifiedPositionY, verifiedPositionZ;
   public double lastPositionX, lastPositionY, lastPositionZ;
   public double positionX, positionY, positionZ;
-  public double lastMotionX, lastMotionY, lastMotionZ;
+  private double motionX, motionY, motionZ;
   public boolean sprinting, lastSprinting, sneaking, lastSneaking;
   private boolean sprintingAllowed, actualSneaking;
   private float yawSine, yawCosine, friction;
@@ -171,6 +171,10 @@ public final class UserMetaMovementData {
       positionX = modifier.read(0);
       positionY = modifier.read(1);
       positionZ = modifier.read(2);
+
+      motionX = positionX - verifiedPositionX;
+      motionY = positionY - verifiedPositionY;
+      motionZ = positionZ - verifiedPositionZ;
 
       swimming = PoseHelper.isSwimming(player);
       elytraFlying = PoseHelper.flyingWithElytra(player);
@@ -320,15 +324,15 @@ public final class UserMetaMovementData {
   }
 
   public double motionX() {
-    return positionX - verifiedPositionX;
+    return motionX;
   }
 
   public double motionY() {
-    return positionY - verifiedPositionY;
+    return motionY;
   }
 
   public double motionZ() {
-    return positionZ - verifiedPositionZ;
+    return motionZ;
   }
 
   public WrappedAxisAlignedBB boundingBox() {
