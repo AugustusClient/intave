@@ -194,6 +194,7 @@ public final class IntavePlugin extends JavaPlugin {
 
       String requiredState = null; // leave this be
       boolean partnerServer = false;
+      boolean offlineMode = false;
 
       // ja das muss so krebsig hier hin
       if (IntaveControl.DISABLE_LICENSE_CHECK) {
@@ -418,6 +419,8 @@ public final class IntavePlugin extends JavaPlugin {
         }
         logger().info(infoMessage);
       }
+
+      IntavePlugin.offlineMode = offlineMode;
 
       // resolve config hash
       configurationService.setupConfiguration(requiredState);
