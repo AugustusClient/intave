@@ -5,6 +5,7 @@ import com.comphenix.protocol.reflect.StructureModifier;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.detect.checks.movement.physics.MotionVector;
 import de.jpx3.intave.detect.checks.movement.physics.Pose;
+import de.jpx3.intave.detect.checks.movement.physics.SimulationProcessor;
 import de.jpx3.intave.reflect.ReflectiveHandleAccess;
 import de.jpx3.intave.tools.client.*;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
@@ -48,7 +49,8 @@ public final class UserMetaMovementData {
   private float yawSine, yawCosine, friction;
   public float rotationYaw, rotationPitch;
   public float lastRotationYaw, lastRotationPitch;
-  private Pose movementPoseType = Pose.DEFAULT;
+  private Pose movementPoseType = Pose.PLAYER;
+  private SimulationProcessor.IterativeSimulationResult iterativeSimulation = new SimulationProcessor.IterativeSimulationResult();
 
   private volatile WrappedAxisAlignedBB boundingBox;
   public Vector emulationVelocity;
@@ -337,6 +339,10 @@ public final class UserMetaMovementData {
 
   public WrappedAxisAlignedBB boundingBox() {
     return boundingBox;
+  }
+
+  public SimulationProcessor.IterativeSimulationResult iterativeSimulation() {
+    return iterativeSimulation;
   }
 
   public double resetMotion() {

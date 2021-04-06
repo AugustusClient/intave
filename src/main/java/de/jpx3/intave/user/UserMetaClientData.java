@@ -50,6 +50,11 @@ public final class UserMetaClientData {
     return protocolVersion >= PROTOCOL_VERSION_VILLAGE_UPDATE;
   }
 
+  public boolean sprintWhenHandActive() {
+    // >= 1.9
+    return protocolVersion >= PROTOCOL_VERSION_COMBAT_UPDATE;
+  }
+
   public boolean delayedSneak() {
     // 1.15
     return protocolVersion >= PROTOCOL_VERSION_BEE_UPDATE;

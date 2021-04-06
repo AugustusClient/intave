@@ -11,6 +11,7 @@ import de.jpx3.intave.tools.annotate.Relocate;
 import de.jpx3.intave.tools.items.InventoryUseItemHelper;
 import de.jpx3.intave.tools.sync.Synchronizer;
 import de.jpx3.intave.user.User;
+import de.jpx3.intave.user.UserMetaClientData;
 import de.jpx3.intave.user.UserMetaInventoryData;
 import de.jpx3.intave.user.UserMetaMovementData;
 import de.jpx3.intave.world.collider.result.ComplexColliderSimulationResult;
@@ -202,16 +203,22 @@ public final class SimulationProcessor {
     User.UserMeta meta = user.meta();
     UserMetaInventoryData inventoryData = meta.inventoryData();
     UserMetaMovementData movementData = meta.movementData();
+    UserMetaClientData clientData = meta.clientData();
     Pose movementPoseType = movementData.movementPoseType();
     PoseSimulator simulator = movementPoseType.simulator();
-    IterativeSimulationResult iterativeSimulation = new IterativeSimulationResult();
+    IterativeSimulationResult iterativeSimulation = movementData.iterativeSimulation();
+    iterativeSimulation.restore();
     boolean inLava = movementData.inLava();
     boolean inWater = movementData.inWater;
     boolean lastOnGround = movementData.lastOnGround;
     boolean estimatedJump = Math.abs(movementData.motionY() - 0.2) < 1e-5 || movementData.motionY() == movementData.jumpUpwardsMotion();
+    boolean skipUseItem = !clientData.sprintWhenHandActive() && movementData.sprinting;
 
     SIMULATION:
     for (boolean useItemState : inventoryData.handActive() ? BOOLEAN_STATES_TF : BOOLEAN_STATES_FT) {
+      if (skipUseItem && useItemState) {
+        continue;
+      }
       for (boolean attackReduce : BOOLEAN_STATES_FT) {
         if (attackReduce && (movementData.pastPlayerAttackPhysics >= 1 || AttackDispatcher.REDUCING_DISABLED)) {
           continue;
@@ -318,7 +325,7 @@ public final class SimulationProcessor {
     }
   }
 
-  private static final class IterativeSimulationResult {
+  public static final class IterativeSimulationResult {
     private final static int DEFAULT_DISTANCE = Integer.MAX_VALUE;
 
     private ComplexColliderSimulationResult collisionResult;
@@ -330,6 +337,16 @@ public final class SimulationProcessor {
 
     public IterativeSimulationResult() {
       this.smallestDistance = DEFAULT_DISTANCE;
+    }
+
+    public void restore() {
+      collisionResult = null;
+      forward = 0;
+      strafe = 0;
+      jumped = false;
+      reduced = false;
+      smallestDistance = DEFAULT_DISTANCE;
+      handActive = false;
     }
 
     public void tryAppendToState(

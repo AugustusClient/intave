@@ -144,7 +144,7 @@ public final class Physics extends IntaveCheck {
     } else if (PoseHelper.flyingWithElytra(player)) {
       return Pose.ELYTRA;
     }
-    return Pose.DEFAULT;
+    return Pose.PLAYER;
   }
 
   @DispatchCrossCall
@@ -299,7 +299,7 @@ public final class Physics extends IntaveCheck {
     double verticalViolationIncrease = skipVLCalculation ? 0 : calculateVerticalViolationLevelIncrease(user, predictedY, onLadder);
     double horizontalViolationIncrease = skipVLCalculation ? 0 : calculateHorizontalViolationIncrease(user, predictedX, predictedZ, onLadder);
 
-    if (movementData.pastVelocity < 10) {
+    if (!skipVLCalculation && movementData.pastVelocity < 10) {
       if (horizontalViolationIncrease > 0) {
         horizontalViolationIncrease = Math.max(horizontalViolationIncrease, 1.0);
       }
