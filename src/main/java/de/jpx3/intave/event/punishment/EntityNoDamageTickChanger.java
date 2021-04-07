@@ -30,8 +30,9 @@ public final class EntityNoDamageTickChanger {
     int noDamageTicksBefore = resolveNoDamageTicksOf(player);
     int newNoDamageTicks = calculateNewNoDamageTicks(noDamageTicksBefore, heavy);
     punishmentData.damageTicksBefore = noDamageTicksBefore;
+    punishmentData.appliedDamageTicks = newNoDamageTicks;
     setNoDamageTicksOf(player, newNoDamageTicks);
-    Synchronizer.synchronizeDelayed(() -> removeNoDamageTickChangeOf(user, heavy), durationTicks);
+    Synchronizer.synchronizeDelayed(() -> removeNoDamageTickChangeOf(user), durationTicks);
   }
 
   private static int calculateNewNoDamageTicks(int noDamageTicks, boolean heavy) {
@@ -41,16 +42,15 @@ public final class EntityNoDamageTickChanger {
     return Math.max(0, noDamageTicks - subtraction);
   }
 
-  private static void removeNoDamageTickChangeOf(User user, boolean heavy) {
+  private static void removeNoDamageTickChangeOf(User user) {
     Player player = user.player();
     UserMetaPunishmentData punishmentData = user.meta().punishmentData();
-    int noDamageTicksBefore = punishmentData.damageTicksBefore;
-    int expectedPlayerNoDamageTicks = calculateNewNoDamageTicks(noDamageTicksBefore, heavy);
-    if (expectedPlayerNoDamageTicks != resolveNoDamageTicksOf(player)) {
+    if (punishmentData.appliedDamageTicks != resolveNoDamageTicksOf(player)) {
       // The server has changed the noDamageTicks field, do not override
       punishmentData.damageTicksBefore = -1;
       return;
     }
+    int noDamageTicksBefore = punishmentData.damageTicksBefore;
     setNoDamageTicksOf(player, noDamageTicksBefore);
     punishmentData.damageTicksBefore = -1;
   }

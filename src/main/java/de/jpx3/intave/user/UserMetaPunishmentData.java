@@ -22,6 +22,7 @@ public final class UserMetaPunishmentData {
   private final List<DamageCancel> damageCancels;
 
   public int damageTicksBefore = -1;
+  public int appliedDamageTicks = -1;
   public long timeLastBlockCancel;
 
   public UserMetaPunishmentData(Player player) {
