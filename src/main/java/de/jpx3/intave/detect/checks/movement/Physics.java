@@ -28,7 +28,10 @@ import de.jpx3.intave.world.collider.result.ComplexColliderSimulationResult;
 import de.jpx3.intave.world.collider.result.QuickColliderSimulationResult;
 import de.jpx3.intave.world.collision.Collision;
 import de.jpx3.intave.world.waterflow.Waterflow;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -301,20 +304,32 @@ public final class Physics extends IntaveCheck {
         horizontalViolationIncrease = Math.max(horizontalViolationIncrease, 1.0);
       }
       // Could be smaller (testing required)
-      if (distance > 0.005) {
-        horizontalViolationIncrease *= 10.0;
+      if (distance > 0.0005) {
+        if (violationLevelData.physicsVelocityVL++ > 2 || distance > 0.01) {
+          horizontalViolationIncrease = Math.max(2, horizontalViolationIncrease);
+          horizontalViolationIncrease *= 10.0;
+        }
       }
+    }
+
+    if (violationLevelData.physicsVelocityVL > 10) {
+      violationLevelData.physicsVelocityVL = 10;
+    }
+    if (violationLevelData.physicsVelocityVL > 0) {
+      violationLevelData.physicsVelocityVL -= 0.005;
     }
 
     double violationLevelIncrease = horizontalViolationIncrease + verticalViolationIncrease;
 
     if (distance > 1e-3) {
       movementData.suspiciousMovement = true;
-      ComplexColliderSimulationResult entityCollisionResult = simulationService.simulateMovementWithoutKeyPress(user);
-      MotionVector setbackContext = entityCollisionResult.context();
-      predictedX = setbackContext.motionX;
-      predictedY = setbackContext.motionY;
-      predictedZ = setbackContext.motionZ;
+      if (violationLevelData.physicsVL > 50 && distance > 0.3) {
+        ComplexColliderSimulationResult entityCollisionResult = simulationService.simulateMovementWithoutKeyPress(user);
+        MotionVector setbackContext = entityCollisionResult.context();
+        predictedX = setbackContext.motionX;
+        predictedY = setbackContext.motionY;
+        predictedZ = setbackContext.motionZ;
+      }
     }
 
     if (flying || spectator) {
@@ -430,7 +445,13 @@ public final class Physics extends IntaveCheck {
 
       boolean setback = plugin.violationProcessor().processViolation(player, violationLevelIncrease / 10d, "Physics", message, details) || violationLevelData.physicsVL >= 60;
       if (setback) {
-        plugin.eventService().emulationEngine().emulationSetBack(player, emulationMotion, movementData.pastExternalVelocity <= 8 ? 8 : 1);
+        int setbackTicks;
+        if (movementData.pastExternalVelocity <= 8) {
+          setbackTicks = 8;
+        } else {
+          setbackTicks = violationLevelData.physicsVL > 50 ? 3 : 1;
+        }
+        plugin.eventService().emulationEngine().emulationSetBack(player, emulationMotion, setbackTicks);
       }
       if (setback) {
         movementData.invalidMovement = true;
@@ -680,11 +701,7 @@ public final class Physics extends IntaveCheck {
     boolean recentlyVelocity = movementData.pastVelocity <= 1;
     double baseMoveSpeed = movementData.baseMoveSpeed();
 
-    boolean useBaseMoveSpeed = true;
-
-    if ((movementData.pastWaterMovement < 20 && movementData.pastPushedByWaterFlow > 5) || movementData.inLava()) {
-      useBaseMoveSpeed = false;
-    }
+    boolean useBaseMoveSpeed = (movementData.pastWaterMovement >= 20 || movementData.pastPushedByWaterFlow <= 5) && !movementData.inLava();
 
     if (recentlySentFlying) {
       boolean lessThanExpected = distanceMoved <= predictedDistanceMoved;
