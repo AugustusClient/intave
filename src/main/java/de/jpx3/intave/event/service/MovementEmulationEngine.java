@@ -60,14 +60,17 @@ public final class MovementEmulationEngine {
   public void emulationSetBack(Player player, Vector motion, int ticks) {
     User user = UserRepository.userOf(player);
     User.UserMeta meta = user.meta();
+    UserMetaMovementData movementData = meta.movementData();
     UserMetaViolationLevelData violationLevelData = meta.violationLevelData();
     if (violationLevelData.isInActiveTeleportBundle) {
       return;
     }
+
     // starting conditions
+    motion = resolveCollisionVector(player, movementData.boundingBox(), motion.getX(), motion.getY(), motion.getZ());
     violationLevelData.isInActiveTeleportBundle = true;
     if (IntaveControl.DEBUG_EMULATION) {
-      player.sendMessage("[E+] " + motion + " (" + ticks + " ticks)");
+      player.sendMessage("[E+] " + MathHelper.formatMotion(motion) + " (" + ticks + " ticks)");
     }
     proceedEmulationTick(player, motion, ticks);
   }
