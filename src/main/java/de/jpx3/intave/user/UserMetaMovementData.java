@@ -50,7 +50,7 @@ public final class UserMetaMovementData {
   public float rotationYaw, rotationPitch;
   public float lastRotationYaw, lastRotationPitch;
   private Pose movementPoseType = Pose.PLAYER;
-  private SimulationProcessor.IterativeSimulationResult iterativeSimulation = new SimulationProcessor.IterativeSimulationResult();
+  private final SimulationProcessor.IterativeSimulationResult iterativeSimulation = new SimulationProcessor.IterativeSimulationResult();
 
   private volatile WrappedAxisAlignedBB boundingBox;
   public Vector emulationVelocity;
@@ -90,6 +90,9 @@ public final class UserMetaMovementData {
   // Phase prevention
   public List<WrappedAxisAlignedBB> phaseIntersectingBoundingBoxes;
   public boolean currentlyInBlock;
+  // Entity collision
+  public boolean enforceBoatStep;
+  public volatile Location nearestBoatLocation = null;
 
   public boolean isTeleportConfirmationPacket;
   public boolean willReceiveSetbackVelocity;

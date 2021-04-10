@@ -12,6 +12,7 @@ import de.jpx3.intave.detect.checks.movement.physics.Pose;
 import de.jpx3.intave.detect.checks.movement.physics.SimulationProcessor;
 import de.jpx3.intave.detect.checks.movement.physics.simulators.PoseSimulator;
 import de.jpx3.intave.diagnostics.timings.Timings;
+import de.jpx3.intave.event.service.entity.LazyEntityCollisionService;
 import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.tools.MathHelper;
 import de.jpx3.intave.tools.annotate.DispatchCrossCall;
@@ -28,7 +29,10 @@ import de.jpx3.intave.world.collider.result.ComplexColliderSimulationResult;
 import de.jpx3.intave.world.collider.result.QuickColliderSimulationResult;
 import de.jpx3.intave.world.collision.Collision;
 import de.jpx3.intave.world.waterflow.Waterflow;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -36,6 +40,7 @@ import org.bukkit.util.Vector;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.util.ArrayList;
 import java.util.List;
 
 import static de.jpx3.intave.tools.MathHelper.formatDouble;
@@ -289,9 +294,19 @@ public final class Physics extends IntaveCheck {
     boolean onLadder = onLadderCurrent | movementData.onLadderLast;
     movementData.onLadderLast = onLadderCurrent;
 
+    // Entity collision check
+    Location nearestBoatLocation = movementData.nearestBoatLocation;
+    boolean collidedWithBoat = false;
+    if (nearestBoatLocation != null) {
+      double distanceToBoat = LazyEntityCollisionService.distanceTo(movementData, nearestBoatLocation);
+      if (distanceToBoat < 2) {
+        collidedWithBoat = true;
+      }
+    }
+
     boolean skipVLCalculation = distance <= 1e-5;
-    double verticalViolationIncrease = skipVLCalculation ? 0 : calculateVerticalViolationLevelIncrease(user, predictedY, onLadder);
-    double horizontalViolationIncrease = skipVLCalculation ? 0 : calculateHorizontalViolationIncrease(user, predictedX, predictedZ, onLadder);
+    double verticalViolationIncrease = skipVLCalculation ? 0 : calculateVerticalViolationLevelIncrease(user, predictedY, onLadder, collidedWithBoat);
+    double horizontalViolationIncrease = skipVLCalculation ? 0 : calculateHorizontalViolationIncrease(user, predictedX, predictedZ, onLadder, collidedWithBoat);
 
     if (onLadder) {
       movementData.artificialFallDistance = 0;
@@ -303,8 +318,11 @@ public final class Physics extends IntaveCheck {
       }
       // Could be smaller (testing required)
       if (distance > 0.0005) {
-        if (violationLevelData.physicsVelocityVL++ > 2 || distance > 0.01) {
-          horizontalViolationIncrease = Math.max(2, horizontalViolationIncrease);
+        boolean aggressive = violationLevelData.physicsVelocityVL++ > 2;
+        if (aggressive || distance > 0.01) {
+          if (aggressive) {
+            horizontalViolationIncrease = Math.max(2, horizontalViolationIncrease);
+          }
           horizontalViolationIncrease *= 10.0;
         }
       }
@@ -318,7 +336,6 @@ public final class Physics extends IntaveCheck {
     }
 
     double violationLevelIncrease = horizontalViolationIncrease + verticalViolationIncrease;
-
     if (distance > 1e-3) {
       movementData.suspiciousMovement = true;
       ComplexColliderSimulationResult entityCollisionResult = simulationService.simulateMovementWithoutKeyPress(user);
@@ -338,14 +355,12 @@ public final class Physics extends IntaveCheck {
     }
 
     Location verifiedLocation = movementData.verifiedLocation();
-
     List<WrappedAxisAlignedBB> intersectionBoundingBoxesLast = Collision.resolve(user.player(), WrappedAxisAlignedBB.createFromPosition(user, verifiedLocation.getX(), verifiedLocation.getY(), verifiedLocation.getZ()));
     WrappedAxisAlignedBB currentBoundingBox = WrappedAxisAlignedBB.createFromPosition(user, receivedPositionX, receivedPositionY, receivedPositionZ);
     List<WrappedAxisAlignedBB> intersectionBoundingBoxesCurrent = Collision.resolve(user.player(), currentBoundingBox);
 
     boolean boundingBoxIntersectionLast = !intersectionBoundingBoxesLast.isEmpty();
     boolean boundingBoxIntersectionCurrent = !intersectionBoundingBoxesCurrent.isEmpty();
-
     boolean movedIntoBlock = !boundingBoxIntersectionLast && boundingBoxIntersectionCurrent;
 
     if (boundingBoxIntersectionCurrent && !spectator) {
@@ -496,16 +511,24 @@ public final class Physics extends IntaveCheck {
 //      debug += "handActive=" + inventoryData.handActive();
 //      debug += inventoryData.heldItem().getType().name();
 //      debug += " flying:" + movementData.pastFlyingPacketAccurate;
-      debug += " dist=" + formatDouble(distance, 10);
-      //      debug += " inventoryOpen=" + inventoryData.inventoryOpen();
-      debug += " " + (violationLevelData.isInActiveTeleportBundle ? "atb" : "");
+
+      List<String> tags = new ArrayList<>();
+
+      tags.add("dist=" + formatDouble(distance, 10));
+      if (collidedWithBoat) {
+        tags.add("boat");
+      }
+      if (violationLevelData.isInActiveTeleportBundle) {
+        tags.add("atb");
+      }
       if (movedIntoBlock) {
-        debug += " bb-intersection";
+        tags.add("bb-intersection");
+      }
+      if (movementData.physicsJumped) {
+        tags.add("jump");
       }
 
-      if (movementData.physicsJumped) {
-        debug += " jump";
-      }
+      debug += " " + String.join(" ", tags);
 
       String finalDebug = debug;
       player.sendMessage(finalDebug);
@@ -549,7 +572,12 @@ public final class Physics extends IntaveCheck {
 
   private final static double LADDER_UPWARDS_MOTION = (0.2 - 0.08) * 0.98005f;
 
-  private double calculateVerticalViolationLevelIncrease(User user, double predictedY, boolean onLadder) {
+  private double calculateVerticalViolationLevelIncrease(
+    User user,
+    double predictedY,
+    boolean onLadder,
+    boolean collidedWithBoat
+  ) {
     Player player = user.player();
     User.UserMeta meta = user.meta();
     UserMetaMovementData movementData = meta.movementData();
@@ -587,6 +615,20 @@ public final class Physics extends IntaveCheck {
     if (movementData.physicsUnpredictableVelocityExpected) {
       double velocityY = movementData.lastVelocity.getY();
       legitimateDeviation = Math.max(legitimateDeviation, velocityY * 1.2 - differenceY);
+    }
+
+    if (collidedWithBoat && movementData.motionY() < 0.605) {
+      if (movementData.enforceBoatStep) {
+        if (movementData.motionY() < 0.1) {
+          legitimateDeviation = Math.max(legitimateDeviation, 10);
+        }
+        movementData.enforceBoatStep = false;
+      } else if (movementData.physicsMotionY < 0) {
+        legitimateDeviation = Math.max(legitimateDeviation, 10);
+        if (movementData.motionY() > movementData.jumpUpwardsMotion()) {
+          movementData.enforceBoatStep = true;
+        }
+      }
     }
 
     boolean criticalWeb = receivedMotionY > -0.01
@@ -638,7 +680,13 @@ public final class Physics extends IntaveCheck {
     return abuseVertically * multiplier;
   }
 
-  private double calculateHorizontalViolationIncrease(User user, double predictedX, double predictedZ, boolean onLadder) {
+  private double calculateHorizontalViolationIncrease(
+    User user,
+    double predictedX,
+    double predictedZ,
+    boolean onLadder,
+    boolean collidedWithBoat
+  ) {
     User.UserMeta meta = user.meta();
     UserMetaViolationLevelData violationLevelData = meta.violationLevelData();
     UserMetaMovementData movementData = meta.movementData();
@@ -679,10 +727,8 @@ public final class Physics extends IntaveCheck {
     // Flying packet
     if (movementData.recentlyEncounteredFlyingPacket(2)) {
       if (movementData.onGround) {
-        //TODO: Check if last block-placement did not happen recently
         boolean lessThanExpected = distanceMoved <= predictedDistanceMoved;
         legitimateDeviation = lessThanExpected ? 0.115 : 0.005;
-//        legitimateDeviation = 0.05;
       } else {
         legitimateDeviation = 0.05;
       }
@@ -696,18 +742,22 @@ public final class Physics extends IntaveCheck {
     boolean recentlySentFlying = movementData.recentlyEncounteredFlyingPacket(2);
     boolean recentlyVelocity = movementData.pastVelocity <= 1;
     double baseMoveSpeed = movementData.baseMoveSpeed();
-
-    boolean useBaseMoveSpeed = (movementData.pastWaterMovement >= 20 || movementData.pastPushedByWaterFlow <= 5) && !movementData.inLava();
+    boolean inLiquid = (movementData.pastWaterMovement >= 20 || movementData.pastPushedByWaterFlow <= 5) || movementData.inLava();
 
     if (recentlySentFlying) {
       boolean lessThanExpected = distanceMoved <= predictedDistanceMoved;
-      if (lessThanExpected || ((distanceMoved < baseMoveSpeed * 0.7) && useBaseMoveSpeed)) {
+      double baseSpeedMultiplier = inLiquid ? 0.2 : 0.7;
+      if (lessThanExpected || distanceMoved < baseMoveSpeed * baseSpeedMultiplier) {
         legitimateDeviation = Math.max(legitimateDeviation, baseMoveSpeed * 0.7);
       }
     }
 
     if (onLadder && (distanceMoved < predictedDistanceMoved || distanceMoved < (movementData.motionY() < 0 ? 0.4 : 0.2))) {
       legitimateDeviation = Math.max(distanceMoved, 0.2);
+    }
+
+    if (collidedWithBoat) {
+      legitimateDeviation = Math.max(legitimateDeviation, 0.4);
     }
 
     double distance = MathHelper.resolveHorizontalDistance(predictedX, predictedZ, motionX, motionZ);
@@ -727,7 +777,7 @@ public final class Physics extends IntaveCheck {
     double abuseHorizontally = Math.max(0, distance - legitimateDeviation);
     boolean movedTooQuickly = distanceMoved > predictedDistanceMoved * 1.0005;
 
-    if (useBaseMoveSpeed) {
+    if (inLiquid) {
       movedTooQuickly = movedTooQuickly && distanceMoved > baseMoveSpeed;
     }
 

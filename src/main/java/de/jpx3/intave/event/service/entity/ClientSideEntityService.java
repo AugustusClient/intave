@@ -44,6 +44,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
 
   private void setupSynchronizer() {
     // async required?
+    //noinspection deprecation
     Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, this::reevaluateTracingEntities, 0, 20);
   }
 
@@ -169,7 +170,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
     int[] entityIDs = event.getPacket().getIntegerArrays().read(0);
     /* IMPORTANT: If the entity destroy packet gets synchronized the player could be spammed with transaction packets
      *   which could cause a too many packets kick
-    */
+     */
     // plugin.eventService().transactionFeedbackService().requestPong(player, entityIDs, this::processEntityDestroy);
 
     processEntityDestroy(player, entityIDs);
@@ -199,7 +200,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
     UserMetaSynchronizeData synchronizeData = user.meta().synchronizeData();
     UserMetaMovementData movementData = user.meta().movementData();
 
-    if(movementData.lastTeleport == 0) {
+    if (movementData.lastTeleport == 0) {
       return;
     }
     for (Map.Entry<Integer, WrappedEntity> entry : synchronizeData.synchronizedEntityMap().entrySet()) {
@@ -226,7 +227,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
     if (entity == null) {
       registerEntity(event);
       entity = entityByIdentifier(user, entityId);
-      if(entity == null) {
+      if (entity == null) {
 //        IntaveLogger.logger().info("Failed to reference entity (id " + entityId + ")");
 //        throw new NullPointerException("entity could not be created");
         return;
@@ -236,7 +237,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
       WrappedEntity finalEntity = entity;
       plugin.eventService().transactionFeedbackService().requestPong(player, event, (player1, event1) -> {
         processEntityTeleport(event1, finalEntity);
-        if(event1.getPacketType() == PacketType.Play.Server.ENTITY_TELEPORT) {
+        if (event1.getPacketType() == PacketType.Play.Server.ENTITY_TELEPORT) {
           finalEntity.clientSynchronized = true;
         }
       });
@@ -245,6 +246,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
       entity.clientSynchronized = false;
     }
   }
+
   private void processEntityTeleport(PacketEvent event, WrappedEntity entity) {
     if (event.getPacketType() == PacketType.Play.Server.ENTITY_TELEPORT) {
       entity.handleEntityTeleport(event.getPacket());
@@ -293,7 +295,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
   ) {
     Integer entityID = packet.getIntegers().read(0);
 
-    if(NEW_POSITION_PROCESSING) {
+    if (NEW_POSITION_PROCESSING) {
       // 1.9+
       // TODO: Das spawnen von entities auf 1.9+ komplett nochmal überprüfen da posX/Y/Z statt serverPosX/Y/Z genutzt wird
       // TODO: Ich hatte auf 1.9.4 noch false positives für hitbox wenn sich zwei spieler bewegt hatten (vielleicht teleport packets)
@@ -312,7 +314,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
       Integer serverPosY;
       Integer serverPosZ;
 
-      if(packetType == PacketType.Play.Server.SPAWN_ENTITY_LIVING) {
+      if (packetType == PacketType.Play.Server.SPAWN_ENTITY_LIVING) {
         // dead or living entities
         serverPosX = packet.getIntegers().read(2);
         serverPosY = packet.getIntegers().read(3);

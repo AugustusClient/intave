@@ -11,6 +11,7 @@ import de.jpx3.intave.event.service.ConnectionHealthResolver;
 import de.jpx3.intave.event.service.MovementEmulationEngine;
 import de.jpx3.intave.event.service.TransactionFeedbackService;
 import de.jpx3.intave.event.service.entity.ClientSideEntityService;
+import de.jpx3.intave.event.service.entity.LazyEntityCollisionService;
 import de.jpx3.intave.permission.PermissionCheck;
 import de.jpx3.intave.reflect.caller.CallerResolver;
 import de.jpx3.intave.reflect.caller.PluginInvocation;
@@ -51,6 +52,7 @@ public final class EventService implements BukkitEventSubscriber {
     new PlayerAbilityEvaluator(plugin);
     new PlayerInventoryEvaluator(plugin);
     new ClientSideEntityService(plugin);
+    new LazyEntityCollisionService(plugin);
     new ConnectionHealthResolver(plugin);
 
     plugin.eventLinker().registerEventsIn(this);
