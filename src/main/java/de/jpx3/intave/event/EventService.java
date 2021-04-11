@@ -12,7 +12,7 @@ import de.jpx3.intave.event.service.MovementEmulationEngine;
 import de.jpx3.intave.event.service.TransactionFeedbackService;
 import de.jpx3.intave.event.service.entity.ClientSideEntityService;
 import de.jpx3.intave.event.service.entity.LazyEntityCollisionService;
-import de.jpx3.intave.permission.PermissionCheck;
+import de.jpx3.intave.permission.BukkitPermissionCheck;
 import de.jpx3.intave.reflect.caller.CallerResolver;
 import de.jpx3.intave.reflect.caller.PluginInvocation;
 import de.jpx3.intave.tools.AccessHelper;
@@ -62,7 +62,7 @@ public final class EventService implements BukkitEventSubscriber {
   public void on(PlayerJoinEvent join) {
     Player player = join.getPlayer();
 
-    boolean hasNotificationPermission = PermissionCheck.permissionCheck(player, "intave.command");
+    boolean hasNotificationPermission = BukkitPermissionCheck.permissionCheck(player, "intave.command");
     if (!hasNotificationPermission) {
       return;
     }

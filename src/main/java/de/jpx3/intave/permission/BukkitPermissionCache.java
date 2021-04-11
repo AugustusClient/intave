@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public final class PermissionCache {
+public final class BukkitPermissionCache {
   private final static long CACHE_EXPIRE = TimeUnit.SECONDS.toMillis(20);
   private final Map<String, PermissionEntry> permissionEntries = new HashMap<>();
 

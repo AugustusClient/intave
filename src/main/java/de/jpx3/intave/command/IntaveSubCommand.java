@@ -2,7 +2,7 @@ package de.jpx3.intave.command;
 
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.IntaveInternalException;
-import de.jpx3.intave.permission.PermissionCheck;
+import de.jpx3.intave.permission.BukkitPermissionCheck;
 import de.jpx3.intave.tools.annotate.Native;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
@@ -112,7 +112,7 @@ public final class IntaveSubCommand {
         sender.sendMessage(NO_PERMISSION_MESSAGE);
         return null;
       }
-    } else if(sender instanceof Player && !permission.equals("none") && !permission.equalsIgnoreCase("sibyl") && !PermissionCheck.permissionCheck(sender, permission)) {
+    } else if(sender instanceof Player && !permission.equals("none") && !permission.equalsIgnoreCase("sibyl") && !BukkitPermissionCheck.permissionCheck(sender, permission)) {
       sender.sendMessage(NO_PERMISSION_MESSAGE);
       return null;
     }
@@ -181,7 +181,7 @@ public final class IntaveSubCommand {
     String prefix = IntavePlugin.prefix();
     String[] args = executedCommand.split(" ");
 
-    if(!permission.equals("none") && !PermissionCheck.permissionCheck(commandSender, permission)) {
+    if(!permission.equals("none") && !BukkitPermissionCheck.permissionCheck(commandSender, permission)) {
       return null;
     }
 

@@ -5,7 +5,7 @@ import de.jpx3.intave.command.CommandStage;
 import de.jpx3.intave.command.Forward;
 import de.jpx3.intave.command.Optional;
 import de.jpx3.intave.command.SubCommand;
-import de.jpx3.intave.permission.PermissionCheck;
+import de.jpx3.intave.permission.BukkitPermissionCheck;
 import de.jpx3.intave.security.LicenseVerification;
 import de.jpx3.intave.tools.AccessHelper;
 import de.jpx3.intave.tools.DurationTranslator;
@@ -163,7 +163,7 @@ public final class IntaveCommandStage extends CommandStage {
 
   @Override
   protected void showInfo(CommandSender sender) {
-    boolean hasIntavePermission = PermissionCheck.permissionCheck(sender, "intave.command");
+    boolean hasIntavePermission = BukkitPermissionCheck.permissionCheck(sender, "intave.command");
 
     if(hasIntavePermission) {
       super.showInfo(sender);
@@ -174,7 +174,7 @@ public final class IntaveCommandStage extends CommandStage {
 
   @Native
   private void sendVersionMessage(CommandSender player) {
-    boolean hasVersionViewPermission = PermissionCheck.permissionCheck(player, "intave.command");
+    boolean hasVersionViewPermission = BukkitPermissionCheck.permissionCheck(player, "intave.command");
     boolean versionViewAllowed = false;
 
     Version versionInformation = IntavePlugin.singletonInstance().versionList().versionInformation(IntavePlugin.version());

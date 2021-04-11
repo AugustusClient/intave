@@ -390,7 +390,8 @@ public class WrappedAxisAlignedBB {
     if(clientData.roundEnvironmentNumbers()) {
       newYMax = Math.round((positionY + height) * 10000000d) / 10000000d;
     } else {
-      newYMax = (positionY + height);
+//      newYMax = (positionY + height);
+      newYMax = Math.round((positionY + height) * 10000000000d) / 10000000000d;
     }
     return new WrappedAxisAlignedBB(
       positionX - width, positionY, positionZ - width,

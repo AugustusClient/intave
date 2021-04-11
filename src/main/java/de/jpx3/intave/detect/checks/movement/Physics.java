@@ -374,7 +374,7 @@ public final class Physics extends IntaveCheck {
 
         plugin.violationProcessor().processViolation(player, 0, "Physics", message, details);
         Vector emulationMotion = new Vector(predictedX, predictedY, predictedZ);
-        plugin.eventService().emulationEngine().emulationSetBack(player, emulationMotion, 8);
+        plugin.eventService().emulationEngine().emulationSetBack(player, emulationMotion, 2);
       } else {
         // Phase Check
         if (!movementData.currentlyInBlock) {
@@ -816,5 +816,10 @@ public final class Physics extends IntaveCheck {
     if (Math.abs(movementData.physicsMotionZ) < resetMotion) {
       movementData.physicsMotionZ = 0.0;
     }
+  }
+
+  @Override
+  public boolean enabled() {
+    return true;
   }
 }
