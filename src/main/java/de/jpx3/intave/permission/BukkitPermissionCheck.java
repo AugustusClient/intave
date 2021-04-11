@@ -7,7 +7,7 @@ import de.jpx3.intave.user.UserRepository;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
 
-public final class PermissionCheck {
+public final class BukkitPermissionCheck {
   @Native
   public static boolean permissionCheck(Permissible permissible, String permission) {
     if(permissible instanceof Player) {
@@ -28,7 +28,7 @@ public final class PermissionCheck {
     if(!user.hasOnlinePlayer()) {
       return false;
     }
-    PermissionCache permissionCache = user.permissionCache();
+    BukkitPermissionCache permissionCache = user.permissionCache();
     if(permissionCache.inCache(permission)) {
       return permissionCache.permissionCheck(permission);
     } else {

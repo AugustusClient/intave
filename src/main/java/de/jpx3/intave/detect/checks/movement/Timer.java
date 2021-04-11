@@ -192,7 +192,6 @@ public final class Timer extends IntaveMetaCheck<Timer.TimerData> {
     }
   }
 
-
   public void checkSetback(PacketEvent event) {
     Player player = event.getPlayer();
     User user = UserRepository.userOf(player);
@@ -203,6 +202,11 @@ public final class Timer extends IntaveMetaCheck<Timer.TimerData> {
       plugin.eventService().emulationEngine().emulationSetBack(player, new Vector(movementData.physicsMotionX, movementData.physicsMotionY, movementData.physicsMotionZ), 6);
       event.setCancelled(true);
     }
+  }
+
+  @Override
+  public boolean enabled() {
+    return true;
   }
 
   public static class TimerData extends UserCustomCheckMeta {

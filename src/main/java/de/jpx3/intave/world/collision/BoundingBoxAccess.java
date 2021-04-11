@@ -112,7 +112,8 @@ public final class BoundingBoxAccess {
         boundingBoxes = BoundingBoxPatcher.patch(world, player, block, boundingBoxes);
         cacheEntry = new CacheEntry(boundingBoxes, type, block.getData());
       }
-      if (!DISABLE_BLOCK_CACHING_ENTIRELY) {
+      boolean cacheType = block.getY() >= 0;
+      if (!DISABLE_BLOCK_CACHING_ENTIRELY && cacheType) {
         blockCache.put(blockPositionKey, cacheEntry);
       }
     }
@@ -156,7 +157,8 @@ public final class BoundingBoxAccess {
         boundingBoxes = BoundingBoxPatcher.patch(world, player, block, boundingBoxes);
         cacheEntry = new CacheEntry(boundingBoxes, type, block.getData());
       }
-      if (!DISABLE_BLOCK_CACHING_ENTIRELY) {
+      boolean cacheType = block.getY() >= 0;
+      if (!DISABLE_BLOCK_CACHING_ENTIRELY && cacheType) {
         blockCache.put(blockPositionKey, cacheEntry);
       }
     }
@@ -201,7 +203,8 @@ public final class BoundingBoxAccess {
         boundingBoxes = BoundingBoxPatcher.patch(world, player, block, boundingBoxes);
         cacheEntry = new CacheEntry(boundingBoxes, type, block.getData());
       }
-      if (!DISABLE_BLOCK_CACHING_ENTIRELY) {
+      boolean cacheType = block.getY() >= 0;
+      if (!DISABLE_BLOCK_CACHING_ENTIRELY && cacheType) {
         blockCache.put(blockPositionKey, cacheEntry);
       }
     }

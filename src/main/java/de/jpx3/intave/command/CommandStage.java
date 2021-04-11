@@ -1,7 +1,7 @@
 package de.jpx3.intave.command;
 
 import de.jpx3.intave.IntavePlugin;
-import de.jpx3.intave.permission.PermissionCheck;
+import de.jpx3.intave.permission.BukkitPermissionCheck;
 import de.jpx3.intave.tools.annotate.Native;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -68,7 +68,7 @@ public abstract class CommandStage {
           showInfo(sender);
           return;
         }
-      } else if(sender instanceof Player && !permission.equals("none") && !permission.equals("sibyl") && !PermissionCheck.permissionCheck(sender, permission)) {
+      } else if(sender instanceof Player && !permission.equals("none") && !permission.equals("sibyl") && !BukkitPermissionCheck.permissionCheck(sender, permission)) {
         sender.sendMessage(NO_PERMISSION_MESSAGE);
         return;
       }
@@ -94,7 +94,7 @@ public abstract class CommandStage {
       String permission = link.permission();
       if(sender instanceof Player && permission.equals("sibyl") && !IntavePlugin.singletonInstance().sibylIntegrationService().isAuthenticated((Player) sender)) {
         return null;
-      } else if(sender instanceof Player && !permission.equals("none") && !permission.equals("sibyl") && !PermissionCheck.permissionCheck(sender, permission)) {
+      } else if(sender instanceof Player && !permission.equals("none") && !permission.equals("sibyl") && !BukkitPermissionCheck.permissionCheck(sender, permission)) {
         return null;
       }
       CommandStage commandStage = globalInstances.get(link.forwardClass());
@@ -106,7 +106,7 @@ public abstract class CommandStage {
 
   private List<String> subcommandCompletions(CommandSender player) {
     return subCommandList.stream()
-      .filter(subCommand -> PermissionCheck.permissionCheck(player, subCommand.permission()))
+      .filter(subCommand -> BukkitPermissionCheck.permissionCheck(player, subCommand.permission()))
       .filter(subCommandList1 -> !subCommandList1.hideInHelp())
       .map(intaveSubCommand -> intaveSubCommand.selectors()[0])
       .collect(Collectors.toList());
@@ -130,7 +130,7 @@ public abstract class CommandStage {
       String permission = intaveSubCommand.permission();
       if(sender instanceof Player && permission.equals("sibyl") && !IntavePlugin.singletonInstance().sibylIntegrationService().isAuthenticated((Player) sender)) {
         continue;
-      } else if(sender instanceof Player && !permission.equals("none") && !permission.equals("sibyl") && !PermissionCheck.permissionCheck(sender, permission)) {
+      } else if(sender instanceof Player && !permission.equals("none") && !permission.equals("sibyl") && !BukkitPermissionCheck.permissionCheck(sender, permission)) {
         continue;
       }
       sender.sendMessage(IntavePlugin.prefix() + commandPathAsString + intaveSubCommand.selectors()[0] + ": " + intaveSubCommand.description());

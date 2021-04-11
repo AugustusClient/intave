@@ -5,8 +5,8 @@ import de.jpx3.intave.access.IntaveInternalException;
 import de.jpx3.intave.access.player.trust.TrustFactor;
 import de.jpx3.intave.connect.shadow.ShadowPacketDataLink;
 import de.jpx3.intave.fakeplayer.FakePlayer;
-import de.jpx3.intave.permission.PermissionCache;
-import de.jpx3.intave.permission.PermissionCheck;
+import de.jpx3.intave.permission.BukkitPermissionCache;
+import de.jpx3.intave.permission.BukkitPermissionCheck;
 import de.jpx3.intave.reflect.ReflectiveHandleAccess;
 import de.jpx3.intave.tools.AccessHelper;
 import de.jpx3.intave.tools.annotate.Relocate;
@@ -30,7 +30,7 @@ public final class User {
   private final WeakReference<Player> playerRef;
   private final WeakReference<Object> nmsEntity;
   private final UserMeta userMeta;
-  private final PermissionCache permissionCache;
+  private final BukkitPermissionCache permissionCache;
   private final BoundingBoxAccess boundingBoxAccess;
   private final ComplexColliderProcessor colliderProcessor;
   private final boolean hasPlayer;
@@ -51,7 +51,7 @@ public final class User {
     this.nmsEntity = new WeakReference<>(hasPlayer ? ReflectiveHandleAccess.handleOf(player) : null);
     this.userMeta = new UserMeta(player, this);
     this.userMeta.setup();
-    this.permissionCache = new PermissionCache();
+    this.permissionCache = new BukkitPermissionCache();
     this.boundingBoxAccess = new BoundingBoxAccess(hasOnlinePlayer() ? player() : null);
     this.colliderProcessor = Collider.suitableComplexColliderProcessorFor(this);
     if(hasPlayer) {
@@ -96,7 +96,7 @@ public final class User {
     return userCustomCheckMeta;
   }
 
-  public PermissionCache permissionCache() {
+  public BukkitPermissionCache permissionCache() {
     return permissionCache;
   }
 
@@ -158,14 +158,14 @@ public final class User {
 
   public void setDefaultMessagingChannel() {
     for (UserMessageChannel channel : UserMessageChannel.values()) {
-      if(channel.enabledByDefault && PermissionCheck.permissionCheck(player(), channel.permission())) {
+      if(channel.enabledByDefault && BukkitPermissionCheck.permissionCheck(player(), channel.permission())) {
         receivingUserChannels.add(channel);
       }
     }
   }
 
   public boolean receives(UserMessageChannel channel) {
-    if(!PermissionCheck.permissionCheck(player(), channel.permission())) {
+    if(!BukkitPermissionCheck.permissionCheck(player(), channel.permission())) {
       receivingUserChannels.remove(channel);
       return false;
     }

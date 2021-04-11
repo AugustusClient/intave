@@ -1,6 +1,6 @@
 package de.jpx3.intave.access.player.trust;
 
-import de.jpx3.intave.permission.PermissionCheck;
+import de.jpx3.intave.permission.BukkitPermissionCheck;
 import de.jpx3.intave.tools.annotate.Relocate;
 import org.bukkit.entity.Player;
 
@@ -31,6 +31,6 @@ public final class DefaultForwardingPermissionTrustFactorResolver implements Tru
   }
 
   private boolean hasPermissionFor(Player player, TrustFactor trustFactor) {
-    return PermissionCheck.permissionCheck(player, trustFactor.permission());
+    return BukkitPermissionCheck.permissionCheck(player, trustFactor.permission());
   }
 }

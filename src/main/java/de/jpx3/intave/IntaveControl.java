@@ -4,7 +4,7 @@ public final class IntaveControl {
   public final static boolean APPLY_LOWEST_TRUSTFACTOR = false;
   public final static boolean USE_DEBUG_RESOURCES = false;
   public final static boolean DEBUG_MOVEMENT = false;
-  public final static boolean DEBUG_EMULATION = false;
+  public final static boolean DEBUG_EMULATION = true;
   public final static boolean DEBUG_HEURISTICS = false;
   public final static boolean OUTPUT_PATCHY_RESULT = false;
   public final static boolean DEBUG_TELEPORT_CAUSE_AND_CAUSER = false;
