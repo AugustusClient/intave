@@ -745,11 +745,11 @@ public final class Physics extends IntaveCheck {
     boolean recentlySentFlying = movementData.recentlyEncounteredFlyingPacket(2);
     boolean recentlyVelocity = movementData.pastVelocity <= 1;
     double baseMoveSpeed = movementData.baseMoveSpeed();
-    boolean inLiquid = (movementData.pastWaterMovement >= 20 || movementData.pastPushedByWaterFlow <= 5) || movementData.inLava();
+    boolean inLiquid = (movementData.pastWaterMovement < 20 && movementData.pastPushedByWaterFlow > 5) || movementData.inLava();
 
     if (recentlySentFlying) {
       boolean lessThanExpected = distanceMoved <= predictedDistanceMoved;
-      double baseSpeedMultiplier = inLiquid ? 0.2 : 0.7;
+      double baseSpeedMultiplier = inLiquid ? 0.3 : 0.7;
       if (lessThanExpected || distanceMoved < baseMoveSpeed * baseSpeedMultiplier) {
         legitimateDeviation = Math.max(legitimateDeviation, baseMoveSpeed * 0.7);
       }
