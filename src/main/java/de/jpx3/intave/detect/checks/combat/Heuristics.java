@@ -71,6 +71,7 @@ public final class Heuristics extends IntaveMetaCheck<Heuristics.HeuristicMeta> 
     appendCheckPart(new BlockingHeuristic(this));
 //    appendCheckPart(new VentolotlHeuristic(this));
 //    appendCheckPart(new LinearRegressionHeuristic(this));
+    appendCheckPart(new AttackRequiredHeuristic(this));
   }
 
   public void saveAnomaly(Player player, Anomaly anomaly) {
