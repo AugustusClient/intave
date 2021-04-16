@@ -472,11 +472,9 @@ public final class Physics extends IntaveCheck {
         if (movementData.pastExternalVelocity <= 8) {
           setbackTicks = 8;
         } else {
-          setbackTicks = violationLevelData.physicsVL > 50 ? 3 : 1;
+          setbackTicks = violationLevelData.physicsVL > 50 ? 3 : 2;
         }
         plugin.eventService().emulationEngine().emulationSetBack(player, emulationMotion, setbackTicks);
-      }
-      if (setback) {
         movementData.invalidMovement = true;
       }
     }
@@ -843,6 +841,10 @@ public final class Physics extends IntaveCheck {
     if (Math.abs(movementData.physicsMotionZ) < resetMotion) {
       movementData.physicsMotionZ = 0.0;
     }
+  }
+
+  public SimulationProcessor simulationService() {
+    return simulationService;
   }
 
   @Override
