@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Relocate
 public final class UserMetaSynchronizeData {
@@ -18,7 +17,6 @@ public final class UserMetaSynchronizeData {
   private final Map<Integer, WrappedEntity> synchronizedEntityMap = Maps.newConcurrentMap();
   private final Map<Long, Long> remainingPingPacketTimestamps = Maps.newConcurrentMap();
   private final List<Long> latencyDifferenceBalance = Lists.newArrayList();
-  private final List<Integer> occupiedEntityIDs = new CopyOnWriteArrayList<>();
 
   // Client Synchronization
   public int latency;
@@ -30,14 +28,6 @@ public final class UserMetaSynchronizeData {
 
   public UserMetaSynchronizeData(Player player) {
     this.player = player;
-  }
-
-  public int resolveEntityID(int add) {
-    User user = UserRepository.userOf(player);
-    UserMetaSynchronizeData synchronizeData = user.meta().synchronizeData();
-    List<Integer> entityIDs = synchronizeData.occupiedEntityIDs();
-    Integer highestEntityID = entityIDs.stream().max(Integer::compareTo).orElse(0);
-    return highestEntityID + add;
   }
 
   public Map<Short, TransactionCallBackData<?>> transactionFeedBackMap() {
@@ -54,9 +44,5 @@ public final class UserMetaSynchronizeData {
 
   public List<Long> latencyDifferenceBalance() {
     return latencyDifferenceBalance;
-  }
-
-  public List<Integer> occupiedEntityIDs() {
-    return occupiedEntityIDs;
   }
 }

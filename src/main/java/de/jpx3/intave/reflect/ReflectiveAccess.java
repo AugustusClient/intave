@@ -6,6 +6,8 @@ import de.jpx3.intave.patchy.PatchyLoadingInjector;
 import de.jpx3.intave.reflect.hitbox.ReflectiveEntityHitBoxAccess;
 import org.bukkit.Bukkit;
 
+import java.lang.reflect.Field;
+
 public final class ReflectiveAccess {
   private final static String NMS_PACKAGE_NAME = Bukkit.getServer().getClass().getPackage().getName().substring(23);
   private final static String NMS_PREFIX = "net.minecraft.server." + NMS_PACKAGE_NAME;
@@ -32,6 +34,13 @@ public final class ReflectiveAccess {
     } catch (ClassNotFoundException e) {
       throw new IntaveInternalException(e);
     }
+  }
+
+  public static Field ensureAccessible(Field field) {
+    if (!field.isAccessible()) {
+      field.setAccessible(true);
+    }
+    return field;
   }
 
   public static String version() {

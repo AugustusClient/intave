@@ -43,7 +43,7 @@ public final class FakePlayer implements TickTaskScheduler {
   private final User user;
   private final WrappedGameProfile wrappedGameProfile;
   private final String tabListPrefix, prefix;
-  private final int fakePlayerID, timeout;
+  private final int fakePlayerID;
   public double killAuraVL = 0;
   private int taskId;
   private int previousLatency = 0, ticks = 0;
@@ -64,7 +64,6 @@ public final class FakePlayer implements TickTaskScheduler {
     String tabListPrefix,
     String prefix,
     int entityId,
-    int timeout,
     boolean invisible,
     boolean visibleInTablist,
     boolean equipArmor,
@@ -72,7 +71,6 @@ public final class FakePlayer implements TickTaskScheduler {
     FakePlayerAttackSubscriber attackSubscriber
   ) {
     this.user = UserRepository.userOf(parentPlayer);
-    this.timeout = timeout;
     this.movement = movement;
     this.wrappedGameProfile = wrappedGameProfile;
     this.parentPlayer = parentPlayer;
@@ -120,11 +118,11 @@ public final class FakePlayer implements TickTaskScheduler {
     PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.NAMED_ENTITY_SPAWN);
     packet.getModifier().writeSafely(0, fakePlayerID);
     packet.getModifier().writeSafely(1, wrappedGameProfile.getUUID());
-    packet.getModifier().writeSafely(2, WrappedMathHelper.floor(location.getX() * 32.0));
-    packet.getModifier().writeSafely(3, WrappedMathHelper.floor(location.getY() * 32.0));
-    packet.getModifier().writeSafely(4, WrappedMathHelper.floor(location.getZ() * 32.0));
-    packet.getModifier().writeSafely(5, FakeEntityPositionHelper.getFixRotation(location.getYaw()));
-    packet.getModifier().writeSafely(6, FakeEntityPositionHelper.getFixRotation(location.getPitch()));
+    packet.getModifier().writeSafely(2, translateCoordinateToPacket(location.getX()));
+    packet.getModifier().writeSafely(3, translateCoordinateToPacket(location.getY()));
+    packet.getModifier().writeSafely(4, translateCoordinateToPacket(location.getZ()));
+    packet.getModifier().writeSafely(5, translateRotationToPacket(location.getYaw()));
+    packet.getModifier().writeSafely(6, translateRotationToPacket(location.getPitch()));
     packet.getModifier().writeSafely(7, 0);
     // Entity
     wrappedDataWatcher.setObject(0, (byte) 0);
@@ -302,11 +300,6 @@ public final class FakePlayer implements TickTaskScheduler {
     }
   }
 
-  private boolean shouldDespawn() {
-    return false;
-//    return System.currentTimeMillis() - user.lastEntityAttack > timeout;
-  }
-
   private void decreaseViolationLevel() {
     if (killAuraVL > 0) {
       killAuraVL -= 0.1;
@@ -344,11 +337,11 @@ public final class FakePlayer implements TickTaskScheduler {
     if (move && look) {
       PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.REL_ENTITY_MOVE_LOOK);
       packet.getIntegers().writeSafely(0, this.fakePlayerID);
-      packet.getBytes().writeSafely(0, FakeEntityPositionHelper.relativeMoveDiff(to.getX(), from.getX()));
-      packet.getBytes().writeSafely(1, FakeEntityPositionHelper.relativeMoveDiff(to.getY(), from.getY()));
-      packet.getBytes().writeSafely(2, FakeEntityPositionHelper.relativeMoveDiff(to.getZ(), from.getZ()));
-      packet.getBytes().writeSafely(3, FakeEntityPositionHelper.getFixRotation(to.getYaw()));
-      packet.getBytes().writeSafely(4, FakeEntityPositionHelper.getFixRotation(to.getPitch()));
+      packet.getBytes().writeSafely(0, translateRelativeMoveDiff(to.getX(), from.getX()));
+      packet.getBytes().writeSafely(1, translateRelativeMoveDiff(to.getY(), from.getY()));
+      packet.getBytes().writeSafely(2, translateRelativeMoveDiff(to.getZ(), from.getZ()));
+      packet.getBytes().writeSafely(3, translateRotationToPacket(to.getYaw()));
+      packet.getBytes().writeSafely(4, translateRotationToPacket(to.getPitch()));
       packet.getBooleans().writeSafely(0, onGround);
       try {
         protocolManager.sendServerPacket(this.parentPlayer, packet);
@@ -358,9 +351,9 @@ public final class FakePlayer implements TickTaskScheduler {
     } else if (move) {
       PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.REL_ENTITY_MOVE);
       packet.getIntegers().writeSafely(0, this.fakePlayerID);
-      packet.getBytes().writeSafely(0, FakeEntityPositionHelper.relativeMoveDiff(to.getX(), from.getX()));
-      packet.getBytes().writeSafely(1, FakeEntityPositionHelper.relativeMoveDiff(to.getY(), from.getY()));
-      packet.getBytes().writeSafely(2, FakeEntityPositionHelper.relativeMoveDiff(to.getZ(), from.getZ()));
+      packet.getBytes().writeSafely(0, translateRelativeMoveDiff(to.getX(), from.getX()));
+      packet.getBytes().writeSafely(1, translateRelativeMoveDiff(to.getY(), from.getY()));
+      packet.getBytes().writeSafely(2, translateRelativeMoveDiff(to.getZ(), from.getZ()));
       packet.getBooleans().writeSafely(0, onGround);
       try {
         protocolManager.sendServerPacket(this.parentPlayer, packet);
@@ -370,8 +363,8 @@ public final class FakePlayer implements TickTaskScheduler {
     } else if (look) {
       PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_LOOK);
       packet.getIntegers().writeSafely(0, this.fakePlayerID);
-      packet.getBytes().writeSafely(0, FakeEntityPositionHelper.getFixRotation(to.getYaw()));
-      packet.getBytes().writeSafely(1, FakeEntityPositionHelper.getFixRotation(to.getPitch()));
+      packet.getBytes().writeSafely(0, translateRotationToPacket(to.getYaw()));
+      packet.getBytes().writeSafely(1, translateRotationToPacket(to.getPitch()));
       packet.getBooleans().writeSafely(0, onGround);
       try {
         protocolManager.sendServerPacket(this.parentPlayer, packet);
@@ -394,17 +387,25 @@ public final class FakePlayer implements TickTaskScheduler {
       });
   }
 
+  private final static double POSITION_CONVERT_FACTOR = 32.0D;
+
+  private byte translateRelativeMoveDiff(double coordinateTo, double coordinateFrom) {
+    double fixedTo = WrappedMathHelper.floor(coordinateTo * POSITION_CONVERT_FACTOR);
+    double fixedFrom = WrappedMathHelper.floor(coordinateFrom * POSITION_CONVERT_FACTOR);
+    return (byte) (fixedTo - fixedFrom);
+  }
+
   public void sendTeleport(Location to, boolean onGround) {
     Preconditions.checkNotNull(to);
     float rotationYaw = to.getYaw();
     float rotationPitch = to.getPitch();
     PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_TELEPORT);
     packet.getIntegers().writeSafely(0, this.fakePlayerID);
-    packet.getIntegers().writeSafely(1, FakeEntityPositionHelper.getFixCoordinate(to.getX()));
-    packet.getIntegers().writeSafely(2, FakeEntityPositionHelper.getFixCoordinate(to.getY()));
-    packet.getIntegers().writeSafely(3, FakeEntityPositionHelper.getFixCoordinate(to.getZ()));
-    packet.getBytes().writeSafely(0, FakeEntityPositionHelper.getFixRotation(rotationYaw));
-    packet.getBytes().writeSafely(1, FakeEntityPositionHelper.getFixRotation(rotationPitch));
+    packet.getIntegers().writeSafely(1, translateCoordinateToPacket(to.getX()));
+    packet.getIntegers().writeSafely(2, translateCoordinateToPacket(to.getY()));
+    packet.getIntegers().writeSafely(3, translateCoordinateToPacket(to.getZ()));
+    packet.getBytes().writeSafely(0, translateRotationToPacket(rotationYaw));
+    packet.getBytes().writeSafely(1, translateRotationToPacket(rotationPitch));
     packet.getBooleans().writeSafely(0, onGround);
     try {
       protocolManager.sendServerPacket(this.parentPlayer, packet);
@@ -423,15 +424,25 @@ public final class FakePlayer implements TickTaskScheduler {
       });
   }
 
+  private int translateCoordinateToPacket(double coordinate) {
+    return (int) Math.floor(coordinate * POSITION_CONVERT_FACTOR);
+  }
+
   public void headRotation(float yaw) {
     PacketContainer packet = protocolManager.createPacket(PacketType.Play.Server.ENTITY_HEAD_ROTATION);
     packet.getIntegers().writeSafely(0, this.fakePlayerID);
-    packet.getBytes().writeSafely(0, FakeEntityPositionHelper.getFixRotation(yaw));
+    packet.getBytes().writeSafely(0, translateRotationToPacket(yaw));
     try {
       protocolManager.sendServerPacket(this.parentPlayer, packet);
     } catch (InvocationTargetException e) {
       e.printStackTrace();
     }
+  }
+
+  private static final float FIX_CONVERT_FACTOR = 256.0F / 360.0F;
+
+  private byte translateRotationToPacket(final float f) {
+    return (byte) (f * FIX_CONVERT_FACTOR);
   }
 
   public void setSprinting(boolean sprinting) {

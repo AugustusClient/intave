@@ -72,9 +72,7 @@ public class WrappedMovingObjectPosition {
     try {
       Class<?> movingObjectPositionClass = ReflectiveAccess.lookupServerClass("MovingObjectPosition");
       Field eField = movingObjectPositionClass.getDeclaredField("e");
-      if(!eField.isAccessible()) {
-        eField.setAccessible(true);
-      }
+      ReflectiveAccess.ensureAccessible(eField);
       Object blockPosition = eField.get(movingObjectPosition);
       Object type = movingObjectPositionClass.getField("type").get(movingObjectPosition);
       Object direction = movingObjectPositionClass.getField("direction").get(movingObjectPosition);

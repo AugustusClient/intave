@@ -2,13 +2,13 @@ package de.jpx3.intave.detect.checks.combat.heuristics.mining;
 
 import de.jpx3.intave.detect.checks.combat.heuristics.MiningStrategy;
 import de.jpx3.intave.executor.BackgroundExecutor;
+import de.jpx3.intave.fakeplayer.EntityIdentifierPrefetch;
 import de.jpx3.intave.fakeplayer.FakePlayer;
 import de.jpx3.intave.fakeplayer.movement.CameraUtils;
 import de.jpx3.intave.fakeplayer.movement.types.ConvertEntityMovement;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaAttackData;
 import de.jpx3.intave.user.UserMetaMovementData;
-import de.jpx3.intave.user.UserMetaSynchronizeData;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
@@ -22,25 +22,20 @@ public final class EmulationLight extends MiningStrategyExecutor {
   @Override
   protected void setup() {
     User.UserMeta meta = user().meta();
-    UserMetaSynchronizeData synchronizeData = meta.synchronizeData();
     UserMetaAttackData attackData = meta.attackData();
     if (attackData.fakePlayer() != null) {
       return;
     }
-    int entityIDAdd = ThreadLocalRandom.current().nextInt(10, 20);
-    int entityID = synchronizeData.resolveEntityID(entityIDAdd);
+    int entityID = EntityIdentifierPrefetch.acquireEntityId();
     BackgroundExecutor.execute(() -> {
       FakePlayer fakePlayer = FakePlayer
         .builder()
-        .setEntityID(entityID)
-        .setMovement(new ConvertEntityMovement())
-        .setInvisible(true)
-        .setInTablist(false)
-        .setEquipArmor(false)
-        .setEquipHeldItem(false)
-        .setParentPlayer(user().player())
-        .setTimeout(-1)
-        .setAttackSubscriber(() -> saveAnomalyWithID(1))
+        .withEntityID(entityID)
+        .withMovement(new ConvertEntityMovement())
+        .invisible()
+        .invisibleInTabList()
+        .withParentPlayer(user().player())
+        .withAttackSubscriber(() -> saveAnomalyWithID(1))
         .build();
       fakePlayer.spawn(locationBehind(user(), ThreadLocalRandom.current().nextInt(1, 2)));
     });

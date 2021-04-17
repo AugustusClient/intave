@@ -3,6 +3,7 @@ package de.jpx3.intave.fakeplayer.randomaction;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import de.jpx3.intave.fakeplayer.FakePlayer;
+import de.jpx3.intave.tools.sync.Synchronizer;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
@@ -34,16 +35,16 @@ public abstract class RandomAction {
   ) {
     for (RandomAction randomAction : randomActions) {
       if (randomAction.type == type) {
-        randomAction.performAction();
+        Synchronizer.synchronize(randomAction::performAction);
       }
     }
   }
 
   public final void mayProcess() {
     if (++loop % this.probability.probability() == 0) {
-      performAction();
+      Synchronizer.synchronize(this::performAction);
     } else {
-      unsafeAction();
+      Synchronizer.synchronize(this::unsafeAction);
     }
   }
 

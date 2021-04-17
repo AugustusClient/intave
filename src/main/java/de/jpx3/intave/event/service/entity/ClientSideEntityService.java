@@ -179,9 +179,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
 
   private Object entityByHandle(Object handle, Field entityField) {
     try {
-      if (!entityField.isAccessible()) {
-        entityField.setAccessible(true);
-      }
+      ReflectiveAccess.ensureAccessible(entityField);
       return entityField.get(handle);
     } catch (Exception e) {
       throw new IntaveInternalException(e);
