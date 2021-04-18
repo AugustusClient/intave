@@ -30,10 +30,7 @@ import de.jpx3.intave.world.collider.result.ComplexColliderSimulationResult;
 import de.jpx3.intave.world.collider.result.QuickColliderSimulationResult;
 import de.jpx3.intave.world.collision.Collision;
 import de.jpx3.intave.world.waterflow.Waterflow;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -435,7 +432,7 @@ public final class Physics extends IntaveCheck {
     }
 
     if (violationLevelIncrease > 0) {
-      violationLevelIncrease = Math.min(60.0, violationLevelIncrease);
+      violationLevelIncrease = Math.min(200.0, violationLevelIncrease);
       violationLevelIncrease = Math.max(1, violationLevelIncrease);
       violationLevelData.physicsVL += violationLevelIncrease;
       violationLevelData.physicsInvalidMovementsInRow++;
@@ -446,7 +443,7 @@ public final class Physics extends IntaveCheck {
       statistics().increasePasses();
     }
 
-    if (!spectator && violationLevelData.physicsVL > 20 && violationLevelIncrease > 0) {
+    if (!spectator && violationLevelData.physicsVL > 50 && violationLevelIncrease > 0) {
       String received = formatPosition(receivedMotionX, receivedMotionY, receivedMotionZ);
       String expected = formatPosition(predictedX, predictedY, predictedZ);
 
@@ -680,7 +677,7 @@ public final class Physics extends IntaveCheck {
 
     double abuseVertically = Math.max(0, differenceY - legitimateDeviation);
 
-    double multiplier = abuseVertically > 0.009 ? 205.0 : 10.0;
+    double multiplier = abuseVertically > 0.009 ? 305.0 : 10.0;
     if (criticalWeb) {
       multiplier *= 40;
     }
@@ -801,12 +798,11 @@ public final class Physics extends IntaveCheck {
       movedTooQuickly = movedTooQuickly && distanceMoved > baseMoveSpeed;
     }
 
-    boolean movedTooQuicklyCheckable = distanceMoved > 0.15 || violationLevelData.physicsInvalidMovementsInRow >= 8;
+    boolean movedTooQuicklyCheckable = distanceMoved > 0.3 || violationLevelData.physicsInvalidMovementsInRow >= 8;
 
-    if (movedTooQuickly && movedTooQuicklyCheckable && abuseHorizontally > 0 && !recentlyVelocity) {
-      boolean aggressive = distance > 0.4;
+    if (movedTooQuickly && movedTooQuicklyCheckable) {
       //noinspection UnnecessaryLocalVariable
-      double vl = Math.max(abuseHorizontally, aggressive ? 0.6 : 0.3) * (aggressive ? 200 : 100);
+      double vl = abuseHorizontally * abuseHorizontally > 0.2 ? 1000 : 60;
 //      Bukkit.broadcastMessage(user.player().getName() + " moved too quickly: vl+" + vl);
       return vl;
     }
