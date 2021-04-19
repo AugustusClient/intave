@@ -30,10 +30,7 @@ import de.jpx3.intave.world.collider.result.ComplexColliderSimulationResult;
 import de.jpx3.intave.world.collider.result.QuickColliderSimulationResult;
 import de.jpx3.intave.world.collision.Collision;
 import de.jpx3.intave.world.waterflow.Waterflow;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -344,7 +341,7 @@ public final class Physics extends IntaveCheck {
     }
 
     if (violationLevelIncrease == 0 && violationLevelData.physicsVL > 0) {
-      violationLevelData.physicsVL *= 0.980;
+      violationLevelData.physicsVL *= 0.990;
       violationLevelData.physicsVL -= 0.012;
     }
 
@@ -804,8 +801,8 @@ public final class Physics extends IntaveCheck {
 
     if (movedTooQuickly && movedTooQuicklyCheckable) {
       //noinspection UnnecessaryLocalVariable
-      double vl = abuseHorizontally * abuseHorizontally > 0.2 ? 1000 : 60;
-//      Bukkit.broadcastMessage(user.player().getName() + " moved too quickly: vl+" + vl);
+      double vl = abuseHorizontally > 0.2 ? 1000 : Math.max(0.1, abuseHorizontally) * 100;
+//      Bukkit.broadcastMessage(user.player().getName() + " moved too quickly: vl+" + vl + " abuse:" + abuseHorizontally);
       return vl;
     }
 
