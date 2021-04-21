@@ -21,7 +21,7 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 import static de.jpx3.intave.user.UserMetaClientData.PROTOCOL_VERSION_BOUNTIFUL_UPDATE;
-import static de.jpx3.intave.world.raytrace.Raytracer.distanceOfIgnoringBlocks;
+import static de.jpx3.intave.world.raytrace.Raytracer.distanceOf;
 
 public final class AttackRequiredHeuristic extends IntaveMetaCheckPart<Heuristics, AttackRequiredHeuristic.VentolotlMeta> {
   private final IntavePlugin plugin;
@@ -132,7 +132,7 @@ public final class AttackRequiredHeuristic extends IntaveMetaCheckPart<Heuristic
     boolean alternativePositionY = clientData.protocolVersion() == PROTOCOL_VERSION_BOUNTIFUL_UPDATE;
     boolean hasAlwaysMouseDelayFix = clientData.protocolVersion() >= 314;
     // mouse delay fix
-    Raytracer.EntityInteractionRaytrace distanceOfResult = distanceOfIgnoringBlocks(
+    Raytracer.EntityInteractionRaytrace distanceOfResult = distanceOf(
       player,
       entity, alternativePositionY,
       movementData.lastPositionX, movementData.lastPositionY, movementData.lastPositionZ,
@@ -144,7 +144,7 @@ public final class AttackRequiredHeuristic extends IntaveMetaCheckPart<Heuristic
     }
     if (!hasAlwaysMouseDelayFix) {
       // normal
-      distanceOfResult = distanceOfIgnoringBlocks(
+      distanceOfResult = distanceOf(
         player,
         entity, true,
         movementData.lastPositionX, movementData.lastPositionY, movementData.lastPositionZ,
