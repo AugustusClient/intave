@@ -21,10 +21,6 @@ import de.jpx3.intave.user.*;
 import de.jpx3.intave.world.raytrace.Raytracer;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public final class RotationModuloResetHeuristic extends IntaveMetaCheckPart<Heuristics, RotationModuloResetHeuristic.RotationModuloResetHeuristicMeta> {
   private final IntavePlugin plugin;
 
@@ -175,12 +171,6 @@ public final class RotationModuloResetHeuristic extends IntaveMetaCheckPart<Heur
       meta.perfectRotations[meta.index] = Double.NaN;
     }
 
-    if (movementData.lastTeleport <= 5) {
-      meta.rotationMotions = new double[meta.rotationMotions.length];
-      return;
-    }
-
-
     boolean isLegit = false;
 
     for (int i = 0; i < meta.rotationMotions.length; i++) {
@@ -200,26 +190,50 @@ public final class RotationModuloResetHeuristic extends IntaveMetaCheckPart<Heur
       isLegit = true;
     }
 
-    if (!isLegit && (meta.lastSwing <= 5 || meta.lastAttack <= 5) && meta.rotationPacketCounter > 5) {
+    if (!isLegit && (meta.lastSwing <= 3 || meta.lastAttack <= 5) && meta.rotationPacketCounter > 10 && movementData.lastTeleport > 7) {
+      Confidence confidence = Confidence.MAYBE;
       String description = "rotation snap ("
         + getArrayAsString(meta.rotationMotions, yawMotion, meta.index)
-        + " swing:" + Math.min(meta.lastSwing, 99)
+        + " s:" + Math.min(meta.lastSwing, 99)
         + "/" + Math.min(meta.lastAttack, 99);
-      if(movementData.lastTeleport < 20) {
-        description += " tp:" + movementData.lastTeleport;
+
+      double valueOfSnap = meta.rotationMotions[getHopIndex(meta)];
+      if(valueOfSnap > 90) {
+        if(meta.lastAttack <= 5) {
+          confidence = Confidence.PROBABLE;
+        }
       }
 
       UserMetaAttackData attackData = user.meta().attackData();
       if(attackData.lastAttackedEntity() != null) {
-        description += " perfYaw:" + MathHelper.formatDouble(meta.perfectRotations[Math.floorMod(meta.index - 2, meta.perfectRotations.length)], 2)
-        + "/" + MathHelper.formatDouble(meta.perfectRotations[Math.floorMod(meta.index - 1, meta.perfectRotations.length)], 2);
+        double values[] = new double[] { meta.perfectRotations[Math.floorMod(meta.index - 2, meta.perfectRotations.length)],
+          meta.perfectRotations[Math.floorMod(meta.index - 1, meta.perfectRotations.length)]};
+        if(values[0] != Double.NaN && values[1] != Double.NaN) {
+          double minValue = Math.min(values[0], values[1]);
+          double maxValue = Math.max(values[0], values[1]);
+          if(minValue < 10 && maxValue > 65) {
+            if(valueOfSnap > 90) {
+              confidence = Confidence.LIKELY;
+            }
+            description += " pYaw:" + MathHelper.formatDouble(meta.perfectRotations[Math.floorMod(meta.index - 2, meta.perfectRotations.length)], 2)
+              + "/" + MathHelper.formatDouble(meta.perfectRotations[Math.floorMod(meta.index - 1, meta.perfectRotations.length)], 2);
+          }
+        }
       }
 
-      description += ")";
+      if(valueOfSnap >= 178) {
+        confidence = Confidence.VERY_LIKELY;
+      }
 
       int options = Anomaly.AnomalyOption.DELAY_128s;
-      Anomaly anomaly = Anomaly.anomalyOf("102", Confidence.NONE, Anomaly.Type.KILLAURA, description, options);
+      Anomaly anomaly = Anomaly.anomalyOf("102", confidence, Anomaly.Type.KILLAURA, description, options);
       parentCheck().saveAnomaly(player, anomaly);
+    }
+
+    if(System.currentTimeMillis() - meta.lastViolationTimeStamp > 15000 && (movementData.motionX() + movementData.motionZ() != 0)) {
+      if(meta.violationLevel > 0)
+        meta.violationLevel--;
+      meta.lastViolationTimeStamp = System.currentTimeMillis();
     }
 
 //    if (meta.lastLastYawMotion < 7 && meta.lastYawMotion > 50 && yawMotion < 6) {
@@ -244,10 +258,6 @@ public final class RotationModuloResetHeuristic extends IntaveMetaCheckPart<Heur
     return Math.floorMod(meta.index - 1, meta.rotationMotions.length);
   }
 
-  private int getHopIndexWithOffset(RotationModuloResetHeuristicMeta meta, int offset) {
-    return Math.floorMod(getHopIndex(meta) + offset, meta.rotationMotions.length);
-  }
-
   private void prepareNextTick(RotationModuloResetHeuristicMeta meta, double yawMotion) {
     meta.lastSwing++;
     meta.lastAttack++;
@@ -261,6 +271,8 @@ public final class RotationModuloResetHeuristic extends IntaveMetaCheckPart<Heur
 
 
   public static final class RotationModuloResetHeuristicMeta extends UserCustomCheckMeta {
+    private int violationLevel;
+    private long lastViolationTimeStamp;
     // used to disable the check on startup
     private int rotationPacketCounter;
     private double[] rotationMotions = new double[4];
