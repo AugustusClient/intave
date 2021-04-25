@@ -14,18 +14,12 @@ import de.jpx3.intave.event.packet.PacketSubscription;
 import de.jpx3.intave.event.packet.Sender;
 import de.jpx3.intave.event.punishment.AttackCancelType;
 import de.jpx3.intave.event.service.entity.WrappedEntity;
-import de.jpx3.intave.tools.AccessHelper;
 import de.jpx3.intave.tools.MathHelper;
 import de.jpx3.intave.tools.client.RotationHelper;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import de.jpx3.intave.user.*;
 import de.jpx3.intave.world.raytrace.Raytracer;
 import org.bukkit.entity.Player;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.locks.Condition;
 
 public final class RotationModuloResetHeuristic extends IntaveMetaCheckPart<Heuristics, RotationModuloResetHeuristic.RotationModuloResetHeuristicMeta> {
   private final IntavePlugin plugin;
@@ -177,11 +171,6 @@ public final class RotationModuloResetHeuristic extends IntaveMetaCheckPart<Heur
       meta.perfectRotations[meta.index] = Double.NaN;
     }
 
-    if (movementData.lastTeleport <= 5) {
-      meta.rotationMotions = new double[meta.rotationMotions.length];
-      return;
-    }
-
     boolean isLegit = false;
 
     for (int i = 0; i < meta.rotationMotions.length; i++) {
@@ -201,7 +190,7 @@ public final class RotationModuloResetHeuristic extends IntaveMetaCheckPart<Heur
       isLegit = true;
     }
 
-    if (!isLegit && (meta.lastSwing <= 3 || meta.lastAttack <= 5) && meta.rotationPacketCounter > 10) {
+    if (!isLegit && (meta.lastSwing <= 3 || meta.lastAttack <= 5) && meta.rotationPacketCounter > 10 && movementData.lastTeleport > 7) {
       Confidence confidence = Confidence.MAYBE;
       String description = "rotation snap ("
         + getArrayAsString(meta.rotationMotions, yawMotion, meta.index)
