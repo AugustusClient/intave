@@ -11,7 +11,7 @@ import de.jpx3.intave.event.packet.ListenerPriority;
 import de.jpx3.intave.event.packet.PacketDescriptor;
 import de.jpx3.intave.event.packet.PacketSubscription;
 import de.jpx3.intave.event.packet.Sender;
-import de.jpx3.intave.event.punishment.AttackCancelType;
+import de.jpx3.intave.event.punishment.AttackNerfStrategy;
 import de.jpx3.intave.event.service.entity.WrappedEntity;
 import de.jpx3.intave.tools.MathHelper;
 import de.jpx3.intave.tools.RotationMathHelper;
@@ -23,7 +23,8 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-import static de.jpx3.intave.detect.checks.combat.heuristics.Anomaly.AnomalyOption.*;
+import static de.jpx3.intave.detect.checks.combat.heuristics.Anomaly.AnomalyOption.LIMIT_2;
+import static de.jpx3.intave.detect.checks.combat.heuristics.Anomaly.AnomalyOption.SUGGEST_MINING;
 
 public final class RotationStandardDeviationHeuristic extends IntaveMetaCheckPart<Heuristics, RotationStandardDeviationHeuristic.RotationStandardDeviationMeta> {
   private final IntavePlugin plugin;
@@ -90,7 +91,7 @@ public final class RotationStandardDeviationHeuristic extends IntaveMetaCheckPar
         Anomaly anomaly = Anomaly.anomalyOf("121", Confidence.PROBABLE, Anomaly.Type.KILLAURA, description, options);
         parentCheck().saveAnomaly(player, anomaly);
         heuristicMeta.rotationBalanceYaw--;
-        plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.MEDIUM);
+        plugin.eventService().combatMitigator().mitigate(user, AttackNerfStrategy.HT_MEDIUM);
       }
     } else {
       heuristicMeta.rotationBalanceYaw -= heuristicMeta.rotationBalanceYaw > 0 ? 0.2 : 0;
@@ -109,7 +110,7 @@ public final class RotationStandardDeviationHeuristic extends IntaveMetaCheckPar
         Anomaly anomaly = Anomaly.anomalyOf("122", Confidence.MAYBE, Anomaly.Type.KILLAURA, description, options);
         parentCheck().saveAnomaly(player, anomaly);
         heuristicMeta.rotationBalancePitch -= 2;
-        plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.LIGHT);
+        plugin.eventService().combatMitigator().mitigate(user, AttackNerfStrategy.HT_LIGHT);
       }
     } else {
       heuristicMeta.rotationBalancePitch -= heuristicMeta.rotationBalancePitch > 0 ? 0.2 : 0;

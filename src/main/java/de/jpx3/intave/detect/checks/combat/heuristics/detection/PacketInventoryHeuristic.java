@@ -12,7 +12,7 @@ import de.jpx3.intave.event.packet.ListenerPriority;
 import de.jpx3.intave.event.packet.PacketDescriptor;
 import de.jpx3.intave.event.packet.PacketSubscription;
 import de.jpx3.intave.event.packet.Sender;
-import de.jpx3.intave.event.punishment.AttackCancelType;
+import de.jpx3.intave.event.punishment.AttackNerfStrategy;
 import de.jpx3.intave.user.*;
 import org.bukkit.entity.Player;
 
@@ -60,7 +60,7 @@ public final class PacketInventoryHeuristic extends IntaveMetaCheckPart<Heuristi
       String details = "closed inventory too quickly (" + meta.inventoryTicks + ")";
       Anomaly anomaly = Anomaly.anomalyOf("131", Confidence.PROBABLE, Anomaly.Type.KILLAURA, details, options);
       parentCheck().saveAnomaly(player, anomaly);
-      plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.MEDIUM);
+      plugin.eventService().combatMitigator().mitigate(user, AttackNerfStrategy.HT_MEDIUM);
     }
   }
 
@@ -100,7 +100,7 @@ public final class PacketInventoryHeuristic extends IntaveMetaCheckPart<Heuristi
         String details = "sent rotations in inventory (" + meta.rotationsInInventory + " rotations)";
         Anomaly anomaly = Anomaly.anomalyOf("132", Confidence.NONE, Anomaly.Type.KILLAURA, details, options);
         parentCheck().saveAnomaly(player, anomaly);
-        plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.LIGHT);
+        plugin.eventService().combatMitigator().mitigate(user, AttackNerfStrategy.HT_LIGHT);
       }
     }
 

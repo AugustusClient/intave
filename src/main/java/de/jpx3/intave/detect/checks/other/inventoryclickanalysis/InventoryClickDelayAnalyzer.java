@@ -7,8 +7,9 @@ import de.jpx3.intave.detect.CheckViolationLevelDecrementer;
 import de.jpx3.intave.detect.IntaveMetaCheckPart;
 import de.jpx3.intave.detect.checks.other.InventoryClickAnalysis;
 import de.jpx3.intave.event.bukkit.BukkitEventSubscription;
-import de.jpx3.intave.event.punishment.AttackCancelType;
+import de.jpx3.intave.event.punishment.AttackNerfStrategy;
 import de.jpx3.intave.event.service.violation.Violation;
+import de.jpx3.intave.event.service.violation.ViolationContext;
 import de.jpx3.intave.tools.AccessHelper;
 import de.jpx3.intave.tools.MathHelper;
 import de.jpx3.intave.user.UserCustomCheckMeta;
@@ -64,19 +65,19 @@ public final class InventoryClickDelayAnalyzer extends IntaveMetaCheckPart<Inven
       Violation violation = Violation.builderFor(InventoryClickAnalysis.class)
         .withPlayer(player).withDefaultThreshold()
         .withMessage("is switching too quickly between item slots")
-        .withDetails("moved from slot "+lastSlot+" to slot "+slot+" in " + MathHelper.formatDouble(time, 3) + " seconds")
+        .withDetails("moved from slot " + lastSlot + " to slot " + slot + " in " + MathHelper.formatDouble(time, 3) + " seconds")
         .withVL(time > 0.01 ? 10 : 5).build();
 
-      plugin.violationProcessor().processViolation(violation);
+      ViolationContext violationContext = plugin.violationProcessor().processViolation(violation);
 
-      if(IntaveControl.GOMME_MODE) {
-        if(distance > 0) {
-          plugin.eventService().attackCancelService().requestDamageCancel(userOf(player), AttackCancelType.MEDIUM);
+      if (IntaveControl.GOMME_MODE) {
+        if (distance > 0 && violationContext.violationLevelAfter() > 30) {
+          plugin.eventService().combatMitigator().mitigate(userOf(player), AttackNerfStrategy.DMG_LIGHT);
         }
       }
     }
 
-    if(speedAttr < 10) {
+    if (speedAttr < 10) {
       CheckViolationLevelDecrementer decrementer = parentCheck().decrementer();
       decrementer.decrement(userOf(player), MAX_VL_DECREMENT_PER_SECOND);
     }

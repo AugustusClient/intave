@@ -11,8 +11,10 @@ import de.jpx3.intave.event.packet.ListenerPriority;
 import de.jpx3.intave.event.packet.PacketDescriptor;
 import de.jpx3.intave.event.packet.PacketSubscription;
 import de.jpx3.intave.event.packet.Sender;
+import de.jpx3.intave.event.punishment.AttackNerfStrategy;
 import de.jpx3.intave.event.service.entity.WrappedEntity;
 import de.jpx3.intave.event.service.violation.Violation;
+import de.jpx3.intave.event.service.violation.ViolationContext;
 import de.jpx3.intave.tools.MathHelper;
 import de.jpx3.intave.tools.annotate.Native;
 import de.jpx3.intave.tools.sync.Synchronizer;
@@ -240,7 +242,10 @@ public class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackRaytrac
       .withPlayer(player).withMessage(message).withDetails(details)
       .withCustomThreshold(thresholdKey).withVL(vl)
       .build();
-    plugin.violationProcessor().processViolation(violation);
+    ViolationContext violationContext = plugin.violationProcessor().processViolation(violation);
+    if(violationContext.violationLevelAfter() > 50) {
+      plugin.eventService().combatMitigator().mitigate(user, AttackNerfStrategy.DMG_MEDIUM);
+    }
     return true;
   }
 

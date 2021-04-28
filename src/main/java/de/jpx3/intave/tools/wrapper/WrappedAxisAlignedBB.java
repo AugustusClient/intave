@@ -377,6 +377,40 @@ public class WrappedAxisAlignedBB {
     return new WrappedAxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    WrappedAxisAlignedBB that = (WrappedAxisAlignedBB) o;
+
+    if (Double.compare(that.minX, minX) != 0) return false;
+    if (Double.compare(that.minY, minY) != 0) return false;
+    if (Double.compare(that.minZ, minZ) != 0) return false;
+    if (Double.compare(that.maxX, maxX) != 0) return false;
+    if (Double.compare(that.maxY, maxY) != 0) return false;
+    return Double.compare(that.maxZ, maxZ) == 0;
+  }
+
+  @Override
+  public int hashCode() {
+    int result;
+    long temp;
+    temp = Double.doubleToLongBits(minX);
+    result = (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(minY);
+    result = 31 * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(minZ);
+    result = 31 * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(maxX);
+    result = 31 * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(maxY);
+    result = 31 * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(maxZ);
+    result = 31 * result + (int) (temp ^ (temp >>> 32));
+    return result;
+  }
+
   public static WrappedAxisAlignedBB createFromPosition(
     User user,
     double positionX, double positionY, double positionZ

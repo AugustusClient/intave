@@ -12,7 +12,7 @@ import de.jpx3.intave.event.packet.ListenerPriority;
 import de.jpx3.intave.event.packet.PacketDescriptor;
 import de.jpx3.intave.event.packet.PacketSubscription;
 import de.jpx3.intave.event.packet.Sender;
-import de.jpx3.intave.event.punishment.AttackCancelType;
+import de.jpx3.intave.event.punishment.AttackNerfStrategy;
 import de.jpx3.intave.event.service.entity.WrappedEntity;
 import de.jpx3.intave.tools.AccessHelper;
 import de.jpx3.intave.user.*;
@@ -101,7 +101,7 @@ public final class AttackRequiredHeuristic extends IntaveMetaCheckPart<Heuristic
           Anomaly anomaly = Anomaly.anomalyOf("151", confidence, Anomaly.Type.KILLAURA, "missed attack packet vl:" + vl, options);
           parentCheck().saveAnomaly(player, anomaly);
           if (flag) {
-            plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.LIGHT);
+            plugin.eventService().combatMitigator().mitigate(user, AttackNerfStrategy.HT_LIGHT);
           }
         }
         meta.lastFlag = AccessHelper.now();

@@ -3,6 +3,20 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
+        <entry key="C:\Program Files\Java\jdk1.8.0_191\src.zip!\java\lang\Exception.java">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\build.gradle">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\src\main\java\de\jpx3\intave\IntaveControl.java">
           <value>
             <Attribute>
@@ -207,6 +221,13 @@
           </value>
         </entry>
         <entry key="\src\main\java\de\jpx3\intave\tools\placeholder\PlayerContext.java">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\src\main\java\de\jpx3\intave\user\UserMetaPunishmentData.java">
           <value>
             <Attribute>
               <option name="separator" value=";" />

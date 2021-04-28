@@ -6,7 +6,7 @@ import de.jpx3.intave.event.bukkit.BukkitEventSubscriber;
 import de.jpx3.intave.event.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.event.context.ReconDelayLimiter;
 import de.jpx3.intave.event.dispatch.*;
-import de.jpx3.intave.event.punishment.AttackCancelService;
+import de.jpx3.intave.event.punishment.CombatMitigator;
 import de.jpx3.intave.event.service.ConnectionHealthResolver;
 import de.jpx3.intave.event.service.MovementEmulationEngine;
 import de.jpx3.intave.event.service.TransactionFeedbackService;
@@ -32,7 +32,7 @@ public final class EventService implements BukkitEventSubscriber {
   private final IntavePlugin plugin;
   private TransactionFeedbackService transactionFeedbackService;
   private MovementEmulationEngine emulationEngine;
-  private AttackCancelService attackCancelService;
+  private CombatMitigator combatMitigator;
   private ReconDelayLimiter reconDelayLimiter;
 
   public EventService(IntavePlugin plugin) {
@@ -42,7 +42,7 @@ public final class EventService implements BukkitEventSubscriber {
   public void setup() {
     this.transactionFeedbackService = new TransactionFeedbackService(plugin);
     this.emulationEngine = new MovementEmulationEngine(plugin);
-    this.attackCancelService = new AttackCancelService(plugin);
+    this.combatMitigator = new CombatMitigator(plugin);
     this.reconDelayLimiter = new ReconDelayLimiter(plugin);
     new UserRepositoryEventListener(plugin);
     new AttackDispatcher(plugin);
@@ -117,7 +117,7 @@ public final class EventService implements BukkitEventSubscriber {
     return transactionFeedbackService;
   }
 
-  public AttackCancelService attackCancelService() {
-    return attackCancelService;
+  public CombatMitigator combatMitigator() {
+    return combatMitigator;
   }
 }

@@ -10,7 +10,7 @@ import de.jpx3.intave.detect.checks.combat.heuristics.Confidence;
 import de.jpx3.intave.event.packet.PacketDescriptor;
 import de.jpx3.intave.event.packet.PacketSubscription;
 import de.jpx3.intave.event.packet.Sender;
-import de.jpx3.intave.event.punishment.AttackCancelType;
+import de.jpx3.intave.event.punishment.AttackNerfStrategy;
 import de.jpx3.intave.reflect.ReflectiveDataWatcherAccess;
 import de.jpx3.intave.tools.AccessHelper;
 import de.jpx3.intave.tools.packet.PlayerAction;
@@ -92,7 +92,7 @@ public final class PacketPlayerActionToggleHeuristic extends IntaveMetaCheckPart
         Anomaly anomaly = Anomaly.anomalyOf("41", confidence, Anomaly.Type.KILLAURA, description, options);
         parentCheck().saveAnomaly(player, anomaly);
         if (sprint) {
-          plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.HEAVY);
+          plugin.eventService().combatMitigator().mitigate(user, AttackNerfStrategy.CANCEL);
         } else {
           punishmentData.timeLastSneakToggleCancel = AccessHelper.now();
           Synchronizer.synchronize(() -> ReflectiveDataWatcherAccess.setDataWatcherFlag(player, DATA_WATCHER_SNEAK_ID, false));

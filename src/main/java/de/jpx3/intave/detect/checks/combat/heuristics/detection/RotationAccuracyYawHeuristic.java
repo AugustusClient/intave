@@ -10,7 +10,7 @@ import de.jpx3.intave.event.packet.ListenerPriority;
 import de.jpx3.intave.event.packet.PacketDescriptor;
 import de.jpx3.intave.event.packet.PacketSubscription;
 import de.jpx3.intave.event.packet.Sender;
-import de.jpx3.intave.event.punishment.AttackCancelType;
+import de.jpx3.intave.event.punishment.AttackNerfStrategy;
 import de.jpx3.intave.event.service.entity.WrappedEntity;
 import de.jpx3.intave.tools.MathHelper;
 import de.jpx3.intave.user.User;
@@ -64,7 +64,7 @@ public final class RotationAccuracyYawHeuristic extends IntaveMetaCheckPart<Heur
         int options = LIMIT_4 | SUGGEST_MINING;
         Anomaly anomaly = Anomaly.anomalyOf("86", Confidence.PROBABLE, Anomaly.Type.KILLAURA, description, options);
         parentCheck().saveAnomaly(player, anomaly);
-        plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.MEDIUM);
+        plugin.eventService().combatMitigator().mitigate(user, AttackNerfStrategy.HT_MEDIUM);
       }
     } else if (heuristicMeta.snapVL > 0) {
       heuristicMeta.snapVL -= 0.1;
@@ -100,7 +100,7 @@ public final class RotationAccuracyYawHeuristic extends IntaveMetaCheckPart<Heur
           int options = LIMIT_2 | DELAY_128s | SUGGEST_MINING;
           Anomaly anomaly = Anomaly.anomalyOf("82", Confidence.LIKELY, Anomaly.Type.KILLAURA, description, options);
           parentCheck().saveAnomaly(player, anomaly);
-          plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.MEDIUM);
+          plugin.eventService().combatMitigator().mitigate(user, AttackNerfStrategy.HT_MEDIUM);
         }
 
         // Check yaw accuracy
@@ -115,7 +115,7 @@ public final class RotationAccuracyYawHeuristic extends IntaveMetaCheckPart<Heur
               int options = LIMIT_2 | DELAY_32s | SUGGEST_MINING;
               Anomaly anomaly = Anomaly.anomalyOf("83", Confidence.PROBABLE, Anomaly.Type.KILLAURA, description, options);
               parentCheck().saveAnomaly(player, anomaly);
-              plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.MEDIUM);
+              plugin.eventService().combatMitigator().mitigate(user, AttackNerfStrategy.HT_MEDIUM);
             }
           } else if (heuristicMeta.rotationAccuracyVL > 0) {
             heuristicMeta.rotationAccuracyVL -= 0.005;
@@ -131,7 +131,7 @@ public final class RotationAccuracyYawHeuristic extends IntaveMetaCheckPart<Heur
           Anomaly anomaly = Anomaly.anomalyOf("84", Confidence.MAYBE, Anomaly.Type.KILLAURA, description, options);
           parentCheck().saveAnomaly(player, anomaly);
           heuristicMeta.balanceYawAccuracyOther = 0;
-          plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.LIGHT);
+          plugin.eventService().combatMitigator().mitigate(user, AttackNerfStrategy.HT_LIGHT);
         }
       }
     }

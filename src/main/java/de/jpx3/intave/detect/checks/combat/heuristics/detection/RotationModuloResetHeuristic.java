@@ -12,7 +12,7 @@ import de.jpx3.intave.event.packet.ListenerPriority;
 import de.jpx3.intave.event.packet.PacketDescriptor;
 import de.jpx3.intave.event.packet.PacketSubscription;
 import de.jpx3.intave.event.packet.Sender;
-import de.jpx3.intave.event.punishment.AttackCancelType;
+import de.jpx3.intave.event.punishment.AttackNerfStrategy;
 import de.jpx3.intave.event.service.entity.WrappedEntity;
 import de.jpx3.intave.tools.MathHelper;
 import de.jpx3.intave.tools.client.RotationHelper;
@@ -63,7 +63,7 @@ public final class RotationModuloResetHeuristic extends IntaveMetaCheckPart<Heur
           int options = Anomaly.AnomalyOption.LIMIT_4 | Anomaly.AnomalyOption.DELAY_128s | Anomaly.AnomalyOption.SUGGEST_MINING;
           Anomaly anomaly = Anomaly.anomalyOf("101", Confidence.PROBABLE, Anomaly.Type.KILLAURA, description, options);
           parentCheck().saveAnomaly(player, anomaly);
-          plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.MEDIUM);
+          plugin.eventService().combatMitigator().mitigate(user, AttackNerfStrategy.HT_MEDIUM);
         }
       }
       heuristicMeta.roundedRotationLooking = false;
@@ -242,7 +242,7 @@ public final class RotationModuloResetHeuristic extends IntaveMetaCheckPart<Heur
       if(confidence.level() != 0) {
         int options = Anomaly.AnomalyOption.DELAY_128s;
         if(confidence.level() >= Confidence.LIKELY.level()) {
-          plugin.eventService().attackCancelService().requestDamageCancel(user, AttackCancelType.MEDIUM);
+          plugin.eventService().combatMitigator().mitigate(user, AttackNerfStrategy.HT_MEDIUM);
         }
         Anomaly anomaly = Anomaly.anomalyOf("102", confidence, Anomaly.Type.KILLAURA, description, options);
         parentCheck().saveAnomaly(player, anomaly);
