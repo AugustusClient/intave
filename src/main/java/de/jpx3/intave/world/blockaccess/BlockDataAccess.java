@@ -75,7 +75,7 @@ public final class BlockDataAccess {
       return block.getData();
     } else {
       try {
-        return RuntimeBlockDataIndexer.indexOfModernState(type, nativeBlockDataAccess.invoke());
+        return RuntimeBlockDataIndexer.indexOfModernState(type, nativeBlockDataAccess.invoke(block));
       } catch (Throwable throwable) {
         throw new IntaveInternalException("Failed to access data of " + block, throwable);
       }
