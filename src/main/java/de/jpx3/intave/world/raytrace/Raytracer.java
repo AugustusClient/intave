@@ -97,7 +97,7 @@ public final class Raytracer {
    * @return distance the distance between the entity and the eyes of the player 0 means the player is inside of the
    * entity -1 means the player hit outside of the hitbox of the entity >0 means the reach of the player
    */
-  private static EntityInteractionRaytrace distanceOf(
+  public static EntityInteractionRaytrace distanceOf(
     Player player,
     WrappedAxisAlignedBB entityBoundingBox,
     WrappedEntity.EntityPositionContext position,
