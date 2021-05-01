@@ -257,7 +257,7 @@ public final class SimulationProcessor {
         }
       }
     }
-    if (iterativeSimulation.noMatch()) {
+    if (iterativeSimulation.noMatch() || iterativeSimulation.collisionResult == null) {
       simulateIterativeState(
         user,
         movementData,
