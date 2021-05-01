@@ -58,19 +58,6 @@ public final class MovementDispatcher implements EventProcessor {
     subscriptionLinker.linkSubscriptionsIn(teleportPositionObserver);
   }
 
-  @PacketSubscription(
-    packets = {
-      @PacketDescriptor(sender = Sender.SERVER, packetName = "SCOREBOARD_TEAM")
-    }
-  )
-  public void applyNoEntityCollisionRule(PacketEvent event) {
-    Player player = event.getPlayer();
-    PacketContainer packet = event.getPacket();
-    StructureModifier<String> strings = packet.getStrings();
-
-
-  }
-
   @BukkitEventSubscription
   public void receiveExternalTeleport(PlayerTeleportEvent event) {
     Player player = event.getPlayer();
@@ -88,10 +75,8 @@ public final class MovementDispatcher implements EventProcessor {
     Player player = event.getPlayer();
     User user = UserRepository.userOf(player);
     User.UserMeta meta = user.meta();
-    UserMetaPotionData potionData = meta.potionData();
     UserMetaMovementData movementData = meta.movementData();
     movementData.artificialFallDistance = 0;
-    potionData.clearPotionEffects();
   }
 
   @BukkitEventSubscription
@@ -155,6 +140,7 @@ public final class MovementDispatcher implements EventProcessor {
         movementData.physicsMotionY = 0;
         movementData.physicsMotionZ = 0;
         user.boundingBoxAccess().identityInvalidate();
+        user.meta().potionData().clearPotionEffects();
       });
   }
 
