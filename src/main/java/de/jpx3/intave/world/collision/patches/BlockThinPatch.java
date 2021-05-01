@@ -34,7 +34,7 @@ public final class BlockThinPatch extends BoundingBoxPatch {
   };
 
   public BlockThinPatch() {
-    super(Material.STAINED_GLASS_PANE, Material.IRON_FENCE);
+    super(Material.THIN_GLASS, Material.STAINED_GLASS_PANE, Material.IRON_FENCE);
     Arrays.stream(STATES_8).forEach(WrappedAxisAlignedBB::setOriginBox);
     Arrays.stream(STATES_9).forEach(WrappedAxisAlignedBB::setOriginBox);
   }
@@ -50,8 +50,8 @@ public final class BlockThinPatch extends BoundingBoxPatch {
     if (MinecraftVersions.VER1_9_0.atOrAbove()) {
       if (!user.meta().clientData().combatUpdate()) {
         // update 1.9 to 1.8
-        int[] indices = new int[bbs.size()];
         int count = 0;
+        int[] indices = new int[bbs.size()];
         for (WrappedAxisAlignedBB bb : bbs) {
           indices[count++] = indexOf9(bb);
         }
@@ -95,8 +95,8 @@ public final class BlockThinPatch extends BoundingBoxPatch {
     } else {
       if (user.meta().clientData().combatUpdate()) {
         // update 1.8 to 1.9
-        int[] indices = new int[bbs.size()];
         int count = 0;
+        int[] indices = new int[bbs.size()];
         for (WrappedAxisAlignedBB bb : bbs) {
           indices[count++] = indexOf8(bb);
         }
