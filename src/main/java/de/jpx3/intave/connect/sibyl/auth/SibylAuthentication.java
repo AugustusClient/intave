@@ -68,8 +68,6 @@ public final class SibylAuthentication implements BukkitEventSubscriber {
     JsonObject jsonObject = element.getAsJsonObject();
     String action = jsonObject.get("action").getAsString();
 
-    player.sendMessage(action);
-
     switch (action) {
       case "greet":
         if((boolean)whitelisted(player) && authStateOf(player) == SibylAuthenticationState.N) {
