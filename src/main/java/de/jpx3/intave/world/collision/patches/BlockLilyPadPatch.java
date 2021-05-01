@@ -12,8 +12,6 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-import static de.jpx3.intave.user.UserMetaClientData.PROTOCOL_VERSION_COMBAT_UPDATE;
-
 public final class BlockLilyPadPatch extends BoundingBoxPatch {
   @Override
   public List<WrappedAxisAlignedBB> patch(World world, Player player, Block block, List<WrappedAxisAlignedBB> bbs) {
@@ -24,12 +22,12 @@ public final class BlockLilyPadPatch extends BoundingBoxPatch {
   public List<WrappedAxisAlignedBB> patch(World world, Player player, Material type, int blockState, List<WrappedAxisAlignedBB> bbs) {
     User user = UserRepository.userOf(player);
     BoundingBoxBuilder builder = BoundingBoxBuilder.create();
-    if (user.meta().clientData().protocolVersion() >= PROTOCOL_VERSION_COMBAT_UPDATE) {
+    if (user.meta().clientData().combatUpdate()) {
       builder.shape(0.0625f, 0.0f, 0.0625f, 0.9375f, 0.09375f, 0.9375f);
     } else {
-      float f = 0.5F;
-      float f1 = 0.015625F;
-      builder.shape(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, f1, 0.5F + f);
+      float radius = 0.5F;
+      float height = 0.015625F;
+      builder.shape(0.5F - radius, 0.0F, 0.5F - radius, 0.5F + radius, height, 0.5F + radius);
     }
     return builder.applyAndResolve();
   }
