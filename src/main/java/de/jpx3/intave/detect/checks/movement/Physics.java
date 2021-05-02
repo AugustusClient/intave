@@ -499,6 +499,7 @@ public final class Physics extends IntaveCheck {
         } else {
           setbackTicks = violationLevelData.physicsVL > 50 ? 3 : 2;
         }
+
         plugin.eventService().emulationEngine().emulationSetBack(player, emulationMotion, setbackTicks);
         movementData.invalidMovement = true;
       }

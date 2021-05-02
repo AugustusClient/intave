@@ -5,6 +5,7 @@ import de.jpx3.intave.detect.IntaveCheckPart;
 import de.jpx3.intave.detect.checks.other.InventoryClickAnalysis;
 import de.jpx3.intave.event.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.event.service.violation.Violation;
+import de.jpx3.intave.tools.sync.Synchronizer;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaMovementData;
 import de.jpx3.intave.user.UserRepository;
@@ -50,9 +51,10 @@ public final class InventoryClickOnMoveCheck extends IntaveCheckPart<InventoryCl
       Violation violation = Violation.builderFor(InventoryClickAnalysis.class)
         .withPlayer(player)
         .withMessage(message)
-        .withVL(5)
+        .withVL(0)
         .build();
       plugin.violationProcessor().processViolation(violation);
+      Synchronizer.synchronize(player::closeInventory);
       event.setCancelled(true);
     }
   }

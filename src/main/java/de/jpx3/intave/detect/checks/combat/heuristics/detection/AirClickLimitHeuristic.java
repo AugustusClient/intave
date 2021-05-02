@@ -1,8 +1,5 @@
 package de.jpx3.intave.detect.checks.combat.heuristics.detection;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.EnumWrappers;
@@ -31,8 +28,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-
-import java.lang.reflect.InvocationTargetException;
 
 public class AirClickLimitHeuristic extends IntaveMetaCheckPart<Heuristics, AirClickLimitHeuristic.AirClickLimitHeuristicMeta> {
 
