@@ -16,7 +16,7 @@ import de.jpx3.intave.event.packet.Sender;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaMovementData;
 import de.jpx3.intave.user.UserRepository;
-import de.jpx3.intave.world.collision.access.OCBlockShapeAccess;
+import de.jpx3.intave.world.blockshape.OCBlockShapeAccess;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;

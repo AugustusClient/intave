@@ -27,7 +27,7 @@ import de.jpx3.intave.update.Version;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.UserRepositoryEventListener;
-import de.jpx3.intave.world.collision.access.GlobalStaticOCBlockShapeAccess;
+import de.jpx3.intave.world.blockshape.GlobalStaticOCBlockShapeAccess;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;

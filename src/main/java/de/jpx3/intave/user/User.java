@@ -16,13 +16,13 @@ import de.jpx3.intave.tools.AccessHelper;
 import de.jpx3.intave.tools.annotate.Relocate;
 import de.jpx3.intave.tools.placeholder.PlayerContext;
 import de.jpx3.intave.tools.sync.Synchronizer;
+import de.jpx3.intave.world.blockshape.BlankUserBlockOCShapeAccess;
+import de.jpx3.intave.world.blockshape.GlobalStaticOCBlockShapeAccess;
+import de.jpx3.intave.world.blockshape.MultiChunkKeyOCBlockShapeAccess;
+import de.jpx3.intave.world.blockshape.OCBlockShapeAccess;
+import de.jpx3.intave.world.blockshape.resolver.BoundingBoxResolverFactory;
 import de.jpx3.intave.world.collider.Collider;
 import de.jpx3.intave.world.collider.processor.ComplexColliderProcessor;
-import de.jpx3.intave.world.collision.access.BlankUserBlockOCShapeAccess;
-import de.jpx3.intave.world.collision.access.GlobalStaticOCBlockShapeAccess;
-import de.jpx3.intave.world.collision.access.MultiChunkKeyOCBlockShapeAccess;
-import de.jpx3.intave.world.collision.access.OCBlockShapeAccess;
-import de.jpx3.intave.world.collision.resolver.BoundingBoxResolverFactory;
 import org.bukkit.entity.Player;
 
 import java.lang.ref.WeakReference;

@@ -19,7 +19,7 @@ import de.jpx3.intave.tools.annotate.Native;
 import de.jpx3.intave.tools.annotate.Relocate;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
-import de.jpx3.intave.world.collision.access.OCBlockShapeAccess;
+import de.jpx3.intave.world.blockshape.OCBlockShapeAccess;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
