@@ -7,4 +7,10 @@ package de.jpx3.intave.world.collision.access;
 
 public interface OCBlockShapeAccess extends OverrideBlockShapeAccess, CachedBlockShapeAccess {
 
+  default void applyFrom(OCBlockShapeAccess priorBlockShapeAccess) {
+    indexedReplacements().clear();
+    locatedReplacements().clear();
+    indexedReplacements().putAll(priorBlockShapeAccess.indexedReplacements());
+    locatedReplacements().putAll(priorBlockShapeAccess.locatedReplacements());
+  }
 }

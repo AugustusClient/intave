@@ -232,7 +232,7 @@ public final class Heuristics extends IntaveMetaCheck<Heuristics.HeuristicMeta> 
       .entrySet()
       .stream()
       .max(Comparator.comparingLong(Map.Entry::getValue))
-      .orElseThrow(IllegalMonitorStateException::new)
+      .orElseThrow(IllegalStateException::new)
       .getKey();
   }
 

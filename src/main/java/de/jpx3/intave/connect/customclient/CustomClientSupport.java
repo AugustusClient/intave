@@ -28,11 +28,4 @@ public final class CustomClientSupport {
     JsonElement element = object.get(key);
     return element == null ? def : element.getAsBoolean();
   }
-
-  @Override
-  public String toString() {
-    return "CustomClientSupport{" +
-      "legacySneakHeight=" + legacySneakHeight +
-      '}';
-  }
 }

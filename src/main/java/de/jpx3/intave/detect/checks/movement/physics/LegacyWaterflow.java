@@ -9,7 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-public final class LegacyWaterPhysics {
+public final class LegacyWaterflow {
   public static boolean handleMaterialAcceleration(User user, WrappedAxisAlignedBB boundingBox) {
     Player player = user.player();
     World world = player.getWorld();

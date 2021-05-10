@@ -54,7 +54,7 @@ public final class UserMetaMovementData {
   public float rotationYaw, rotationPitch;
   public float lastRotationYaw, lastRotationPitch;
   private Pose movementPoseType = Pose.PLAYER;
-  private final SimulationProcessor.IterativeSimulationResult iterativeSimulation = new SimulationProcessor.IterativeSimulationResult();
+  private final SimulationProcessor.IterativeSimulationContext iterativeSimulation = new SimulationProcessor.IterativeSimulationContext();
 
   // Timestamps
   public long lastSneakingTimestamps, lastJumpTimestamps;
@@ -399,7 +399,7 @@ public final class UserMetaMovementData {
     return boundingBox;
   }
 
-  public SimulationProcessor.IterativeSimulationResult iterativeSimulation() {
+  public SimulationProcessor.IterativeSimulationContext iterativeSimulation() {
     return iterativeSimulation;
   }
 

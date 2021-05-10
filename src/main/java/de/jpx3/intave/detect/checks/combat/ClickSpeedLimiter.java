@@ -20,7 +20,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClickSpeedLimiter extends IntaveMetaCheck<ClickSpeedLimiter.ClickSpeedLimiterMeta> {
+public final class ClickSpeedLimiter extends IntaveMetaCheck<ClickSpeedLimiter.ClickSpeedLimiterMeta> {
   private final IntavePlugin plugin;
   private final int maxCPS;
 

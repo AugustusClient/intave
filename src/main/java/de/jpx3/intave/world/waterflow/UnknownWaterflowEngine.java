@@ -1,7 +1,7 @@
 package de.jpx3.intave.world.waterflow;
 
 import com.comphenix.protocol.utility.MinecraftVersion;
-import de.jpx3.intave.detect.checks.movement.physics.LegacyWaterPhysics;
+import de.jpx3.intave.detect.checks.movement.physics.LegacyWaterflow;
 import de.jpx3.intave.tools.client.MaterialLogic;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.tools.wrapper.WrappedBlockPosition;
@@ -51,12 +51,12 @@ final class UnknownWaterflowEngine extends AbstractWaterflowEngine {
           boolean waterServerSide = MaterialLogic.isWater(block.getType());
           boolean waterClientSide = MaterialLogic.isWater(clientSideBlock);
           if (waterServerSide) {
-            double height = 1 - LegacyWaterPhysics.resolveLiquidHeightPercentage(BlockDataAccess.dataIndexOf(block));
+            double height = 1 - LegacyWaterflow.resolveLiquidHeightPercentage(BlockDataAccess.dataIndexOf(block));
             double d1 = (float) y + height;
             if (d1 >= entityBoundingBox.minY) {
               inWater = true;
               d0 = Math.max(d1 - entityBoundingBox.minY, d0);
-              WrappedVector flowVector = LegacyWaterPhysics.modifyAcceleration(user, new WrappedBlockPosition(x, y, z), new WrappedVector(0, 0, 0));
+              WrappedVector flowVector = LegacyWaterflow.modifyAcceleration(user, new WrappedBlockPosition(x, y, z), new WrappedVector(0, 0, 0));
               if (d0 < 0.4) {
                 flowVector = flowVector.scale(d0);
               }
@@ -97,7 +97,7 @@ final class UnknownWaterflowEngine extends AbstractWaterflowEngine {
     WrappedVector vector3d = new WrappedVector(positionX, d0, positionZ);
     Block block = BukkitBlockAccess.blockAccess(world, vector3d.xCoord, vector3d.yCoord, vector3d.zCoord);
     if (MaterialLogic.isWater(block.getType())) {
-      double d1 = vector3d.yCoord + 1 - LegacyWaterPhysics.resolveLiquidHeightPercentage(BlockDataAccess.dataIndexOf(block));
+      double d1 = vector3d.yCoord + 1 - LegacyWaterflow.resolveLiquidHeightPercentage(BlockDataAccess.dataIndexOf(block));
       return d1 > d0;
     }
     return false;

@@ -16,11 +16,7 @@ public interface OverrideBlockShapeAccess extends BlockShapeAccess {
 
  void invalidateOverride(int posX, int posY, int posZ);
 
- void purgeOverrides();
-
- @Deprecated
  Map<Location, BlockShape> locatedReplacements();
 
- @Deprecated
  Map<Long, BlockShape> indexedReplacements();
 }

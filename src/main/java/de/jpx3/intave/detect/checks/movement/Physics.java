@@ -7,7 +7,7 @@ import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.detect.CheckStatistics;
 import de.jpx3.intave.detect.CheckViolationLevelDecrementer;
 import de.jpx3.intave.detect.IntaveCheck;
-import de.jpx3.intave.detect.checks.movement.physics.LegacyWaterPhysics;
+import de.jpx3.intave.detect.checks.movement.physics.LegacyWaterflow;
 import de.jpx3.intave.detect.checks.movement.physics.MotionVector;
 import de.jpx3.intave.detect.checks.movement.physics.Pose;
 import de.jpx3.intave.detect.checks.movement.physics.SimulationProcessor;
@@ -30,6 +30,7 @@ import de.jpx3.intave.world.collider.Collider;
 import de.jpx3.intave.world.collider.result.ComplexColliderSimulationResult;
 import de.jpx3.intave.world.collider.result.QuickColliderSimulationResult;
 import de.jpx3.intave.world.collision.Collision;
+import de.jpx3.intave.world.collision.access.OCBlockShapeAccess;
 import de.jpx3.intave.world.waterflow.Waterflow;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -269,7 +270,7 @@ public final class Physics extends IntaveCheck {
       WrappedAxisAlignedBB checkableBoundingBox = entityBoundingBox
         .expand(0.0D, -0.4000000059604645D, 0.0D)
         .contract(0.001D, 0.001D, 0.001D);
-      movementData.inWater = LegacyWaterPhysics.handleMaterialAcceleration(user, checkableBoundingBox);
+      movementData.inWater = LegacyWaterflow.handleMaterialAcceleration(user, checkableBoundingBox);
     }
     if (movementData.inWater) {
       movementData.pastWaterMovement = 0;
@@ -285,6 +286,7 @@ public final class Physics extends IntaveCheck {
     UserMetaMovementData movementData = meta.movementData();
     UserMetaViolationLevelData violationLevelData = meta.violationLevelData();
     UserMetaAbilityData abilityData = meta.abilityData();
+    OCBlockShapeAccess blockShapeAccess = user.blockShapeAccess();
     MotionVector context = expectedMovement.context();
 
     int keyForward = movementData.keyForward;
@@ -386,18 +388,17 @@ public final class Physics extends IntaveCheck {
         double blockPositionY = (boundingBox.minY + boundingBox.maxY) / 2.0;
         double blockPositionZ = (boundingBox.minZ + boundingBox.maxZ) / 2.0;
         Block block = BukkitBlockAccess.blockAccess(player.getWorld(), blockPositionX, blockPositionY, blockPositionZ);
-        boolean currentlyInOverride = user.blockShapeAccess().currentlyInOverride(WrappedMathHelper.floor(blockPositionX), WrappedMathHelper.floor(blockPositionY), WrappedMathHelper.floor(blockPositionZ));
+        boolean currentlyInOverride = blockShapeAccess.currentlyInOverride(WrappedMathHelper.floor(blockPositionX), WrappedMathHelper.floor(blockPositionY), WrappedMathHelper.floor(blockPositionZ));
 
         String message = "moved into " + (currentlyInOverride ? "emulated " : "") + shortenTypeName(block.getType()) + " block";
         boolean multipleBoxes = intersectionBoundingBoxesCurrent.size() > 1;
         String details = (multipleBoxes ? intersectionBoundingBoxesCurrent.size() : "one") + " box" + (multipleBoxes ? "es" : "");
 
-        user.blockShapeAccess().identityInvalidate();
+        blockShapeAccess.identityInvalidate();
 
         Violation violation = Violation.builderFor(Physics.class)
           .withPlayer(player).withMessage(message).withDetails(details)
-          .withVL(0)
-          .build();
+          .withVL(0).build();
         plugin.violationProcessor().processViolation(violation);
 
         Vector emulationMotion = new Vector(predictedX, predictedY, predictedZ);
@@ -421,7 +422,7 @@ public final class Physics extends IntaveCheck {
 
         if (!startBoundingBoxInList) {
           movementData.invalidMovement = true;
-          user.blockShapeAccess().identityInvalidate();
+          blockShapeAccess.identityInvalidate();
 
           WrappedAxisAlignedBB boundingBox = intersectionBoundingBoxesCurrent.get(0);
           double blockPositionX = (boundingBox.minX + boundingBox.maxX) / 2.0;
@@ -458,7 +459,7 @@ public final class Physics extends IntaveCheck {
       violationLevelIncrease = Math.max(1, violationLevelIncrease);
       violationLevelData.physicsVL = MathHelper.minmax(0, violationLevelData.physicsVL + violationLevelIncrease, 200);
       violationLevelData.physicsInvalidMovementsInRow++;
-      user.blockShapeAccess().identityInvalidate();
+      blockShapeAccess.identityInvalidate();
       statisticApply(user, CheckStatistics::increaseFails);
     } else {
       violationLevelData.physicsInvalidMovementsInRow = 0;

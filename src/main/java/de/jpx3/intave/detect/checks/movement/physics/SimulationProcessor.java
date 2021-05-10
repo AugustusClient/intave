@@ -40,19 +40,19 @@ public final class SimulationProcessor {
     // Perform biased simulation
     //
     predictedMovement = simulateMovementBiased(user);
-    double movementDistance = calculateMovementDistance(user, predictedMovement.context());
+    double movementDistance = compareReceivedMotionWithMotion(user, predictedMovement.context());
     Timings.CHECK_PHYSICS_PROC_BIA.stop();
     //
     // Perform iterative simulation if biased fails
     //
     if (!forceBiased && movementDistance > VERIFY_DISTANCE) {
       Timings.CHECK_PHYSICS_PROC_ITR.start();
-      IterativeSimulationResult iterativeSimulationResult = simulatePossibleMovement(user);
-      predictedMovement = iterativeSimulationResult.collisionResult();
-      applyIterativeSimulationTo(user, iterativeSimulationResult);
+      IterativeSimulationContext iterativeSimulationContext = simulateMovementIterative(user);
+      predictedMovement = iterativeSimulationContext.collisionResult();
+      applyIterativeSimulationTo(user, iterativeSimulationContext);
       Timings.CHECK_PHYSICS_PROC_ITR.stop();
       // enter iterative keys
-      KeyPressStudy.enterKeyPress(iterativeSimulationResult.forward, iterativeSimulationResult.strafe);
+      KeyPressStudy.enterKeyPress(iterativeSimulationContext.forward, iterativeSimulationContext.strafe);
     } else {
       UserMetaMovementData movementData = user.meta().movementData();
       // enter bias keys
@@ -61,7 +61,7 @@ public final class SimulationProcessor {
     return predictedMovement;
   }
 
-  private void applyIterativeSimulationTo(User user, IterativeSimulationResult iterativeResult) {
+  private void applyIterativeSimulationTo(User user, IterativeSimulationContext iterativeResult) {
     User.UserMeta meta = user.meta();
     UserMetaMovementData movementData = meta.movementData();
     UserMetaInventoryData inventoryData = meta.inventoryData();
@@ -198,14 +198,14 @@ public final class SimulationProcessor {
 
   private final static int[][] SORTED_KEYS = {{1, 0}, {1, -1}, {1, 1}, {0, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 0}, {-1, 1}};
 
-  private IterativeSimulationResult simulatePossibleMovement(User user) {
+  private IterativeSimulationContext simulateMovementIterative(User user) {
     User.UserMeta meta = user.meta();
     UserMetaInventoryData inventoryData = meta.inventoryData();
     UserMetaMovementData movementData = meta.movementData();
     UserMetaClientData clientData = meta.clientData();
     Pose movementPoseType = movementData.movementPoseType();
     PoseSimulator simulator = movementPoseType.simulator();
-    IterativeSimulationResult iterativeSimulation = movementData.iterativeSimulation();
+    IterativeSimulationContext iterativeSimulation = movementData.iterativeSimulation();
     iterativeSimulation.restore();
     boolean inLava = movementData.inLava();
     boolean inWater = movementData.inWater;
@@ -291,7 +291,7 @@ public final class SimulationProcessor {
     return key;
   }
 
-  private double calculateMovementDistance(User user, MotionVector context) {
+  private double compareReceivedMotionWithMotion(User user, MotionVector context) {
     UserMetaMovementData movementData = user.meta().movementData();
     return MathHelper.resolveDistance(
       context.motionX, context.motionY, context.motionZ,
@@ -303,7 +303,7 @@ public final class SimulationProcessor {
     User user,
     UserMetaMovementData movementData,
     UserMetaInventoryData inventoryData,
-    IterativeSimulationResult result,
+    IterativeSimulationContext result,
     PoseSimulator simulator,
     int keyForward,
     int keyStrafe,
@@ -320,14 +320,14 @@ public final class SimulationProcessor {
       user, motionVector, moveForward, moveStrafe,
       attackReduce, jumped, handActive
     );
-    MotionVector collisionContext = collisionResult.context();
-    double distance = calculateMovementDistance(user, collisionContext);
+    MotionVector predictedMotion = collisionResult.context();
+    double distance = compareReceivedMotionWithMotion(user, predictedMotion);
     if (forceApply || inventoryData.handActive() == handActive || distance < 0.001) {
       result.tryAppendToState(collisionResult, distance, keyForward, keyStrafe, attackReduce, jumped, handActive);
     }
   }
 
-  public static final class IterativeSimulationResult {
+  public static final class IterativeSimulationContext {
     private final static int DEFAULT_DISTANCE = Integer.MAX_VALUE;
 
     private ComplexColliderSimulationResult collisionResult;
@@ -337,7 +337,7 @@ public final class SimulationProcessor {
     private double smallestDistance;
     private boolean handActive;
 
-    public IterativeSimulationResult() {
+    public IterativeSimulationContext() {
       this.smallestDistance = DEFAULT_DISTANCE;
     }
 

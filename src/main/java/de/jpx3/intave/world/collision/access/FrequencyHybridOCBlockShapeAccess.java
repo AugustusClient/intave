@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static de.jpx3.intave.IntaveControl.DISABLE_BLOCK_CACHING_ENTIRELY;
 
-public final class FastDoubleIndexOCBlockShapeAccess implements OCBlockShapeAccess {
+public final class FrequencyHybridOCBlockShapeAccess implements OCBlockShapeAccess {
   private final static int FREQUENCY_OVERFLOW = 2;
 
   private final Player player;
@@ -38,7 +38,7 @@ public final class FastDoubleIndexOCBlockShapeAccess implements OCBlockShapeAcce
   private int chunkZPos;
   private int chunkZ;
 
-  public FastDoubleIndexOCBlockShapeAccess(Player player, BoundingBoxResolvePipelineElement resolver) {
+  public FrequencyHybridOCBlockShapeAccess(Player player, BoundingBoxResolvePipelineElement resolver) {
     this.player = player;
     this.resolver = resolver;
   }
@@ -46,7 +46,7 @@ public final class FastDoubleIndexOCBlockShapeAccess implements OCBlockShapeAcce
   @Override
   public List<WrappedAxisAlignedBB> resolveBoxes(int chunkX, int chunkZ, int posX, int posY, int posZ) {
     if (posY < 0 || 255 < posY) {
-      posY = 256;
+      return Collections.emptyList();
     }
 
     BoundingBoxAccessFlowStudy.requests++;
@@ -109,7 +109,7 @@ public final class FastDoubleIndexOCBlockShapeAccess implements OCBlockShapeAcce
   @Override
   public Material resolveType(int chunkX, int chunkZ, int posX, int posY, int posZ) {
     if (posY < 0 || 255 < posY) {
-      posY = 256;
+      return Material.AIR;
     }
 
     BoundingBoxAccessFlowStudy.requests++;
@@ -172,7 +172,7 @@ public final class FastDoubleIndexOCBlockShapeAccess implements OCBlockShapeAcce
   @Override
   public int resolveData(int chunkX, int chunkZ, int posX, int posY, int posZ) {
     if (posY < 0 || 255 < posY) {
-      posY = 256;
+      return 0;
     }
 
     BoundingBoxAccessFlowStudy.requests++;
@@ -326,7 +326,6 @@ public final class FastDoubleIndexOCBlockShapeAccess implements OCBlockShapeAcce
     indexedReplacements.remove(key);
   }
 
-  @Override
   public void purgeOverrides() {
     if(indexedReplacements.isEmpty()) {
       return;
@@ -336,11 +335,13 @@ public final class FastDoubleIndexOCBlockShapeAccess implements OCBlockShapeAcce
   }
 
   @Override
+  @Deprecated
   public Map<Location, BlockShape> locatedReplacements() {
     return locatedReplacements;
   }
 
   @Override
+  @Deprecated
   public Map<Long, BlockShape> indexedReplacements() {
     return indexedReplacements;
   }

@@ -18,7 +18,9 @@ import de.jpx3.intave.tools.placeholder.PlayerContext;
 import de.jpx3.intave.tools.sync.Synchronizer;
 import de.jpx3.intave.world.collider.Collider;
 import de.jpx3.intave.world.collider.processor.ComplexColliderProcessor;
-import de.jpx3.intave.world.collision.access.FastDoubleIndexOCBlockShapeAccess;
+import de.jpx3.intave.world.collision.access.BlankUserBlockShapeAccess;
+import de.jpx3.intave.world.collision.access.GlobalStaticOCBlockShapeAccess;
+import de.jpx3.intave.world.collision.access.MultiChunkKeyOCBlockShapeAccess;
 import de.jpx3.intave.world.collision.access.OCBlockShapeAccess;
 import de.jpx3.intave.world.collision.resolver.BoundingBoxResolverFactory;
 import org.bukkit.entity.Player;
@@ -33,15 +35,17 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class User {
   private final Map<Class<? extends UserCustomCheckMeta>, UserCustomCheckMeta> customMetaPool = new ConcurrentHashMap<>();
 
+  public static boolean USE_GLOBAL_STATIC_BLOCK_SHAPE_ACCESS = true;
+
   private final WeakReference<Player> playerRef;
   private final WeakReference<Object> nmsEntity;
   private final UserMeta userMeta;
   private final BukkitPermissionCache permissionCache;
-  private final OCBlockShapeAccess blockShapeAccess;
   private final ComplexColliderProcessor colliderProcessor;
   private final boolean hasPlayer;
   private final List<UserMessageChannel> receivingUserChannels = new ArrayList<>();
   private final Map<UserMessageChannel, UserMessageChannelPlayerConstraint> receiveWhitelist = Maps.newEnumMap(UserMessageChannel.class);
+  private OCBlockShapeAccess blockShapeAccess;
   private boolean ignoreNextPacket;
   private boolean ignoreNextOutboundPacket;
   private boolean hasShadow;
@@ -59,7 +63,13 @@ public final class User {
     this.userMeta = new UserMeta(player, this);
     this.userMeta.setup();
     this.permissionCache = new BukkitPermissionCache();
-    this.blockShapeAccess = new FastDoubleIndexOCBlockShapeAccess(player, BoundingBoxResolverFactory.resolver());
+    if(!hasPlayer) {
+      useBlankBlockShapeAccess();
+    } else if(USE_GLOBAL_STATIC_BLOCK_SHAPE_ACCESS) {
+      useGlobalStaticBlockShapeAccess();
+    } else {
+      useMultiChunkBlockShapeAccess();
+    }
     this.colliderProcessor = Collider.suitableComplexColliderProcessorFor(this);
     if(hasPlayer) {
       Synchronizer.synchronize(this::setDefaultMessagingChannel);
@@ -153,6 +163,25 @@ public final class User {
 
   public void setShadowRepo(ShadowPacketDataLink shadowRepo) {
     this.shadowRepo = shadowRepo;
+  }
+
+  public void useBlankBlockShapeAccess() {
+    setBlockShapeAccess(new BlankUserBlockShapeAccess());
+  }
+
+  public void useGlobalStaticBlockShapeAccess() {
+    setBlockShapeAccess(new GlobalStaticOCBlockShapeAccess(player(), BoundingBoxResolverFactory.resolver()));
+  }
+
+  public void useMultiChunkBlockShapeAccess() {
+    setBlockShapeAccess(new MultiChunkKeyOCBlockShapeAccess(player(), BoundingBoxResolverFactory.resolver()));
+  }
+
+  public void setBlockShapeAccess(OCBlockShapeAccess newBlockShapeAccess) {
+    if(blockShapeAccess != null) {
+      newBlockShapeAccess.applyFrom(blockShapeAccess);
+    }
+    blockShapeAccess = newBlockShapeAccess;
   }
 
   public OCBlockShapeAccess blockShapeAccess() {

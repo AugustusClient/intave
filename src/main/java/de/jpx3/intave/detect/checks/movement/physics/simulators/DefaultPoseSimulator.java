@@ -1,6 +1,6 @@
 package de.jpx3.intave.detect.checks.movement.physics.simulators;
 
-import de.jpx3.intave.detect.checks.movement.physics.LegacyWaterPhysics;
+import de.jpx3.intave.detect.checks.movement.physics.LegacyWaterflow;
 import de.jpx3.intave.detect.checks.movement.physics.MotionVector;
 import de.jpx3.intave.tools.client.EffectLogic;
 import de.jpx3.intave.tools.client.MaterialLogic;
@@ -72,7 +72,7 @@ public class DefaultPoseSimulator extends PoseSimulator {
           user, user.player().getWorld(),
           movementData.lastPositionX, movementData.lastPositionY, movementData.lastPositionZ
         );
-        float heightPercentage = LegacyWaterPhysics.resolveLiquidHeightPercentage(blockData);
+        float heightPercentage = LegacyWaterflow.resolveLiquidHeightPercentage(blockData);
         if (movementData.onGround) {
           heightPercentage += movementData.positionY % 1;
           allowJumpInWater = !MaterialLogic.isWater(material) || heightPercentage > 0.5;
