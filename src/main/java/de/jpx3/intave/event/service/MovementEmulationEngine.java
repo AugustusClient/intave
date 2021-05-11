@@ -58,7 +58,12 @@ public final class MovementEmulationEngine {
     }
   }
 
-  public void emulationSetBack(Player player, Vector motion, int ticks) {
+  public void emulationSetBack(
+    Player player,
+    Vector motion,
+    int ticks,
+    boolean cancellable
+  ) {
     User user = UserRepository.userOf(player);
     User.UserMeta meta = user.meta();
     UserMetaMovementData movementData = meta.movementData();
@@ -79,7 +84,7 @@ public final class MovementEmulationEngine {
       player.sendMessage("[E+] " + motion + " (" + ticks + " ticks)");
     }
 
-    proceedEmulationTick(player, motion, ticks, ticks);
+    proceedEmulationTick(player, motion, ticks, ticks, cancellable);
   }
 
   public void emulationPushOutOfBlock(
@@ -139,10 +144,16 @@ public final class MovementEmulationEngine {
     }
   }
 
-  private void proceedEmulationTick(Player player, Vector motion, int ticks, int startingTicks) {
+  private void proceedEmulationTick(
+    Player player,
+    Vector motion,
+    int ticks,
+    int startingTicks,
+    boolean cancellable
+  ) {
     if (!Bukkit.isPrimaryThread()) {
       Vector finalMotion1 = motion;
-      Synchronizer.synchronizeDelayed(() -> proceedEmulationTick(player, finalMotion1, ticks, startingTicks), 0);
+      Synchronizer.synchronizeDelayed(() -> proceedEmulationTick(player, finalMotion1, ticks, startingTicks, cancellable), 0);
       return;
     }
 
@@ -177,7 +188,7 @@ public final class MovementEmulationEngine {
     futurePosition.setYaw(movementData.rotationYaw);
     futurePosition.setPitch(movementData.rotationPitch);
 
-    if ((Math.abs(motion.getX()) < 0.01 && Math.abs(motion.getZ()) < 0.01 && motion.getY() == 0.0 && ticks <= 3) || ticks <= 0) {
+    if ((Math.abs(motion.getX()) < 0.01 && Math.abs(motion.getZ()) < 0.01 && motion.getY() == 0.0 && cancellable) || ticks <= 0) {
       // velocity
 
       // fixes stuck in block below, please remove and fix me differently
@@ -223,7 +234,7 @@ public final class MovementEmulationEngine {
       //   s += " @" + movementData.entityBoundingBox();
 
       Vector finalMotion = motion;
-      Synchronizer.synchronizeDelayed(() -> proceedEmulationTick(player, finalMotion, ticks - 1, startingTicks), 1);
+      Synchronizer.synchronizeDelayed(() -> proceedEmulationTick(player, finalMotion, ticks - 1, startingTicks, cancellable), 1);
 
       // velocity
       Vector futureMotion = motionProceed(motion, user, boundingBox, true);
