@@ -210,7 +210,7 @@ public final class MovementDispatcher implements EventProcessor {
     if (distance > 50) {
       event.setCancelled(true);
       Vector vector = new Vector(movementData.physicsMotionX, movementData.physicsMotionY, movementData.physicsMotionZ);
-      plugin.eventService().emulationEngine().emulationSetBack(player, vector, 10);
+      plugin.eventService().emulationEngine().emulationSetBack(player, vector, 10, false);
       String message = "sent unsafe position";
       String details = "moved " + MathHelper.formatDouble(distance, 2) + " blocks";
       Violation violation = Violation.builderFor(Physics.class)

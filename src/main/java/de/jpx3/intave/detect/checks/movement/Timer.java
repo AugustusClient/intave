@@ -148,7 +148,7 @@ public final class Timer extends IntaveMetaCheck<Timer.TimerData> {
       if (violationContext.shouldCounterThreat()) {
         UserMetaMovementData movementData = user.meta().movementData();
         movementData.invalidMovement = true;
-        plugin.eventService().emulationEngine().emulationSetBack(player, new Vector(movementData.physicsMotionX, movementData.physicsMotionY, movementData.physicsMotionZ), 12);
+        plugin.eventService().emulationEngine().emulationSetBack(player, new Vector(movementData.physicsMotionX, movementData.physicsMotionY, movementData.physicsMotionZ), 12, false);
       }
       timerData.lastTimerFlag = AccessHelper.now();
       // leniency
@@ -212,7 +212,7 @@ public final class Timer extends IntaveMetaCheck<Timer.TimerData> {
     if (timerData.flagTick) {
       ComplexColliderSimulationResult result = this.simulationProcessor.simulateMovementWithoutKeyPress(user);
       Vector bukkitVector = result.context().toBukkitVector();
-      plugin.eventService().emulationEngine().emulationSetBack(player, bukkitVector, 6);
+      plugin.eventService().emulationEngine().emulationSetBack(player, bukkitVector, 6, false);
       movementData.invalidMovement = true;
     }
   }

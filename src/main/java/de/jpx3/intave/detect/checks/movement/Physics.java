@@ -402,7 +402,7 @@ public final class Physics extends IntaveCheck {
         plugin.violationProcessor().processViolation(violation);
 
         Vector emulationMotion = new Vector(predictedX, predictedY, predictedZ);
-        plugin.eventService().emulationEngine().emulationSetBack(player, emulationMotion, 2);
+        plugin.eventService().emulationEngine().emulationSetBack(player, emulationMotion, 2, true);
       } else {
         // Phase Check
         if (!movementData.currentlyInBlock) {
@@ -492,7 +492,7 @@ public final class Physics extends IntaveCheck {
         } else {
           setbackTicks = violationLevelData.physicsVL > 50 ? 3 : 2;
         }
-        plugin.eventService().emulationEngine().emulationSetBack(player, emulationMotion, setbackTicks);
+        plugin.eventService().emulationEngine().emulationSetBack(player, emulationMotion, setbackTicks, true);
         movementData.invalidMovement = true;
       }
     }
