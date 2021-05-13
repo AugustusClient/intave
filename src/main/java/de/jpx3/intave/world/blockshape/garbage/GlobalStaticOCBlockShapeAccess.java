@@ -137,7 +137,7 @@ public final class GlobalStaticOCBlockShapeAccess implements OCBlockShapeAccess 
     if(type == Material.AIR) {
       return EMPTY_CACHE_ENTRY;
     } else {
-      BoundingBoxAccessFlowStudy.increaseLookups();
+      BoundingBoxAccessFlowStudy.incremLookups();
       int data = BlockDataAccess.dataIndexOf(block);
       List<WrappedAxisAlignedBB> boundingBoxes = resolver.customResolve(world, player, type, data, posX, posY, posZ);
       return new BlockShape(boundingBoxes, type, data);
@@ -207,7 +207,7 @@ public final class GlobalStaticOCBlockShapeAccess implements OCBlockShapeAccess 
 
   @Override
   public List<WrappedAxisAlignedBB> constructBlock(World world, int posX, int posY, int posZ, Material type, int blockState) {
-    BoundingBoxAccessFlowStudy.increaseLookups();
+    BoundingBoxAccessFlowStudy.incremLookups();
     return resolver.customResolve(world, player, type, blockState, posX, posY, posZ);
   }
 

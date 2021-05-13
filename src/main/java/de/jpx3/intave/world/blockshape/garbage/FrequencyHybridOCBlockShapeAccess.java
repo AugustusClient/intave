@@ -237,7 +237,7 @@ public final class FrequencyHybridOCBlockShapeAccess implements OCBlockShapeAcce
     if(type == Material.AIR) {
       return EMPTY_CACHE_ENTRY;
     } else {
-      BoundingBoxAccessFlowStudy.increaseLookups();
+      BoundingBoxAccessFlowStudy.incremLookups();
       int data = BlockDataAccess.dataIndexOf(block);
       List<WrappedAxisAlignedBB> boundingBoxes = resolver.customResolve(world, player, type, data, posX, posY, posZ);
       return new BlockShape(boundingBoxes, type, data);

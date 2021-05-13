@@ -121,7 +121,7 @@ public final class EventService implements BukkitEventSubscriber {
     return emulationEngine;
   }
 
-  public TransactionFeedbackService transactionFeedbackService() {
+  public TransactionFeedbackService feedback() {
     return transactionFeedbackService;
   }
 

@@ -19,27 +19,27 @@ public final class BoundingBoxAccessFlowStudy {
   //   red = cache denied, manual lookup
   public static int green, yellow, red;
 
-  public static void increaseRequests() {
+  public static void incremRequests() {
     requests++;
   }
 
-  public static void increaseLookups() {
+  public static void incremLookups() {
     lookups++;
   }
 
-  public static void increaseDynamic() {
+  public static void incremDynamic() {
     dynamic++;
   }
 
-  public static void increaseGreenLookups() {
+  public static void incremGreenLookups() {
     green++;
   }
 
-  public static void increaseYellowLookups() {
+  public static void incremYellowLookups() {
     yellow++;
   }
 
-  public static void increaseRedLookups() {
+  public static void incremRedLookups() {
     red++;
   }
 

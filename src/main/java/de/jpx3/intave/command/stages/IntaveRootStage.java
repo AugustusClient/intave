@@ -237,8 +237,7 @@ public final class IntaveRootStage extends CommandStage {
     player.sendMessage(ChatColor.RED + "Loading bounding box access flow study..");
 
     String colorScheme = ChatColor.GREEN + "" + green + " " + ChatColor.YELLOW + yellow + " " + ChatColor.RED + red + "" + ChatColor.GRAY;
-    player.sendMessage(ChatColor.GRAY + "" + requests + " requests required " + lookups + " lookups ("+colorScheme+"), " + ChatColor.AQUA + (yellow - dynamic) + ChatColor.GRAY + " by server");
-
+    player.sendMessage(ChatColor.GRAY + "" + requests + " requests required " + lookups + " lookups ("+colorScheme+"), " + ChatColor.AQUA + ((lookups) - dynamic) + ChatColor.GRAY + " by server");
   }
 
   @SubCommand(
