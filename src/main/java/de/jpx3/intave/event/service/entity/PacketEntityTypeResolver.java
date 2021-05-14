@@ -63,18 +63,17 @@ public final class PacketEntityTypeResolver {
     int entityId = packet.getIntegers().read(0);
     Entity entity = ClientSideEntityService.serverEntityByIdentifier(event.getPlayer(), entityId);
 
-    if(entity != null) {
+    if (entity != null) {
       return entityTypeDataOfBukkitEntity(entity);
     } else {
       int deadEntityType = packet.getIntegers().read(9);
       String name = nameByDeadEntityType(deadEntityType);
       HitBoxBoundaries boundaries = hitboxBoundariesByDeadEntityType(deadEntityType);
-      EntityTypeData entityTypeData = new EntityTypeData(name, boundaries);
+      EntityTypeData entityTypeData = new EntityTypeData(name, boundaries, -1);
 
       return entityTypeData;
     }
   }
-
 
   public EntityTypeData entityTypeDataOfLivingEntity(PacketEvent event) {
     PacketContainer packet = event.getPacket();
@@ -82,86 +81,78 @@ public final class PacketEntityTypeResolver {
     int entityId = packet.getIntegers().read(0);
     Entity entity = ClientSideEntityService.serverEntityByIdentifier(event.getPlayer(), entityId);
 
-    if(entity != null) {
+    if (entity != null) {
       return entityTypeDataOfBukkitEntity(entity);
     } else {
-      if(DATA_WATCHER_ACCESS_UNDER_1_15) {
+      if (DATA_WATCHER_ACCESS_UNDER_1_15) {
         WrappedDataWatcher dataWatcher = packet.getDataWatcherModifier().read(0);
         // Guckt ob das Packet ein Datawatcher hat
         if (dataWatcher != null) {
           return entityTypeDataOfDataWatcher(dataWatcher);
         } else {
-          int entityTypeID = packet.getIntegers().read(1);
-          return entityTypeDataOfEntityType(entityTypeID);
+          int entityTypeId = packet.getIntegers().read(1);
+          return entityTypeDataOfEntityType(entityTypeId);
         }
       } else {
-        return typeAccess(packet);
+        int entityTypeId = packet.getIntegers().read(1);
+        return DualEntityTypeAccess.resolveFromId(entityTypeId);
       }
     }
   }
 
-  public EntityTypeData entityTypeDataOfEntityMetaData(PacketEvent event, boolean isChild) {
+  public EntityTypeData entityTypeDataOfEntityMetaData(PacketEvent event, boolean isChild, int entityTypeId) {
     PacketContainer packet = event.getPacket();
     int entityId = packet.getIntegers().read(0);
     Entity entity = ClientSideEntityService.serverEntityByIdentifier(event.getPlayer(), entityId);
 
-    if(entity != null) {
+    if (entity != null) {
       return entityTypeDataOfBukkitEntity(entity);
     } else {
-      return null;
-      //TODO: aus dem Datawatcher auslesen welches entityType das entity hat und dann die boundingbox dadurch bekommen
-//      EntityTypeData entityTypeData = typeAccess(packet);
-//
-//      if(isChild) {
-//      return convertHitboxBoundariesToBaby(entityTypeData);
-//      } else {
-//      return entityTypeData;
-//      }
+      EntityTypeData entityTypeData = entityTypeDataOfEntityType(entityTypeId);
+
+      if (isChild) {
+        return convertHitboxBoundariesToBaby(entityTypeData);
+      } else {
+        return entityTypeData;
+      }
     }
   }
 
   private EntityTypeData convertHitboxBoundariesToBaby(EntityTypeData entityTypeData) {
     HitBoxBoundaries hitBoxBoundaries = HitBoxBoundaries.of(entityTypeData.hitBoxBoundaries().width() * 0.5f, entityTypeData.hitBoxBoundaries().length() * 0.5f);
-    return new EntityTypeData(entityTypeData.entityName(),hitBoxBoundaries);
+    return new EntityTypeData(entityTypeData.entityName(), hitBoxBoundaries, entityTypeData.entityTypeId());
   }
 
   public HitBoxBoundaries hitBoxBoundariesByBukkitEntity(Entity bukkitEntity) {
     return bukkitEntity.isDead() ? HitBoxBoundaries.zero() : ReflectiveEntityHitBoxAccess.boundariesOf(bukkitEntity);
   }
+
   public String entityNameByBukkitEntity(Entity entity) {
     return entityNameOf(ReflectiveHandleAccess.handleOf(entity));
   }
 
-  //
-  // Type Access
-  //
-
-  private EntityTypeData typeAccess(PacketContainer packet) {
-    Integer type = packet.getIntegers().read(1);
-    return DualEntityTypeAccess.resolveFromId(type);
-  }
-
-  //
-  // DataWatcher Access
-  //
-
   public EntityTypeData entityTypeDataOfBukkitEntity(Entity entity) {
     HitBoxBoundaries hitBoxBoundaries = hitBoxBoundariesByBukkitEntity(entity);
     String name = entityNameByBukkitEntity(entity);
-    return new EntityTypeData(name, hitBoxBoundaries);
+    return new EntityTypeData(name, hitBoxBoundaries, entity.getType().getTypeId());
   }
 
-  public EntityTypeData entityTypeDataOfEntityType(int entityTypeID) {
-    HitBoxBoundaries hitBoxBoundaries = DualEntityTypeAccess.boundariesFromId(entityTypeID);
-    String name = DualEntityTypeAccess.nameFromID(entityTypeID);
-    return new EntityTypeData(name, hitBoxBoundaries);
+  public EntityTypeData entityTypeDataOfEntityType(int entityTypeId) {
+    HitBoxBoundaries hitBoxBoundaries = DualEntityTypeAccess.boundariesFromId(entityTypeId);
+    String name = DualEntityTypeAccess.nameFromID(entityTypeId);
+    return new EntityTypeData(name, hitBoxBoundaries, entityTypeId);
   }
 
   private EntityTypeData entityTypeDataOfDataWatcher(WrappedDataWatcher dataWatcher) {
     Object entity = entityOfDataWatcher(dataWatcher);
     HitBoxBoundaries hitBoxBoundaries = ReflectiveEntityHitBoxAccess.boundariesOf(entity);
     String name = entityNameOf(entity);
-    return new EntityTypeData(name, hitBoxBoundaries);
+    int entityTypeId = entityTypeIdOfDataWatcher(dataWatcher);
+    return new EntityTypeData(name, hitBoxBoundaries, entityTypeId);
+  }
+
+  private int entityTypeIdOfDataWatcher(WrappedDataWatcher dataWatcher) {
+    return dataWatcher.getEntity().getType().getTypeId();
   }
 
   private String entityNameOf(Object entity) {

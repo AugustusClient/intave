@@ -17,6 +17,10 @@ public final class HitBoxBoundaries {
     return new HitBoxBoundaries(0, 0);
   }
 
+  public static HitBoxBoundaries player() {
+    return new HitBoxBoundaries(0.6f, 1.8f);
+  }
+
   public float width() {
     return width;
   }

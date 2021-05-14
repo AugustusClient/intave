@@ -27,8 +27,8 @@ public final class DualEntityTypeAccess {
     }
   }
 
-  public static EntityTypeData resolveFromId(Integer type) {
-    return new EntityTypeData(nameFromID(type), boundariesFromId(type));
+  public static EntityTypeData resolveFromId(int entityTypeId) {
+    return new EntityTypeData(nameFromID(entityTypeId), boundariesFromId(entityTypeId), entityTypeId);
   }
 
   public static HitBoxBoundaries boundariesFromId(int id) {

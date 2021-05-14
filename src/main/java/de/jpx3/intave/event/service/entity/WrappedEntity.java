@@ -4,7 +4,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import de.jpx3.intave.access.IntaveInternalException;
 import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.adapter.ProtocolLibraryAdapter;
-import de.jpx3.intave.reflect.hitbox.HitBoxBoundaries;
+import de.jpx3.intave.reflect.hitbox.typeaccess.EntityTypeData;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 
@@ -14,11 +14,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class WrappedEntity implements Cloneable {
   private final static boolean NEW_POSITION_PROCESSING_1_9 = ProtocolLibraryAdapter.serverVersion().isAtLeast(MinecraftVersions.VER1_9_0);
   private final static boolean NEW_POSITION_PROCESSING_1_14 = ProtocolLibraryAdapter.serverVersion().isAtLeast(MinecraftVersions.VER1_14_0);
-  private final String entityName;
-  private final int entityId;
+  public EntityTypeData entityTypeData;
 
+  private final int entityId;
   final public boolean isEntityLiving;
-  public HitBoxBoundaries hitBoxBoundaries;
 
   /**
    * Indicates if the entity position is synchronized with the client
@@ -49,15 +48,13 @@ public class WrappedEntity implements Cloneable {
   private boolean isClone;
 
   public WrappedEntity(
-    String entityName,
     int entityId,
-    boolean isEntityLiving,
-    HitBoxBoundaries hitBoxBoundaries
+    EntityTypeData entityTypeData,
+    boolean isEntityLiving
   ) {
-    this.entityName = entityName;
     this.entityId = entityId;
+    this.entityTypeData = entityTypeData;
     this.isEntityLiving = isEntityLiving;
-    this.hitBoxBoundaries = hitBoxBoundaries;
 
     this.position = new EntityPositionContext();
     this.lastPosition = new EntityPositionContext();
@@ -298,7 +295,7 @@ public class WrappedEntity implements Cloneable {
    * Returns the type name of this entity.
    */
   public String entityName() {
-    return entityName;
+    return entityTypeData.entityName();
   }
 
   public int entityId() {
@@ -319,7 +316,7 @@ public class WrappedEntity implements Cloneable {
 
   @Override
   public WrappedEntity clone()  {
-    WrappedEntity clone = new WrappedEntity(entityName, entityId, isEntityLiving, hitBoxBoundaries);
+    WrappedEntity clone = new WrappedEntity(entityId, entityTypeData, isEntityLiving);
     clone.isClone = true;
     clone.position = position.clone();
     clone.alternativePosition = alternativePosition.clone();
@@ -333,8 +330,8 @@ public class WrappedEntity implements Cloneable {
     double y = position.posY;
     double z = position.posZ;
 
-    double halfWidth = entity.hitBoxBoundaries.width() / 2.0;
-    double length = entity.hitBoxBoundaries.length();
+    double halfWidth = entity.entityTypeData.hitBoxBoundaries().width() / 2.0;
+    double length = entity.entityTypeData.hitBoxBoundaries().length();
     return new WrappedAxisAlignedBB(
       x - halfWidth, y, z - halfWidth,
       x + halfWidth, y + length, z + halfWidth

@@ -105,34 +105,32 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
     UserMetaAttackData attackData = user.meta().attackData();
     PacketType packetType = event.getPacketType();
     PacketContainer packet = event.getPacket();
-    String entityName;
-    HitBoxBoundaries hitBoxBoundaries;
+    EntityTypeData entityTypeData;
     boolean livingEntity;
+    Integer entityId = packet.getIntegers().read(0);
     if (packetType == PacketType.Play.Server.SPAWN_ENTITY) {
       // dead entities
-      EntityTypeData entityTypeData = entityTypeResolver.entityTypeDataOfDeadEntity(event);
-      entityName = entityTypeData.entityName();
-      hitBoxBoundaries = entityTypeData.hitBoxBoundaries();
+      entityTypeData = entityTypeResolver.entityTypeDataOfDeadEntity(event);
       livingEntity = false;
     } else if (packetType == PacketType.Play.Server.SPAWN_ENTITY_LIVING) {
       // entities
-      EntityTypeData entityTypeData = entityTypeResolver.entityTypeDataOfLivingEntity(event);
-      entityName = entityTypeData.entityName();
-      hitBoxBoundaries = entityTypeData.hitBoxBoundaries();
+      entityTypeData = entityTypeResolver.entityTypeDataOfLivingEntity(event);
       livingEntity = true;
     } else {
       // player
-      Integer entityID = packet.getIntegers().read(0);
       FakePlayer fakePlayer = attackData.fakePlayer();
-      if (fakePlayer != null && fakePlayer.fakePlayerEntityId() == entityID) {
+      String entityName;
+      if (fakePlayer != null && fakePlayer.fakePlayerEntityId() == entityId) {
         entityName = "Intave-Bot";
       } else {
         entityName = "Player";
       }
-      hitBoxBoundaries = HitBoxBoundaries.of(0.6f, 1.8f);
+
+      HitBoxBoundaries hitBoxBoundaries = HitBoxBoundaries.player();
       livingEntity = true;
+      entityTypeData = new EntityTypeData(entityName, hitBoxBoundaries, -1);
     }
-    processPacketSpawnMob(user, event.getPacketType(), entityName, packet, livingEntity, hitBoxBoundaries);
+    processPacketSpawnMob(user, event.getPacketType(), entityTypeData, packet, livingEntity, entityId);
   }
 
   @PacketSubscription(
@@ -207,10 +205,10 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
     if (entity == null) {
       entity = entityByIdentifier(user, entityId);
     }
-    if(entity == null) {
+    if (entity == null) {
       entity = createEntityByMovePacket(event);
     }
-    if(entity == null) {
+    if (entity == null) {
 //        IntaveLogger.logger().info("Failed to reference entity (id " + entityId + ")");
 //        throw new NullPointerException("entity could not be created");
     }
@@ -249,11 +247,10 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
   }
 
   private WrappedEntity spawnMobByBukkitEntity(User user, Entity bukkitEntity) {
-    String entityName = entityTypeResolver.entityNameByBukkitEntity(bukkitEntity);
     Location location = bukkitEntity.getLocation();
     boolean isEntityLiving = !bukkitEntity.isDead();
-    HitBoxBoundaries boundaries = entityTypeResolver.hitBoxBoundariesByBukkitEntity(bukkitEntity);
     int entityID = bukkitEntity.getEntityId();
+
     long serverPosX;
     long serverPosY;
     long serverPosZ;
@@ -267,11 +264,12 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
       serverPosZ = WrappedMathHelper.floor(location.getZ() * 32d);
     }
 
+    EntityTypeData entityTypeData = entityTypeResolver.entityTypeDataOfBukkitEntity(bukkitEntity);
+
     WrappedEntity entity = processEntitySpawn(
       user,
-      entityName, isEntityLiving, entityID,
-      serverPosX, serverPosY, serverPosZ,
-      boundaries
+      isEntityLiving, entityID, entityTypeData,
+      serverPosX, serverPosY, serverPosZ
     );
 
     if (bukkitEntity instanceof LivingEntity) {
@@ -285,20 +283,17 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
   private void processPacketSpawnMob(
     User user,
     PacketType packetType,
-    String entityName, PacketContainer packet,
-    boolean isEntityLiving, HitBoxBoundaries boundaries
+    EntityTypeData entityTypeData, PacketContainer packet,
+    boolean isEntityLiving, int entityId
   ) {
-    Integer entityID = packet.getIntegers().read(0);
-
     if (NEW_POSITION_PROCESSING_1_9) {
       double posX = packet.getDoubles().read(0);
       double posY = packet.getDoubles().read(1);
       double posZ = packet.getDoubles().read(2);
 
       processEntitySpawnNewVersion(
-        user, entityName, isEntityLiving, entityID,
-        posX, posY, posZ,
-        boundaries
+        user, entityTypeData, isEntityLiving, entityId,
+        posX, posY, posZ
       );
     } else {
       // 1.8.x
@@ -319,9 +314,8 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
       }
 
       processEntitySpawn(
-        user, entityName, isEntityLiving, entityID,
-        serverPosX, serverPosY, serverPosZ,
-        boundaries
+        user, isEntityLiving, entityId, entityTypeData,
+        serverPosX, serverPosY, serverPosZ
       );
 
 //      WrappedEntity wrappedEntity = entityByIdentifier(user, entityID);
@@ -331,14 +325,13 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
   }
 
   private void processEntitySpawnNewVersion(
-    User user, String entityName,
+    User user, EntityTypeData entityTypeData,
     boolean isEntityLiving, int entityId,
-    double posX, double posY, double posZ,
-    HitBoxBoundaries boundaries
+    double posX, double posY, double posZ
   ) {
     UserMetaSynchronizeData synchronizeData = user.meta().synchronizeData();
     Map<Integer, WrappedEntity> synchronizedEntityMap = synchronizeData.synchronizedEntityMap();
-    WrappedEntity entity = new WrappedEntity(entityName, entityId, isEntityLiving, boundaries);
+    WrappedEntity entity = new WrappedEntity(entityId, entityTypeData, isEntityLiving);
     entity.serverPosX = WrappedMathHelper.getPositionLong(posX);
     entity.serverPosY = WrappedMathHelper.getPositionLong(posY);
     entity.serverPosZ = WrappedMathHelper.getPositionLong(posZ);
@@ -347,17 +340,16 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
   }
 
   private WrappedEntity processEntitySpawn(
-    User user, String entityName,
-    boolean isEntityLiving, int entityId,
-    long serverPosX, long serverPosY, long serverPosZ,
-    HitBoxBoundaries boundaries
+    User user,
+    boolean isEntityLiving, int entityId, EntityTypeData entityTypeData,
+    long serverPosX, long serverPosY, long serverPosZ
   ) {
     UserMetaSynchronizeData synchronizeData = user.meta().synchronizeData();
     Map<Integer, WrappedEntity> synchronizedEntityMap = synchronizeData.synchronizedEntityMap();
     double posX = serverPosX / 32d;
     double posY = serverPosY / 32d;
     double posZ = serverPosZ / 32d;
-    WrappedEntity entity = new WrappedEntity(entityName, entityId, isEntityLiving, boundaries);
+    WrappedEntity entity = new WrappedEntity(entityId, entityTypeData, isEntityLiving);
     entity.serverPosX = serverPosX;
     entity.serverPosY = serverPosY;
     entity.serverPosZ = serverPosZ;
@@ -425,8 +417,8 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
     if (age != null) {
       boolean isChild = age < 0;
 
-      EntityTypeData entityTypeData = entityTypeResolver.entityTypeDataOfEntityMetaData(event, isChild);
-      entity.hitBoxBoundaries = entityTypeData.hitBoxBoundaries();
+      EntityTypeData entityTypeData = entityTypeResolver.entityTypeDataOfEntityMetaData(event, isChild, entity.entityTypeData.entityTypeId());
+      entity.entityTypeData = entityTypeData;
     }
 
     Float health = readHealthOf(watchableObjects);
