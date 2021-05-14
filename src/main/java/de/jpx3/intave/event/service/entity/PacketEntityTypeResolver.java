@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 
 public final class PacketEntityTypeResolver {
   private static final boolean DATA_WATCHER_ACCESS_UNDER_1_15 = !MinecraftVersions.VER1_15_0.atOrAbove();
+  private static final boolean ENTITY_TYPE_ACCESS_1_14 = !MinecraftVersions.VER1_14_0.atOrAbove();
   private String dataWatcherEntityFieldName;
 
   public PacketEntityTypeResolver(IntavePlugin plugin) {
@@ -66,12 +67,14 @@ public final class PacketEntityTypeResolver {
     if (entity != null) {
       return entityTypeDataOfBukkitEntity(entity);
     } else {
-      int deadEntityType = packet.getIntegers().read(9);
-      String name = nameByDeadEntityType(deadEntityType);
-      HitBoxBoundaries boundaries = hitboxBoundariesByDeadEntityType(deadEntityType);
-      EntityTypeData entityTypeData = new EntityTypeData(name, boundaries, -1);
-
-      return entityTypeData;
+      if (ENTITY_TYPE_ACCESS_1_14) {
+        int deadEntityType = packet.getIntegers().read(9);
+        String name = nameByDeadEntityType(deadEntityType);
+        HitBoxBoundaries boundaries = hitboxBoundariesByDeadEntityType(deadEntityType);
+        return new EntityTypeData(name, boundaries, -1);
+      } else {
+        return new EntityTypeData("null", HitBoxBoundaries.zero(), -2);
+      }
     }
   }
 

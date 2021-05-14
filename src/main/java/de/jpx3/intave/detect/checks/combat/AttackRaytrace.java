@@ -136,7 +136,10 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
             }
           } else {
             // wenn entity tot ist
-            invalid = processIterativeReachCheck(player, entity);
+            if(entity.entityTypeData.entityTypeId() != -2) {
+              // entity type id -2 = wenn das entity auf neuen mc versionen nicht erstellt werden konnte
+              invalid = processIterativeReachCheck(player, entity);
+            }
           }
         }
         if (invalid) {

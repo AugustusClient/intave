@@ -33,6 +33,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
   private final static boolean NEW_POSITION_PROCESSING_1_9 = ProtocolLibraryAdapter.serverVersion().isAtLeast(MinecraftVersions.VER1_9_0);
   private final static boolean HEALTH_PROCESSING_1_10 = ProtocolLibraryAdapter.serverVersion().isAtLeast(MinecraftVersions.VER1_10_0);
   private final static boolean HEALTH_PROCESSING_1_14 = ProtocolLibraryAdapter.serverVersion().isAtLeast(MinecraftVersions.VER1_14_0);
+  private final static boolean AGE_PROCESSING_1_15 = ProtocolLibraryAdapter.serverVersion().isAtLeast(MinecraftVersions.VER1_15_0);
 
   public ClientSideEntityService(IntavePlugin plugin) {
     this.plugin = plugin;
@@ -210,7 +211,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
     }
     if (entity == null) {
 //        IntaveLogger.logger().info("Failed to reference entity (id " + entityId + ")");
-//        throw new NullPointerException("entity could not be created");
+        throw new NullPointerException("entity could not be created");
     }
     if (entity.isEntityLiving && entity.tracingEnabled()) {
       WrappedEntity finalEntity = entity;
@@ -233,7 +234,6 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
       entity.handleEntityMovement(event.getPacket());
     }
   }
-
 
   private WrappedEntity createEntityByMovePacket(PacketEvent event) {
     Player player = event.getPlayer();
@@ -413,10 +413,8 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
 
     List<WrappedWatchableObject> watchableObjects = packet.getWatchableCollectionModifier().read(0);
 
-    Integer age = readAgeOf(watchableObjects);
-    if (age != null) {
-      boolean isChild = age < 0;
-
+    Boolean isChild = isChildByWatchableObjects(watchableObjects);
+    if (isChild != null) {
       EntityTypeData entityTypeData = entityTypeResolver.entityTypeDataOfEntityMetaData(event, isChild, entity.entityTypeData.entityTypeId());
       entity.entityTypeData = entityTypeData;
     }
@@ -456,16 +454,51 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
     return null;
   }
 
-  private Integer readAgeOf(List<WrappedWatchableObject> watchableObjects) {
+  private Boolean isChildByWatchableObjects(List<WrappedWatchableObject> watchableObjects) {
     for (WrappedWatchableObject watchableObject : watchableObjects) {
       int index = watchableObject.getIndex();
+      Object object = watchableObject.getRawValue();
+//      Bukkit.broadcastMessage("" + index + " " + object);
 
-      int requiredIndex = 12;
-      if (index == requiredIndex) {
-        Object rawValue = watchableObject.getRawValue();
-        return ((Number) rawValue).intValue();
+      if (NEW_POSITION_PROCESSING_1_9) {
+        if (HEALTH_PROCESSING_1_10) {
+          if(HEALTH_PROCESSING_1_14) {
+            if(AGE_PROCESSING_1_15) {
+              // 1.15+
+              if (index == 15) {
+                Boolean isChild = (Boolean) object;
+                return isChild;
+              }
+            } else {
+              // 1.14+
+              if (index == 14) {
+                Boolean isChild = (Boolean) object;
+                return isChild;
+              }
+            }
+          } else {
+            // 1.10+
+            if (index == 12) {
+              Boolean isChild = (Boolean) object;
+              return isChild;
+            }
+          }
+        } else {
+          // 1.9
+          if (index == 11) {
+            Boolean isChild = (Boolean) object;
+            return isChild;
+          }
+        }
+      } else {
+        // 1.8
+        if (index == 12) {
+          byte isChild = (byte) object;
+          return isChild < 0;
+        }
       }
     }
+
     return null;
   }
 
