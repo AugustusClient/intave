@@ -88,7 +88,7 @@ public class SameRotationHeuristic extends IntaveMetaCheckPart<Heuristics, SameR
     // Guckt ob die rotation Yaw oder Pitch eine ganze Zahl ist
     boolean yawExactNumber = meta.lastTick.yaw % 1 == 0;
 
-    if(yawExactNumber && meta.lastTick.yawMotion != 0 && !lastYawMotionExactNumber) {
+    if(yawExactNumber && !lastYawMotionExactNumber) {
       String description = "exact rotation (yaw:" + meta.lastTick.yaw + ")";
       Anomaly anomaly = Anomaly.anomalyOf("183", Confidence.NONE, Anomaly.Type.KILLAURA, description, getOptions(true));
       parentCheck().saveAnomaly(player, anomaly);
@@ -98,11 +98,10 @@ public class SameRotationHeuristic extends IntaveMetaCheckPart<Heuristics, SameR
     // Guckt ob die alte Rotation Yaw oder Pitch eine ganze Zahl ist
     // Wird genutzt um false flaggs zu vermeiden wenn die alte Rotation eine Ganzezahl war und man sich mit einer ganzen Zahl rotiert hat.
     boolean lastPitchMotionExactNumber = meta.lastLastTick.pitchMotion % 1 == 0;
-
     // Guckt ob die rotation Yaw oder Pitch eine ganze Zahl ist
     boolean pitchExactNumber = meta.lastTick.pitch % 1 == 0;
 
-    if(pitchExactNumber && Math.abs(meta.lastTick.pitchMotion) != 90 && meta.lastTick.pitchMotion != 0 && !lastPitchMotionExactNumber) {
+    if(pitchExactNumber && Math.abs(meta.lastTick.pitch) != 90 && !lastPitchMotionExactNumber) {
       String description = "exact rotation (pitch:" + meta.lastTick.pitch + ")";
       Anomaly anomaly = Anomaly.anomalyOf("183", Confidence.NONE, Anomaly.Type.KILLAURA, description, getOptions(true));
       parentCheck().saveAnomaly(player, anomaly);
@@ -113,7 +112,7 @@ public class SameRotationHeuristic extends IntaveMetaCheckPart<Heuristics, SameR
     // Guckt ob die rotation die ein Spieler hat schon mal zuvor gesendet wurde wärend der Spieler sich schnell gedreht hat
     boolean containedYaw = meta.yawRotations.contains(meta.lastLastTick.yaw) || meta.yawRotations.contains(meta.lastTick.yaw);
 
-    if (containedYaw && meta.lastTick.yawMotion != 0) {
+    if (containedYaw) {
       String description = "same rotation (yaw:" + meta.lastTick.yaw + ")";
       Anomaly anomaly = Anomaly.anomalyOf("181", Confidence.NONE, Anomaly.Type.KILLAURA, description, getOptions(true));
       parentCheck().saveAnomaly(player, anomaly);
@@ -123,7 +122,7 @@ public class SameRotationHeuristic extends IntaveMetaCheckPart<Heuristics, SameR
     // Guckt ob die rotation die ein Spieler hat schon mal zuvor gesendet wurde wärend der Spieler sich schnell gedreht hat
     boolean containedPitch = meta.pitchRotations.contains(meta.lastLastTick.pitch) || meta.pitchRotations.contains(meta.lastTick.pitch);
 
-    if(containedPitch && meta.lastTick.pitchMotion != 0) {
+    if(containedPitch) {
       String description = "same rotation (pitch:" + meta.lastTick.pitch + ")";
       Anomaly anomaly = Anomaly.anomalyOf("181", Confidence.NONE, Anomaly.Type.KILLAURA, description, getOptions(true));
       parentCheck().saveAnomaly(player, anomaly);
