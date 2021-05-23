@@ -399,7 +399,7 @@ public final class Physics extends IntaveCheck {
         boolean currentlyInOverride = blockShapeAccess.currentlyInOverride(WrappedMathHelper.floor(blockPositionX), WrappedMathHelper.floor(blockPositionY), WrappedMathHelper.floor(blockPositionZ));
 
         String colliderName;
-        if(Collision.blockOutsideBorder(player.getWorld(), blockPositionX, blockPositionZ)) {
+        if(!Collision.blockInsideBorder(player.getWorld(), blockPositionX, blockPositionZ)) {
           colliderName = "world border";
         } else {
           colliderName = (currentlyInOverride ? "emulated " : "") + shortenTypeName(block.getType()) + " block";
@@ -411,8 +411,7 @@ public final class Physics extends IntaveCheck {
         blockShapeAccess.identityInvalidate();
 
         Violation violation = Violation.builderFor(Physics.class)
-          .forPlayer(player).withMessage(message).withDetails(details)
-          .withVL(0).build();
+          .forPlayer(player).withMessage(message).withDetails(details).withVL(0).build();
         plugin.violationProcessor().processViolation(violation);
 
         Vector emulationMotion = new Vector(predictedX, predictedY, predictedZ);

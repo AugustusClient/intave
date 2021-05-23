@@ -48,7 +48,7 @@ public final class LegacyVersionRaytracer implements VersionRaytracer {
     IBlockData iblockdata = typeOf(player, world, blockposition);//world.getType(blockposition);
     Block block = iblockdata.getBlock();
     if (block.a(iblockdata, false) &&
-      (movingobjectposition = block.a(world, blockposition, (Vec3D) lookVector.convertToNativeVec3(), (Vec3D) position.convertToNativeVec3())) != null
+      (movingobjectposition = (MovingObjectPosition) movingObjectPosition(world, block, blockposition, (Vec3D) lookVector.convertToNativeVec3(), (Vec3D) position.convertToNativeVec3())) != null
     ) {
       return movingobjectposition;
     }
@@ -132,13 +132,23 @@ public final class LegacyVersionRaytracer implements VersionRaytracer {
 
       // block1.a refers to getCollisionBoundingBox
       if (block1.a(iblockdata1, false)) {
-        MovingObjectPosition movingobjectposition2 = block1.a(world, blockposition, (Vec3D) lookVector.convertToNativeVec3(), (Vec3D) position.convertToNativeVec3());
+        MovingObjectPosition movingobjectposition2 = (MovingObjectPosition) movingObjectPosition(world, block1, blockposition, (Vec3D) lookVector.convertToNativeVec3(), (Vec3D) position.convertToNativeVec3());
         if (movingobjectposition2 != null) {
           return movingobjectposition2;
         }
       }
     }
     return null;
+  }
+
+  @PatchyAutoTranslation
+  @PatchyTranslateParameters
+  private Object movingObjectPosition(WorldServer world, Block block, BlockPosition blockPosition, Vec3D lookVector, Vec3D position) {
+    try {
+      return block.a(world, blockPosition, lookVector, position);
+    } catch (Exception | Error exception) {
+      return Blocks.STONE.a(world, blockPosition, lookVector, position);
+    }
   }
 
   @PatchyAutoTranslation

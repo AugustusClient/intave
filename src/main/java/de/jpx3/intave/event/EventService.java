@@ -104,9 +104,6 @@ public final class EventService implements BukkitEventSubscriber {
 
   @BukkitEventSubscription
   public void on(PlayerQuitEvent quit) {
-    if(IntaveControl.GOMME_MODE) {
-      Thread.dumpStack();
-    }
     GarbageCollector.clear(quit.getPlayer());
     GarbageCollector.clear(quit.getPlayer().getUniqueId());
   }

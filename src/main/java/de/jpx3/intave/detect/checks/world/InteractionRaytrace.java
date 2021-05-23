@@ -207,7 +207,7 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
     playerLocation.setYaw(movementData.rotationYaw);
     playerLocation.setPitch(movementData.rotationPitch);
 
-    Location playerVerifiedLocation = new Location(world, movementData.lastPositionX, movementData.lastPositionY, movementData.lastPositionZ);
+//    Location playerVerifiedLocation = new Location(world, movementData.lastPositionX, movementData.lastPositionY, movementData.lastPositionZ);
 
     Location playerLocationmdf = playerLocation.clone();
     playerLocationmdf.setYaw(movementData.lastRotationYaw);
@@ -244,7 +244,6 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
       raycastResult = Raytracer.blockRayTrace(player, playerLocation);
       raycastResultmdf = Raytracer.blockRayTrace(player, playerLocationmdf);
     } catch (Exception exception) {
-//      exception.printStackTrace();
       if(interaction.targetBlock.toLocation(world).distance(player.getLocation()) < 6) {
         emulatePacket(interaction, null, interaction.targetBlock.toLocation(world), interaction.targetBlock.toLocation(world), false, false, false);
       }
@@ -323,11 +322,11 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
   private boolean emulate(Interaction interaction) {
     Player player = interaction.player();
     boolean emulationFailed = false;
-    if(interaction.type == InteractionType.PLACE) {
+    if (interaction.type == InteractionType.PLACE) {
       emulationFailed = !emulatePlacement(player, interaction);
-    } else if(interaction.type == InteractionType.INTERACT) {
+    } else if (interaction.type == InteractionType.INTERACT) {
       emulationFailed = !emulateInteraction(player, interaction);
-    } else if(interaction.type == InteractionType.BREAK) {
+    } else if (interaction.type == InteractionType.BREAK) {
       emulationFailed = !emulateBreak(player, interaction);
     }
     return emulationFailed;
@@ -385,9 +384,7 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
     int blockZ = blockPlacementLocation.getBlockZ();
     int dat = 0;
     boolean raytraceCollidesWithPosition = Collision.playerInImaginaryBlock(
-      user, world, blockX, blockY, blockZ,
-      itemTypeInHand,
-      dat
+      user, world, blockX, blockY, blockZ, itemTypeInHand, dat
     );
     if(raytraceCollidesWithPosition) {
       return false;
@@ -395,13 +392,10 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
     Material replacementType = interaction.itemTypeInHand;
     byte shape = 0;
     boolean access = WorldPermission.blockPlacePermission(
-      player,
-      world,
+      player, world,
       interaction.hand == null || interaction.hand == EnumWrappers.Hand.MAIN_HAND,
-      blockX, blockY, blockZ,
-      interaction.targetDirection,
-      replacementType,
-      (byte) 0
+      blockX, blockY, blockZ, interaction.targetDirection, replacementType,
+      shape
     );
     if(access) {
       OCBlockShapeAccess blockShapeAccess = userOf(player).blockShapeAccess();
@@ -690,7 +684,8 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
         vl = 2.5;
       }
       if(lookingAtBlock) {
-        vl *= 0.25;
+        double multiplier = trustFactorSetting("k-multiplier", player) / 100d;
+        vl *= multiplier;
       }
       message = "performed invalid placement";
       details = typeName + " block on " + typeAgainstName + " block, " + append;

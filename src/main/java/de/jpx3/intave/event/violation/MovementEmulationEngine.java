@@ -4,7 +4,6 @@ import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.IntaveException;
 import de.jpx3.intave.access.IntaveInternalException;
-import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.detect.checks.movement.Physics;
 import de.jpx3.intave.logging.IntaveLogger;
 import de.jpx3.intave.reflect.ReflectiveAccess;
@@ -215,14 +214,9 @@ public final class MovementEmulationEngine {
         movementData.artificialFallDistance = 0;
       }
 
-      if(futurePosition.getY() < 0 && !MinecraftVersions.VER1_17_0.atOrAbove()) {
-        Synchronizer.synchronize(() -> player.damage(4));
-      }
-
       if (IntaveControl.DEBUG_EMULATION) {
         player.sendMessage("[E-] (" + ticks + " ticks remaining)");
       }
-
     } else {
       // teleport
       //player.teleport(futurePosition);

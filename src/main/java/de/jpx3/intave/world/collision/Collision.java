@@ -70,15 +70,13 @@ public final class Collision {
             for (int z = zstart; z < zend; ++z) {
               for (int y = ystart; y < maxY; ++y) {
                 List<WrappedAxisAlignedBB> resolve = blockShapeAccess.resolveBoxes(chunkx, chunkz, x, y, z);
-
-                boolean positionInBorder = !blockOutsideBorder(world, x, z);
-                if (positionInBorder && !movementData.outsideBorder) {
+                boolean blockOutsideBorder = !blockInsideBorder(world, x, z);
+                if (blockOutsideBorder && !movementData.outsideBorder) {
                   if (resolvedBoundingBoxes == null) {
                     resolvedBoundingBoxes = new ArrayList<>();
                   }
                   resolvedBoundingBoxes.add(new WrappedAxisAlignedBB(x, y, z, x + 1, y, z + 1));
                 }
-
                 if (resolve != null && !resolve.isEmpty()) {
                   if (resolvedBoundingBoxes == null) {
                     resolvedBoundingBoxes = new ArrayList<>(resolve);
@@ -112,11 +110,8 @@ public final class Collision {
     int maxY = WrappedMathHelper.floor(boundingBox.maxY + 1.0D);
     int minZ = WrappedMathHelper.floor(boundingBox.minZ);
     int maxZ = WrappedMathHelper.floor(boundingBox.maxZ + 1.0D);
-
     int ystart = Math.max(minY - 1, 0);
     List<WrappedAxisAlignedBB> resolvedBoundingBoxes = null;
-
-    // this looks 1000x slower than it actually is
     for (int chunkx = minX >> 4; chunkx <= maxX - 1 >> 4; ++chunkx) {
       int chunkXPos = chunkx << 4;
       for (int chunkz = minZ >> 4; chunkz <= maxZ - 1 >> 4; ++chunkz) {
@@ -133,15 +128,13 @@ public final class Collision {
                 Material type = block.getType();
                 int data = BlockDataAccess.dataIndexOf(block);
                 List<WrappedAxisAlignedBB> resolve = boundingBoxResolver.customResolve(world, null, type, data, x, y, z);
-
-                boolean insideBorder = !blockOutsideBorder(world, x, z);
-                if (insideBorder) {
+                boolean blockIsOutsideBorder = !blockInsideBorder(world, x, z);
+                if (blockIsOutsideBorder) {
                   if (resolvedBoundingBoxes == null) {
                     resolvedBoundingBoxes = new ArrayList<>();
                   }
                   resolvedBoundingBoxes.add(new WrappedAxisAlignedBB(x, y, z, x + 1, y, z + 1));
                 }
-
                 if ((resolve != null && !resolve.isEmpty())) {
                   if (resolvedBoundingBoxes == null) {
                     resolvedBoundingBoxes = new ArrayList<>(resolve);
@@ -163,7 +156,7 @@ public final class Collision {
     return resolvedBoundingBoxes;
   }
 
-  public static boolean blockOutsideBorder(World world, double positionX, double positionZ) {
+  public static boolean blockInsideBorder(World world, double positionX, double positionZ) {
     WorldBorder worldBorder = world.getWorldBorder();
     Location center = worldBorder.getCenter();
     double radians = worldBorder.getSize() / 2.0;
