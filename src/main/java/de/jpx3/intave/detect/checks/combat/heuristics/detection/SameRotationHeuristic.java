@@ -12,7 +12,6 @@ import de.jpx3.intave.event.packet.ListenerPriority;
 import de.jpx3.intave.event.packet.PacketDescriptor;
 import de.jpx3.intave.event.packet.PacketSubscription;
 import de.jpx3.intave.event.packet.Sender;
-import de.jpx3.intave.tools.MathHelper;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserCustomCheckMeta;
 import de.jpx3.intave.user.UserMetaClientData;
@@ -89,7 +88,7 @@ public class SameRotationHeuristic extends IntaveMetaCheckPart<Heuristics, SameR
     boolean yawExactNumber = meta.lastTick.yaw % 1 == 0;
 
     if(yawExactNumber && !lastYawMotionExactNumber) {
-      String description = "exact rotation (yaw:" + meta.lastTick.yaw + ")";
+      String description = "exact Yaw Rotation:" + meta.lastTick.yaw;
       Anomaly anomaly = Anomaly.anomalyOf("183", Confidence.NONE, Anomaly.Type.KILLAURA, description, getOptions(true));
       parentCheck().saveAnomaly(player, anomaly);
     }
@@ -102,7 +101,7 @@ public class SameRotationHeuristic extends IntaveMetaCheckPart<Heuristics, SameR
     boolean pitchExactNumber = meta.lastTick.pitch % 1 == 0;
 
     if(pitchExactNumber && Math.abs(meta.lastTick.pitch) != 90 && !lastPitchMotionExactNumber) {
-      String description = "exact rotation (pitch:" + meta.lastTick.pitch + ")";
+      String description = "exact Pitch Rotation:" + meta.lastTick.pitch;
       Anomaly anomaly = Anomaly.anomalyOf("183", Confidence.NONE, Anomaly.Type.KILLAURA, description, getOptions(true));
       parentCheck().saveAnomaly(player, anomaly);
     }
@@ -110,20 +109,20 @@ public class SameRotationHeuristic extends IntaveMetaCheckPart<Heuristics, SameR
 
   private void checkSameRotationYaw(SameRotationHeuristicMeta meta, Player player) {
     // Guckt ob die rotation die ein Spieler hat schon mal zuvor gesendet wurde wärend der Spieler sich schnell gedreht hat
-    boolean containedYaw = meta.yawRotations.contains(meta.lastLastTick.yaw) || meta.yawRotations.contains(meta.lastTick.yaw);
+    boolean containedYaw = meta.yawRotations.contains(meta.lastTick.yaw);
 
     if (containedYaw) {
-      String description = "same rotation (yaw:" + meta.lastTick.yaw + ")";
+      String description = "same Rotation (Yaw:" + meta.lastTick.yaw + ")";
       Anomaly anomaly = Anomaly.anomalyOf("181", Confidence.NONE, Anomaly.Type.KILLAURA, description, getOptions(true));
       parentCheck().saveAnomaly(player, anomaly);
     }
   }
   private void checkSameRotationPitch(SameRotationHeuristicMeta meta, Player player) {
     // Guckt ob die rotation die ein Spieler hat schon mal zuvor gesendet wurde wärend der Spieler sich schnell gedreht hat
-    boolean containedPitch = meta.pitchRotations.contains(meta.lastLastTick.pitch) || meta.pitchRotations.contains(meta.lastTick.pitch);
+    boolean containedPitch = meta.pitchRotations.contains(meta.lastTick.pitch);
 
     if(containedPitch) {
-      String description = "same rotation (pitch:" + meta.lastTick.pitch + ")";
+      String description = "same Rotation (Pitch:" + meta.lastTick.pitch + ")";
       Anomaly anomaly = Anomaly.anomalyOf("181", Confidence.NONE, Anomaly.Type.KILLAURA, description, getOptions(true));
       parentCheck().saveAnomaly(player, anomaly);
     }
@@ -134,7 +133,7 @@ public class SameRotationHeuristic extends IntaveMetaCheckPart<Heuristics, SameR
     boolean yawMotionExactNumber = meta.lastTick.yawMotion % 1 == 0;
 
     if(yawMotionExactNumber) {
-      String description = "exact rotation (yaw:" + meta.lastTick.yawMotion + ")";
+      String description = "exact Yaw Motion:" + meta.lastTick.yawMotion;
       Anomaly anomaly = Anomaly.anomalyOf("182", Confidence.NONE, Anomaly.Type.KILLAURA, description, getOptions(true));
       parentCheck().saveAnomaly(player, anomaly);
     }
@@ -144,7 +143,7 @@ public class SameRotationHeuristic extends IntaveMetaCheckPart<Heuristics, SameR
     boolean pitchMotionExactNumber = meta.lastTick.pitchMotion % 1 == 0;
 
     if(pitchMotionExactNumber) {
-      String description = "exact rotation (pitch:" + meta.lastTick.pitchMotion + ")";
+      String description = "exact Pitch Motion:" + meta.lastTick.pitchMotion;
       Anomaly anomaly = Anomaly.anomalyOf("182", Confidence.NONE, Anomaly.Type.KILLAURA, description, getOptions(true));
       parentCheck().saveAnomaly(player, anomaly);
     }
