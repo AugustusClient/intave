@@ -33,7 +33,10 @@ import de.jpx3.intave.world.collider.result.ComplexColliderSimulationResult;
 import de.jpx3.intave.world.collider.result.QuickColliderSimulationResult;
 import de.jpx3.intave.world.collision.Collision;
 import de.jpx3.intave.world.waterflow.Waterflow;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -399,13 +402,15 @@ public final class Physics extends IntaveCheck {
         if (!Collision.blockInsideBorder(player.getWorld(), blockPositionX, blockPositionZ)) {
           colliderName = "world border";
         } else {
-          colliderName = (currentlyInOverride ? "emulated " : "") + shortenTypeName(block.getType()) + " block";
+          colliderName = (currentlyInOverride ? "emulated " : "") + shortenTypeName(currentlyInOverride ? BukkitBlockAccess.cacheAppliedTypeAccess(user, block.getLocation()) : block.getType()) + " block";
         }
         String message = "moved into " + colliderName;
         boolean multipleBoxes = intersectionBoundingBoxesCurrent.size() > 1;
         String details = (multipleBoxes ? intersectionBoundingBoxesCurrent.size() : "one") + " box" + (multipleBoxes ? "es" : "");
 
-        blockShapeAccess.identityInvalidate();
+        if(!IntaveControl.IGNORE_CACHE_REFRESH_ON_DETECTION) {
+          blockShapeAccess.identityInvalidate();
+        }
 
         Violation violation = Violation.builderFor(Physics.class)
           .forPlayer(player).withMessage(message).withDetails(details).withVL(0).build();
@@ -432,7 +437,9 @@ public final class Physics extends IntaveCheck {
 
         if (!startBoundingBoxInList) {
           movementData.invalidMovement = true;
-          blockShapeAccess.identityInvalidate();
+          if(!IntaveControl.IGNORE_CACHE_REFRESH_ON_DETECTION) {
+            blockShapeAccess.identityInvalidate();
+          }
 
           WrappedAxisAlignedBB boundingBox = intersectionBoundingBoxesCurrent.get(0);
           double blockPositionX = (boundingBox.minX + boundingBox.maxX) / 2.0;
@@ -444,8 +451,7 @@ public final class Physics extends IntaveCheck {
           boolean multipleBoxes = intersectionBoundingBoxesCurrent.size() > 1;
           String details = (multipleBoxes ? intersectionBoundingBoxesCurrent.size() : "one") + " box" + (multipleBoxes ? "es" : "");
           Violation violation = Violation.builderFor(Physics.class)
-            .forPlayer(player).withMessage(message).withDetails(details)
-            .withVL(0)
+            .forPlayer(player).withMessage(message).withDetails(details).withVL(0)
             .build();
           plugin.violationProcessor().processViolation(violation);
           WrappedAxisAlignedBB startPhaseBoundingBox = WrappedAxisAlignedBB.createFromPosition(user, movementData.verifiedLocation());
@@ -469,7 +475,9 @@ public final class Physics extends IntaveCheck {
       violationLevelIncrease = Math.max(1, violationLevelIncrease);
       violationLevelData.physicsVL = MathHelper.minmax(0, violationLevelData.physicsVL + violationLevelIncrease, 200);
       violationLevelData.physicsInvalidMovementsInRow++;
-      blockShapeAccess.identityInvalidate();
+      if(!IntaveControl.IGNORE_CACHE_REFRESH_ON_DETECTION) {
+        blockShapeAccess.identityInvalidate();
+      }
       statisticApply(user, CheckStatistics::increaseFails);
     } else {
       violationLevelData.physicsInvalidMovementsInRow = 0;
