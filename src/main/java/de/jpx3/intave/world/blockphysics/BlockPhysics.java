@@ -26,6 +26,7 @@ public final class BlockPhysics {
     loadBlock(BlockPhysicBerryBush.class);
     loadBlock(BlockPhysicHoney.class);
     loadBlock(BlockPhysicWeb.class);
+    loadBlock(BlockPhysicsFlowingFluid.class);
   }
 
   private static void loadBlock(Class<? extends BlockPhysic> blockClass) {

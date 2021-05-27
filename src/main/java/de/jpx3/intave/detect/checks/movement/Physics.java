@@ -8,7 +8,7 @@ import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.detect.CheckStatistics;
 import de.jpx3.intave.detect.CheckViolationLevelDecrementer;
 import de.jpx3.intave.detect.IntaveCheck;
-import de.jpx3.intave.detect.checks.movement.physics.LegacyWaterflow;
+import de.jpx3.intave.world.fluid.LegacyWaterflow;
 import de.jpx3.intave.detect.checks.movement.physics.MotionVector;
 import de.jpx3.intave.detect.checks.movement.physics.Pose;
 import de.jpx3.intave.detect.checks.movement.physics.SimulationProcessor;
@@ -32,7 +32,7 @@ import de.jpx3.intave.world.collider.Collider;
 import de.jpx3.intave.world.collider.result.ComplexColliderSimulationResult;
 import de.jpx3.intave.world.collider.result.QuickColliderSimulationResult;
 import de.jpx3.intave.world.collision.Collision;
-import de.jpx3.intave.world.waterflow.Waterflow;
+import de.jpx3.intave.world.fluid.Fluid;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -260,7 +260,7 @@ public final class Physics extends IntaveCheck {
 
   private void updateEyesInWater(User user) {
     UserMetaMovementData movementData = user.meta().movementData();
-    movementData.eyesInWater = Waterflow.areEyesInFluid(user, movementData.positionX, movementData.positionY, movementData.positionZ);
+    movementData.eyesInWater = Fluid.areEyesInFluid(user, movementData.positionX, movementData.positionY, movementData.positionZ);
   }
 
   private void updateInWater(User user) {
@@ -268,7 +268,7 @@ public final class Physics extends IntaveCheck {
     UserMetaClientData clientData = meta.clientData();
     UserMetaMovementData movementData = meta.movementData();
     if (clientData.protocolVersion() >= PROTOCOL_VERSION_AQUATIC_UPDATE) {
-      movementData.inWater = Waterflow.handleFluidAcceleration(user, movementData.boundingBox());
+      movementData.inWater = Fluid.handleFluidAcceleration(user, movementData.boundingBox());
     } else {
       WrappedAxisAlignedBB entityBoundingBox = movementData.boundingBox();
       WrappedAxisAlignedBB checkableBoundingBox = entityBoundingBox

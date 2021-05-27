@@ -5,7 +5,7 @@ import org.bukkit.Material;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class BlockClimableRepository {
+public final class BlockClimbableRepository {
   private static final List<Material> registry = new ArrayList<>();
 
   public static void setup() {
@@ -20,7 +20,7 @@ public final class BlockClimableRepository {
     tryRegister("TWISTING_VINES_PLANT");
   }
 
-  public static boolean isClimable(Material material) {
+  public static boolean isClimbable(Material material) {
     return registry.contains(material);
   }
 
@@ -30,5 +30,4 @@ public final class BlockClimableRepository {
       registry.add(material);
     }
   }
-
 }

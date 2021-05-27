@@ -78,6 +78,7 @@ public final class UserMetaMovementData {
   public int pastLongTeleport = 100;
   public int pastInventoryOpen = 100;
   public boolean onLadderLast;
+  public boolean aquaticUpdateInLava;
 
   public int physicsPacketRelinkFlyVL; // In Air
   public boolean invalidMovement, suspiciousMovement;
@@ -333,12 +334,17 @@ public final class UserMetaMovementData {
   }
 
   public boolean inLava() {
-    WrappedAxisAlignedBB lavaBoundingBox = boundingBox.expand(
-      -0.1f,
-      -0.4000000059604645D,
-      -0.1f
-    );
-    return MovementContextHelper.isLavaInBB(player.getWorld(), lavaBoundingBox);
+    UserMetaClientData clientData = user.meta().clientData();
+    if (clientData.waterUpdate()) {
+      return aquaticUpdateInLava;
+    } else {
+      WrappedAxisAlignedBB lavaBoundingBox = boundingBox.expand(
+        -0.1f,
+        -0.4000000059604645D,
+        -0.1f
+      );
+      return MovementContextHelper.isLavaInBB(player.getWorld(), lavaBoundingBox);
+    }
   }
 
   public boolean recentlyEncounteredFlyingPacket(int ticks) {

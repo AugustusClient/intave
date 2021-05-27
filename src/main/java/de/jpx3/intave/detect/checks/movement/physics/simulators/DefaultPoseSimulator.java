@@ -1,6 +1,6 @@
 package de.jpx3.intave.detect.checks.movement.physics.simulators;
 
-import de.jpx3.intave.detect.checks.movement.physics.LegacyWaterflow;
+import de.jpx3.intave.world.fluid.LegacyWaterflow;
 import de.jpx3.intave.detect.checks.movement.physics.MotionVector;
 import de.jpx3.intave.tools.client.EffectLogic;
 import de.jpx3.intave.tools.client.MaterialLogic;
@@ -18,7 +18,7 @@ import de.jpx3.intave.world.blockphysics.BlockPhysics;
 import de.jpx3.intave.world.collider.Collider;
 import de.jpx3.intave.world.collider.result.ComplexColliderSimulationResult;
 import de.jpx3.intave.world.collider.result.QuickColliderSimulationResult;
-import de.jpx3.intave.world.waterflow.Waterflow;
+import de.jpx3.intave.world.fluid.Fluid;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -94,7 +94,7 @@ public class DefaultPoseSimulator extends PoseSimulator {
     if (waterUpdate && swimming) {
       double d3 = movementData.lookVector.getY();
       double d4 = d3 < -0.2D ? 0.085D : 0.06D;
-      boolean fluidStateEmpty = Waterflow.fluidStateEmpty(user, positionX, positionY + 1.0 - 0.1, positionZ);
+      boolean fluidStateEmpty = Fluid.fluidStateEmpty(user, positionX, positionY + 1.0 - 0.1, positionZ);
       if (d3 <= 0.0D || jumped || !fluidStateEmpty) {
         context.motionY += (d3 - context.motionY) * d4;
       }
@@ -450,6 +450,9 @@ public class DefaultPoseSimulator extends PoseSimulator {
     }
 
     // Block collisions
+
+    movementData.aquaticUpdateInLava = false;
+
     int blockPositionStartX = WrappedMathHelper.floor(entityBoundingBox.minX + 0.001);
     int blockPositionStartY = WrappedMathHelper.floor(entityBoundingBox.minY + 0.001);
     int blockPositionStartZ = WrappedMathHelper.floor(entityBoundingBox.minZ + 0.001);

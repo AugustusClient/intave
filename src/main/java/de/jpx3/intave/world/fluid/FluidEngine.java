@@ -1,6 +1,5 @@
-package de.jpx3.intave.world.waterflow;
+package de.jpx3.intave.world.fluid;
 
-import com.comphenix.protocol.utility.MinecraftVersion;
 import de.jpx3.intave.tools.client.MaterialLogic;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
@@ -11,15 +10,10 @@ import de.jpx3.intave.world.blockaccess.BukkitBlockAccess;
 import org.bukkit.Material;
 import org.bukkit.World;
 
-public abstract class AbstractWaterflowEngine {
-  protected void setup() throws Exception {}
-
-  protected abstract boolean fluidStateEmpty(User user, double x, double y, double z);
-
+public abstract class FluidEngine {
   protected boolean handleFluidAcceleration(User user, WrappedAxisAlignedBB boundingBox) {
     World world = user.player().getWorld();
     UserMetaMovementData movementData = user.meta().movementData();
-    Object serverWorld = movementData.nmsWorld();
     WrappedAxisAlignedBB wrappedAxisAlignedBB = boundingBox.shrink(0.001D);
     int minX = WrappedMathHelper.floor(wrappedAxisAlignedBB.minX);
     int minY = WrappedMathHelper.floor(wrappedAxisAlignedBB.minY);
@@ -35,16 +29,14 @@ public abstract class AbstractWaterflowEngine {
     for (int x = minX; x < maxX; ++x) {
       for (int y = minY; y < maxY; ++y) {
         for (int z = minZ; z < maxZ; ++z) {
-          Object blockPosition = blockPositionOf(x, y, z);
-          Object fluidState = fluidState(user, blockPosition);
           Material blockClientSide = BukkitBlockAccess.cacheAppliedTypeAccess(user, world, x, y, z);
-          if (fluidTaggedWithWater(fluidState)) {
-            float fluidHeight = fluidHeight(fluidState);
-            double d1 = (float) y + fluidHeight;
+          WrappedFluid wrappedFluid = fluidAt(user, x, y, z);
+          if (wrappedFluid.isIn(FluidTag.WATER)) {
+            double d1 = (float) y + wrappedFluid.height();
             if (d1 >= wrappedAxisAlignedBB.minY) {
               inWater = true;
               d0 = Math.max(d1 - wrappedAxisAlignedBB.minY, d0);
-              WrappedVector flowVector = resolveFlowVector(fluidState, serverWorld, blockPosition);
+              WrappedVector flowVector = flowVectorAt(user, x, y, z);
               if (d0 < 0.4) {
                 flowVector = flowVector.scale(d0);
               }
@@ -80,15 +72,11 @@ public abstract class AbstractWaterflowEngine {
     int blockPlayerViewPositionY = WrappedMathHelper.floor(playerViewPositionY);
     int blockX = WrappedMathHelper.floor(positionX);
     int blockZ = WrappedMathHelper.floor(positionZ);
-    Object blockPosition = blockPositionOf(blockX, blockPlayerViewPositionY, blockZ);
-    Object fluidState = fluidState(user, blockPosition);
-    return fluidTaggedWithWater(fluidState);
+    WrappedFluid wrappedFluid = fluidAt(user, blockX, blockPlayerViewPositionY, blockZ);
+    return wrappedFluid.fluidTag() == FluidTag.WATER;
   }
 
-  protected abstract boolean fluidTaggedWithWater(Object fluidState);
-  protected abstract Object blockPositionOf(int x, int y, int z);
-  protected abstract Object fluidState(User user, Object blockPosition);
-  protected abstract float fluidHeight(Object fluidState);
-  protected abstract WrappedVector resolveFlowVector(Object fluidState, Object world, Object blockPosition);
-  protected abstract boolean appliesToAtLeast(MinecraftVersion currentVersion);
+  protected abstract WrappedFluid fluidAt(User user, int x, int y, int z);
+
+  protected abstract WrappedVector flowVectorAt(User user, int x, int y, int z);
 }

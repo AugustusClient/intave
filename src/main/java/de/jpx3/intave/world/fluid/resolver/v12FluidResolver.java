@@ -1,7 +1,5 @@
-package de.jpx3.intave.world.waterflow;
+package de.jpx3.intave.world.fluid.resolver;
 
-import com.comphenix.protocol.utility.MinecraftVersion;
-import de.jpx3.intave.detect.checks.movement.physics.LegacyWaterflow;
 import de.jpx3.intave.tools.client.MaterialLogic;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.tools.wrapper.WrappedBlockPosition;
@@ -9,23 +7,38 @@ import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import de.jpx3.intave.tools.wrapper.WrappedVector;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaMovementData;
-import de.jpx3.intave.world.blockaccess.BlockDataAccess;
 import de.jpx3.intave.world.blockaccess.BukkitBlockAccess;
+import de.jpx3.intave.world.fluid.FluidEngine;
+import de.jpx3.intave.world.fluid.FluidTag;
+import de.jpx3.intave.world.fluid.LegacyWaterflow;
+import de.jpx3.intave.world.fluid.WrappedFluid;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-final class UnknownWaterflowEngine extends AbstractWaterflowEngine {
+public final class v12FluidResolver extends FluidEngine {
   @Override
-  public boolean fluidStateEmpty(User user, double x, double y, double z) {
-    World world = user.player().getWorld();
-    Block block = BukkitBlockAccess.blockAccess(world, WrappedMathHelper.floor(x), WrappedMathHelper.floor(y), WrappedMathHelper.floor(z));
-    return !MaterialLogic.isLiquid(block.getType());
+  protected WrappedFluid fluidAt(User user, int x, int y, int z) {
+    Block block = BukkitBlockAccess.blockAccess(user.player().getWorld(), x, y, z);
+    float height = LegacyWaterflow.resolveLiquidHeightPercentage(block.getData());
+    Material type = block.getType();
+    FluidTag fluidTag = FluidTag.EMPTY;
+    if (MaterialLogic.isWater(type)) {
+      fluidTag = FluidTag.WATER;
+    } else if (MaterialLogic.isLava(type)) {
+      fluidTag = FluidTag.LAVA;
+    }
+    return WrappedFluid.construct(fluidTag, height);
   }
 
   @Override
-  public boolean handleFluidAcceleration(User user, WrappedAxisAlignedBB boundingBox) {
+  protected WrappedVector flowVectorAt(User user, int x, int y, int z) {
+    return null;
+  }
+
+  @Override
+  protected boolean handleFluidAcceleration(User user, WrappedAxisAlignedBB boundingBox) {
     Player player = user.player();
     World world = player.getWorld();
     UserMetaMovementData movementData = user.meta().movementData();
@@ -51,7 +64,7 @@ final class UnknownWaterflowEngine extends AbstractWaterflowEngine {
           boolean waterServerSide = MaterialLogic.isWater(block.getType());
           boolean waterClientSide = MaterialLogic.isWater(clientSideBlock);
           if (waterServerSide) {
-            double height = 1 - LegacyWaterflow.resolveLiquidHeightPercentage(BlockDataAccess.dataIndexOf(block));
+            double height = 1 - LegacyWaterflow.resolveLiquidHeightPercentage(block.getData());
             double d1 = (float) y + height;
             if (d1 >= entityBoundingBox.minY) {
               inWater = true;
@@ -83,58 +96,5 @@ final class UnknownWaterflowEngine extends AbstractWaterflowEngine {
     }
 
     return inWater;
-  }
-
-  @Override
-  public boolean areEyesInFluid(User user, double positionX, double positionY, double positionZ) {
-    Player player = user.player();
-    World world = player.getWorld();
-    User.UserMeta meta = user.meta();
-    UserMetaMovementData movementData = meta.movementData();
-    float eyeHeight = movementData.eyeHeight();
-    double posYEye = positionY + eyeHeight;
-    double d0 = posYEye - (double) 0.11111111F;
-    WrappedVector vector3d = new WrappedVector(positionX, d0, positionZ);
-    Block block = BukkitBlockAccess.blockAccess(world, vector3d.xCoord, vector3d.yCoord, vector3d.zCoord);
-    if (MaterialLogic.isWater(block.getType())) {
-      double d1 = vector3d.yCoord + 1 - LegacyWaterflow.resolveLiquidHeightPercentage(BlockDataAccess.dataIndexOf(block));
-      return d1 > d0;
-    }
-    return false;
-  }
-
-  @Override
-  @Deprecated
-  public Object blockPositionOf(int x, int y, int z) {
-    return null;
-  }
-
-  @Override
-  @Deprecated
-  public boolean fluidTaggedWithWater(Object fluidState) {
-    return false;
-  }
-
-  @Override
-  @Deprecated
-  public Object fluidState(User user, Object blockPosition) {
-    return null;
-  }
-
-  @Override
-  @Deprecated
-  public float fluidHeight(Object fluidState) {
-    return 0;
-  }
-
-  @Override
-  @Deprecated
-  public WrappedVector resolveFlowVector(Object fluidState, Object world, Object blockPosition) {
-    return null;
-  }
-
-  @Override
-  public boolean appliesToAtLeast(MinecraftVersion currentVersion) {
-    return true;
   }
 }

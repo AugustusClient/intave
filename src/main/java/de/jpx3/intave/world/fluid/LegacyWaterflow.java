@@ -1,4 +1,4 @@
-package de.jpx3.intave.detect.checks.movement.physics;
+package de.jpx3.intave.world.fluid;
 
 import de.jpx3.intave.tools.client.MaterialLogic;
 import de.jpx3.intave.tools.wrapper.*;

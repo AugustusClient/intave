@@ -41,7 +41,7 @@ import de.jpx3.intave.warning.ClientWarningService;
 import de.jpx3.intave.world.blockaccess.BlockDataAccess;
 import de.jpx3.intave.world.blockaccess.BukkitBlockAccess;
 import de.jpx3.intave.world.blockaccess.RuntimeBlockDataIndexer;
-import de.jpx3.intave.world.blockphysics.BlockClimableRepository;
+import de.jpx3.intave.world.blockphysics.BlockClimbableRepository;
 import de.jpx3.intave.world.blockphysics.BlockPhysics;
 import de.jpx3.intave.world.blockphysics.BlockSlipperinessRepository;
 import de.jpx3.intave.world.blockshape.resolver.BoundingBoxResolverFactory;
@@ -49,7 +49,7 @@ import de.jpx3.intave.world.blockshape.resolver.pipeline.patcher.BoundingBoxPatc
 import de.jpx3.intave.world.collider.Collider;
 import de.jpx3.intave.world.permission.WorldPermission;
 import de.jpx3.intave.world.raytrace.Raytracer;
-import de.jpx3.intave.world.waterflow.Waterflow;
+import de.jpx3.intave.world.fluid.Fluid;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginLogger;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -483,7 +483,7 @@ public final class IntavePlugin extends JavaPlugin {
       WrapperLinkage.setup();
       Raytracer.setup();
       Collider.setup();
-      Waterflow.setup();
+      Fluid.setup();
       BukkitBlockAccess.setup();
       BlockDataAccess.setup();
       ViaVersionAdapter.setup();
@@ -491,7 +491,7 @@ public final class IntavePlugin extends JavaPlugin {
       WorldPermission.setup();
       BlockPhysics.setup();
       BlockSlipperinessRepository.setup();
-      BlockClimableRepository.setup();
+      BlockClimbableRepository.setup();
       InventoryUseItemHelper.setup();
       BoundingBoxPatcher.setup();
 
