@@ -66,7 +66,7 @@ public final class BlockingHeuristic extends IntaveMetaCheckPart<Heuristics, Blo
     }
 
     if (meta.heldItemOperations > 1) {
-      if(meta.blocksPlacedThisTick == 0) {
+      if(meta.blocksPlacedThisTick == 0 || meta.heldItemOperations > 2) {
         String description = "sent too many item operations (operations: " + meta.heldItemOperations + ")";
         description += " (version " + user.meta().clientData().versionString() + ")";
         Anomaly anomaly = Anomaly.anomalyOf("144", Confidence.NONE, Anomaly.Type.KILLAURA, description, 0);
