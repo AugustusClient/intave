@@ -26,6 +26,8 @@ public class Timings {
 
   public static final Timing CHECK_PHYSICS_PROC_TOT = Timing.of("Check/Physics/ProcTot", "Exe/Netty");
   public static final Timing CHECK_PHYSICS_PROC_BIA = Timing.of("Check/Physics/ProcBia", "Check/Physics/ProcTot");
+  public static final Timing CHECK_PHYSICS_PROC_PRED_BIA = Timing.of("Check/Physics/ProcPredBia", "Check/Physics/ProcBia");
+  public static final Timing CHECK_PHYSICS_PROC_LK_BIA = Timing.of("Check/Physics/ProcLKBia", "Check/Physics/ProcBia");
   public static final Timing CHECK_PHYSICS_PROC_ITR = Timing.of("Check/Physics/ProcItr", "Check/Physics/ProcTot");
   public static final Timing CHECK_PHYSICS_EVAL = Timing.of("Check/Physics/Eval", "Check/Physics/ProcTot");
 

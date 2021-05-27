@@ -79,6 +79,11 @@ public final class NoSwingHeuristic extends IntaveMetaCheckPart<Heuristics, NoSw
       return;
     }
 
+    // fix?
+    if (user.meta().clientData().clientVersionBehindServerVersion()) {
+      return;
+    }
+
     if(meta.attacksThisTick > 0) {
       if(meta.swingsThisTick == 0) {
         String details = "missing swing packet on attack";

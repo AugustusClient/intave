@@ -470,7 +470,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
     if(movementData.recentlyEncounteredFlyingPacket(1)
       && user.meta().clientData().protocolVersion() >= UserMetaClientData.PROTOCOL_VERSION_COMBAT_UPDATE) {
       for (WrappedEntity.EntityPositionContext possiblePosition : entity.positionHistory) {
-        // TODO: 01/07/21 add trust-factor based length tolerance
+        // TODO: 01/07/21 add general packet based length tolerance
         clonedEntity.position = possiblePosition.clone();
         // mouse delay fix
         Raytracer.EntityInteractionRaytrace resultWithoutIncrement = Raytracer.distanceOfCombo(

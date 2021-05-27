@@ -8,7 +8,6 @@ import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.adapter.ProtocolLibraryAdapter;
 import de.jpx3.intave.event.packet.*;
-import de.jpx3.intave.event.transaction.TransactionFeedbackService;
 import de.jpx3.intave.fakeplayer.FakePlayer;
 import de.jpx3.intave.logging.IntaveLogger;
 import de.jpx3.intave.reflect.hitbox.HitBoxBoundaries;
@@ -27,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+
+import static de.jpx3.intave.event.transaction.TransactionFeedbackService.TransactionOptions.OPTIONAL;
 
 public final class ClientSideEntityService implements PacketEventSubscriber {
   private final IntavePlugin plugin;
@@ -148,7 +149,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
        player,
        entityIDs,
        this::processEntityDestroy,
-       TransactionFeedbackService.TransactionOptions.OPTIONAL
+       OPTIONAL
      );
   }
 

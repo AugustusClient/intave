@@ -31,7 +31,12 @@ public final class UserRepositoryEventListener implements BukkitEventSubscriber 
     Synchronizer.synchronizeDelayed(() -> {
       UserMetaClientData clientData = UserRepository.userOf(player).meta().clientData();
       clientData.refresh(player);
-      IntaveLogger.logger().pushPrintln(player.getName() + " joined with version " + clientData.versionString() + " ("+clientData.protocolVersion()+")");
+      String string = player.getName() + " joined with version " + clientData.versionString() + " ";
+      string += "(" + clientData.protocolVersion() + ")";
+      if (clientData.clientVersionBehindServerVersion()) {
+        string += " (behind server)";
+      }
+      IntaveLogger.logger().pushPrintln(string);
     }, 10);
   }
 

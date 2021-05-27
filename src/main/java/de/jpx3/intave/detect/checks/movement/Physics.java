@@ -8,7 +8,6 @@ import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.detect.CheckStatistics;
 import de.jpx3.intave.detect.CheckViolationLevelDecrementer;
 import de.jpx3.intave.detect.IntaveCheck;
-import de.jpx3.intave.world.fluid.LegacyWaterflow;
 import de.jpx3.intave.detect.checks.movement.physics.MotionVector;
 import de.jpx3.intave.detect.checks.movement.physics.Pose;
 import de.jpx3.intave.detect.checks.movement.physics.SimulationProcessor;
@@ -33,6 +32,7 @@ import de.jpx3.intave.world.collider.result.ComplexColliderSimulationResult;
 import de.jpx3.intave.world.collider.result.QuickColliderSimulationResult;
 import de.jpx3.intave.world.collision.Collision;
 import de.jpx3.intave.world.fluid.Fluid;
+import de.jpx3.intave.world.fluid.LegacyWaterflow;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -157,6 +157,8 @@ public final class Physics extends IntaveCheck {
     Timings.CHECK_PHYSICS_EVAL.start();
     evaluateBestSimulation(user, predictedMovement);
     Timings.CHECK_PHYSICS_EVAL.stop();
+    movementData.lastKeyStrafe = movementData.keyStrafe;
+    movementData.lastKeyForward = movementData.keyForward;
     movementData.pastRiptideSpin++;
   }
 
@@ -552,7 +554,7 @@ public final class Physics extends IntaveCheck {
       debug += "(" + key + ")";
       debug += " " + violationLevelInfo;
 
-//      debug += " (sneak " + movementData.sneaking + ")";
+      debug += " (sneak " + movementData.sneaking + "/"+movementData.actualSneaking()+")";
 //      debug += " (size:" + movementData.width + "," + movementData.height + ")";
 //      debug += "handActive=" + inventoryData.handActive();
 //      debug += inventoryData.heldItem().getType().name();

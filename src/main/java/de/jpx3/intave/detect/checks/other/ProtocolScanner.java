@@ -96,7 +96,9 @@ public final class ProtocolScanner extends IntaveMetaCheck<ProtocolScanner.Proto
     UserMetaMovementData movementData = user.meta().movementData();
     int keyForward = movementData.keyForward;
     int keyStrafe = movementData.keyStrafe;
-    if (keyForward != 0 || keyStrafe != 0) {
+    double distanceMoved = Math.hypot(movementData.motionX(), movementData.motionZ());
+
+    if ((keyForward != 0 || keyStrafe != 0) && distanceMoved > 0.1) {
       Violation violation = Violation.builderFor(ProtocolScanner.class)
         .forPlayer(player)
         .withMessage("updated client settings whilst walking")

@@ -5,11 +5,10 @@ plugins {
 }
 
 group 'de.jpx3'
-version = '14.0.7-b2'
+version = '14.0.8'
 description = 'Intave is an event- & packetbased, hyper-threaded & polyheuristic cheat detection software, providing fair play'
 
 def fileName = "Intave"
-
 def outputDirectory = "C:\\Users\\Richard\\Desktop\\Minecraft Plugins\\bungeecort system\\AAC\\plugins\\"
 
 repositories {

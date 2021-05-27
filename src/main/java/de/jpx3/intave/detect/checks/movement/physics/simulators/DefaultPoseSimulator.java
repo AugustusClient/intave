@@ -1,6 +1,5 @@
 package de.jpx3.intave.detect.checks.movement.physics.simulators;
 
-import de.jpx3.intave.world.fluid.LegacyWaterflow;
 import de.jpx3.intave.detect.checks.movement.physics.MotionVector;
 import de.jpx3.intave.tools.client.EffectLogic;
 import de.jpx3.intave.tools.client.MaterialLogic;
@@ -19,6 +18,7 @@ import de.jpx3.intave.world.collider.Collider;
 import de.jpx3.intave.world.collider.result.ComplexColliderSimulationResult;
 import de.jpx3.intave.world.collider.result.QuickColliderSimulationResult;
 import de.jpx3.intave.world.fluid.Fluid;
+import de.jpx3.intave.world.fluid.LegacyWaterflow;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -48,7 +48,8 @@ public class DefaultPoseSimulator extends PoseSimulator {
     boolean inLava = movementData.inLava();
     boolean swimming = movementData.swimming;
     boolean waterUpdate = clientData.waterUpdate();
-    if (movementData.actualSneaking()) {
+    boolean ignoreSneakingInput = inWater && clientData.beeUpdate();
+    if (movementData.actualSneaking() && !ignoreSneakingInput) {
       strafe = (float) ((double) strafe * 0.3);
       forward = (float) ((double) forward * 0.3);
     }
@@ -117,7 +118,7 @@ public class DefaultPoseSimulator extends PoseSimulator {
       context.motionY *= motionMultiplier.getY();
       context.motionZ *= motionMultiplier.getZ();
       movementData.physicsMotionX = 0;
-//      movementData.physicsMotionY = 0;
+      movementData.physicsMotionY = 0;
       movementData.physicsMotionZ = 0;
     }
 
@@ -531,6 +532,9 @@ public class DefaultPoseSimulator extends PoseSimulator {
         motionVector.motionY -= gravity / 16.0D;
       }
     }
+//    if(movementData.collidedHorizontally && MovementContextHelper.isOffsetPositionInLiquid(player, entityBoundingBox, x, y, z)) {
+//      motionVector.motionY = 0.3;
+//    }
   }
 
   private void simulateLavaAfter(

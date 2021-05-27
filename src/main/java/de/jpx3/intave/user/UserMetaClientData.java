@@ -1,5 +1,6 @@
 package de.jpx3.intave.user;
 
+import com.comphenix.protocol.utility.MinecraftVersion;
 import de.jpx3.intave.adapter.ViaVersionAdapter;
 import de.jpx3.intave.tools.annotate.Relocate;
 import org.bukkit.entity.Player;
@@ -19,6 +20,7 @@ public final class UserMetaClientData {
   private String versionString;
   private int protocolVersion;
   private final User user;
+  private int refreshes;
 
   public UserMetaClientData(Player player, User user) {
     this.user = user;
@@ -28,15 +30,16 @@ public final class UserMetaClientData {
   public void refresh(Player player) {
     this.protocolVersion = player == null ? -1 : ViaVersionAdapter.protocolVersionOf(player);
     this.versionString = versionAsString();
+    this.refreshes++;
   }
 
   private String versionAsString() {
     if(protocolVersion < 0)
-      return "unknown";
+      return "1.0";
     if (protocolVersion <= 47)
-      return "1.8.x";
+      return "1.8";
     if (protocolVersion <= 107)
-      return "1.9.0";
+      return "1.9";
     if (protocolVersion <= 108)
       return "1.9.1";
     if (protocolVersion <= 109)
@@ -44,25 +47,25 @@ public final class UserMetaClientData {
     if (protocolVersion <= 110)
       return "1.9.3";
     if (protocolVersion <= 210)
-      return "1.10.x";
+      return "1.10.1";
     if (protocolVersion <= 315)
-      return "1.11.0";
+      return "1.11";
     if (protocolVersion <= 316)
-      return "1.11.1/2";
+      return "1.11.1";
     if (protocolVersion <= 335)
-      return "1.12.0";
+      return "1.12";
     if (protocolVersion <= 338)
       return "1.12.1";
     if (protocolVersion <= 340)
       return "1.12.2";
     if (protocolVersion <= 393)
-      return "1.13.0";
+      return "1.13";
     if (protocolVersion <= 401)
       return "1.13.1";
     if (protocolVersion <= 404)
       return "1.13.2";
     if (protocolVersion <= 477)
-      return "1.14.0";
+      return "1.14";
     if (protocolVersion <= 480)
       return "1.14.1";
     if (protocolVersion <= 485)
@@ -72,13 +75,13 @@ public final class UserMetaClientData {
     if (protocolVersion <= 498)
       return "1.14.4";
     if (protocolVersion <= 573)
-      return "1.15.0";
+      return "1.15";
     if (protocolVersion <= 575)
       return "1.15.1";
     if (protocolVersion <= 578)
       return "1.15.2";
     if (protocolVersion <= 735)
-      return "1.16.0";
+      return "1.16";
     if (protocolVersion <= 736)
       return "1.16.1";
     if (protocolVersion <= 751)
@@ -86,9 +89,8 @@ public final class UserMetaClientData {
     if (protocolVersion <= 753)
       return "1.16.3";
     if (protocolVersion <= 754)
-      return "1.16.4/5";
-
-    return "Newer than 1.16.5";
+      return "1.16.5";
+    return "1.16.5";
   }
 
   public int protocolVersion() {
@@ -114,7 +116,7 @@ public final class UserMetaClientData {
   }
 
   public boolean flyingPacketStream() {
-    return protocolVersion <= PROTOCOL_VERSION_BOUNTIFUL_UPDATE;
+    return protocolVersion <= PROTOCOL_VERSION_BOUNTIFUL_UPDATE && !clientVersionBehindServerVersion();
   }
 
   public boolean inventoryAchievementPacket() {
@@ -168,6 +170,17 @@ public final class UserMetaClientData {
 
   public boolean combatUpdate() {
     return protocolVersion >= PROTOCOL_VERSION_COMBAT_UPDATE;
+  }
+
+  private Boolean behind;
+
+  public boolean clientVersionBehindServerVersion() {
+    if(behind == null || refreshes < 2) {
+      MinecraftVersion server = MinecraftVersion.getCurrentVersion();
+      MinecraftVersion client = new MinecraftVersion(versionAsString());
+      behind = !client.isAtLeast(server);
+    }
+    return behind;
   }
 
   public String versionString() {

@@ -100,12 +100,13 @@ public final class IntaveRootStage extends CommandStage {
         boolean suspicious = timing.averageCallDurationInMillis() > 0.5d;
         boolean dumping = timing.averageCallDurationInMillis() > 1.5d;
         String message = String.format(
-          "%s: %s::%sms (%s&f ms/c)",
+          "%s: %s::%sms (%s ms/c)",
           timing.coloredName(),
           timing.recordedCalls(),
           MathHelper.formatDouble(timing.totalDurationMillis(), 4),
           (suspicious ? (dumping ? ChatColor.RED : ChatColor.YELLOW) : ChatColor.GREEN) + "" +
             MathHelper.formatDouble(timing.averageCallDurationInMillis(), 8)
+          + ChatColor.WHITE
         );
         if(!fullSpecifier.isEmpty() && !timing.name().toLowerCase(Locale.ROOT).contains(fullSpecifier)) {
           message = ChatColor.GRAY + ChatColor.stripColor(message);
@@ -191,16 +192,21 @@ public final class IntaveRootStage extends CommandStage {
   public void outputBiasSuccess(User user) {
     Player player = user.player();
 
-    long biasCalls = Timings.CHECK_PHYSICS_PROC_BIA.recordedCalls();
-    long failedCalls = Timings.CHECK_PHYSICS_PROC_ITR.recordedCalls();
-    long successfulCalls = biasCalls - failedCalls;
+    long biasPredCalls = Timings.CHECK_PHYSICS_PROC_PRED_BIA.recordedCalls();
+    long biasLKCalls = Timings.CHECK_PHYSICS_PROC_LK_BIA.recordedCalls();
+    long biasTotalCalls = biasPredCalls + biasLKCalls;
+    long iterativeCall = Timings.CHECK_PHYSICS_PROC_ITR.recordedCalls();
+    long successfulCalls = biasTotalCalls - iterativeCall;
 
-    double percentage = ((double) successfulCalls / (double) biasCalls) * 100;
+    double percentage = ((double) successfulCalls / ((double) biasTotalCalls)) * 100;
 
-    player.sendMessage(biasCalls + " biased with " + failedCalls + " fails");
+    long successfulBias = biasPredCalls - (biasLKCalls + iterativeCall);
+    long successfulLK = biasLKCalls - iterativeCall;
+
+    player.sendMessage(successfulBias + "/"+biasPredCalls+" pred biased, "+successfulLK+"/"+biasLKCalls+" lk biased with " + iterativeCall + " iterative");
     player.sendMessage(MathHelper.formatDouble(percentage, 2) + "% movements bias simulated");
-    double estimatedTimeIfAllBiasCallsWereIterative = biasCalls * Timings.CHECK_PHYSICS_PROC_ITR.getAverageCallDurationInNanos();
-    double savedTime = (estimatedTimeIfAllBiasCallsWereIterative - Timings.CHECK_PHYSICS_PROC_BIA.getTotalDurationNanos()) / 1000000d;
+    double estimatedTimeIfAllBiasCallsWereIterative = biasTotalCalls * Timings.CHECK_PHYSICS_PROC_ITR.getAverageCallDurationInNanos();
+    double savedTime = (estimatedTimeIfAllBiasCallsWereIterative - (Timings.CHECK_PHYSICS_PROC_PRED_BIA.getTotalDurationNanos() + Timings.CHECK_PHYSICS_PROC_LK_BIA.getTotalDurationNanos()) ) / 1000000d;
 
     player.sendMessage("Saved " + (savedTime > 0 ? ChatColor.GREEN : ChatColor.RED) + MathHelper.formatDouble(savedTime, 2) + ChatColor.WHITE + "ms");
   }
