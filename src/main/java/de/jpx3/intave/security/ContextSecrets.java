@@ -16,7 +16,7 @@ public final class ContextSecrets {
 
   @Native
   public static void setup() {
-    if(GOMME_MODE) {
+    if (GOMME_MODE) {
       IntavePlugin plugin = IntavePlugin.singletonInstance();
       File dataFolder = plugin.getDataFolder();
       if (!dataFolder.exists()) {
@@ -37,7 +37,7 @@ public final class ContextSecrets {
 
   @Native
   public static String secret(String key) {
-    if(GOMME_MODE) {
+    if (GOMME_MODE) {
       return mapping.getOrDefault(key.toLowerCase(), "null");
     }
     return "null";

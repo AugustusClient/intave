@@ -29,7 +29,7 @@ public final class EquipmentFilter extends Filter {
   public void filterEquipment(PacketEvent event) {
     PacketContainer packet = event.getPacket();
 
-//    if(packet.getItemModifier().readSafely(0) != null) {
+//    if (packet.getItemModifier().readSafely(0) != null) {
 //      // 1.8 - 1.15
 //      ItemStack itemStack = packet.getItemModifier().readSafely(0);
 //      ItemStack newItemStack = stripFromData(itemStack);
@@ -51,9 +51,9 @@ public final class EquipmentFilter extends Filter {
     itemStack.setAmount(1);
     itemStack.setDurability((short) 1337);
 
-    if(itemStack.hasItemMeta()) {
+    if (itemStack.hasItemMeta()) {
       ItemMeta meta = itemStack.getItemMeta();
-      if(meta.hasEnchants()) {
+      if (meta.hasEnchants()) {
         for (Enchantment enchantment : itemStack.getEnchantments().keySet()) {
           itemStack.removeEnchantment(enchantment);
         }

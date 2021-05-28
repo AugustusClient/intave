@@ -20,7 +20,7 @@ public final class CallerResolver {
       String callerClassName = element.getClassName();
       String callerMethodName = element.getMethodName();
       String pluginName = pluginFromClass(callerClassName);
-      if(!pluginName.equalsIgnoreCase(NO_PLUGIN_FOUND)
+      if (!pluginName.equalsIgnoreCase(NO_PLUGIN_FOUND)
 //        && !pluginName.equalsIgnoreCase("Intave")
         && i++ > 1
       ) {
@@ -48,12 +48,12 @@ public final class CallerResolver {
     try {
       Class<?> clazz = Class.forName(className);
       ClassLoader classLoader = clazz.getClassLoader();
-      if(classLoader == null) {
+      if (classLoader == null) {
         return NO_PLUGIN_FOUND;
       }
       Class<? extends ClassLoader> classLoaderClass = classLoader.getClass();
-      if(classLoaderClass != null && classLoader.getClass().getName().equalsIgnoreCase(BUKKIT_CLASSLOADER_LOCATION)) {
-        if(classLoaderClassPluginField == null) {
+      if (classLoaderClass != null && classLoader.getClass().getName().equalsIgnoreCase(BUKKIT_CLASSLOADER_LOCATION)) {
+        if (classLoaderClassPluginField == null) {
           classLoaderClassPluginField = classLoader.getClass().getDeclaredField("plugin");
           classLoaderClassPluginField.setAccessible(true);
         }

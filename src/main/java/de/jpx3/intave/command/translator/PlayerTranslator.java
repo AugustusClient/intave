@@ -19,7 +19,7 @@ public final class PlayerTranslator extends TypeTranslator<Player> {
   @Override
   public Player resolve(CommandSender commandSender, String element, String forward) {
     Player player = Bukkit.getPlayer(element);
-    if(!AccessHelper.isOnline(player)) {
+    if (!AccessHelper.isOnline(player)) {
       commandSender.sendMessage(IntavePlugin.prefix() + ChatColor.RED + "Invalid argument \""+element+"\": Unable to locate player");
       return null;
     }
@@ -31,10 +31,10 @@ public final class PlayerTranslator extends TypeTranslator<Player> {
     List<String> playerNames = new ArrayList<>();
     for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
       boolean add = true;
-      if(commandSender instanceof Player) {
+      if (commandSender instanceof Player) {
         add = ((Player) commandSender).canSee(onlinePlayer);
       }
-      if(add) {
+      if (add) {
         playerNames.add(onlinePlayer.getName());
       }
     }

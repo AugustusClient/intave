@@ -50,7 +50,7 @@ public final class CustomEventService {
 
   private <T extends IntaveEvent> T activeInstanceOf(Class<T> eventClass) {
     ThreadLocal<IntaveEvent> eventThreadLocal = eventAccess.get(eventClass);
-    if(eventThreadLocal == null) {
+    if (eventThreadLocal == null) {
       throw new IllegalStateException("Unable to locate thread local handle for event class " + eventClass.getName());
     }
     //noinspection unchecked

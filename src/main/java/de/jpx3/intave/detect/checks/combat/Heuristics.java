@@ -60,12 +60,13 @@ public final class Heuristics extends IntaveMetaCheck<Heuristics.HeuristicMeta> 
     boolean enterprise = (UserMetaClientData.VERSION_DETAILS & 0x200) != 0;
     boolean partner = (UserMetaClientData.VERSION_DETAILS & 0x100) != 0;
 
-    if(enterprise) {
+    if (enterprise) {
       appendCheckPart(new AirClickLimitHeuristic(this));
       appendCheckPart(new AttackRequiredHeuristic(this));
       appendCheckPart(new AttackReduceIgnoreHeuristic(this));
       appendCheckPart(new RotationStandardDeviationHeuristic(this));
       appendCheckPart(new RotationSnapHeuristic(this));
+      appendCheckPart(new SameRotationHeuristic(this));
     }
 
     appendCheckPart(new ReshapedJumpHeuristic(this));
@@ -81,7 +82,6 @@ public final class Heuristics extends IntaveMetaCheck<Heuristics.HeuristicMeta> 
     appendCheckPart(new BlockingHeuristic(this));
     appendCheckPart(new AttackInInvalidStateHeuristic(this));
     appendCheckPart(new NoSwingHeuristic(this));
-    appendCheckPart(new SameRotationHeuristic(this));
 //    appendCheckPart(new VentolotlHeuristic(this));
 //    appendCheckPart(new LinearRegressionHeuristic(this));
   }

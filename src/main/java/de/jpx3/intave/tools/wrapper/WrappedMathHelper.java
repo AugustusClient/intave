@@ -22,7 +22,7 @@ public final class WrappedMathHelper {
   public static int binarySearch(int min, int max, IntPredicate isTargetBeforeOrAt) {
     int i = max - min;
 
-    while(i > 0) {
+    while (i > 0) {
       int j = i / 2;
       int k = min + j;
       if (isTargetBeforeOrAt.test(k)) {

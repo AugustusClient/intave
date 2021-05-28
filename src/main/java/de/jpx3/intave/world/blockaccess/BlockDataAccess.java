@@ -34,17 +34,17 @@ public final class BlockDataAccess {
     if (MinecraftVersions.VER1_9_0.atOrAbove()) {
       resolverName = "de.jpx3.intave.world.blockaccess.v9BlockAccessor";
     }
-    if(MinecraftVersions.VER1_13_0.atOrAbove()) {
+    if (MinecraftVersions.VER1_13_0.atOrAbove()) {
       resolverName = "de.jpx3.intave.world.blockaccess.v13BlockAccessor";
     }
-    if(MinecraftVersions.VER1_14_0.atOrAbove()) {
+    if (MinecraftVersions.VER1_14_0.atOrAbove()) {
       resolverName = "de.jpx3.intave.world.blockaccess.v14BlockAccessor";
     }
     ClassLoader classLoader = IntavePlugin.class.getClassLoader();
     PatchyLoadingInjector.loadUnloadedClassPatched(classLoader, resolverName);
     blockAccessor = instanceOf(resolverName);
 
-    if(MinecraftVersions.VER1_14_0.atOrAbove()) {
+    if (MinecraftVersions.VER1_14_0.atOrAbove()) {
       try {
         Class<?> blockDataClass = ReflectiveAccess.lookupServerClass("IBlockData");
         Class<?> craftBukkitClass = ReflectiveAccess.lookupCraftBukkitClass("block.CraftBlock");
@@ -68,7 +68,7 @@ public final class BlockDataAccess {
 
   public static int dataIndexOf(Block block) {
     Material type = block.getType();
-    if(isLegacy(type)) {
+    if (isLegacy(type)) {
       return block.getData();
     } else {
       try {
@@ -96,7 +96,7 @@ public final class BlockDataAccess {
   }
 
   private static void loadMaterials() {
-    if(MinecraftVersions.VER1_14_0.atOrAbove()) {
+    if (MinecraftVersions.VER1_14_0.atOrAbove()) {
       modernMaterialLoad();
     } else {
       legacyMaterialLoad();
@@ -114,7 +114,7 @@ public final class BlockDataAccess {
 
     for (Material material : Material.values()) {
       try {
-        if((boolean) isLegacy.invoke(material)) {
+        if ((boolean) isLegacy.invoke(material)) {
           legacyMaterials.add(material);
         }
       } catch (Exception exception) {
@@ -122,7 +122,7 @@ public final class BlockDataAccess {
       }
 
       try {
-        if(material.isBlock() && (boolean) isInteractable.invoke(material)) {
+        if (material.isBlock() && (boolean) isInteractable.invoke(material)) {
           clickableMaterials.add(material);
         }
       } catch (Exception exception) {
@@ -133,7 +133,7 @@ public final class BlockDataAccess {
 
   private static void legacyMaterialLoad() {
     for (Material material : Material.values()) {
-      if(!material.isBlock()) {
+      if (!material.isBlock()) {
         continue;
       }
       Object block = ReflectiveBlockAccess.blockById(material.getId());

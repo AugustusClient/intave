@@ -439,7 +439,7 @@ public class WrappedAxisAlignedBB {
     float height = movementData.height;
 
     double newYMax;
-    if(clientData.roundEnvironmentNumbers()) {
+    if (clientData.roundEnvironmentNumbers()) {
       newYMax = Math.round((positionY + height) * 10000000d) / 10000000d;
     } else {
       newYMax = Math.round((positionY + height) * 10000000000d) / 10000000000d;

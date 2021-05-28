@@ -57,7 +57,7 @@ public final class InjectionService implements EventProcessor {
   }
 
   public void inject(Player player) {
-    if(!pipelineInjector.hasInjected(player)) {
+    if (!pipelineInjector.hasInjected(player)) {
       pipelineInjector.injectPlayer(player);
     }
   }
@@ -67,7 +67,7 @@ public final class InjectionService implements EventProcessor {
   }
 
   public void uninject(Player player) {
-//    if(pipelineInjector.hasInjected(player)) {
+//    if (pipelineInjector.hasInjected(player)) {
 //      pipelineInjector.uninjectPlayer(player);
 //    }
   }

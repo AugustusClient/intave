@@ -99,7 +99,7 @@ public final class IntaveProxyStage extends CommandStage {
   }
 
   public static IntaveProxyStage singletonInstance() {
-    if(singletonInstance == null) {
+    if (singletonInstance == null) {
       singletonInstance = new IntaveProxyStage();
     }
     return singletonInstance;

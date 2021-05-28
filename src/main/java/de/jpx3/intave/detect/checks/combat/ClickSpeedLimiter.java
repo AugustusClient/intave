@@ -53,7 +53,7 @@ public final class ClickSpeedLimiter extends IntaveMetaCheck<ClickSpeedLimiter.C
     }
 
     double timeDiff = (AccessHelper.now() - meta.lastFlag) / 1000d;
-    if(timeDiff < 1d) {
+    if (timeDiff < 1d) {
       event.setCancelled(true);
     }
   }
@@ -150,7 +150,7 @@ public final class ClickSpeedLimiter extends IntaveMetaCheck<ClickSpeedLimiter.C
         .withVL(addedVL)
         .build();
       ViolationContext violationContext = plugin.violationProcessor().processViolation(violation);
-      if(violationContext.shouldCounterThreat()) {
+      if (violationContext.shouldCounterThreat()) {
         meta.lastFlag = AccessHelper.now();
       }
     }

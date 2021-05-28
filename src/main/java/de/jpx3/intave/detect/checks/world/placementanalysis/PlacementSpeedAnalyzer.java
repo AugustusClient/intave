@@ -52,12 +52,12 @@ public final class PlacementSpeedAnalyzer extends IntaveMetaCheckPart<PlacementA
     PlacementSpeedMeta meta = metaOf(user);
     PacketContainer packet = event.getPacket();
 
-    if(event.getPacketType() == PacketType.Play.Client.BLOCK_PLACE) {
+    if (event.getPacketType() == PacketType.Play.Client.BLOCK_PLACE) {
       Integer facing = packet.getIntegers().readSafely(0);
-      if(facing == null) {
+      if (facing == null) {
         facing = 0;
       }
-      if(facing == 255) {
+      if (facing == 255) {
         meta.lastHardFaultClick = AccessHelper.now();
       }
     }
@@ -74,21 +74,21 @@ public final class PlacementSpeedAnalyzer extends IntaveMetaCheckPart<PlacementA
     Block block = place.getBlockPlaced();
     Block blockAgainst = place.getBlockAgainst();
 
-    if(blockUnderPlayer(block, player) && blockCollisions(block) < 2) {
+    if (blockUnderPlayer(block, player) && blockCollisions(block) < 2) {
       List<Long> placementSpeedHistory = meta.placementSpeedHistory;
 
-      if(placementSpeedHistory.size() >= CHECK_LENGTH) {
+      if (placementSpeedHistory.size() >= CHECK_LENGTH) {
         placementSpeedHistory.remove(0);
       }
 
-      if(block.getY() == blockAgainst.getY()) {
+      if (block.getY() == blockAgainst.getY()) {
         placementSpeedHistory.add(AccessHelper.now() - meta.lastPlacement);
         meta.lastPlacement = AccessHelper.now();
       } else {
         placementSpeedHistory.add(AccessHelper.now() - meta.lastPlacement + 1000);
       }
 
-      if(placementSpeedHistory.size() >= CHECK_LENGTH) {
+      if (placementSpeedHistory.size() >= CHECK_LENGTH) {
         double average = placementSpeedHistory.stream().mapToDouble(value -> value).average().orElse(500);
         boolean inOneLine = isOneLine(meta.placementHistory);
 
@@ -100,7 +100,7 @@ public final class PlacementSpeedAnalyzer extends IntaveMetaCheckPart<PlacementA
         int speedAmplifier = potionData.potionEffectSpeedAmplifier();
         minAverage /= 0.15 * speedAmplifier * speedAmplifier + 1;
 
-        if(average < minAverage) {
+        if (average < minAverage) {
           Violation violation = Violation.builderFor(PlacementAnalysis.class)
             .forPlayer(player).withDefaultThreshold()
             .withMessage(COMMON_FLAG_MESSAGE)
@@ -116,7 +116,7 @@ public final class PlacementSpeedAnalyzer extends IntaveMetaCheckPart<PlacementA
       }
     }
 
-    if(!place.isCancelled()) {
+    if (!place.isCancelled()) {
       List<Location> placementHistory = meta.placementHistory;
       if (placementHistory.size() >= DIRECTION_EVAL_LENGTH) {
         placementHistory.remove(0);
@@ -148,18 +148,18 @@ public final class PlacementSpeedAnalyzer extends IntaveMetaCheckPart<PlacementA
             lockedOnZ = false;
     boolean first = true;
     for (Location block : blocks) {
-      if(!first) {
-        if(lastBlockY != block.getY()) {
+      if (!first) {
+        if (lastBlockY != block.getY()) {
           return false;
         }
-        if(lastBlockX == block.getX()) {
+        if (lastBlockX == block.getX()) {
           lockedOnX = true;
-        } else if(lockedOnX) {
+        } else if (lockedOnX) {
           return false;
         }
-        if(lastBlockZ == block.getZ()) {
+        if (lastBlockZ == block.getZ()) {
           lockedOnZ = true;
-        } else if(lockedOnZ) {
+        } else if (lockedOnZ) {
           return false;
         }
       }

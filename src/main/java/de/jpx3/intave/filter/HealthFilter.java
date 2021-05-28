@@ -25,7 +25,7 @@ public final class HealthFilter extends Filter {
     }
   )
   public void depriveHealth(PacketEvent event) {
-    if(!enabled()) {
+    if (!enabled()) {
       return;
     }
     try {

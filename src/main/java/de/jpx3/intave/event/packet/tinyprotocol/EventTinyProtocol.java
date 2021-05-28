@@ -26,11 +26,11 @@ public final class EventTinyProtocol extends TinyProtocol {
     PacketType packetType = PacketRegistry.getPacketType(packet.getClass());
     if (packetType != null) {
       Collection<LocalPacketAdapter> subscriptions = injectionService.subscriptionsOf(packetType);
-      if(subscriptions != null && !subscriptions.isEmpty()) {
+      if (subscriptions != null && !subscriptions.isEmpty()) {
         PacketEvent packetEvent = PacketEvent.fromServer(packet, PacketContainer.fromPacket(packet), receiver);
         subscriptions.forEach(subscription -> subscription.onPacketSending(packetEvent));
         packet = packetEvent.getPacket().getHandle();
-        if(packetEvent.isCancelled()) {
+        if (packetEvent.isCancelled()) {
           return null;
         }
       }

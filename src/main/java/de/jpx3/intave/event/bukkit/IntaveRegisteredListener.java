@@ -47,7 +47,7 @@ public final class IntaveRegisteredListener extends RegisteredListener {
     boolean asynchronous = !Bukkit.isPrimaryThread();
     if (!asynchronous) {
       Timings.EXE_SERVER.start();
-      if(timing == null) {
+      if (timing == null) {
         timing = Timings.eventTimingOf(event);
       }
       timing.start();

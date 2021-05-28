@@ -62,7 +62,7 @@ public final class CustomClientSupportService implements EventProcessor {
     } else {
       tag = packet.getStrings().getValues().get(0);
     }
-    if(tag.startsWith("minecraft:")) {
+    if (tag.startsWith("minecraft:")) {
       tag = tag.substring(10);
     }
     if (!tag.equalsIgnoreCase("intave")) {
@@ -72,7 +72,7 @@ public final class CustomClientSupportService implements EventProcessor {
     try {
       bytes.markReaderIndex();
       String messageKey = LabyModChannelHelper.readString(bytes, 100);
-      if(messageKey.equalsIgnoreCase("clientconfig")) {
+      if (messageKey.equalsIgnoreCase("clientconfig")) {
         IntaveLogger.logger().pushPrintln("[Intave] " + player.getName() + " has sent a custom client configuration (client has special Intave support)");
         String messageContent = LabyModChannelHelper.readString(bytes, 32767);
         JsonElement jsonElement = jsonParser.parse(messageContent);

@@ -21,7 +21,7 @@ public final class DefaultForwardingPermissionTrustFactorResolver implements Tru
       .filter(trustFactor -> hasPermissionFor(player, trustFactor))
       .findFirst();
 
-    if(resolvedTrustFactor.isPresent()) {
+    if (resolvedTrustFactor.isPresent()) {
       callback.accept(resolvedTrustFactor.get());
     } else {
       defaultResolver.resolve(player, callback);

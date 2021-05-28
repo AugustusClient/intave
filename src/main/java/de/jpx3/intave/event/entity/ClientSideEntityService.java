@@ -319,7 +319,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
       );
 
 //      WrappedEntity wrappedEntity = entityByIdentifier(user, entityID);
-//      if(wrappedEntity != null)
+//      if (wrappedEntity != null)
 //        Bukkit.broadcastMessage("pt " + packetType.name() + " p " + user.player().getName() + " e " + wrappedEntity.position);
     }
   }
@@ -427,7 +427,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
     }
 
     List<WrappedWatchableObject> watchableObjects = packet.getWatchableCollectionModifier().read(0);
-    if(watchableObjects != null) {
+    if (watchableObjects != null) {
       int entityTypeId = entity.entityTypeData.entityTypeId();
       EntityTypeData entityTypeData = entityTypeResolver.entityTypeDataOfEntityMetaData(event, entityTypeId, watchableObjects);
       if (entityTypeData != null) {

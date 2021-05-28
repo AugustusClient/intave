@@ -25,7 +25,7 @@ public final class v11BoundingBoxResolver implements BoundingBoxResolvePipeline 
     Chunk handle = ((CraftChunk) world.getChunkAt(posX >> 4, posZ >> 4)).getHandle();
     BlockPosition blockposition = new BlockPosition(posX, posY, posZ);
     IBlockData blockData = handle.getBlockData(blockposition);
-    if(blockData == null) {
+    if (blockData == null) {
       return Collections.emptyList();
     }
     List<AxisAlignedBB> bbs = new ArrayList<>();
@@ -46,7 +46,7 @@ public final class v11BoundingBoxResolver implements BoundingBoxResolvePipeline 
     BlockPosition blockposition = new BlockPosition(posX, posY, posZ);
     IBlockData blockData = Block.getByCombinedId(type.getId() | ((blockState << 12) & 0xF));
     List<AxisAlignedBB> bbs = new ArrayList<>();
-    if(blockData == null) {
+    if (blockData == null) {
       return Collections.emptyList();
     }
     blockData.getBlock().a(
@@ -61,7 +61,7 @@ public final class v11BoundingBoxResolver implements BoundingBoxResolvePipeline 
   }
 
   private List<WrappedAxisAlignedBB> translate(List<?> bbs) {
-    if(bbs.isEmpty()) {
+    if (bbs.isEmpty()) {
       return Collections.emptyList();
     }
     List<WrappedAxisAlignedBB> list = new ArrayList<>();

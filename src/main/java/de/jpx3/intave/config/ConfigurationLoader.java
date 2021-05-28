@@ -46,7 +46,7 @@ public final class ConfigurationLoader {
 /*  @Native
   @Nullable
   public String precomputeConfigurationHash() {
-    if(!configurationCacheExists()) {
+    if (!configurationCacheExists()) {
       return null;
     }
     try {
@@ -54,7 +54,7 @@ public final class ConfigurationLoader {
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
       byte[] buf = new byte[4096];
       int read;
-      while((read = fileInputStream.read(buf)) != -1) {
+      while ((read = fileInputStream.read(buf)) != -1) {
         byteArrayOutputStream.write(buf, 0, read);
       }
       fileInputStream.close();
@@ -84,13 +84,13 @@ public final class ConfigurationLoader {
     Map<String, Integer> mappings = new HashMap<>();
     while (scanner.hasNextLine()) {
       String nextLine = scanner.nextLine();
-      if(!nextLine.contains(":")) {
+      if (!nextLine.contains(":")) {
         return 0;
       }
       String[] split = nextLine.split(":");
       mappings.put(split[0], Integer.parseInt(split[1]));
     }
-    if(!mappings.containsKey(configurationKey)) {
+    if (!mappings.containsKey(configurationKey)) {
       return -1;
     }
     return mappings.get(configurationKey.toLowerCase());
@@ -99,11 +99,11 @@ public final class ConfigurationLoader {
   @Native
   public void saveState(int state) {
     Map<String, Integer> mappings = new HashMap<>();
-    if(configurationStates.exists()) {
+    if (configurationStates.exists()) {
       Scanner scanner = new Scanner(configurationStates.read());
       while (scanner.hasNextLine()) {
         String nextLine = scanner.nextLine();
-        if(nextLine.contains(":")) {
+        if (nextLine.contains(":")) {
           String[] split = nextLine.split(":");
           mappings.put(split[0], Integer.parseInt(split[1]));
         }
@@ -118,7 +118,7 @@ public final class ConfigurationLoader {
   @Native
   public void loadConfigurationUpdatedForcefully() {
     YamlConfiguration configuration = tryDownloadConfiguration();
-    if(configuration == null) {
+    if (configuration == null) {
       try {
         configuration = (YamlConfiguration) readConfiguration();
       } catch (IllegalStateException exception) {
@@ -133,9 +133,9 @@ public final class ConfigurationLoader {
   @Native
   public void loadConfiguration() {
     YamlConfiguration configuration;
-    if(!configurationCacheExists()) {
+    if (!configurationCacheExists()) {
       configuration = tryDownloadConfiguration();
-      if(configuration == null) {
+      if (configuration == null) {
         try {
           configuration = (YamlConfiguration) readConfiguration();
         } catch (IllegalStateException exception) {
@@ -149,7 +149,7 @@ public final class ConfigurationLoader {
         configuration = (YamlConfiguration) readConfiguration();
       } catch (IllegalStateException exception) {
         configuration = tryDownloadConfiguration();
-        if(configuration == null) {
+        if (configuration == null) {
           throw exception;
         }
       }
@@ -166,18 +166,18 @@ public final class ConfigurationLoader {
       boolean partner = (UserMetaClientData.VERSION_DETAILS & 0x100) != 0;
 
       boolean useExternalConfigurationFile = (configurationKey.equalsIgnoreCase("file") && enterprise) || IntaveControl.USE_EXTERNAL_CONFIGURATION_FILE;
-      if(useExternalConfigurationFile) {
+      if (useExternalConfigurationFile) {
         IntavePlugin plugin = IntavePlugin.singletonInstance();
         File settingFile = new File(plugin.getDataFolder(), "settings.yml");
-        if(!settingFile.exists()) {
-          if(plugin.getResource("settings.yml") != null) {
+        if (!settingFile.exists()) {
+          if (plugin.getResource("settings.yml") != null) {
             plugin.saveResource("settings.yml", false);
           } else {
             throw new IntaveException("Please download Intave again to use file configurations");
           }
         }
         inputStream = new FileInputStream(settingFile);
-      } else if(IntaveControl.USE_DEBUG_RESOURCES) {
+      } else if (IntaveControl.USE_DEBUG_RESOURCES) {
         inputStream = ConfigurationLoader.class.getResourceAsStream("/settings.yml");
       } else {
         URL url = new URL("https://intave.de/api/configuration-download");
@@ -205,7 +205,7 @@ public final class ConfigurationLoader {
   private Object readConfiguration() {
     try {
       File configurationCache = configurationCache();
-      if(!configurationCache.exists()) {
+      if (!configurationCache.exists()) {
         throw new IllegalStateException();
       }
       configurationCache.setLastModified(AccessHelper.now());
@@ -213,7 +213,7 @@ public final class ConfigurationLoader {
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
       byte[] buf = new byte[4096];
       int read;
-      while((read = fileInputStream.read(buf)) != -1) {
+      while ((read = fileInputStream.read(buf)) != -1) {
         byteArrayOutputStream.write(buf, 0, read);
       }
       fileInputStream.close();
@@ -289,16 +289,16 @@ public final class ConfigurationLoader {
   private File intaveTempDirectory() {
     File workDirectory;
     String operatingSystem = System.getProperty("os.name").toLowerCase(Locale.ROOT);
-    if(operatingSystem.contains("win")) {
+    if (operatingSystem.contains("win")) {
       workDirectory = new File(System.getenv("APPDATA") + "/Intave");
     } else {
-      if(GOMME_MODE) {
+      if (GOMME_MODE) {
         workDirectory = new File(ContextSecrets.secret("cache-directory"));
       } else {
         workDirectory = new File(System.getProperty("user.home") + "/.intave/");
       }
     }
-    if(!workDirectory.exists()) {
+    if (!workDirectory.exists()) {
       workDirectory.mkdir();
     }
     return workDirectory;

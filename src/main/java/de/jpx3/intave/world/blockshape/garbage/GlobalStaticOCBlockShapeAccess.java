@@ -134,7 +134,7 @@ public final class GlobalStaticOCBlockShapeAccess implements OCBlockShapeAccess 
 
   private BlockShape lookup(World world, Block block, int posX, int posY, int posZ) {
     Material type = block.getType();
-    if(type == Material.AIR) {
+    if (type == Material.AIR) {
       return EMPTY_CACHE_ENTRY;
     } else {
       BoundingBoxAccessFlowStudy.incremLookups();
@@ -163,7 +163,7 @@ public final class GlobalStaticOCBlockShapeAccess implements OCBlockShapeAccess 
   public void override(World world, int posX, int posY, int posZ, Material type, int blockState) {
     invalidateOverride(posX, posY, posZ);
     BlockShape blockShape;
-    if(type == Material.AIR) {
+    if (type == Material.AIR) {
       blockShape = EMPTY_CACHE_ENTRY;
     } else {
       blockShape = new BlockShape(
@@ -173,7 +173,7 @@ public final class GlobalStaticOCBlockShapeAccess implements OCBlockShapeAccess 
     }
     BlockShape originalShape = resolveOriginalShape(posX >> 4, posZ >> 4, posX, posY, posZ);
     boolean shapeRemains = (blockShape.boundingBoxes().equals(originalShape.boundingBoxes()));
-    if(!shapeRemains) {
+    if (!shapeRemains) {
 //      IntavePlugin.singletonInstance().eventService().disableGlobalStaticBlockAccess();
     }
     long key = bigKey(posX, posY, posZ);
@@ -184,7 +184,7 @@ public final class GlobalStaticOCBlockShapeAccess implements OCBlockShapeAccess 
   @Override
   public void invalidateOverridesInBounds(int chunkXMinPos, int chunkXMaxPos, int chunkZMinPos, int chunkZMaxPos) {
     for (Location location : locatedReplacements.keySet()) {
-      if(location.getX() >= chunkXMinPos && location.getX() < chunkXMaxPos &&
+      if (location.getX() >= chunkXMinPos && location.getX() < chunkXMaxPos &&
           location.getZ() >= chunkZMinPos && location.getZ() < chunkZMaxPos) {
         long key = bigKey(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         locatedReplacements.remove(location);
@@ -218,7 +218,7 @@ public final class GlobalStaticOCBlockShapeAccess implements OCBlockShapeAccess 
   }
 
   public void purgeOverrides() {
-    if(indexedReplacements.isEmpty()) {
+    if (indexedReplacements.isEmpty()) {
       return;
     }
     indexedReplacements.values().removeIf(BlockShape::expired);

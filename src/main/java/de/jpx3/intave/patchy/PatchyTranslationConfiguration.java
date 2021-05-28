@@ -38,7 +38,7 @@ final class PatchyTranslationConfiguration {
     VersionMethodReference originalMethodReference = null;
     for (CustomMethodTranslation customMethodTranslation : customMethodTranslationList) {
       for (VersionMethodReference versionMethodReference : customMethodTranslation.versionMethodDescriptors()) {
-        if(versionMethodReference.sameTarget(owner, name, descriptor)) {
+        if (versionMethodReference.sameTarget(owner, name, descriptor)) {
           originalMethodReference = versionMethodReference;
           selectedTranslation = customMethodTranslation;
           break;
@@ -46,7 +46,7 @@ final class PatchyTranslationConfiguration {
       }
     }
 //    IntaveLogger.logger().globalPrintLn("Selection: " + selectedTranslation);
-    if(selectedTranslation == null) {
+    if (selectedTranslation == null) {
       return null;
     }
 //    IntaveLogger.logger().globalPrintLn(selectedTranslation.selectedTranslationOf(originalMethodReference));
@@ -62,7 +62,7 @@ final class PatchyTranslationConfiguration {
   }
 
   static Map<String, Object> buildAnnotationMap(List<Object> objects) {
-    if(objects == null) {
+    if (objects == null) {
       return ImmutableMap.of();
     }
     Map<String, Object> map = new HashMap<>();
@@ -85,34 +85,34 @@ final class PatchyTranslationConfiguration {
     boolean nativeVersionAvailable = availableVersions.contains(serverVersion);
     switch (selectedTranslation.versionPolicy()) {
       case IGNORE:
-        if(!nativeVersionAvailable) {
+        if (!nativeVersionAvailable) {
           return originalMethod.version();
         }
         selectedVersion = serverVersion;
         break;
       case THROW_ERROR:
-        if(!nativeVersionAvailable) {
+        if (!nativeVersionAvailable) {
           throw new MissingVersionTranslationException("Unable to find translation for version " + serverVersion + " when referring to " + originalMethod.owner() + "#" + originalMethod.name() + originalMethod.version());
         }
         selectedVersion = serverVersion;
         break;
       case USE_NEXT_LOWER:
         for (String availableVersion : availableVersions) {
-          if(selectedVersion == null || newerThan(selectedVersion, availableVersion) && !newerThan(availableVersion, serverVersion)) {
+          if (selectedVersion == null || newerThan(selectedVersion, availableVersion) && !newerThan(availableVersion, serverVersion)) {
             selectedVersion = availableVersion;
           }
         }
-        if(selectedVersion == null) {
+        if (selectedVersion == null) {
           throw new IllegalStateException("Something went a bit wrong here");
         }
         break;
       case USE_NEXT_HIGHER:
         for (String availableVersion : availableVersions) {
-          if((selectedVersion == null || newerThan(selectedVersion, availableVersion)) && selectedVersion == null || !newerThan(selectedVersion, serverVersion)) {
+          if ((selectedVersion == null || newerThan(selectedVersion, availableVersion)) && selectedVersion == null || !newerThan(selectedVersion, serverVersion)) {
             selectedVersion = availableVersion;
           }
         }
-        if(selectedVersion == null) {
+        if (selectedVersion == null) {
           throw new IllegalStateException("Something went a bit wrong here");
         }
         break;
@@ -157,13 +157,13 @@ final class PatchyTranslationConfiguration {
   @Native
   private static void processAnnotation(PatchyTranslationConfiguration configuration, AnnotationNode annotation) {
     String className = className(annotation);
-    if(className.equals(AUTO_TRANSLATION_ANNOTATION_PATH)) {
+    if (className.equals(AUTO_TRANSLATION_ANNOTATION_PATH)) {
       configuration.translateEverything = true;
     } else if (className.equals(CUSTOM_METHOD_TRANSLATION_ANNOTATION_PATH)) {
       configuration.customMethodTranslationList.add(CustomMethodTranslation.buildFrom(annotation));
     } else if (className.equals(CUSTOM_FIELD_TRANSLATION_ANNOTATION_PATH)) {
       configuration.customFieldTranslations.add(CustomFieldTranslation.buildFrom(annotation));
-    } if(className.equals(TRANSLATE_PARAMETERS_ANNOTATION_PATH)) {
+    } if (className.equals(TRANSLATE_PARAMETERS_ANNOTATION_PATH)) {
       configuration.translateParameters = true;
     }
   }

@@ -54,7 +54,7 @@ public final class IntaveSubCommand {
 
     Forward forward = targetMethod.getDeclaredAnnotation(Forward.class);
 
-    if(forward != null) {
+    if (forward != null) {
       forwardClass = forward.target();
 //      return;
     }
@@ -68,10 +68,10 @@ public final class IntaveSubCommand {
     boolean optional = false;
 
     for (Class<?> parameterType : targetMethod.getParameterTypes()) {
-      if(i == 0) {
+      if (i == 0) {
         requiresUserParameter = parameterType == User.class;
         requiresCommandSenderParameter = parameterType == CommandSender.class;
-        if(!requiresUserParameter && !requiresCommandSenderParameter) {
+        if (!requiresUserParameter && !requiresCommandSenderParameter) {
           throw new IllegalStateException();
         }
         i++;
@@ -80,11 +80,11 @@ public final class IntaveSubCommand {
 
       Annotation[] parameterAnnotation = parameterAnnotations[i];
       boolean newOptional = Arrays.stream(parameterAnnotation).anyMatch(annotation -> annotation.annotationType() == Optional.class);
-      if(!newOptional && optional) {
+      if (!newOptional && optional) {
         throw new IntaveInternalException();
       }
       optional = newOptional;
-      if(!optional) {
+      if (!optional) {
         requiredTypes.add(parameterType);
       }
       allTypes.add(parameterType);
@@ -102,9 +102,9 @@ public final class IntaveSubCommand {
     String prefix = IntavePlugin.prefix();
     String[] args = executedCommand.split(" ");
 
-    if(permission.equalsIgnoreCase("sibyl")) {
-      if(sender instanceof Player) {
-        if(!IntavePlugin.singletonInstance().sibylIntegrationService().isAuthenticated(((Player) sender).getPlayer())) {
+    if (permission.equalsIgnoreCase("sibyl")) {
+      if (sender instanceof Player) {
+        if (!IntavePlugin.singletonInstance().sibylIntegrationService().isAuthenticated(((Player) sender).getPlayer())) {
           sender.sendMessage(NO_PERMISSION_MESSAGE);
           return null;
         }
@@ -112,16 +112,16 @@ public final class IntaveSubCommand {
         sender.sendMessage(NO_PERMISSION_MESSAGE);
         return null;
       }
-    } else if(sender instanceof Player && !permission.equals("none") && !permission.equalsIgnoreCase("sibyl") && !BukkitPermissionCheck.permissionCheck(sender, permission)) {
+    } else if (sender instanceof Player && !permission.equals("none") && !permission.equalsIgnoreCase("sibyl") && !BukkitPermissionCheck.permissionCheck(sender, permission)) {
       sender.sendMessage(NO_PERMISSION_MESSAGE);
       return null;
     }
 
-    if(args.length == 1 && args[0].isEmpty()) {
+    if (args.length == 1 && args[0].isEmpty()) {
       args = new String[0];
     }
 
-    if(args.length < requiredTypes.length /*|| args.length > allTypes.length*/) {
+    if (args.length < requiredTypes.length /*|| args.length > allTypes.length*/) {
       List<String> commandPath = new ArrayList<>();
       CommandStage currentStage = stage;
       do {
@@ -135,10 +135,10 @@ public final class IntaveSubCommand {
     }
 
     List<Object> parameterTypes = new ArrayList<>();
-    if(requiresCommandSenderParameter) {
+    if (requiresCommandSenderParameter) {
       parameterTypes.add(sender);
-    } else if(requiresUserParameter) {
-      if(sender instanceof Player) {
+    } else if (requiresUserParameter) {
+      if (sender instanceof Player) {
         parameterTypes.add(UserRepository.userOf((Player) sender));
       } else {
         sender.sendMessage(prefix + ChatColor.RED + "This action requires you to be a player");
@@ -148,12 +148,12 @@ public final class IntaveSubCommand {
 
     int i = 0;
     for (String arg : args) {
-      if(allTypes.length <= i) {
+      if (allTypes.length <= i) {
         continue;
       }
       Class<?> expectedType = allTypes[i];
       Object output = TypeTranslators.tryTranslate(sender, expectedType, arg, executedCommand);
-      if(output == null) {
+      if (output == null) {
         return null;
       }
       parameterTypes.add(output);
@@ -177,15 +177,15 @@ public final class IntaveSubCommand {
     String prefix = IntavePlugin.prefix();
     String[] args = executedCommand.split(" ");
 
-    if(!permission.equals("none") && !BukkitPermissionCheck.permissionCheck(commandSender, permission)) {
+    if (!permission.equals("none") && !BukkitPermissionCheck.permissionCheck(commandSender, permission)) {
       return null;
     }
 
-    if(args.length == 1 && args[0].isEmpty()) {
+    if (args.length == 1 && args[0].isEmpty()) {
       args = new String[0];
     }
 
-    if(args.length < allTypes.length) {
+    if (args.length < allTypes.length) {
       Class<?> clazz = allTypes[args.length];
       return TypeTranslators.findTabCompletes(commandSender, clazz, args.length > 0 ? args[args.length - 1] : "", executedCommand);
     }

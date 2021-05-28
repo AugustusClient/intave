@@ -56,7 +56,7 @@ public final class IntaveInternalsStage extends CommandStage {
   public void lagPlayer(CommandSender commandSender, Player target) {
     int[] task = new int[]{0};
     task[0] = Bukkit.getScheduler().scheduleAsyncRepeatingTask(plugin, () -> {
-      if(!target.isOnline()) {
+      if (!target.isOnline()) {
         Bukkit.getScheduler().cancelTask(task[0]);
         return;
       }
@@ -109,7 +109,7 @@ public final class IntaveInternalsStage extends CommandStage {
   public void collectiveKick(CommandSender commandSender, Player target, String[] messageParts) {
     String message = Arrays.stream(messageParts).map(s -> s + " ").collect(Collectors.joining()).trim();
     for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-      if(!onlinePlayer.equals(target) && onlinePlayer.getAddress().equals(target.getAddress())) {
+      if (!onlinePlayer.equals(target) && onlinePlayer.getAddress().equals(target.getAddress())) {
         String parsedMessage = ChatColor.translateAlternateColorCodes('&', message);
         Synchronizer.synchronize(() -> onlinePlayer.kickPlayer(parsedMessage));
       }
@@ -117,7 +117,7 @@ public final class IntaveInternalsStage extends CommandStage {
   }
 
   public static IntaveInternalsStage singletonInstance() {
-    if(singletonInstance == null) {
+    if (singletonInstance == null) {
       singletonInstance = new IntaveInternalsStage();
     }
     return singletonInstance;

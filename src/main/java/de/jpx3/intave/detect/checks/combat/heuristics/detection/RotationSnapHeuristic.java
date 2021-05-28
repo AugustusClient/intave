@@ -140,9 +140,9 @@ public class RotationSnapHeuristic extends IntaveMetaCheckPart<Heuristics, Rotat
     }
     RotationSnapHeuristicMeta meta = metaOf(user);
 
-    if(movementData.motionX() != 0 && movementData.motionZ() != 0) {
+    if (movementData.motionX() != 0 && movementData.motionZ() != 0) {
       meta.internalViolation -= 0.01;
-      if(meta.internalViolation < 0)
+      if (meta.internalViolation < 0)
         meta.internalViolation = 0;
     }
 
@@ -177,7 +177,7 @@ public class RotationSnapHeuristic extends IntaveMetaCheckPart<Heuristics, Rotat
 
       for (Map.Entry<Integer, WrappedEntity> entry : user.meta().connectionData().synchronizedEntityMap().entrySet()) {
         WrappedEntity value = entry.getValue();
-        if(value != null) {
+        if (value != null) {
           meta.entityPositions.put(entry.getKey(), value.positionHistory.get(Math.max(value.positionHistory.size() - 1, 0)));
         }
       }
@@ -186,7 +186,7 @@ public class RotationSnapHeuristic extends IntaveMetaCheckPart<Heuristics, Rotat
     boolean isSuspicious = (meta.yawMotions[1] == 0 && meta.yawMotions[0] > 25 && meta.yawMotions[0] > 9);
 
     boolean liteFlag = false;
-    if(isSuspicious && meta.silentMovements[1] == KeyStates.SILENTMOVE && meta.rotationPacketCounter > 10 && movementData.lastTeleport > 7) {
+    if (isSuspicious && meta.silentMovements[1] == KeyStates.SILENTMOVE && meta.rotationPacketCounter > 10 && movementData.lastTeleport > 7) {
       liteFlag = true;
     }
 
@@ -215,7 +215,7 @@ public class RotationSnapHeuristic extends IntaveMetaCheckPart<Heuristics, Rotat
         HashMap<Integer, WrappedEntity.EntityPositionContext> entityPositions = meta.entityPositions;
         WrappedEntity.EntityPositionContext lastEntityPosition = entityPositions.get(wrappedEntity.entityId());
 
-        if(lastEntityPosition != null && tick != null) {
+        if (lastEntityPosition != null && tick != null) {
           WrappedAxisAlignedBB lastBoundingBox = WrappedEntity.entityBoundingBoxFrom(lastEntityPosition, wrappedEntity);
           Raytracer.EntityInteractionRaytrace last = distanceOf(
             player,
@@ -238,7 +238,7 @@ public class RotationSnapHeuristic extends IntaveMetaCheckPart<Heuristics, Rotat
           );
 
           changedLookToEntity = (last.reach != 10) != (now.reach != 10);
-          if(changedLookToEntity) {
+          if (changedLookToEntity) {
             description += " lookEn";
           }
         }
@@ -251,7 +251,7 @@ public class RotationSnapHeuristic extends IntaveMetaCheckPart<Heuristics, Rotat
       if (vl >= 40) {
         user.applyAttackNerfer(AttackNerfStrategy.HT_MEDIUM, "23");
       }
-      if(vl > 70) {
+      if (vl > 70) {
         user.applyAttackNerfer(AttackNerfStrategy.CANCEL_FIRST_HIT, "23");
       }
 
@@ -262,13 +262,13 @@ public class RotationSnapHeuristic extends IntaveMetaCheckPart<Heuristics, Rotat
         meta.internalViolation -= confidence.level();
         description += " conf:" + confidence.level();
 
-        if(user.meta().clientData().protocolVersion() > 47) {
+        if (user.meta().clientData().protocolVersion() > 47) {
           description += " " + user.meta().clientData().protocolVersion();
         }
         boolean isPartner = (UserMetaClientData.VERSION_DETAILS & 0x100) != 0;
         boolean isEnterprise = (UserMetaClientData.VERSION_DETAILS & 0x200) != 0;
 
-        if(isPartner || isEnterprise) {
+        if (isPartner || isEnterprise) {
           Anomaly anomaly = Anomaly.anomalyOf("102", confidence, Anomaly.Type.KILLAURA, description, anomalieOptions(isPartner));
           parentCheck().saveAnomaly(player, anomaly);
         }
@@ -277,13 +277,13 @@ public class RotationSnapHeuristic extends IntaveMetaCheckPart<Heuristics, Rotat
       meta.entityPositions.clear();
     }
 
-    if(liteFlag) {
+    if (liteFlag) {
       String description = "rotation snap scaffold [" +  MathHelper.formatDouble(meta.yawMotions[0], 2) + "]";
 
       boolean isPartner = (UserMetaClientData.VERSION_DETAILS & 0x100) != 0;
       boolean isEnterprise = (UserMetaClientData.VERSION_DETAILS & 0x200) != 0;
 
-      if(isPartner || isEnterprise) {
+      if (isPartner || isEnterprise) {
         Anomaly anomaly = Anomaly.anomalyOf("103", Confidence.MAYBE, Anomaly.Type.KILLAURA, description, anomalieOptions(isPartner));
         parentCheck().saveAnomaly(player, anomaly);
       }
@@ -318,7 +318,7 @@ public class RotationSnapHeuristic extends IntaveMetaCheckPart<Heuristics, Rotat
       vl = 10;
     }
 
-    if(meta.lastBlockPlace < 3) {
+    if (meta.lastBlockPlace < 3) {
       vl *= 1.5;
     }
 
@@ -332,15 +332,15 @@ public class RotationSnapHeuristic extends IntaveMetaCheckPart<Heuristics, Rotat
       vl *= 1.7;
     }
 
-    if(user.meta().clientData().protocolVersion() <= UserMetaClientData.PROTOCOL_VERSION_BOUNTIFUL_UPDATE) {
+    if (user.meta().clientData().protocolVersion() <= UserMetaClientData.PROTOCOL_VERSION_BOUNTIFUL_UPDATE) {
       vl /= 2;
     }
 
-    if(liteFlag) {
+    if (liteFlag) {
       vl += 10;
     }
 
-    if(!IntaveControl.GOMME_MODE) {
+    if (!IntaveControl.GOMME_MODE) {
       vl /= 2;
     }
 

@@ -35,11 +35,11 @@ public final class SibylPacketTransmitter {
   @Native
   private void transmitPacketDataToPlayer(Player player, String messageKey, JsonElement jsonElement) {
     String channel = "LMC";
-    if(!authenticated(player)) {
+    if (!authenticated(player)) {
       return;
     }
     PacketContainer packetContainer = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.CUSTOM_PAYLOAD);
-    if(MinecraftVersions.VER1_13_0.atOrAbove()) {
+    if (MinecraftVersions.VER1_13_0.atOrAbove()) {
       packetContainer.getSpecificModifier(MinecraftKey.class).write(0, new MinecraftKey(channel));
     } else {
       packetContainer.getStrings().write(0, channel);

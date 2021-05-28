@@ -57,7 +57,7 @@ public class Timing implements Cloneable, Comparable<Timing> {
     for (int i = 0, pathSize = path.size(); i < pathSize; i++) {
       String pathElement = path.get(i);
       ChatColor correspCC = Timings.COLOR_CODE_NAMESPACE.get(pathElement);
-      if(correspCC != null) {
+      if (correspCC != null) {
         pathElement = correspCC + pathElement + ChatColor.WHITE;
       }
       path.set(i, pathElement);

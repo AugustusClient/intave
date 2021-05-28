@@ -39,7 +39,7 @@ public final class PacketSubscriptionLinker {
         linkSubscription(subscriber, method);
       }
     }
-    if(plugin.isEnabled()) {
+    if (plugin.isEnabled()) {
       refreshLinkages();
     }
   }
@@ -48,7 +48,7 @@ public final class PacketSubscriptionLinker {
     for (SCOWAList<LocalPacketAdapter> value : internalPacketListenerMappings.values()) {
       value.removeIf(localPacketAdapter -> localPacketAdapter.subscriber() == subscriber);
     }
-    if(plugin.isEnabled()) {
+    if (plugin.isEnabled()) {
       refreshLinkages();
     }
   }
@@ -119,10 +119,10 @@ public final class PacketSubscriptionLinker {
   private void linkSubscription(PacketEventSubscriber subscriber, Method method) {
     PacketSubscription metadata = method.getAnnotation(PacketSubscription.class);
     PacketSubscriptionMethodExecutor executor = assembleSubscriptionMethodCaller(subscriber, method, metadata.identifier());
-    if(metadata.engine() == Engine.INTERNAL) {
+    if (metadata.engine() == Engine.INTERNAL) {
       performCustomLinkage(plugin, subscriber, metadata.priority(), translatePacketTypes(metadata.packets()), method.getName(), executor);
     } else {
-      if(metadata.prioritySlot() == PrioritySlot.INTERNAL) {
+      if (metadata.prioritySlot() == PrioritySlot.INTERNAL) {
         performInternalLinkage(plugin, subscriber, metadata.priority(), translatePacketTypes(metadata.packets()), method.getName(), executor);
       } else {
         performExternalLinkage(plugin, subscriber, metadata.priority(), translatePacketTypes(metadata.packets()), method.getName(), executor);
@@ -150,12 +150,12 @@ public final class PacketSubscriptionLinker {
   }
 
   private boolean excluded(PacketType packetType) {
-    if(NO_CHAT_HOOKUP) {
+    if (NO_CHAT_HOOKUP) {
       return packetType == PacketType.Play.Client.TAB_COMPLETE ||
         packetType == PacketType.Play.Server.TAB_COMPLETE ||
         packetType == PacketType.Play.Client.CHAT;
     }
-    if(DISABLE_CHUNK_PACKET_HOOK) {
+    if (DISABLE_CHUNK_PACKET_HOOK) {
       return packetType == PacketType.Play.Server.MAP_CHUNK ||
         packetType == PacketType.Play.Server.MAP_CHUNK_BULK;
     }
@@ -170,10 +170,10 @@ public final class PacketSubscriptionLinker {
 
   private Set<PacketType> selectPacketTypesFor(ConnectionSide connectionSide) {
     Set<PacketType> availableTypes = new HashSet<>();
-    if(connectionSide.isForServer()) {
+    if (connectionSide.isForServer()) {
       availableTypes.addAll(PacketRegistry.getServerPacketTypes());
     }
-    if(connectionSide.isForClient()) {
+    if (connectionSide.isForClient()) {
       availableTypes.addAll(PacketRegistry.getClientPacketTypes());
     }
     return availableTypes;
@@ -249,7 +249,7 @@ public final class PacketSubscriptionLinker {
     ListenerPriority priority, PacketType[] translatePacketTypes,
     String methodName, PacketSubscriptionMethodExecutor executor
   ) {
-    if(translatePacketTypes.length == 0) {
+    if (translatePacketTypes.length == 0) {
       return;
     }
     LocalPacketAdapter adapter = new LocalPacketAdapter(plugin, subscriber, priority, translatePacketTypes, methodName, executor);
@@ -263,7 +263,7 @@ public final class PacketSubscriptionLinker {
     ListenerPriority priority, PacketType[] translatePacketTypes,
     String methodName, PacketSubscriptionMethodExecutor executor
   ) {
-    if(translatePacketTypes.length == 0) {
+    if (translatePacketTypes.length == 0) {
       return;
     }
     LocalPacketAdapter adapter = new LocalPacketAdapter(plugin, subscriber, priority, translatePacketTypes, methodName, executor);

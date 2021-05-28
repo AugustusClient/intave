@@ -30,7 +30,7 @@ public final class DynamicCorruptedBlockFilter implements BoundingBoxResolvePipe
   }
 
   public List<WrappedAxisAlignedBB> resolveCorrupted(Material type, int data) {
-    if(type == BlockTypeAccess.SKULL) {
+    if (type == BlockTypeAccess.SKULL) {
       BoundingBoxBuilder builder = BoundingBoxBuilder.create();
       switch (data & 7) {
         case 1:

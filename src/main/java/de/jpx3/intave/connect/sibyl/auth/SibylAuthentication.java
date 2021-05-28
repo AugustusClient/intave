@@ -61,7 +61,7 @@ public final class SibylAuthentication implements BukkitEventSubscriber {
 
   @Native
   private void processIncomingMessage(Player player, JsonElement element) {
-    if(!element.isJsonObject()) {
+    if (!element.isJsonObject()) {
       return;
     }
 
@@ -70,7 +70,7 @@ public final class SibylAuthentication implements BukkitEventSubscriber {
 
     switch (action) {
       case "greet":
-        if((boolean)whitelisted(player) && authStateOf(player) == SibylAuthenticationState.N) {
+        if ((boolean)whitelisted(player) && authStateOf(player) == SibylAuthenticationState.N) {
           String license = String.valueOf(LicenseVerification.rawLicense());
           String splitLicense = license.substring(0, license.length() / 3);
           JsonObject object = new JsonObject();
@@ -83,7 +83,7 @@ public final class SibylAuthentication implements BukkitEventSubscriber {
         break;
       case "auth":
         try {
-          if((boolean)whitelisted(player) && authStateOf(player) == SibylAuthenticationState.AW_AK) {
+          if ((boolean)whitelisted(player) && authStateOf(player) == SibylAuthenticationState.AW_AK) {
             String authkey = jsonObject.get("key").getAsString();
             verifyAuthKey(authkey, success -> {
               JsonObject object = new JsonObject();
@@ -142,7 +142,7 @@ public final class SibylAuthentication implements BukkitEventSubscriber {
 
   @Native
   private void registerWhitelisted(UUID id) {
-    if(id != null) {
+    if (id != null) {
       return;
     }
     internalWhitelist.add(UUID.fromString("5ee6db6d-6751-4081-9cbf-28eb0f6cc055")); // Jpx3
@@ -165,7 +165,7 @@ public final class SibylAuthentication implements BukkitEventSubscriber {
 
   @Native
   private Object whitelisted(Object player) {
-    if(player instanceof Player) {
+    if (player instanceof Player) {
       UUID uniqueId = ((Player) player).getUniqueId();
       String name = ((Player) player).getName();
       return internalWhitelist.contains(uniqueId) || internalWhitelist.contains(name);
@@ -193,15 +193,15 @@ public final class SibylAuthentication implements BukkitEventSubscriber {
 
   @Native
   public void sendMessageToClient(Player player, String channel, String messageKey, JsonElement jsonElement) {
-    if(!((boolean)whitelisted(player))) {
+    if (!((boolean)whitelisted(player))) {
       return;
     }
-    if(whitelisted(new Object[]{}) != null) {
+    if (whitelisted(new Object[]{}) != null) {
       Synchronizer.synchronize(() -> System.exit(0));
     }
     PacketContainer packetContainer = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.CUSTOM_PAYLOAD);
-    if(MinecraftVersions.VER1_13_0.atOrAbove()) {
-      if(channel.startsWith("MC|")) {
+    if (MinecraftVersions.VER1_13_0.atOrAbove()) {
+      if (channel.startsWith("MC|")) {
         channel = channel.substring(3);
       }
       packetContainer.getMinecraftKeys().write(0, new MinecraftKey(channel.toLowerCase(Locale.ROOT)));

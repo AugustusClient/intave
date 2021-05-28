@@ -51,14 +51,14 @@ public final class LabymodClientListener implements PacketEventSubscriber {
     } else {
       tag = packet.getStrings().getValues().get(0);
     }
-    if(tag.startsWith("minecraft:")) {
+    if (tag.startsWith("minecraft:")) {
       tag = tag.substring(10);
     }
     if (!tag.equalsIgnoreCase("LMC")) {
       return;
     }
     ByteBuf bytes = (ByteBuf) packet.getSpecificModifier(ReflectiveAccess.lookupServerClass("PacketDataSerializer")).getValues().get(0);
-//    if(bytes.array().length == 0) {
+//    if (bytes.array().length == 0) {
 //      return;
 //    }
     try {
@@ -66,7 +66,7 @@ public final class LabymodClientListener implements PacketEventSubscriber {
       String messageKey = LabyModChannelHelper.readString(bytes, 32767);
       String messageContent = LabyModChannelHelper.readString(bytes, 32767);
       JsonElement jsonElement = jsonParser.parse(messageContent);
-      if(messageKey.equalsIgnoreCase(channel)) {
+      if (messageKey.equalsIgnoreCase(channel)) {
         elementConsumer.accept(player, jsonElement);
       }
     } catch (RuntimeException e) {

@@ -33,25 +33,25 @@ public final class FileArchiver {
   }
 
   private void validateInputFile(File file) {
-    if(file.isDirectory()) {
+    if (file.isDirectory()) {
       throw new IllegalArgumentException("Can't pack directory");
     }
-    if(!file.exists()) {
+    if (!file.exists()) {
       throw new IllegalArgumentException("Input file does not exist");
     }
-    if(!file.canRead()) {
+    if (!file.canRead()) {
       throw new IllegalArgumentException("Can't read input file");
     }
   }
 
   private void validateArchiveFile(File file) {
-    if(file.isDirectory()) {
+    if (file.isDirectory()) {
       throw new IllegalArgumentException("Can't have folder as archive");
     }
-    if(!file.getName().endsWith(".zip")) {
+    if (!file.getName().endsWith(".zip")) {
       throw new IllegalArgumentException("Archive needs a .zip suffix");
     }
-    if(file.exists()) {
+    if (file.exists()) {
       throw new IllegalArgumentException("Archive already exists?");
     }
   }

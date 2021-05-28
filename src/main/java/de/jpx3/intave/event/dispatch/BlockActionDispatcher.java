@@ -136,7 +136,7 @@ public final class BlockActionDispatcher implements EventProcessor {
   private final static boolean USE_MBP_FOR_BC = MinecraftVersions.VER1_13_0.atOrAbove();
 
   private BlockPosition readBlockPositionFrom(PacketContainer container) {
-    if(USE_MBP_FOR_BC) {
+    if (USE_MBP_FOR_BC) {
       MovingObjectPositionBlock movingObjectPositionBlock = container.getMovingBlockPositions().readSafely(0);
       return movingObjectPositionBlock == null ? null : movingObjectPositionBlock.getBlockPosition();
     } else {
@@ -164,7 +164,7 @@ public final class BlockActionDispatcher implements EventProcessor {
     List<WrappedBlockData> blockDataList;
 
     if (packetType == PacketType.Play.Server.MULTI_BLOCK_CHANGE) {
-      if(USE_SELECTION_POSITION_TO_READ_MBC_PACKET) {
+      if (USE_SELECTION_POSITION_TO_READ_MBC_PACKET) {
         BlockPosition blockPosition = packet.getSectionPositions().readSafely(0);
         int chunkXBase = blockPosition.getX() << 4;
         int chunkYBase = blockPosition.getY() << 4;

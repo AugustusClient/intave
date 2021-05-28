@@ -42,8 +42,8 @@ public final class TransactionFeedbackService implements PacketEventSubscriber {
   }
 
   public <T> void clientSynchronize(Player player, T target, TFCallback<T> callback, int options) {
-    if(!Bukkit.isPrimaryThread()) {
-      if(TransactionOptions.matches(ENFORCE_SYNCHRONIZATION, options)) {
+    if (!Bukkit.isPrimaryThread()) {
+      if (TransactionOptions.matches(ENFORCE_SYNCHRONIZATION, options)) {
         Synchronizer.synchronize(() -> clientSynchronize(player, target, callback, options));
       } else {
         IntaveLogger.logger().error("Can't perform tick-validation off main thread");
@@ -53,8 +53,8 @@ public final class TransactionFeedbackService implements PacketEventSubscriber {
       }
       return;
     }
-    if(TransactionOptions.matches(OPTIONAL, options)) {
-      if(pendingTransactions(userOf(player)) > OPTIONAL_LIMIT) {
+    if (TransactionOptions.matches(OPTIONAL, options)) {
+      if (pendingTransactions(userOf(player)) > OPTIONAL_LIMIT) {
         callback.success(player, target);
         return;
       }
@@ -78,7 +78,7 @@ public final class TransactionFeedbackService implements PacketEventSubscriber {
       synchronizeData.transactionCounter = TRANSACTION_MIN_CODE;
     }
     long transactionNumCounter = synchronizeData.transactionNumCounter++;
-    if(obj == null) {
+    if (obj == null) {
       //noinspection unchecked
       obj = (T) FALLBACK_OBJECT;
     }

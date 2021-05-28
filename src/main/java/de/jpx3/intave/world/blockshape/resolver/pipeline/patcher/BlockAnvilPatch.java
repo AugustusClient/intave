@@ -24,7 +24,7 @@ public final class BlockAnvilPatch extends BoundingBoxPatch {
   public List<WrappedAxisAlignedBB> patch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, List<WrappedAxisAlignedBB> bbs) {
     BoundingBoxBuilder boundingBoxBuilder = BoundingBoxBuilder.create();
 
-    if((blockState & 3) % 2 == 0) {
+    if ((blockState & 3) % 2 == 0) {
       boundingBoxBuilder.shape(0.125F, 0.0F, 0.0F, 0.875F, 1.0F, 1.0F);
     } else {
       boundingBoxBuilder.shape(0.0F, 0.0F, 0.125F, 1.0F, 1.0F, 0.875F);

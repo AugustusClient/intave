@@ -24,12 +24,12 @@ public final class LicenseVerification {
 
   @Native
   public static String rawLicense() {
-    if(licenseName == null) {
-      if(IntaveControl.DISABLE_LICENSE_CHECK) {
+    if (licenseName == null) {
+      if (IntaveControl.DISABLE_LICENSE_CHECK) {
         licenseName = "TkxzRWpMdE1NVmdCUUdOMjdmNmdTdz09yB1f45kTpS5yiTeuw6DrRQ==";// Intavede
       } else {
         InputStream resourceAsStream = LicenseVerification.class.getResourceAsStream("/5ee6db6d-6751-4081-9cbf-28eb0f6cc055");
-        if(resourceAsStream == null) {
+        if (resourceAsStream == null) {
           throw new IntaveInternalException("Failed to locate identification file");
         }
         StringBuilder stringBuilder = new StringBuilder();

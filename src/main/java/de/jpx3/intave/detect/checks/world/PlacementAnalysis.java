@@ -25,7 +25,7 @@ public final class PlacementAnalysis extends IntaveCheck {
   public void setupSubChecks() {
     boolean enterprise = (UserMetaClientData.VERSION_DETAILS & 0x200) != 0;
     boolean partner = (UserMetaClientData.VERSION_DETAILS & 0x100) != 0;
-    if(enterprise || partner) {
+    if (enterprise || partner) {
       appendCheckPart(new PlacementSpeedAnalyzer(this));
       appendCheckPart(new PlacementRotationSpeedAnalyzer(this));
     }

@@ -106,7 +106,7 @@ public final class CheckService {
   public void linkPacketEventSubscriptions() {
     PacketSubscriptionLinker packetSubscriptionLinker = plugin.packetSubscriptionLinker();
     for (IntaveCheck check : checks) {
-      if(!check.enabled()) {
+      if (!check.enabled()) {
         continue;
       }
       packetSubscriptionLinker.linkSubscriptionsIn(check);
@@ -122,7 +122,7 @@ public final class CheckService {
   public void removePacketEventSubscriptions() {
     PacketSubscriptionLinker packetSubscriptionLinker = plugin.packetSubscriptionLinker();
     for (IntaveCheck check : checks) {
-      if(!check.enabled()) {
+      if (!check.enabled()) {
         continue;
       }
       packetSubscriptionLinker.removeSubscriptionsOf(check);
@@ -138,7 +138,7 @@ public final class CheckService {
   public void linkBukkitEventSubscriptions() {
     BukkitEventLinker bukkitEventLinker = plugin.eventLinker();
     for (IntaveCheck check : checks) {
-      if(!check.enabled()) {
+      if (!check.enabled()) {
         continue;
       }
       bukkitEventLinker.registerEventsIn(check);
@@ -154,7 +154,7 @@ public final class CheckService {
   public void removeBukkitEventSubscriptions() {
     BukkitEventLinker bukkitEventLinker = plugin.eventLinker();
     for (IntaveCheck check : checks) {
-      if(!check.enabled()) {
+      if (!check.enabled()) {
         continue;
       }
       bukkitEventLinker.unregisterEventsIn(check);
@@ -171,7 +171,7 @@ public final class CheckService {
     IntaveCheck check = classRequestCache.get(checkClass);
     if (check == null) {
       for (IntaveCheck intaveCheck : checks) {
-        if(intaveCheck.getClass() == checkClass) {
+        if (intaveCheck.getClass() == checkClass) {
           //noinspection unchecked
           return (T) intaveCheck;
         }
@@ -186,7 +186,7 @@ public final class CheckService {
     IntaveCheck check = nameRequestCache.get(checkName.toLowerCase());
     if (check == null) {
       for (IntaveCheck intaveCheck : checks) {
-        if(intaveCheck.name().equalsIgnoreCase(checkName)) {
+        if (intaveCheck.name().equalsIgnoreCase(checkName)) {
           //noinspection unchecked
           return (T) intaveCheck;
         }
@@ -205,7 +205,7 @@ public final class CheckService {
     YamlConfiguration configuration = plugin.configurationService().configuration();
     String checkSectionPath = "check." + checkConfiguration.check().configurationKey();
     ConfigurationSection checkSection = configuration.getConfigurationSection(checkSectionPath);
-    if(checkSection == null) {
+    if (checkSection == null) {
       checkConfiguration.setSettings(new HashMap<>());
       return;
     }

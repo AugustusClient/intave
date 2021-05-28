@@ -139,22 +139,22 @@ public final class Violation {
     }
 
     public synchronized Violation build() {
-      if(constructed) {
+      if (constructed) {
         throw new IllegalStateException();
       }
       constructed = true;
       Preconditions.checkNotNull(checkClass);
       Preconditions.checkNotNull(playerid);
       Preconditions.checkNotNull(baseMessage);
-      if(details == null) {
+      if (details == null) {
         details = "";
       }
       baseMessage = baseMessage.trim();
       details = details.trim();
-      if(addedViolationPoints < 0) {
+      if (addedViolationPoints < 0) {
         throw new IllegalStateException("Can not have negative VL");
       }
-      if(threshold == null) {
+      if (threshold == null) {
         withDefaultThreshold();
       }
       return new Violation(checkClass, playerid, baseMessage, details, threshold, addedViolationPoints, optionFlags);

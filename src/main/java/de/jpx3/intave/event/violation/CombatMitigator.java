@@ -40,7 +40,7 @@ public final class CombatMitigator implements BukkitEventSubscriber {
       }
     }
     Entity attacked = event.getEntity();
-    if(!(attacked instanceof Player)) {
+    if (!(attacked instanceof Player)) {
       return;
     }
     Player attackedPlayer = (Player) attacked;

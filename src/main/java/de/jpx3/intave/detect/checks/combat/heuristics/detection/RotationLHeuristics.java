@@ -48,7 +48,7 @@ public final class RotationLHeuristics extends IntaveMetaCheckPart<Heuristics, R
     }
     WrappedEntity entity = attackData.lastAttackedEntity();
 
-    if(entity == null) {
+    if (entity == null) {
       return;
     }
 

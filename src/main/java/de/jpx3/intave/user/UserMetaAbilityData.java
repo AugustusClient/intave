@@ -24,7 +24,7 @@ public final class UserMetaAbilityData {
 
   public UserMetaAbilityData(Player player) {
     boolean hasPlayer = (player != null);
-    if(hasPlayer) {
+    if (hasPlayer) {
       this.allowFlying = player.getAllowFlight();
       this.flying = player.isFlying();
       this.health = (float) player.getHealth();
@@ -39,7 +39,7 @@ public final class UserMetaAbilityData {
   }
 
   private void setupDefaultGameMode(GameMode gameMode) {
-    if(gameMode == null) {
+    if (gameMode == null) {
       throw new IntaveInternalException("Player gameMode reference is null?");
     }
     int gameModeValue = gameMode.getValue();

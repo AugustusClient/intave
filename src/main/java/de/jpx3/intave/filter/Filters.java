@@ -36,7 +36,7 @@ public final class Filters {
 
   private void linkEnabled() {
     for (Filter filter : availableFilters) {
-      if(filter.enabled()) {
+      if (filter.enabled()) {
         plugin.eventLinker().registerEventsIn(filter);
         plugin.packetSubscriptionLinker().linkSubscriptionsIn(filter);
       }

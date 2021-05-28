@@ -32,7 +32,7 @@ public final class ConnectionHealthResolver implements PacketEventSubscriber {
       for (Player player : Bukkit.getOnlinePlayers()) {
         User user = UserRepository.userOf(player);
         long dur = AccessHelper.now() - lastKeepAliveResponse(user);
-        if(TIMEOUT_DURATION < dur) {
+        if (TIMEOUT_DURATION < dur) {
           Synchronizer.synchronize(() -> {
             IntaveLogger.logger().pushPrintln("[Intave] " + player.getName() + " was not responding to keep-alive packets for at least 30 seconds");
             player.kickPlayer("Timed out");
@@ -62,7 +62,7 @@ public final class ConnectionHealthResolver implements PacketEventSubscriber {
     User user = UserRepository.userOf(player);
     PacketContainer packet = event.getPacket();
     long id;
-    if(packet.getLongs().size() > 0) {
+    if (packet.getLongs().size() > 0) {
       id = packet.getLongs().read(0);
     } else {
       id = packet.getIntegers().read(0);
@@ -84,13 +84,13 @@ public final class ConnectionHealthResolver implements PacketEventSubscriber {
     Map<Long, Long> remainingPingPackets = synchronizeData.remainingPingPacketTimestamps();
 
     Long id;
-    if(packet.getLongs().size() > 0) {
+    if (packet.getLongs().size() > 0) {
       id = packet.getLongs().read(0);
     } else {
       id = Long.valueOf(packet.getIntegers().read(0));
     }
 
-    if(!remainingPingPackets.containsKey(id)) {
+    if (!remainingPingPackets.containsKey(id)) {
       IntaveLogger.logger().pushPrintln("[Intave] Player " + player + " sent kai " + id + ", but expected " + remainingPingPackets);
       Synchronizer.synchronize(() -> player.kickPlayer("Unknown keep-alive identifier"));
       return;
@@ -104,11 +104,11 @@ public final class ConnectionHealthResolver implements PacketEventSubscriber {
     int size = 8;
     boolean enoughPingDataAvailable = differenceBalance.size() >= size;
 
-    if(enoughPingDataAvailable) {
+    if (enoughPingDataAvailable) {
       differenceBalance.remove(0);
     }
     differenceBalance.add(pingChange);
-    if(enoughPingDataAvailable) {
+    if (enoughPingDataAvailable) {
       user.meta().connectionData().latencyJitter =
         (int) differenceBalance.stream().mapToLong(value -> value).average().orElse(0d);
     }

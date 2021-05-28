@@ -22,11 +22,11 @@ public final class Raytracer {
 
   public static void setup() {
     String className;
-    if(MinecraftVersions.VER1_16_2.atOrAbove())  {
+    if (MinecraftVersions.VER1_16_2.atOrAbove())  {
       className = "de.jpx3.intave.world.raytrace.NetherUpdateRaytracer";
-    } else if(MinecraftVersions.VER1_14_0.atOrAbove()) {
+    } else if (MinecraftVersions.VER1_14_0.atOrAbove()) {
       className = "de.jpx3.intave.world.raytrace.VoxelVersionRaytracer";
-    } else if(MinecraftVersions.VER1_13_0.atOrAbove()) {
+    } else if (MinecraftVersions.VER1_13_0.atOrAbove()) {
       className = "de.jpx3.intave.world.raytrace.AquaticUpdateRaytracer";
     } else if (MinecraftVersions.VER1_9_0.atOrAbove()) {
       className = "de.jpx3.intave.world.raytrace.CombatUpdateRaytracer";
@@ -149,7 +149,7 @@ public final class Raytracer {
     double lastReach = 10;
     WrappedVector lastHitVec = null;
     for(boolean fastMath : BOOLEANSTATES) {
-      if(lastReach < attackReachDistance)
+      if (lastReach < attackReachDistance)
         break;
 
       WrappedVector interpolatedLookVec = RotationHelper.wrappedVectorForRotation(pitch, prevYaw, fastMath);
@@ -177,9 +177,9 @@ public final class Raytracer {
         } else {
           reach = distanceToEntity;
         }
-//        if(fastMath)
+//        if (fastMath)
 //          Bukkit.broadcastMessage("" + (lastReach - reach));
-        if(reach < lastReach) {
+        if (reach < lastReach) {
           lastReach = reach;
           lastHitVec = movingObjectPosition.hitVec;
         }

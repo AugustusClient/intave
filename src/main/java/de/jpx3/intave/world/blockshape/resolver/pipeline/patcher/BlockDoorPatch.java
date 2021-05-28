@@ -29,7 +29,7 @@ public final class BlockDoorPatch extends BoundingBoxPatch {
 
     User user = UserRepository.userOf(player);
     boolean isUpper = (upperData & 8) != 0;
-    if(isUpper) {
+    if (isUpper) {
       lowerData = BukkitBlockAccess.cacheAppliedDataAccess(user, world, posX, posY - 1, posZ);
     } else {
       lowerData = upperData;

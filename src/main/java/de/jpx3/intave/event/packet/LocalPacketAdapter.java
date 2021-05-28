@@ -35,7 +35,7 @@ public final class LocalPacketAdapter extends IntavePacketAdapter implements Com
 
   @Override
   public void onPacketReceiving(PacketEvent event) {
-    if(!validateEvent(event)) {
+    if (!validateEvent(event)) {
       return;
     }
     Timing timing = localTimings.computeIfAbsent(event.getPacketType(), Timings::packetTimingOf);
@@ -44,7 +44,7 @@ public final class LocalPacketAdapter extends IntavePacketAdapter implements Com
       timing.start();
       executor.invoke(subscriber, event);
     } catch (IntaveInternalException internalException) {
-      if(!internalException.getMessage().contains("Unable to reference player")) {
+      if (!internalException.getMessage().contains("Unable to reference player")) {
         processException(event.getPacketType(), internalException);
       }
     } catch (RuntimeException exception) {
@@ -57,13 +57,13 @@ public final class LocalPacketAdapter extends IntavePacketAdapter implements Com
 
   @Override
   public void onPacketSending(PacketEvent event) {
-    if(!validateEvent(event)) {
+    if (!validateEvent(event)) {
       return;
     }
     try {
       executor.invoke(subscriber, event);
     } catch (IntaveInternalException internalException) {
-      if(!internalException.getMessage().contains("Unable to reference player")) {
+      if (!internalException.getMessage().contains("Unable to reference player")) {
         processException(event.getPacketType(), internalException);
       }
     } catch (RuntimeException exception) {

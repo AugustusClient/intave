@@ -66,7 +66,7 @@ public class LinearRegressionHeuristic extends IntaveMetaCheckPart<Heuristics, L
     Player player = user.player();
     LinearRegressionHeuristicMeta meta = metaOf(player);
 
-    if(meta.lastMoveTimeStamp == 0)
+    if (meta.lastMoveTimeStamp == 0)
       meta.lastMoveTimeStamp = System.currentTimeMillis();
 
     double timeDiff = (double) (System.currentTimeMillis() - meta.lastMoveTimeStamp);
@@ -81,7 +81,7 @@ public class LinearRegressionHeuristic extends IntaveMetaCheckPart<Heuristics, L
       meta.panel.repaint();
     }
 
-    if(meta.vectorList.size() > 200)
+    if (meta.vectorList.size() > 200)
       meta.vectorList.remove(0);
   }
 
@@ -149,13 +149,13 @@ public class LinearRegressionHeuristic extends IntaveMetaCheckPart<Heuristics, L
           int maxVectorY = Integer.MIN_VALUE;
 
           for(Vector vector : meta.vectorList) {
-            if(vector.x > maxVectorX)
+            if (vector.x > maxVectorX)
               maxVectorX = (int) vector.x;
-            if(vector.y > maxVectorY)
+            if (vector.y > maxVectorY)
               maxVectorY = (int) vector.y;
-            if(vector.x < minVectorX)
+            if (vector.x < minVectorX)
               minVectorX = (int) vector.x;
-            if(vector.y < minVectorY)
+            if (vector.y < minVectorY)
               minVectorY = (int) vector.y;
           }
 
@@ -168,7 +168,7 @@ public class LinearRegressionHeuristic extends IntaveMetaCheckPart<Heuristics, L
             int vectorX = (int) map2(vector.x, minVectorX, maxVectorX, 0, getWidth());
             int vectorY = (int) map2(vector.y, minVectorY, maxVectorY, 0, getHeight());
 
-            if(lastVectorX != Integer.MAX_VALUE && lastVectorY != Integer.MAX_VALUE) {
+            if (lastVectorX != Integer.MAX_VALUE && lastVectorY != Integer.MAX_VALUE) {
               g.drawLine(lastVectorX, lastVectorY, vectorX, vectorY);
             }
 

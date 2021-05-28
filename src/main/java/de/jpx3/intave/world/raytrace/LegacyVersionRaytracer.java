@@ -156,7 +156,7 @@ public final class LegacyVersionRaytracer implements VersionRaytracer {
   private IBlockData typeOf(Player player, WorldServer world, BlockPosition blockPosition) {
     OCBlockShapeAccess blockShapeAccess = UserRepository.userOf(player).blockShapeAccess();
     BlockShape shape = blockShapeAccess.overrideOf(blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
-    if(shape != null) {
+    if (shape != null) {
       return Block.getById(shape.type().getId()).fromLegacyData(shape.data());
     } else {
       return world.getType(blockPosition);

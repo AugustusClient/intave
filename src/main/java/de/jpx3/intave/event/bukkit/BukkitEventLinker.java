@@ -81,15 +81,15 @@ public final class BukkitEventLinker {
     int found = 0;
     for (Method method : methods) {
       BukkitEventSubscription eventHandler = method.getAnnotation(BukkitEventSubscription.class);
-      if(eventHandler == null) {
+      if (eventHandler == null) {
         continue;
       }
       Class<?> checkClass;
-      if(
+      if (
         method.getParameterTypes().length == 1 &&
         Event.class.isAssignableFrom(checkClass = method.getParameterTypes()[0])
       ) {
-        if(Modifier.isPrivate(method.getModifiers()) || Modifier.isStatic(method.getModifiers())) {
+        if (Modifier.isPrivate(method.getModifiers()) || Modifier.isStatic(method.getModifiers())) {
           throw new IntaveInternalException("Invalid linking for method " + method);
         }
         Class<? extends Event> eventClass = checkClass.asSubclass(Event.class);

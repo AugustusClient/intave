@@ -29,7 +29,7 @@ public final class Placeholders {
     String initialString,
     Map<String, String> placeholderToReplacementMap
   ) {
-    if(initialString == null || initialString.isEmpty()) {
+    if (initialString == null || initialString.isEmpty()) {
       return "";
     }
     for (

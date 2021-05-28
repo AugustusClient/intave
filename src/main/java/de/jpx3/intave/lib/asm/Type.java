@@ -243,7 +243,7 @@ public final class Type {
   }
 
   public Type convertToArrayType(int dimensions) {
-    if(dimensions == 0) {
+    if (dimensions == 0) {
       return this;
     } else {
       StringBuilder arrayPrefix = new StringBuilder();

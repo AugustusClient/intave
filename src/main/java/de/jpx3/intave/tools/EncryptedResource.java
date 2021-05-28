@@ -34,7 +34,7 @@ public final class EncryptedResource {
 
   @Native
   public InputStream read() {
-    if(!fileStore().exists()) {
+    if (!fileStore().exists()) {
       throw new IllegalStateException();
     }
     fileStore().setLastModified(AccessHelper.now());
@@ -43,7 +43,7 @@ public final class EncryptedResource {
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
       byte[] buf = new byte[4096];
       int read;
-      while((read = fileInputStream.read(buf)) != -1) {
+      while ((read = fileInputStream.read(buf)) != -1) {
         byteArrayOutputStream.write(buf, 0, read);
       }
       fileInputStream.close();
@@ -69,7 +69,7 @@ public final class EncryptedResource {
   @Native
   public boolean write(InputStream inputStream) {
     File file = fileStore();
-    if(file.exists()) {
+    if (file.exists()) {
       file.delete();
     }
 //    IntaveLogger.logger().globalPrintLn(file.getAbsolutePath());
@@ -125,17 +125,17 @@ public final class EncryptedResource {
     String operatingSystem = System.getProperty("os.name").toLowerCase(Locale.ROOT);
     File workDirectory;
     String filePath;
-    if(operatingSystem.contains("win")) {
+    if (operatingSystem.contains("win")) {
       filePath = System.getenv("APPDATA") + "/Intave/";
     } else {
-      if(GOMME_MODE) {
+      if (GOMME_MODE) {
         filePath = ContextSecrets.secret("cache-directory");
       } else {
         filePath = System.getProperty("user.home") + "/.intave/";
       }
     }
     workDirectory = new File(filePath);
-    if(!workDirectory.exists()) {
+    if (!workDirectory.exists()) {
       workDirectory.mkdir();
     }
     return new File(workDirectory, resourceId());

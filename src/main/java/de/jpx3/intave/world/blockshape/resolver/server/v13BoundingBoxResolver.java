@@ -33,19 +33,19 @@ public final class v13BoundingBoxResolver implements BoundingBoxResolvePipeline 
     WorldServer handle = ((CraftWorld) world).getHandle();
     BlockPosition blockPosition = new BlockPosition(posX, posY, posZ);
     IBlockData blockData = CraftMagicNumbers.getBlock(type, (byte) blockState);
-    if(blockData == null) {
+    if (blockData == null) {
       return Collections.emptyList();
     }
     VoxelShape collisionShape = blockData.getCollisionShape(handle, blockPosition);
     List<AxisAlignedBB> nativeBoxes = collisionShape.d();
-    if(nativeBoxes.isEmpty()) {
+    if (nativeBoxes.isEmpty()) {
       return Collections.emptyList();
     }
     return translate(nativeBoxes, posX, posY, posZ);
   }
 
   private List<WrappedAxisAlignedBB> translate(List<?> bbs, int posX, int posY, int posZ) {
-    if(bbs.isEmpty()) {
+    if (bbs.isEmpty()) {
       return Collections.emptyList();
     }
     return bbs.stream().map(bb -> WrappedAxisAlignedBB.fromNative(bb).offset(posX, posY, posZ)).collect(Collectors.toList());

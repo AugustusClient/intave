@@ -409,7 +409,7 @@ public final class Physics extends IntaveCheck {
         boolean multipleBoxes = intersectionBoundingBoxesCurrent.size() > 1;
         String details = (multipleBoxes ? intersectionBoundingBoxesCurrent.size() : "one") + " box" + (multipleBoxes ? "es" : "");
 
-        if(!IntaveControl.IGNORE_CACHE_REFRESH_ON_DETECTION) {
+        if (!IntaveControl.IGNORE_CACHE_REFRESH_ON_DETECTION) {
           blockShapeAccess.identityInvalidate();
         }
 
@@ -438,7 +438,7 @@ public final class Physics extends IntaveCheck {
 
         if (!startBoundingBoxInList) {
           movementData.invalidMovement = true;
-          if(!IntaveControl.IGNORE_CACHE_REFRESH_ON_DETECTION) {
+          if (!IntaveControl.IGNORE_CACHE_REFRESH_ON_DETECTION) {
             blockShapeAccess.identityInvalidate();
           }
 
@@ -476,7 +476,7 @@ public final class Physics extends IntaveCheck {
       violationLevelIncrease = Math.max(1, violationLevelIncrease);
       violationLevelData.physicsVL = MathHelper.minmax(0, violationLevelData.physicsVL + violationLevelIncrease, 200);
       violationLevelData.physicsInvalidMovementsInRow++;
-      if(!IntaveControl.IGNORE_CACHE_REFRESH_ON_DETECTION) {
+      if (!IntaveControl.IGNORE_CACHE_REFRESH_ON_DETECTION) {
         blockShapeAccess.identityInvalidate();
       }
       statisticApply(user, CheckStatistics::increaseFails);

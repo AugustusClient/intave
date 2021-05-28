@@ -45,7 +45,7 @@ public final class CachedResource {
     long fileLastModified = AccessHelper.now() - file.lastModified();
     boolean invalidFile = !file.exists() || fileLastModified > expireDuration;
 
-    if(invalidFile) {
+    if (invalidFile) {
       refreshFile();
     }
     return file.exists();
@@ -80,7 +80,7 @@ public final class CachedResource {
 
   @Native
   public InputStream read() {
-    if(!fileStore().exists()) {
+    if (!fileStore().exists()) {
       return new ByteArrayInputStream(new byte[0]);
     }
 //    fileStore().setLastModified(AccessHelper.now());
@@ -89,7 +89,7 @@ public final class CachedResource {
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
       byte[] buf = new byte[4096];
       int read;
-      while((read = fileInputStream.read(buf)) != -1) {
+      while ((read = fileInputStream.read(buf)) != -1) {
         byteArrayOutputStream.write(buf, 0, read);
       }
       fileInputStream.close();
@@ -153,7 +153,7 @@ public final class CachedResource {
       byteBuffer.put(encryptedData);
       ReadableByteChannel byteChannel = Channels.newChannel(new ByteArrayInputStream(byteBuffer.array()));
 
-      if(file.exists()) {
+      if (file.exists()) {
         file.delete();
       }
       try {
@@ -177,17 +177,17 @@ public final class CachedResource {
     String operatingSystem = System.getProperty("os.name").toLowerCase(Locale.ROOT);
     File workDirectory;
     String filePath;
-    if(operatingSystem.contains("win")) {
+    if (operatingSystem.contains("win")) {
       filePath = System.getenv("APPDATA") + "/Intave/";
     } else {
-      if(GOMME_MODE) {
+      if (GOMME_MODE) {
         filePath = ContextSecrets.secret("cache-directory");
       } else {
         filePath = System.getProperty("user.home") + "/.intave/";
       }
     }
     workDirectory = new File(filePath);
-    if(!workDirectory.exists()) {
+    if (!workDirectory.exists()) {
       workDirectory.mkdir();
     }
     return new File(workDirectory, resourceId());

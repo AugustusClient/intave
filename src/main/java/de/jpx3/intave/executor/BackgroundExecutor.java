@@ -16,11 +16,11 @@ public final class BackgroundExecutor {
   }
 
   public static void stopBlocking() {
-    if(executorService == null) {
+    if (executorService == null) {
       return;
     }
     List<Runnable> runnables = executorService.shutdownNow();
-    if(!runnables.isEmpty()) {
+    if (!runnables.isEmpty()) {
       IntavePlugin.singletonInstance().logger().info("Waiting for background tasks to finish");
     }
     for (Runnable runnable : runnables) {
@@ -29,7 +29,7 @@ public final class BackgroundExecutor {
   }
 
   public static void execute(Runnable runnable) {
-    if(executorService == null || executorService.isShutdown() || executorService.isTerminated()) {
+    if (executorService == null || executorService.isShutdown() || executorService.isTerminated()) {
       return;
     }
     runnable = wrapTask(runnable);

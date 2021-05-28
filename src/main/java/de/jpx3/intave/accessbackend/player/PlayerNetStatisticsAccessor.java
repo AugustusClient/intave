@@ -31,7 +31,7 @@ public final class PlayerNetStatisticsAccessor {
   public void pushPingJitterUpdate(Player player, int ping, int jitter) {
     List<BiConsumer<Integer, Integer>> subscriptionList
       = pingUpdateSubscriptions.get(player.getUniqueId());
-    if(subscriptionList != null) {
+    if (subscriptionList != null) {
       subscriptionList.forEach(subscription -> subscription.accept(ping, jitter));
     }
   }

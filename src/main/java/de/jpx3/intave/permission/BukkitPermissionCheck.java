@@ -10,14 +10,14 @@ import org.bukkit.permissions.Permissible;
 public final class BukkitPermissionCheck {
   @Native
   public static boolean permissionCheck(Permissible permissible, String permission) {
-    if(permissible instanceof Player) {
-      if(permission.equalsIgnoreCase("sibyl") && IntavePlugin.singletonInstance().sibylIntegrationService().isAuthenticated((Player) permissible)) {
+    if (permissible instanceof Player) {
+      if (permission.equalsIgnoreCase("sibyl") && IntavePlugin.singletonInstance().sibylIntegrationService().isAuthenticated((Player) permissible)) {
         return true;
       }
       return playerPermissionCheck((Player) permissible, permission);
     } else {
       // non-player can not inherit sibyl permissions, never
-      if(permission.equalsIgnoreCase("sibyl")) {
+      if (permission.equalsIgnoreCase("sibyl")) {
         return false;
       }
       return nativePermissionCheck(permissible, permission);
@@ -25,15 +25,15 @@ public final class BukkitPermissionCheck {
   }
 
   private static boolean playerPermissionCheck(Player player, String permission) {
-    if(!UserRepository.hasUser(player)) {
+    if (!UserRepository.hasUser(player)) {
       return nativePermissionCheck(player, permission);
     }
     User user = UserRepository.userOf(player);
-    if(!user.hasOnlinePlayer()) {
+    if (!user.hasOnlinePlayer()) {
       return false;
     }
     BukkitPermissionCache permissionCache = user.permissionCache();
-    if(permissionCache.inCache(permission)) {
+    if (permissionCache.inCache(permission)) {
       return permissionCache.permissionCheck(permission);
     } else {
       boolean access = nativePermissionCheck(player, permission);

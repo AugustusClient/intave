@@ -65,8 +65,8 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
     UserMetaViolationLevelData violationLevelData = user.meta().violationLevelData();
     EnumWrappers.EntityUseAction useAction = packet.getEntityUseActions().readSafely(0);
 
-    if(IntaveControl.GOMME_MODE) {
-      if(user.meta().connectionData().sendAsyncMessage) {
+    if (IntaveControl.GOMME_MODE) {
+      if (user.meta().connectionData().sendAsyncMessage) {
         user.meta().connectionData().sendAsyncMessage = false;
         player.sendMessage("I'm async");
       }
@@ -80,13 +80,13 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
       UserMetaMovementData movementData = user.meta().movementData();
       WrappedEntity entity = entityByIdentifier(user, entityId);
       UserMetaClientData clientData = user.meta().clientData();
-      if(entity == null) {
+      if (entity == null) {
         shouldResend = true;
       } else {
-        if(movementData.lastTeleport == 0 || violationLevelData.isInActiveTeleportBundle) {
+        if (movementData.lastTeleport == 0 || violationLevelData.isInActiveTeleportBundle) {
           shouldResend = true;
         } else {
-          if((entity.clientSynchronized && !movementData.recentlyEncounteredFlyingPacket(2) && attackRaytraceMeta.lastFlyPacketCounterReach > 1)
+          if ((entity.clientSynchronized && !movementData.recentlyEncounteredFlyingPacket(2) && attackRaytraceMeta.lastFlyPacketCounterReach > 1)
             || clientData.protocolVersion() == UserMetaClientData.PROTOCOL_VERSION_BOUNTIFUL_UPDATE) {
             shouldResend = validReachWalking(user, entity);
           } else {
@@ -95,7 +95,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
         }
       }
 
-      if(!event.isCancelled()) {
+      if (!event.isCancelled()) {
         event.setCancelled(shouldResend);
       }
 
@@ -137,7 +137,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
         UserMetaAbilityData abilityData = user.meta().abilityData();
         float health = abilityData.health;
         if (entity != null && health > 0) {
-          if(entity.isEntityLiving) {
+          if (entity.isEntityLiving) {
             if (clientData.protocolVersion() >= PROTOCOL_VERSION_COMBAT_UPDATE) {
               // >= 1.9.x
               if (entity.clientSynchronized
@@ -166,7 +166,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
             }
           } else {
             // wenn entity tot ist
-            if(entity.entityTypeData.entityTypeId() != -2) {
+            if (entity.entityTypeData.entityTypeId() != -2) {
               // entity type id -2 = wenn das entity auf neuen mc versionen nicht erstellt werden konnte
               invalid = processIterativeReachCheck(player, entity);
             }
@@ -185,7 +185,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
               for (Player authenticatedPlayer : Bukkit.getOnlinePlayers()) {
                 if (plugin.sibylIntegrationService().isAuthenticated(authenticatedPlayer)) {
                   String message;
-                  if(entity == null) {
+                  if (entity == null) {
                     message = ChatColor.RED + "[R] " + player.getName() + " attacked a null entity";
                   } else {
                     message = ChatColor.RED + "[R] " + player.getName() + " attacked entity while beeing dead";
@@ -442,7 +442,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
         !hasAlwaysMouseDelayFix
       );
       double minReachInItr = resultWithoutIncrement.reach;
-      if(stopOnFound && resultWithoutIncrement.reach < blockReachDistance) {
+      if (stopOnFound && resultWithoutIncrement.reach < blockReachDistance) {
         return resultWithoutIncrement.reach;
       }
       while (clonedEntity.position.newPosRotationIncrements > 0) {
@@ -458,7 +458,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
           0.13f,
           !hasAlwaysMouseDelayFix
         );
-        if(stopOnFound && result.reach < blockReachDistance) {
+        if (stopOnFound && result.reach < blockReachDistance) {
           return result.reach;
         }
         minReachInItr = Math.min(minReachInItr, result.reach);
@@ -467,7 +467,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
     }
 
     // when standing still
-    if(movementData.recentlyEncounteredFlyingPacket(1)
+    if (movementData.recentlyEncounteredFlyingPacket(1)
       && user.meta().clientData().protocolVersion() >= UserMetaClientData.PROTOCOL_VERSION_COMBAT_UPDATE) {
       for (WrappedEntity.EntityPositionContext possiblePosition : entity.positionHistory) {
         // TODO: 01/07/21 add general packet based length tolerance
@@ -483,7 +483,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
           0.13f,
           false
         );
-        if(stopOnFound && resultWithoutIncrement.reach < blockReachDistance) {
+        if (stopOnFound && resultWithoutIncrement.reach < blockReachDistance) {
           return resultWithoutIncrement.reach;
         }
         double minReachInItr = resultWithoutIncrement.reach;
@@ -501,7 +501,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
             0.13f,
             false
           );
-          if(stopOnFound && result.reach < blockReachDistance) {
+          if (stopOnFound && result.reach < blockReachDistance) {
             return result.reach;
           }
           minReachInItr = Math.min(minReachInItr, result.reach);

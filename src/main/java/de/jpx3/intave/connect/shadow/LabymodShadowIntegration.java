@@ -67,7 +67,7 @@ public final class LabymodShadowIntegration {
     User user = UserRepository.userOf(player);
     boolean shadow = user.hasShadow();
 
-    if(!shadow) {
+    if (!shadow) {
       return;
     }
 
@@ -80,7 +80,7 @@ public final class LabymodShadowIntegration {
   private void performShadowUpdate(Player player, ShadowStatus update) {
     String channel = "SHADOW";
     PacketContainer packetContainer = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.CUSTOM_PAYLOAD);
-    if(MinecraftVersions.VER1_13_0.atOrAbove()) {
+    if (MinecraftVersions.VER1_13_0.atOrAbove()) {
       packetContainer.getSpecificModifier(MinecraftKey.class).write(0, new MinecraftKey(channel));
     } else {
       packetContainer.getStrings().write(0, channel);
@@ -106,7 +106,7 @@ public final class LabymodShadowIntegration {
   public void pushPacket(Player player, Object packet, ShadowContext movementData) {
     User user = UserRepository.userOf(player);
     ShadowPacketDataLink shadowPacketDataLink = user.shadowRepo();
-    if(shadowPacketDataLink != null) {
+    if (shadowPacketDataLink != null) {
       shadowPacketDataLink.save(packet, movementData);
     }
   }

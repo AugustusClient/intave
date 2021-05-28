@@ -37,7 +37,7 @@ public final class PlacementFacingAnalyzer extends IntaveCheckPart<PlacementAnal
       return;
     }
     StructureModifier<Float> floatStructureModifier = packet.getFloat();
-    if(floatStructureModifier.size() < 3) {
+    if (floatStructureModifier.size() < 3) {
       return;
     }
     float f1 = floatStructureModifier.read(0);

@@ -46,7 +46,7 @@ public final class FallbackMultiChunkKeyOCBlockShapeAccess implements OCBlockSha
     boolean deletedStuff = false;
     for (Map.Entry<World, Map<Long, BlockShape>> worldMapEntry : globalFallbackCache.entrySet()) {
       Map<Long, BlockShape> globalWorldCache = worldMapEntry.getValue();
-      if(globalWorldCache.size() < REQUIRED_LIMIT) {
+      if (globalWorldCache.size() < REQUIRED_LIMIT) {
         continue;
       }
       long deletedEntries = 0;
@@ -68,7 +68,7 @@ public final class FallbackMultiChunkKeyOCBlockShapeAccess implements OCBlockSha
         }
       }
     }
-    if(deletedStuff) {
+    if (deletedStuff) {
       // why not
       System.gc();
     }
@@ -101,7 +101,7 @@ public final class FallbackMultiChunkKeyOCBlockShapeAccess implements OCBlockSha
       this.chunkX = chunkX;
       this.chunkZ = chunkZ;
       double distance = Math.hypot(chunkX - originChunkX, chunkZ - originChunkZ);
-      if(distance > 2 || blockCache.size() > 4096) {
+      if (distance > 2 || blockCache.size() > 4096) {
         this.originChunkX = chunkX;
         this.originChunkZ = chunkZ;
         blockCache.clear();
@@ -112,7 +112,7 @@ public final class FallbackMultiChunkKeyOCBlockShapeAccess implements OCBlockSha
     long key = bigKey(posX, posY, posZ);
 
     BlockShape blockShape = indexedReplacements.get(key);
-    if(blockShape != null) {
+    if (blockShape != null) {
       return blockShape.boundingBoxes();
     }
 
@@ -140,7 +140,7 @@ public final class FallbackMultiChunkKeyOCBlockShapeAccess implements OCBlockSha
       this.chunkX = chunkX;
       this.chunkZ = chunkZ;
       double distance = Math.hypot(chunkX - originChunkX, chunkZ - originChunkZ);
-      if(distance > 2 || blockCache.size() > 4096) {
+      if (distance > 2 || blockCache.size() > 4096) {
         this.originChunkX = chunkX;
         this.originChunkZ = chunkZ;
         blockCache.clear();
@@ -151,7 +151,7 @@ public final class FallbackMultiChunkKeyOCBlockShapeAccess implements OCBlockSha
     long key = bigKey(posX, posY, posZ);
 
     BlockShape blockShape = indexedReplacements.get(key);
-    if(blockShape != null) {
+    if (blockShape != null) {
       return blockShape.type();
     }
 
@@ -179,7 +179,7 @@ public final class FallbackMultiChunkKeyOCBlockShapeAccess implements OCBlockSha
       this.chunkX = chunkX;
       this.chunkZ = chunkZ;
       double distance = Math.hypot(chunkX - originChunkX, chunkZ - originChunkZ);
-      if(distance > 2 || blockCache.size() > 4096) {
+      if (distance > 2 || blockCache.size() > 4096) {
         this.originChunkX = chunkX;
         this.originChunkZ = chunkZ;
         blockCache.clear();
@@ -190,7 +190,7 @@ public final class FallbackMultiChunkKeyOCBlockShapeAccess implements OCBlockSha
     long key = bigKey(posX, posY, posZ);
 
     BlockShape blockShape = indexedReplacements.get(key);
-    if(blockShape != null) {
+    if (blockShape != null) {
       return blockShape.data();
     }
 
@@ -233,26 +233,26 @@ public final class FallbackMultiChunkKeyOCBlockShapeAccess implements OCBlockSha
 
   private BlockShape cachedLookup(World world, Block block, int posX, int posY, int posZ) {
     Material type = block.getType();
-    if(type == Material.AIR) {
+    if (type == Material.AIR) {
       return EMPTY_CACHE_ENTRY;
     } else {
       BoundingBoxAccessFlowStudy.incremLookups();
       boolean typeIsIntavePatched = BoundingBoxPatcher.requiresPatch(type);
-      if(!typeIsIntavePatched && block.getY() >= 0 && globalKeyValid(posX, posY, posZ)) {
+      if (!typeIsIntavePatched && block.getY() >= 0 && globalKeyValid(posX, posY, posZ)) {
         Map<Long, BlockShape> worldFallbackCache = globalFallbackCache.computeIfAbsent(world, x -> new ConcurrentHashMap<>());
         long key = bigKey(posX, posY, posZ);
         boolean lookup = false;
         BlockShape resolve;
-        if((resolve = worldFallbackCache.get(key)) == null) {
+        if ((resolve = worldFallbackCache.get(key)) == null) {
           resolve = lookup(world, block, posX, posY, posZ);
           worldFallbackCache.put(key, resolve);
           BoundingBoxAccessFlowStudy.incremYellowLookups();
           lookup = true;
         }
-        if(resolve == SERVER_LOOKUP_REQUIRED) {
+        if (resolve == SERVER_LOOKUP_REQUIRED) {
           BoundingBoxAccessFlowStudy.incremRedLookups();
           resolve = lookup(world, block, posX, posY, posZ);
-        } else if(!lookup){
+        } else if (!lookup){
           resolve.successfulFallbackLookup();
           BoundingBoxAccessFlowStudy.incremGreenLookups();
         }
@@ -291,7 +291,7 @@ public final class FallbackMultiChunkKeyOCBlockShapeAccess implements OCBlockSha
   public void override(World world, int posX, int posY, int posZ, Material type, int blockState) {
     invalidateOverride(posX, posY, posZ);
     BlockShape blockShape;
-    if(type == Material.AIR) {
+    if (type == Material.AIR) {
       blockShape = EMPTY_CACHE_ENTRY;
     } else {
       blockShape = new BlockShape(
@@ -302,9 +302,9 @@ public final class FallbackMultiChunkKeyOCBlockShapeAccess implements OCBlockSha
     BlockShape originalShape = resolveOriginalShape(posX >> 4, posZ >> 4, posX, posY, posZ);
     boolean shapeRemains = (blockShape.equals(originalShape));
     long key = bigKey(posX, posY, posZ);
-    if(!shapeRemains) {
+    if (!shapeRemains) {
       Map<Long, BlockShape> worldBlockShapeCache = globalFallbackCache.computeIfAbsent(world, x -> new ConcurrentHashMap<>());
-      if(type.name().contains("DOOR")) {
+      if (type.name().contains("DOOR")) {
         worldBlockShapeCache.put(bigKey(posX, posY - 1, posZ), SERVER_LOOKUP_REQUIRED);
         worldBlockShapeCache.put(bigKey(posX, posY + 1, posZ), SERVER_LOOKUP_REQUIRED);
       }
@@ -318,7 +318,7 @@ public final class FallbackMultiChunkKeyOCBlockShapeAccess implements OCBlockSha
   @Override
   public void invalidateOverridesInBounds(int chunkXMinPos, int chunkXMaxPos, int chunkZMinPos, int chunkZMaxPos) {
     for (Location location : locatedReplacements.keySet()) {
-      if(location.getX() >= chunkXMinPos && location.getX() < chunkXMaxPos &&
+      if (location.getX() >= chunkXMinPos && location.getX() < chunkXMaxPos &&
         location.getZ() >= chunkZMinPos && location.getZ() < chunkZMaxPos) {
         long key = bigKey(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         locatedReplacements.remove(location);
@@ -352,7 +352,7 @@ public final class FallbackMultiChunkKeyOCBlockShapeAccess implements OCBlockSha
   }
 
   public void purgeOverrides() {
-    if(indexedReplacements.isEmpty()) {
+    if (indexedReplacements.isEmpty()) {
       return;
     }
     indexedReplacements.values().removeIf(BlockShape::expired);

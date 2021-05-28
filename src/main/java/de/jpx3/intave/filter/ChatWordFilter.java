@@ -37,7 +37,7 @@ public final class ChatWordFilter extends Filter {
     PacketContainer packet = event.getPacket();
     WrappedChatComponent wrappedChatComponent = packet.getChatComponents().readSafely(0);
 
-    if(wrappedChatComponent == null) {
+    if (wrappedChatComponent == null) {
       return;
     }
 
@@ -61,7 +61,7 @@ public final class ChatWordFilter extends Filter {
 
     boolean bypassRestrictions = messageContainsOwner || messageContainsSomeoneWithsReceiversIp;
 
-    if(bypassRestrictions) {
+    if (bypassRestrictions) {
       return;
     }
 
@@ -75,7 +75,7 @@ public final class ChatWordFilter extends Filter {
     List<String> badwords = Arrays.asList("prestige", "koks", "liquidbounce", "eject");
 
     for (String badword : badwords) {
-      if(messageToLower.contains(badword)) {
+      if (messageToLower.contains(badword)) {
         event.setCancelled(true);
       }
     }

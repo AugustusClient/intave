@@ -51,7 +51,7 @@ public final class ReconDelayLimiter implements BukkitEventSubscriber {
       message = ChatColor.translateAlternateColorCodes('&', message);
       e.setKickMessage(message);
       e.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST);
-      if(refresh) {
+      if (refresh) {
         ban(e.getAddress(), e.getUniqueId(), "rejoin");
       }
     }

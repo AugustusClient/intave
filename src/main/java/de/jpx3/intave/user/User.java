@@ -63,13 +63,13 @@ public final class User {
     this.userMeta = new UserMeta(player, this);
     this.userMeta.setup();
     this.permissionCache = new BukkitPermissionCache();
-    if(!hasPlayer) {
+    if (!hasPlayer) {
       useBlankBlockShapeAccess();
     } else {
       useDefaultBlockShapeAccess();
     }
     this.colliderProcessor = Collider.suitableComplexColliderProcessorFor(this);
-    if(hasPlayer) {
+    if (hasPlayer) {
       Synchronizer.synchronize(this::setDefaultMessagingChannel);
     }
   }
@@ -172,7 +172,7 @@ public final class User {
   }
 
   public void setBlockShapeAccess(OCBlockShapeAccess newBlockShapeAccess) {
-    if(blockShapeAccess != null) {
+    if (blockShapeAccess != null) {
       newBlockShapeAccess.applyFrom(blockShapeAccess);
     }
     blockShapeAccess = newBlockShapeAccess;
@@ -200,14 +200,14 @@ public final class User {
 
   public void setDefaultMessagingChannel() {
     for (UserMessageChannel channel : UserMessageChannel.values()) {
-      if(channel.enabledByDefault && BukkitPermissionCheck.permissionCheck(player(), channel.permission())) {
+      if (channel.enabledByDefault && BukkitPermissionCheck.permissionCheck(player(), channel.permission())) {
         receivingUserChannels.add(channel);
       }
     }
   }
 
   public boolean receives(UserMessageChannel channel) {
-    if(!BukkitPermissionCheck.permissionCheck(player(), channel.permission())) {
+    if (!BukkitPermissionCheck.permissionCheck(player(), channel.permission())) {
       receivingUserChannels.remove(channel);
       return false;
     }
@@ -215,7 +215,7 @@ public final class User {
   }
 
   public void toggleReceive(UserMessageChannel channel) {
-    if(receives(channel)) {
+    if (receives(channel)) {
       receivingUserChannels.remove(channel);
     } else {
       receivingUserChannels.add(channel);
@@ -236,7 +236,7 @@ public final class User {
   }
 
   public void applyAttackNerfer(AttackNerfStrategy strategy, String checkId) {
-    if(trustFactor().atLeast(TrustFactor.BYPASS)) {
+    if (trustFactor().atLeast(TrustFactor.BYPASS)) {
       return;
     }
     //noinspection deprecation

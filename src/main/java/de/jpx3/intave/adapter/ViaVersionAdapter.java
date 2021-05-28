@@ -33,7 +33,7 @@ public class ViaVersionAdapter {
     }
     access = available.stream().filter(ViaVersionAccess::available).findFirst().orElse(null);
     available.clear();
-    if(access != null) {
+    if (access != null) {
       access.setup();
     } else {
       IntaveLogger.logger().error("Unknown ViaVersion version, linkage failed");
@@ -41,7 +41,7 @@ public class ViaVersionAdapter {
   }
 
   public static void patchConfiguration() {
-    if(foundLinkage()) {
+    if (foundLinkage()) {
       access.patchConfiguration();
     }
   }

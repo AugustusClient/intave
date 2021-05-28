@@ -43,7 +43,7 @@ public final class AttackInInvalidStateHeuristic extends IntaveMetaCheckPart<Heu
     User user = userOf(player);
 
     // not checked yet
-    if(user.meta().inventoryData().handActive()) {
+    if (user.meta().inventoryData().handActive()) {
       Anomaly anomaly = Anomaly.anomalyOf("162", Confidence.NONE, Anomaly.Type.KILLAURA, "attacked whilst using an item");
       parentCheck().saveAnomaly(player, anomaly);
       //dmc28

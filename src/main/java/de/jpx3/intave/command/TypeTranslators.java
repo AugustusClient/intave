@@ -27,24 +27,24 @@ public final class TypeTranslators {
   }
 
   public static Object tryTranslate(CommandSender player, Class<?> type, String element, String forward) {
-    if(type.isEnum()) {
+    if (type.isEnum()) {
       Enum<?>[] enumConstants = (Enum<?>[]) type.getEnumConstants();
       for (Enum<?> enumConstant : enumConstants) {
-        if(enumConstant.name().equalsIgnoreCase(element) || niceifyEnumName(enumConstant.name()).equalsIgnoreCase(element)) {
+        if (enumConstant.name().equalsIgnoreCase(element) || niceifyEnumName(enumConstant.name()).equalsIgnoreCase(element)) {
           return enumConstant;
         }
       }
       return ("Could not find " + type + " in " + type.getSimpleName());
     }
     TypeTranslator<?> typeTranslator = typeTranslatorMap.get(type);
-    if(typeTranslator == null) {
+    if (typeTranslator == null) {
       return ("Invalid type: " + type);
     }
     return typeTranslator.resolve(player, element, forward);
   }
 
   public static List<String> findTabCompletes(CommandSender player, Class<?> type, String element, String forward) {
-    if(type.isEnum()) {
+    if (type.isEnum()) {
       Enum<?>[] enumConstants = (Enum<?>[]) type.getEnumConstants();
       List<String> strings = new ArrayList<>();
       for (Enum<?> enumConstant : enumConstants) {

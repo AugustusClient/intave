@@ -36,7 +36,7 @@ public final class NoSwingHeuristic extends IntaveMetaCheckPart<Heuristics, NoSw
     EnumWrappers.EntityUseAction entityUseAction = event.getPacket().getEntityUseActions().read(0);
 
     if (entityUseAction == EnumWrappers.EntityUseAction.ATTACK) {
-//      if(meta.swingsThisTick == 0 && meta.attacksThisTick == 0
+//      if (meta.swingsThisTick == 0 && meta.attacksThisTick == 0
 //        && user.meta().clientData().protocolVersion() == 47
 //      ) {
 //        event.setCancelled(true);
@@ -84,8 +84,8 @@ public final class NoSwingHeuristic extends IntaveMetaCheckPart<Heuristics, NoSw
       return;
     }
 
-    if(meta.attacksThisTick > 0) {
-      if(meta.swingsThisTick == 0) {
+    if (meta.attacksThisTick > 0) {
+      if (meta.swingsThisTick == 0) {
         String details = "missing swing packet on attack";
         Anomaly anomaly = Anomaly.anomalyOf("171", /*Confidence.LIKELY*/Confidence.NONE, Anomaly.Type.KILLAURA, details, Anomaly.AnomalyOption.LIMIT_4);
         parentCheck().saveAnomaly(player, anomaly);

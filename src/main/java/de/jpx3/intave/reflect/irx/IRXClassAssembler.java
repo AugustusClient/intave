@@ -72,7 +72,7 @@ final class IRXClassAssembler {
     String superClassName;
     boolean superClassIsInterface;
 
-    if(superClass == null) {
+    if (superClass == null) {
       superClassName = "java/lang/Object";
       superClassIsInterface = false;
     } else {
@@ -80,7 +80,7 @@ final class IRXClassAssembler {
       superClassIsInterface = superClass.isInterface();
     }
 
-    if(superClassIsInterface) {
+    if (superClassIsInterface) {
       classWriter.visit(
         classVersion,
         classFlags,
@@ -160,7 +160,7 @@ final class IRXClassAssembler {
       Type nestedType = castCallerMethodParameterTypes[index];
       int typeOpcode = resolveTypeOpcode(type, ILOAD);
       methodVisitor.visitVarInsn(typeOpcode, ++index);
-      if(!nestedType.equals(type)) {
+      if (!nestedType.equals(type)) {
         String nestedTypeClassPath = nestedType.getClassName().replaceAll("\\.", "/");
         methodVisitor.visitTypeInsn(CHECKCAST, nestedTypeClassPath);
       }

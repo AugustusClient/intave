@@ -36,12 +36,12 @@ public final class VanishedPlayerInfoFilter extends Filter {
     Player player = event.getPlayer();
     PacketContainer packet = event.getPacket();
     EnumWrappers.PlayerInfoAction playerInfoAction = packet.getPlayerInfoAction().read(0);
-    if(playerInfoAction == UPDATE_LATENCY) {
+    if (playerInfoAction == UPDATE_LATENCY) {
       List<PlayerInfoData> playerInfoDataList = packet.getPlayerInfoDataLists().read(0);
       playerInfoDataList.removeIf(playerInfoData -> {
         UUID otherId = playerInfoData.getProfile().getUUID();
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(otherId);
-        if(AccessHelper.isOnline(offlinePlayer)) {
+        if (AccessHelper.isOnline(offlinePlayer)) {
           Player otherPlayer = offlinePlayer.getPlayer();
           return !player.canSee(otherPlayer);
         }

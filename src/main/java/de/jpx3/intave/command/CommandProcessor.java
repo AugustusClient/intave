@@ -27,7 +27,7 @@ public final class CommandProcessor implements CommandExecutor, TabCompleter {
 
   @Override
   public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-    if(commandSender instanceof CommandBlock) {
+    if (commandSender instanceof CommandBlock) {
       return false;
     }
     String rawCommand = Arrays.stream(strings).map(s1 -> s1 + " ").collect(Collectors.joining()).trim();
@@ -37,12 +37,12 @@ public final class CommandProcessor implements CommandExecutor, TabCompleter {
 
   @Override
   public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] arguments) {
-    if(arguments.length == 0) {
+    if (arguments.length == 0) {
       return Collections.emptyList();
     }
     String rawCommand = Arrays.stream(arguments).map(s1 -> s1 + " ").collect(Collectors.joining()).trim();
     List<String> tabCompletions = rootCommandStage.tabComplete(commandSender, rawCommand);
-    if(tabCompletions == null) {
+    if (tabCompletions == null) {
       return null;
     }
     List<String> completions = new ArrayList<>();

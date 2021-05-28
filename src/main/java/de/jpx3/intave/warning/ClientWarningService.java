@@ -51,17 +51,17 @@ public final class ClientWarningService implements PacketEventSubscriber {
     } else {
       tag = packet.getStrings().getValues().get(0);
     }
-    if(tag.startsWith("minecraft:")) {
+    if (tag.startsWith("minecraft:")) {
       tag = tag.substring(10);
     }
-    if(tag.endsWith("Brand")) {
+    if (tag.endsWith("Brand")) {
       ByteBuf bytes = (ByteBuf) packet.getSpecificModifier(ReflectiveAccess.lookupServerClass("PacketDataSerializer")).getValues().get(0);
       try {
         bytes.markReaderIndex();
         int length = bytes.readByte();
         String brandString = bytes.toString(Charsets.UTF_8);
         ClientData clientData = clientDataOfBrand(brandString);
-        if(clientData != null) {
+        if (clientData != null) {
           Synchronizer.synchronize(() -> warn(player, clientData));
         }
       } catch (Exception exception) {
@@ -69,7 +69,7 @@ public final class ClientWarningService implements PacketEventSubscriber {
       }
     } else {
       ClientData clientData = clientDataOfPayload(tag);
-      if(clientData != null) {
+      if (clientData != null) {
         Synchronizer.synchronize(() -> warn(player, clientData));
       }
     }
@@ -98,7 +98,7 @@ public final class ClientWarningService implements PacketEventSubscriber {
   }
 
   private ClientData clientDataOfPayload(String payload) {
-    if(payload.equalsIgnoreCase("ignore")) {
+    if (payload.equalsIgnoreCase("ignore")) {
       return null;
     }
     return clientDatas
@@ -110,7 +110,7 @@ public final class ClientWarningService implements PacketEventSubscriber {
   }
 
   private ClientData clientDataOfBrand(String brand) {
-    if(brand.equalsIgnoreCase("ignore")) {
+    if (brand.equalsIgnoreCase("ignore")) {
       return null;
     }
     return clientDatas

@@ -532,7 +532,7 @@ public class DefaultPoseSimulator extends PoseSimulator {
         motionVector.motionY -= gravity / 16.0D;
       }
     }
-//    if(movementData.collidedHorizontally && MovementContextHelper.isOffsetPositionInLiquid(player, entityBoundingBox, x, y, z)) {
+//    if (movementData.collidedHorizontally && MovementContextHelper.isOffsetPositionInLiquid(player, entityBoundingBox, x, y, z)) {
 //      motionVector.motionY = 0.3;
 //    }
   }

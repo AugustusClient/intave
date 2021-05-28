@@ -13,13 +13,13 @@ import java.util.zip.ZipFile;
 public final class PatchyLoadingInjector {
   @Native
   public static <T> Class<T> loadUnloadedClassPatched(ClassLoader classLoader, String className) {
-    if(className.isEmpty()) {
+    if (className.isEmpty()) {
       return null;
     }
     className = className.replace("/", ".");
     byte[] classBytes;
     try {
-      if(!classIsLoaded(classLoader, className)) {
+      if (!classIsLoaded(classLoader, className)) {
         classBytes = classBytesOf(classLoader, className);
         classBytes = PatchyTranslator.translateClass(classBytes);
         defineClass(classLoader, classBytes);
@@ -46,7 +46,7 @@ public final class PatchyLoadingInjector {
   private static byte[] classBytesOf(ClassLoader classLoader, String className) throws IOException {
     className = className.replace('.', '/') + ".class";
     InputStream stream = classLoader.getResourceAsStream(className);
-    if(stream == null) {
+    if (stream == null) {
       IntaveLogger.logger().pushPrintln("Unable to resolve class bytes for class " + className + ". Performing manual load attempt..");
       String path;
       try {
@@ -66,7 +66,7 @@ public final class PatchyLoadingInjector {
       Enumeration<? extends ZipEntry> entries = zipFile.entries();
       while (entries.hasMoreElements()) {
         ZipEntry zipEntry = entries.nextElement();
-        if(!zipEntry.isDirectory() && zipEntry.getName().equals(fileName)) {
+        if (!zipEntry.isDirectory() && zipEntry.getName().equals(fileName)) {
           InputStream inputStream = zipFile.getInputStream(zipEntry);
           byte[] bytes = byteArrayFrom(inputStream);
           zipFile.close();

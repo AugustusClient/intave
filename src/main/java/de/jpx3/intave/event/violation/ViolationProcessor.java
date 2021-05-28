@@ -37,23 +37,23 @@ public final class ViolationProcessor {
     ViolationContext violationContext = ViolationContext.newOf(violation);
 
     Optional<Player> playerSearch = violation.findPlayer();
-    if(!playerSearch.isPresent()) {
+    if (!playerSearch.isPresent()) {
       return violationContext.counterThreatBecause("Player is not reachable").complete();
     }
 
     Player player = playerSearch.get();
     User user = UserRepository.userOf(player);
 
-    if(user.trustFactor().atLeast(TrustFactor.BYPASS)) {
+    if (user.trustFactor().atLeast(TrustFactor.BYPASS)) {
       return violationContext.ignoreThreatBecause("Player has bypass trust factor").complete();
     }
 
     IntaveCheck check = violation.check();
-    if(!check.enabled()) {
+    if (!check.enabled()) {
       return violationContext.ignoreThreatBecause("Check is disabled").complete();
     }
 
-    if(user.justJoined() || !user.hasOnlinePlayer()) {
+    if (user.justJoined() || !user.hasOnlinePlayer()) {
       return violationContext.counterThreatBecause("Player is not reachable").complete();
     }
 
@@ -78,7 +78,7 @@ public final class ViolationProcessor {
   private void fillInVLContext(
     ViolationContext violationContext
   ) {
-    if(violationContext.completed()) {
+    if (violationContext.completed()) {
       return;
     }
     Violation violation = violationContext.violation();
@@ -98,7 +98,7 @@ public final class ViolationProcessor {
   private void processViolationEvent(
     ViolationContext violationContext
   ) {
-    if(violationContext.completed()) {
+    if (violationContext.completed()) {
       return;
     }
     Violation violation = violationContext.violation();
@@ -116,10 +116,10 @@ public final class ViolationProcessor {
       event -> event.copy(player, checkName, message, details, oldVl, newVl)
     );
 
-    if(violationEvent.isCancelled()) {
+    if (violationEvent.isCancelled()) {
       IntaveViolationEvent.Reaction response = violationEvent.reaction();
       boolean counterThreat = response == IntaveViolationEvent.Reaction.INTERRUPT && violationContext.violationLevelPassedPreventionActivation();
-      if(counterThreat) {
+      if (counterThreat) {
         violationContext.counterThreatBecause("Intave access requested it");
       } else {
         violationContext.ignoreThreatBecause("Intave access requested it");
@@ -131,11 +131,11 @@ public final class ViolationProcessor {
   private void processViolationStatistics(
     ViolationContext violationContext
   ) {
-    if(violationContext.completed()) {
+    if (violationContext.completed()) {
       return;
     }
     boolean ignoreVioStat = violationContext.violation().flagSet(ViolationFlags.DONT_PROCESS_VIOSTAT);
-    if(ignoreVioStat) {
+    if (ignoreVioStat) {
       return;
     }
     User user = UserRepository.userOf(violationContext.violation().findPlayer().orElseThrow(IllegalStateException::new));
@@ -149,7 +149,7 @@ public final class ViolationProcessor {
   private void processViolationVerbose(ViolationContext violationContext) {
     boolean enterprise = (UserMetaClientData.VERSION_DETAILS & 0x200) != 0;
     boolean partner = (UserMetaClientData.VERSION_DETAILS & 0x100) != 0;
-    if(violationContext.completed()) {
+    if (violationContext.completed()) {
       return;
     }
     Violation violation = violationContext.violation();
@@ -166,7 +166,7 @@ public final class ViolationProcessor {
     String vlAfterViolation = MathHelper.formatDouble(violationContext.violationLevelAfter(), 2);
     String message = violation.message().trim();
     String details = violation.details().isEmpty() ? "" : "(" + violation.details().trim() + ")" + " ";
-    if(!enterprise) {
+    if (!enterprise) {
       details = "";
     }
     String consoleMessage = String.format(
@@ -177,7 +177,7 @@ public final class ViolationProcessor {
   }
 
   private void processViolationLevelIncrease(ViolationContext violationContext) {
-    if(violationContext.completed()) {
+    if (violationContext.completed()) {
       return;
     }
     // hehehe fix fix
@@ -192,7 +192,7 @@ public final class ViolationProcessor {
   }
 
   private void lookupThresholdCommands(ViolationContext violationContext) {
-    if(violationContext.completed()) {
+    if (violationContext.completed()) {
       return;
     }
     Violation violation = violationContext.violation();
@@ -205,7 +205,7 @@ public final class ViolationProcessor {
     Map<Integer, List<String>> thresholds = check.configuration().settings().thresholdsBy(threshold);
     for (int i = (int) oldVl + 1; i <= newVl; i++) {
       List<String> commands = thresholds.get(i);
-      if(commands != null) {
+      if (commands != null) {
         commands.forEach(violationContext::addCommand);
         violationContext.setMeetsThresholds(true);
       }
@@ -228,7 +228,7 @@ public final class ViolationProcessor {
         IntaveCommandExecutionEvent.class,
         event -> event.copy(player, executedCommand, false)
       );
-      if(!commandTriggerEvent.isCancelled()) {
+      if (!commandTriggerEvent.isCancelled()) {
         newCommands.add(commandTriggerEvent.command());
       }
     }
@@ -236,7 +236,7 @@ public final class ViolationProcessor {
   }
 
   private void executeCommands(ViolationContext violationContext) {
-    if(violationContext.completed() || violationContext.commands().isEmpty()) {
+    if (violationContext.completed() || violationContext.commands().isEmpty()) {
       return;
     }
     for (String command : violationContext.commands()) {
@@ -251,7 +251,7 @@ public final class ViolationProcessor {
 
     Synchronizer.synchronize(() -> {
       boolean playerRemoved = command.startsWith("ban") || command.startsWith("kick");
-      if(playerRemoved) {
+      if (playerRemoved) {
         plugin.eventService().reconDelayLimiter().ban(player.getAddress().getAddress(), player.getUniqueId(), checkName);
         plugin.proxyMessenger().sendPacket(player, new IntavePacketOutKicked(
           player.getUniqueId(),
@@ -276,7 +276,7 @@ public final class ViolationProcessor {
     String notifyMessage = MessageFormatter.resolveNotifyReplacements(new TextContext(fullMessage));
     for (Player allPlayers : Bukkit.getOnlinePlayers()) {
       User user = UserRepository.userOf(allPlayers);
-      if(user.receives(NOTIFY_MESSAGE_CHANNEL)) {
+      if (user.receives(NOTIFY_MESSAGE_CHANNEL)) {
         synchronizedMessage(allPlayers, notifyMessage);
       }
     }
@@ -302,14 +302,14 @@ public final class ViolationProcessor {
         continue;
       }
       Predicate<Player> constraint = allUsers.channelPlayerConstraint(channel);
-      if(constraint == null || constraint.test(target)) {
+      if (constraint == null || constraint.test(target)) {
         synchronizedMessage(allPlayers, message);
       }
     }
   }
 
   private void synchronizedMessage(Player player, String message) {
-    if(IntaveControl.GOMME_MODE) {
+    if (IntaveControl.GOMME_MODE) {
       Synchronizer.synchronize(() -> player.sendMessage(message));
     } else {
       player.sendMessage(message);

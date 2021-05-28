@@ -67,7 +67,7 @@ public final class Timer extends IntaveMetaCheck<Timer.TimerData> {
   )
   public void sentPosition(PacketEvent event) {
     User user = userOf(event.getPlayer());
-//    if(user.meta().clientData().flyingPacketStream()) {
+//    if (user.meta().clientData().flyingPacketStream()) {
 //    }
     double leniency = user.meta().violationLevelData().isInActiveTeleportBundle ? 2 : 12.5;
     TimerData timerData = metaOf(user);
@@ -81,7 +81,7 @@ public final class Timer extends IntaveMetaCheck<Timer.TimerData> {
       return;
     }
 
-//    if(teleportConf) {
+//    if (teleportConf) {
 //      return;
 //    }
 
@@ -93,7 +93,7 @@ public final class Timer extends IntaveMetaCheck<Timer.TimerData> {
     timerData.lastFlyingPacket = AccessHelper.now();
     timerData.timerBalance -= delta / 5.0;
 
-//    if(!user.meta().clientData().flyingPacketStream() && event.getPacketType() == PacketType.Play.Client.POSITION) {
+//    if (!user.meta().clientData().flyingPacketStream() && event.getPacketType() == PacketType.Play.Client.POSITION) {
 //      // account missing flying packets
 //      timerData.timerBalance += 200;
 //    } else {
@@ -102,14 +102,14 @@ public final class Timer extends IntaveMetaCheck<Timer.TimerData> {
 
     int allowedLagInMilliseconds = trustFactorSetting("buffer-size", player);
 
-    if(highToleranceMode) {
+    if (highToleranceMode) {
       allowedLagInMilliseconds *= 1.5;
     }
 
     if (AccessHelper.now() - timerData.lastRespawn < 6000) {
       allowedLagInMilliseconds = Math.max(allowedLagInMilliseconds, 8000);
     }
-    if(AccessHelper.now() - timerData.lastLagSpike < 12000 && !highToleranceMode) {
+    if (AccessHelper.now() - timerData.lastLagSpike < 12000 && !highToleranceMode) {
       allowedLagInMilliseconds = Math.max(allowedLagInMilliseconds / 2, 500);
     }
 

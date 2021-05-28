@@ -14,7 +14,7 @@ public final class InterceptorDetection {
   }
 
   public static void revert() {
-    if(System.out instanceof InterceptorFilterPrintStream) {
+    if (System.out instanceof InterceptorFilterPrintStream) {
       System.setOut(original);
     } else {
       System.out.println("[Intave] Invalid print-stream usage: please contact support");

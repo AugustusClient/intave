@@ -85,7 +85,7 @@ public final class ProtocolScanner extends IntaveMetaCheck<ProtocolScanner.Proto
     PacketContainer packet = event.getPacket();
     UserMetaClientData clientData = user.meta().clientData();
     if (HAS_OFF_HAND && clientData.combatUpdate()) {
-      if(enumMainHandClass == null) {
+      if (enumMainHandClass == null) {
         enumMainHandClass = ReflectiveAccess.lookupServerClass("EnumMainHand");
       }
       HandSlot sentHand = packet.getEnumModifier(HandSlot.class, enumMainHandClass).read(0);

@@ -84,7 +84,7 @@ public final class PacketEntityTypeResolver {
         EntityType entityType = packet.getEntityTypeModifier().read(0);
         Class<? extends Entity> entityClass = entityType.getEntityClass();
         String entityClassName = entityClass.getSimpleName();
-        if(IntaveControl.DISABLE_LICENSE_CHECK) {
+        if (IntaveControl.DISABLE_LICENSE_CHECK) {
           IntaveLogger.logger().info("Zero BoundingBox 2");
         }
         return new EntityTypeData(entityClassName, HitBoxBoundaries.zero(), -2);
@@ -121,17 +121,17 @@ public final class PacketEntityTypeResolver {
     final int correctIndex;
     if (AT_OR_ABOVE_1_9) {
       if (AT_OR_ABOVE_1_10) {
-        if(AT_OR_ABOVE_1_14) {
-          if(AT_OR_ABOVE_1_15) {
+        if (AT_OR_ABOVE_1_14) {
+          if (AT_OR_ABOVE_1_15) {
             // 1.15+
-            if(entityTypeId == 30) {
+            if (entityTypeId == 30) {
               // armorstand
               correctIndex = 14;
             } else {
               correctIndex = 15;
             }
           } else {
-            if(entityTypeId == 30) {
+            if (entityTypeId == 30) {
               // armorstand
               correctIndex = 13;
             } else {
@@ -156,14 +156,14 @@ public final class PacketEntityTypeResolver {
       int index = watchableObject.getIndex();
       Object object = watchableObject.getRawValue();
 
-      if(object != null) {
-        if(index == correctIndex) {
-          if(object instanceof Boolean) {
+      if (object != null) {
+        if (index == correctIndex) {
+          if (object instanceof Boolean) {
             Boolean isChild = (Boolean) object;
             return isChild;
-          } else if(object instanceof Byte) {
+          } else if (object instanceof Byte) {
             byte isChild = (byte) object;
-            if(AT_OR_ABOVE_1_14 && entityTypeId == 30) {
+            if (AT_OR_ABOVE_1_14 && entityTypeId == 30) {
               return isChild == 1;
             } else {
               return isChild < 0;
@@ -190,7 +190,7 @@ public final class PacketEntityTypeResolver {
     } else {
       EntityTypeData entityTypeData = entityTypeDataOfEntityType(entityTypeId);
 
-      if(isChild == null) {
+      if (isChild == null) {
         return null;
       } else if (isChild) {
         return convertHitboxBoundariesToBaby(entityTypeData);

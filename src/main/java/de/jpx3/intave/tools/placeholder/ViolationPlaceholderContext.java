@@ -36,7 +36,7 @@ public final class ViolationPlaceholderContext extends PlaceholderContext {
     builder.put("message", message);
 
     String details = this.details;
-    if(!details.isEmpty()) {
+    if (!details.isEmpty()) {
       details = "(" + details + ")";
     }
     builder.put("details", details);

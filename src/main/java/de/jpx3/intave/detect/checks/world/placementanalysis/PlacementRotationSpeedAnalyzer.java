@@ -45,12 +45,12 @@ public final class PlacementRotationSpeedAnalyzer extends IntaveMetaCheckPart<Pl
     RotationSpeedMeta meta = metaOf(user);
     float rotationMovement = Math.min(MathHelper.distanceInDegrees(movementData.rotationYaw, movementData.lastRotationYaw), 360);
 
-    if(AccessHelper.now() - meta.lastBlockPlacement > 2000 || movementData.lastTeleport <= 5) {
+    if (AccessHelper.now() - meta.lastBlockPlacement > 2000 || movementData.lastTeleport <= 5) {
       return;
     }
 
     List<Float> rotationHistory = meta.rotationHistory;
-    if(rotationHistory.size() > 5 * 20) {
+    if (rotationHistory.size() > 5 * 20) {
       rotationHistory.remove(0);
     }
     rotationHistory.add(rotationMovement);
@@ -64,11 +64,11 @@ public final class PlacementRotationSpeedAnalyzer extends IntaveMetaCheckPart<Pl
 
     meta.lastBlockPlacement = AccessHelper.now();
 
-    if(place.getBlock().getY() < player.getLocation().getBlockY()) {
+    if (place.getBlock().getY() < player.getLocation().getBlockY()) {
 
       List<Float> rotationHistory = meta.rotationHistory;
       double rotationSum = rotationHistory.stream().mapToDouble(value -> value).sum();
-      if(rotationSum > 3000) {
+      if (rotationSum > 3000) {
         Violation violation = Violation.builderFor(PlacementAnalysis.class)
           .forPlayer(player).withDefaultThreshold()
           .withMessage(COMMON_FLAG_MESSAGE)

@@ -39,7 +39,7 @@ public final class ConfigurationService {
       fileInputStream.close();
       reader.close();
       String configurationIdentifier = configuration.getString("config-identifier");
-      if(configurationIdentifier == null) {
+      if (configurationIdentifier == null) {
         throw new IntaveException("It seems like you are using an old/invalid configuration");
       }
       return configurationIdentifier;
@@ -65,7 +65,7 @@ public final class ConfigurationService {
 
 //    String hash = loader.precomputeConfigurationHash();
     int latestKnownState = loader().latestState();
-    if(requiredState == null ||  /* no connection to our servers */
+    if (requiredState == null ||  /* no connection to our servers */
       requiredState.equalsIgnoreCase(String.valueOf(latestKnownState)) /* configuration is up to date */
     ) {
       loader.loadConfiguration();

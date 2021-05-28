@@ -41,7 +41,7 @@ public final class SibylIntegrationService implements BukkitEventSubscriber {
 
   @Native
   public void k(Player player) {
-    if(!authentication.isAuthenticated(player)) {
+    if (!authentication.isAuthenticated(player)) {
       authentication.sendMessageToClient(player, "MC|Brand", "INTAVE", null);
     }
   }
@@ -57,7 +57,7 @@ public final class SibylIntegrationService implements BukkitEventSubscriber {
   @Native
   public void broadcastTrustedPacket(SibylPacket packet) {
     for (Player player : Bukkit.getOnlinePlayers()) {
-      if(authentication.isAuthenticated(player)) {
+      if (authentication.isAuthenticated(player)) {
         packetTransmitter.transmitPacket(player, packet);
       }
     }

@@ -79,7 +79,7 @@ public final class UserMetaPunishmentData {
       new AttackNerfer(AttackNerfStrategy.GARBAGE_HITS, GARBAGE_HITS_DURATION, event -> {
         int entityId = event.getEntity().getEntityId();
         long lastValidAttack = AccessHelper.now() - lastTimeValidHurttimeAttack.computeIfAbsent(entityId, x -> 0L);
-        if(lastValidAttack < delay) {
+        if (lastValidAttack < delay) {
           event.setCancelled(true);
         } else {
           delay = ThreadLocalRandom.current().nextInt(550, 600);

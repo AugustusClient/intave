@@ -42,8 +42,8 @@ public final class IntaveCommandStage extends CommandStage {
     Player player = user.player();
     boolean receivesVerbose = user.receives(UserMessageChannel.VERBOSE);
 
-    if(user.receives(UserMessageChannel.VERBOSE)) {
-      if(selectedPlayers != null && !user.hasChannelConstraint(UserMessageChannel.VERBOSE)) {
+    if (user.receives(UserMessageChannel.VERBOSE)) {
+      if (selectedPlayers != null && !user.hasChannelConstraint(UserMessageChannel.VERBOSE)) {
         List<UUID> uniqueIds = Arrays.stream(selectedPlayers).map(Entity::getUniqueId).collect(Collectors.toList());
         String names = Arrays.stream(selectedPlayers).map(Entity::getName).map(s -> s + " ").collect(Collectors.joining()).trim();
         user.setChannelConstraint(UserMessageChannel.VERBOSE, player1 -> uniqueIds.contains(player1.getUniqueId()));
@@ -55,10 +55,10 @@ public final class IntaveCommandStage extends CommandStage {
 
     user.toggleReceive(UserMessageChannel.VERBOSE);
 
-    if(receivesVerbose) {
+    if (receivesVerbose) {
       player.sendMessage(IntavePlugin.prefix() + "You are " + ChatColor.RED + "no longer " + IntavePlugin.defaultColor() + "receiving verbose output");
     } else {
-      if(selectedPlayers == null) {
+      if (selectedPlayers == null) {
         String target = ChatColor.RED + "global";
         player.sendMessage(IntavePlugin.prefix() + "You are " + ChatColor.GREEN + "now " + IntavePlugin.defaultColor() + "receiving verbose output for: " + target);
       } else {
@@ -83,7 +83,7 @@ public final class IntaveCommandStage extends CommandStage {
     boolean receiveNotify = user.receives(UserMessageChannel.NOTIFY);
     user.toggleReceive(UserMessageChannel.NOTIFY);
 
-    if(receiveNotify) {
+    if (receiveNotify) {
       player.sendMessage(IntavePlugin.prefix() + "You are " + ChatColor.RED + "no longer " + IntavePlugin.defaultColor() + "receiving notifications");
     } else {
       player.sendMessage(IntavePlugin.prefix() + "You are " + ChatColor.GREEN + "now " + IntavePlugin.defaultColor() + "receiving notifications");
@@ -167,7 +167,7 @@ public final class IntaveCommandStage extends CommandStage {
   protected void showInfo(CommandSender sender) {
     boolean hasIntavePermission = BukkitPermissionCheck.permissionCheck(sender, "intave.command");
 
-    if(hasIntavePermission) {
+    if (hasIntavePermission) {
       super.showInfo(sender);
     } else {
       sendVersionMessage(sender);
@@ -181,11 +181,11 @@ public final class IntaveCommandStage extends CommandStage {
     Version versionInformation = IntavePlugin.singletonInstance().versionList().versionInformation(IntavePlugin.version());
     String version;
 
-    if(!hasVersionViewPermission) {
+    if (!hasVersionViewPermission) {
       version = "(version hidden)";
-    } else if(versionInformation != null) {
+    } else if (versionInformation != null) {
       version = IntavePlugin.version() + " (" + DurationTranslator.translateDuration(AccessHelper.now() - versionInformation.release()) + " old";
-      if(versionInformation.typeClassifier() == Version.Status.OUTDATED) {
+      if (versionInformation.typeClassifier() == Version.Status.OUTDATED) {
         version += " and outdated";
       }
       version += ")";
@@ -203,11 +203,11 @@ public final class IntaveCommandStage extends CommandStage {
       prefix + "Visit our website for a full list of contributors"
     });
 
-    if(IntaveControl.GOMME_MODE) {
+    if (IntaveControl.GOMME_MODE) {
       player.sendMessage(prefix + "Certified for GommeHDnet / vemyb");
-    } else if(IntavePlugin.isInOfflineMode()) {
+    } else if (IntavePlugin.isInOfflineMode()) {
       player.sendMessage(prefix + "Unable to verify certificate " + LicenseVerification.licenseKey() + ". Intave servers down?");
-    } else if(LicenseVerification.network().equals("~bypass")){
+    } else if (LicenseVerification.network().equals("~bypass")){
       player.sendMessage(prefix + "This self-issued version does not require certification");
     } else {
       player.sendMessage(prefix + "Certified for " + LicenseVerification.network() + (enterprise || partner ? " (verified)" : " (not verified)"));
@@ -215,7 +215,7 @@ public final class IntaveCommandStage extends CommandStage {
   }
 
   public static IntaveCommandStage singletonInstance() {
-    if(singletonInstance == null) {
+    if (singletonInstance == null) {
       singletonInstance = new IntaveCommandStage();
     }
     return singletonInstance;

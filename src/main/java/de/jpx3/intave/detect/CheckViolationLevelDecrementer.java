@@ -41,7 +41,7 @@ public final class CheckViolationLevelDecrementer {
 
     long lastReset = accessValueFromVLMap(lastViolationLevelGainedCounterReset, AccessHelper.now());
 
-    if(AccessHelper.now() - lastReset > 1000) {
+    if (AccessHelper.now() - lastReset > 1000) {
       putValueInVLMap(violationLevelGainedCounter, 0d);
       putValueInVLMap(lastViolationLevelGainedCounterReset, AccessHelper.now());
     }
@@ -49,7 +49,7 @@ public final class CheckViolationLevelDecrementer {
     double recentlyGainedVl  = accessValueFromVLMap(violationLevelGainedCounter, 0d);
     recentlyGainedVl += amount;
 
-    if(recentlyGainedVl > limitPerSecond) {
+    if (recentlyGainedVl > limitPerSecond) {
       return;
     }
 

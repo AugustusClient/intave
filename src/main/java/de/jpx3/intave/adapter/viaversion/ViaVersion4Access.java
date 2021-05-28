@@ -29,7 +29,7 @@ public final class ViaVersion4Access implements ViaVersionAccess {
       Object configuration = viaVersion.getMethod("getConfigurationProvider").invoke(Bukkit.getPluginManager().getPlugin("ViaVersion"));
       Class<?> configurationClass = Class.forName("us.myles.ViaVersion.AbstractViaConfig");
       Field maxPPSField = configurationClass.getDeclaredField("warningPPS");
-      if(!maxPPSField.isAccessible()) {
+      if (!maxPPSField.isAccessible()) {
         maxPPSField.setAccessible(true);
       }
       int maxpps = maxPPSField.getInt(configuration);

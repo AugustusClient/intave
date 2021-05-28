@@ -456,7 +456,7 @@ public final class MovementDispatcher implements EventProcessor {
       height = 0.2F;
     } else if (!movementData.swimming) {
       width = 0.6F;
-      if(movementData.sneaking) {
+      if (movementData.sneaking) {
         height = meta.clientData().hitBoxHeightWhenSneaking();
       } else {
         height = 1.8F;

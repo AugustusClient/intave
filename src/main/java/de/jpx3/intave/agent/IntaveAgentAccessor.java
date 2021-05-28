@@ -21,7 +21,7 @@ public final class IntaveAgentAccessor {
 
   private static Instrumentation instrumentation;
   public static Instrumentation instrumentation() {
-    if(instrumentation == null && agentAvailable()) {
+    if (instrumentation == null && agentAvailable()) {
       try {
         Class<?> agentClass = Class.forName("de.jpx3.intaveagent.IntaveAgent");
         Method universalInstrumentation = agentClass.getMethod("universalInstrumentation");
@@ -39,10 +39,10 @@ public final class IntaveAgentAccessor {
     String methodDescription,
     MethodTransformer methodTransformer
   ) {
-    if(!agentAvailable()) {
+    if (!agentAvailable()) {
       throw new UnsupportedOperationException();
     }
-    if(!isNMSClass(clazz)) {
+    if (!isNMSClass(clazz)) {
       throw new IntaveInternalException("Can not redefine non-server class");
     }
     redefineNMSClass(clazz,
@@ -65,10 +65,10 @@ public final class IntaveAgentAccessor {
   public static void resetNMSClass(
     Class<?> clazz
   ) {
-    if(!agentAvailable()) {
+    if (!agentAvailable()) {
       throw new UnsupportedOperationException();
     }
-    if(!isNMSClass(clazz)) {
+    if (!isNMSClass(clazz)) {
       throw new IntaveInternalException("Can not redefine non-server class");
     }
     redefineNMSClass(clazz,
@@ -89,7 +89,7 @@ public final class IntaveAgentAccessor {
   }
 
   public static void redefineNMSClass(Class<?> clazz, ClassFileTransformer transformer) {
-    if(!agentAvailable() || !isNMSClass(clazz)) {
+    if (!agentAvailable() || !isNMSClass(clazz)) {
       throw new UnsupportedOperationException();
     }
     try {
@@ -123,7 +123,7 @@ public final class IntaveAgentAccessor {
         String[] exceptions
       ) {
         MethodVisitor originalMethod = super.visitMethod(access, name, descriptor, signature, exceptions);
-        if(methodsEqual(name, descriptor, methodName, methodDescription)) {
+        if (methodsEqual(name, descriptor, methodName, methodDescription)) {
           originalMethod = methodTransformer.replace(originalMethod, access, name, descriptor);
         }
         return originalMethod;
@@ -147,7 +147,7 @@ public final class IntaveAgentAccessor {
   private static Method classBytesOfMethod;
   public static byte[] sourceBytesOfMinecraftClass(String minecraftClassName) {
     try {
-      if(classBytesOfMethod == null) {
+      if (classBytesOfMethod == null) {
         classBytesOfMethod = Class.forName("de.jpx3.intaveagent.IntaveAgent").getMethod("classBytesOfNMSClass", String.class);
       }
       minecraftClassName = minecraftClassName.replace(".", "/");

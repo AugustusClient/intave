@@ -31,7 +31,7 @@ public final class LegacyWaterflow {
             double d0 = (float) (y + 1) - resolveLiquidHeightPercentage(level);
             if ((double) maxY >= d0) {
               inWater = true;
-              if(flowVector == null) {
+              if (flowVector == null) {
                 flowVector = new WrappedVector(0, 0, 0);
               }
               flowVector = modifyAcceleration(user, new WrappedBlockPosition(x, y, z), flowVector);

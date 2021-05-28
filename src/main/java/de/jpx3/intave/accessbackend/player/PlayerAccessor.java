@@ -102,7 +102,7 @@ public final class PlayerAccessor {
       public void setTrustFactor(TrustFactor factor) {
         PluginInvocation pluginInvocation = CallerResolver.callerPluginInfo();
         String message;
-        if(pluginInvocation == null) {
+        if (pluginInvocation == null) {
           message = "Changed trustfactor of " + player.getName() + " to " + factor.name() + " (unknown origin)";
         } else {
           message = "Changed trustfactor of " + player.getName() + " to " + factor.name() + " (plugin " + pluginInvocation.pluginName() + " in class " + pluginInvocation.className() + ")";

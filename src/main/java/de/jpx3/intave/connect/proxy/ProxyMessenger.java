@@ -82,7 +82,7 @@ public final class ProxyMessenger {
   }
 
   public void closeChannel() {
-    if(packetListeners != null) {
+    if (packetListeners != null) {
       packetListeners.clear();
     }
     Messenger messenger = Bukkit.getServer().getMessenger();

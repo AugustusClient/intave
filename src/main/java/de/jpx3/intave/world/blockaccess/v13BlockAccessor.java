@@ -21,7 +21,7 @@ public final class v13BlockAccessor implements BlockAccessor {
   public float blockDamage(Player player, ItemStack itemInHand, BlockPosition blockPosition) {
     WorldServer worldServer = ((CraftWorld) player.getWorld()).getHandle();
     Chunk chunk = worldServer.getChunkIfLoaded(blockPosition.getX() >> 4, blockPosition.getZ() >> 4);
-    if(chunk == null) {
+    if (chunk == null) {
       return 0.0f;
     }
     IBlockData blockData = chunk.getBlockData(blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
@@ -33,7 +33,7 @@ public final class v13BlockAccessor implements BlockAccessor {
   public boolean replacementPlace(World world, Player player, BlockPosition blockPosition) {
     WorldServer worldServer = ((CraftWorld) world).getHandle();
     Chunk chunk = worldServer.getChunkIfLoaded(blockPosition.getX() >> 4, blockPosition.getZ() >> 4);
-    if(chunk == null) {
+    if (chunk == null) {
       return false;
     }
     User user = UserRepository.userOf(player);

@@ -50,7 +50,7 @@ public final class LabymodClientListener implements PacketEventSubscriber {
     } else {
       tag = packet.getStrings().getValues().get(0);
     }
-    if(tag.startsWith("minecraft:")) {
+    if (tag.startsWith("minecraft:")) {
       tag = tag.substring(10);
     }
     if (!tag.equalsIgnoreCase("LMC")) {
@@ -60,7 +60,7 @@ public final class LabymodClientListener implements PacketEventSubscriber {
     try {
       bytes.markReaderIndex();
       String messageKey = LabyModChannelHelper.readString(bytes, Short.MAX_VALUE);
-      if(messageKey.equalsIgnoreCase(channel)) {
+      if (messageKey.equalsIgnoreCase(channel)) {
         String messageContent = LabyModChannelHelper.readString(bytes, Short.MAX_VALUE);
         JsonElement jsonElement = jsonParser.parse(messageContent);
         elementConsumer.accept(player, jsonElement);

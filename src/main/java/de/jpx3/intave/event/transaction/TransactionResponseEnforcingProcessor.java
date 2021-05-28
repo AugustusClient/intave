@@ -66,7 +66,7 @@ public final class TransactionResponseEnforcingProcessor implements PacketEventS
       long expected = synchronizeData.lastReceivedTransactionNum + 1;
       if (transactionResponse.num() != expected && /* idk why tha fuck this has problems during join */ !user.justJoined() && transactionResponse.num() > 128) {
         Synchronizer.synchronize(() -> {
-          if(player.isOnline()) {
+          if (player.isOnline()) {
             IntaveLogger.logger().pushPrintln("[Intave] " + player.getName() + " sent invalid validation response (received " + transactionResponse.num() + ", but expected " + expected + ")");
             player.kickPlayer("Timed out");
           }

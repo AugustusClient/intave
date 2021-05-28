@@ -20,7 +20,7 @@ public final class IntaveAccessor {
     if (!loaded()) {
       throw new IntaveColdException("Intave offline");
     }
-    if(weakAccess == null) {
+    if (weakAccess == null) {
       weakAccess = new WeakReference<>(uncheckedUnsafeAccess());
     }
     return weakAccess;

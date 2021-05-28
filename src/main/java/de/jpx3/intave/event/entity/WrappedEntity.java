@@ -186,7 +186,7 @@ public class WrappedEntity implements Cloneable {
     double alternativeNewPosY;
     double newPosZ;
 
-    if(NEW_POSITION_PROCESSING_1_14) {
+    if (NEW_POSITION_PROCESSING_1_14) {
       this.serverPosX += packet.getShorts().readSafely(0);
       this.serverPosY += packet.getShorts().readSafely(1);
       this.serverPosZ += packet.getShorts().readSafely(2);
@@ -249,8 +249,8 @@ public class WrappedEntity implements Cloneable {
   }
 
   private void updatePositionHistory() {
-    if(!isClone) {
-      if(positionHistory.size() > 25) {
+    if (!isClone) {
+      if (positionHistory.size() > 25) {
         positionHistory.remove(0);
       }
 
@@ -318,7 +318,7 @@ public class WrappedEntity implements Cloneable {
    * @return the {@link WrappedAxisAlignedBB}
    */
   public WrappedAxisAlignedBB entityBoundingBox() {
-    if(boundingBox != null) {
+    if (boundingBox != null) {
       return boundingBox;
     }
     boundingBox = entityBoundingBoxFrom(position, this);

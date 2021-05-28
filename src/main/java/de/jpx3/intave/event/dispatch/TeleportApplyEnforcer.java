@@ -196,10 +196,10 @@ public final class TeleportApplyEnforcer implements PacketEventSubscriber {
     if (relativeX) {
       positionX += movementData.positionX;
     }
-    if(relativeY) {
+    if (relativeY) {
       positionY += movementData.positionY;
     }
-    if(relativeZ) {
+    if (relativeZ) {
       positionZ += movementData.positionZ;
     }
 

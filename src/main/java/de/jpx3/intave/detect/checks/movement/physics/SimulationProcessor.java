@@ -48,7 +48,7 @@ public final class SimulationProcessor {
     simulationAccuracy = simulation.accuracy(movementData.motion());
     biasedSimulationFailed = simulationAccuracy > REQUIRED_ACCURACY_FOR_QUICK_PROC_EXIT;
 
-    if(biasedSimulationFailed) {
+    if (biasedSimulationFailed) {
       //
       // try last-key biased simulation
       //
@@ -103,7 +103,7 @@ public final class SimulationProcessor {
         inventoryData.setHandActive(true);
       }
     }
-    if(!ViaVersionAdapter.ignoreBlocking(user.player())) {
+    if (!ViaVersionAdapter.ignoreBlocking(user.player())) {
       Synchronizer.synchronize(() -> ReflectiveDataWatcherAccess.setDataWatcherFlag(user.player(), DATA_WATCHER_BLOCKING_ID, false));
     }
   }
@@ -157,7 +157,7 @@ public final class SimulationProcessor {
     int direction = directionFrom(differenceX, differenceZ, yaw);
 
 //    boolean invalidPrediction = false;
-    if(directionPredictionError(differenceX, differenceZ, yaw) > REQUIRED_PREDICTION_ACCURACY_FOR_PRED_BIAS_PROCEED) {
+    if (directionPredictionError(differenceX, differenceZ, yaw) > REQUIRED_PREDICTION_ACCURACY_FOR_PRED_BIAS_PROCEED) {
 //      invalidPrediction = true;
       movementData.physicsJumped = false;
       movementData.keyForward = -2;
@@ -189,7 +189,7 @@ public final class SimulationProcessor {
 
 //    boolean simulationFailed = simulationResult.accuracy(user.meta().movementData().motion()) > 0.0001;
 //
-//    if(invalidPrediction) {
+//    if (invalidPrediction) {
 //      Synchronizer.synchronize(() -> {
 //        user.player().sendMessage(simulationFailed ? ChatColor.GREEN + "Simulation failure predicted" : ChatColor.RED + "Unexpected simulation success");
 //      });

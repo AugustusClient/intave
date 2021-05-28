@@ -47,9 +47,9 @@ import de.jpx3.intave.world.blockphysics.BlockSlipperinessRepository;
 import de.jpx3.intave.world.blockshape.resolver.BoundingBoxResolverFactory;
 import de.jpx3.intave.world.blockshape.resolver.pipeline.patcher.BoundingBoxPatcher;
 import de.jpx3.intave.world.collider.Collider;
+import de.jpx3.intave.world.fluid.Fluid;
 import de.jpx3.intave.world.permission.WorldPermission;
 import de.jpx3.intave.world.raytrace.Raytracer;
-import de.jpx3.intave.world.fluid.Fluid;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginLogger;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -134,14 +134,14 @@ public final class IntavePlugin extends JavaPlugin {
     logger.info("Please stand by..");
     // stage 4
 
-    if(IntaveAgentAccessor.agentAvailable()) {
+    if (IntaveAgentAccessor.agentAvailable()) {
       logger.info("Using agent :{~"+"-"+"~}:");
     }
 
     prefix = ChatColor.translateAlternateColorCodes('&', prefix);
 
     SecurityManager securityManager = System.getSecurityManager();
-    if(securityManager != null) {
+    if (securityManager != null) {
       logger.error("A security manager of class " + securityManager.getClass().getName() + " is present, unable to start");
       return;
     }
@@ -175,7 +175,7 @@ public final class IntavePlugin extends JavaPlugin {
       configurationService = new ConfigurationService(this);
       String configurationKey = configurationService.configurationKey();
 
-      if(IntaveControl.USE_EXTERNAL_CONFIGURATION_FILE || configurationKey.equalsIgnoreCase("file")) {
+      if (IntaveControl.USE_EXTERNAL_CONFIGURATION_FILE || configurationKey.equalsIgnoreCase("file")) {
         logger.info("Using the file configuration");
       } else {
         logger.info("Using the \"" + configurationKey + "\" configuration");
@@ -187,7 +187,7 @@ public final class IntavePlugin extends JavaPlugin {
         url.getDefaultPort();
       }
 
-      if(foundInterceptor) {
+      if (foundInterceptor) {
         System.exit(1);
         return;
       }
@@ -208,7 +208,7 @@ public final class IntavePlugin extends JavaPlugin {
         }
       }
 
-      if(debuggerFound) {
+      if (debuggerFound) {
         System.exit(1);
         return;
       }
@@ -267,7 +267,7 @@ public final class IntavePlugin extends JavaPlugin {
           while (scanner2.hasNext())
             raw2.append(scanner2.next());
           response = raw2.toString();
-          if(response.equalsIgnoreCase("timeout")) {
+          if (response.equalsIgnoreCase("timeout")) {
             response += "_";
           }
         } catch (IOException exception) {
@@ -304,17 +304,17 @@ public final class IntavePlugin extends JavaPlugin {
           logger.error(message);
         }
 
-        if(clearReloCache) {
+        if (clearReloCache) {
           String operatingSystem = System.getProperty("os.name").toLowerCase(Locale.ROOT);
           String filePath = null;
-          if(operatingSystem.contains("win")) {
+          if (operatingSystem.contains("win")) {
             filePath = System.getenv("APPDATA") + "/Intave/Relocator/";
           } else {
             filePath = System.getProperty("user.home") + "/.intave/relocator/";
           }
           File workDirectory = new File(filePath);
           File[] files = workDirectory.listFiles();
-          if(workDirectory.exists() && files != null) {
+          if (workDirectory.exists() && files != null) {
             for (File file : files) {
               file.delete();
             }
@@ -350,7 +350,7 @@ public final class IntavePlugin extends JavaPlugin {
             properties.put(split1[0], split1[1]);
           }
 
-          if(properties.isEmpty()) {
+          if (properties.isEmpty()) {
             logger.error("Invalid server response " + response);
             contextStatusResource.write(new ByteArrayInputStream(("failure-"+response).getBytes(StandardCharsets.UTF_8)));
             boolFailure();
@@ -358,12 +358,12 @@ public final class IntavePlugin extends JavaPlugin {
             return;
           }
 
-          if(VERSION_DETAILS == 97) {
+          if (VERSION_DETAILS == 97) {
             requiredState = properties.get("configuration-hash");
-            if(properties.containsKey("partner")) {
+            if (properties.containsKey("partner")) {
               VERSION_DETAILS |= 0x100;
             }
-            if(properties.containsKey("enterprise")) {
+            if (properties.containsKey("enterprise")) {
               VERSION_DETAILS |= 0x200;
             }
           } else {
@@ -376,7 +376,7 @@ public final class IntavePlugin extends JavaPlugin {
           boolean validResponse = false;
           long receivedMSB = 0;
           long receivedLSB = 0;
-          if(keyResponse != null) {
+          if (keyResponse != null) {
             UUID receivedResponse = UUID.fromString(keyResponse);
             for (int i = 0; i < 64; i++) {
               longOne |= (longTwo & (1L << i));
@@ -386,7 +386,7 @@ public final class IntavePlugin extends JavaPlugin {
             receivedLSB = receivedResponse.getLeastSignificantBits();
             validResponse = receivedMSB == longOne && receivedLSB == longTwo;
           }
-          if(!validResponse || foundInterceptor) {
+          if (!validResponse || foundInterceptor) {
             logger.error("Unable to boot: Authentication response not trustworthy");
             contextStatusResource.write(new ByteArrayInputStream(("failure-"+response).getBytes(StandardCharsets.UTF_8)));
             boolFailure();
@@ -409,7 +409,7 @@ public final class IntavePlugin extends JavaPlugin {
         // check last online
         boolean allowLeniency = IntaveControl.DISABLE_LICENSE_CHECK;
         //noinspection ConstantConditions
-        if(!allowLeniency && contextStatusResource.exists()) {
+        if (!allowLeniency && contextStatusResource.exists()) {
           InputStream input = contextStatusResource.read();
           Scanner scanner = new Scanner(input);
           StringBuilder text = new StringBuilder();
@@ -417,12 +417,12 @@ public final class IntavePlugin extends JavaPlugin {
             text.append(scanner.next());
           }
           String textString = text.toString();
-          if(textString.startsWith("success")) {
+          if (textString.startsWith("success")) {
             Long lastSuccessfulStart = null;
             try {
               lastSuccessfulStart = Long.valueOf(textString.split("/")[1]);
             } catch (Exception ignored) {}
-            if(lastSuccessfulStart != null) {
+            if (lastSuccessfulStart != null) {
               try {
                 String url_path = "https://raw.githubusercontent.com/Jpx3/IntaveStatus/main/availability";
                 URL url = new URL(url_path);
@@ -435,7 +435,7 @@ public final class IntavePlugin extends JavaPlugin {
                 connection.connect();
                 connection.setConnectTimeout(4000);
                 connection.setReadTimeout(4000);
-                if(AccessHelper.now() - lastSuccessfulStart <= TimeUnit.DAYS.toMillis(3)) {
+                if (AccessHelper.now() - lastSuccessfulStart <= TimeUnit.DAYS.toMillis(3)) {
                   try {
                     connection.connect();
                     allowLeniency = true;
@@ -458,14 +458,14 @@ public final class IntavePlugin extends JavaPlugin {
           }
         }
 
-        if(allowLeniency && !configurationService().loader().configurationCacheExists()) {
+        if (allowLeniency && !configurationService().loader().configurationCacheExists()) {
           logger().error("Unable to boot: Intave requires an internet connection for first-time startup");
           boolFailure();
           performShutdown();
           return;
         }
 
-        if(!allowLeniency) {
+        if (!allowLeniency) {
           logger().error("Unable to boot: Internet connection required to proceed");
           boolFailure();
           performShutdown();
@@ -537,7 +537,7 @@ public final class IntavePlugin extends JavaPlugin {
 
       getCommand("intave").setExecutor(new CommandProcessor());
 
-      if(IntaveControl.DISABLE_BLOCK_CACHING_ENTIRELY) {
+      if (IntaveControl.DISABLE_BLOCK_CACHING_ENTIRELY) {
         logger().info("This version does not cache block-accesses");
       }
 
@@ -660,7 +660,7 @@ public final class IntavePlugin extends JavaPlugin {
   }
 
   private void clearDirectory(File directory) throws IOException {
-    if(!directory.exists() || !directory.isDirectory()) {
+    if (!directory.exists() || !directory.isDirectory()) {
       return;
     }
     File[] files = directory.listFiles();
@@ -697,17 +697,17 @@ public final class IntavePlugin extends JavaPlugin {
     String operatingSystem = System.getProperty("os.name").toLowerCase(Locale.ROOT);
     File workDirectory;
     String filePath;
-    if(operatingSystem.contains("win")) {
+    if (operatingSystem.contains("win")) {
       filePath = System.getenv("APPDATA") + "/Intave/";
     } else {
-      if(GOMME_MODE) {
+      if (GOMME_MODE) {
         filePath = ContextSecrets.secret("cache-directory");
       } else {
         filePath = System.getProperty("user.home") + "/.intave/";
       }
     }
     workDirectory = new File(filePath);
-    if(!workDirectory.exists()) {
+    if (!workDirectory.exists()) {
       return;
     }
     try {
@@ -731,7 +731,7 @@ public final class IntavePlugin extends JavaPlugin {
 
   @Native
   public void clearCacheFiles() {
-    if(configurationService != null) {
+    if (configurationService != null) {
       configurationService.deleteCache();
     }
     clearIntegrityGarbage();
@@ -757,19 +757,19 @@ public final class IntavePlugin extends JavaPlugin {
     BackgroundExecutor.stopBlocking();
     GarbageCollector.die();
     UserRepository.die();
-    if(shadowIntegration != null) {
+    if (shadowIntegration != null) {
       shadowIntegration.shutdown();
     }
-    if(packetSubscriptionLinker != null) {
+    if (packetSubscriptionLinker != null) {
       packetSubscriptionLinker.reset();
     }
-    if(eventLinker != null) {
+    if (eventLinker != null) {
       eventLinker.performShutdown();
     }
-    if(accessService != null) {
+    if (accessService != null) {
       accessService.serverAccessor().pluginShutdown();
     }
-    if(proxyMessenger != null) {
+    if (proxyMessenger != null) {
       proxyMessenger.closeChannel();
     }
     try {

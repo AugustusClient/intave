@@ -23,7 +23,7 @@ public final class BlockTrapdoorPatch extends BoundingBoxPatch {
     boolean isTop = (blockState & 8) != 0;
     boolean isOpen = (blockState & 4) != 0;
 
-    if(isOpen) {
+    if (isOpen) {
       switch (blockState & 3) {
         case 0:
           boundingBoxBuilder.shape(0.0F, 0.0F, 0.8125F, 1.0F, 1.0F, 1.0F);
@@ -39,7 +39,7 @@ public final class BlockTrapdoorPatch extends BoundingBoxPatch {
           break;
       }
     } else {
-      if(isTop) {
+      if (isTop) {
         boundingBoxBuilder.shape(0.0F, 0.8125F, 0.0F, 1.0F, 1.0F, 1.0F);
       } else {
         boundingBoxBuilder.shape(0.0F, 0.0F, 0.0F, 1.0F, 0.1875F, 1.0F);

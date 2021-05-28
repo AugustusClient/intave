@@ -33,19 +33,19 @@ public final class ForwardingPacketAdapter extends IntavePacketAdapter {
   public void onPacketSending(PacketEvent event) {
     if (TEMP_PLAYER_CHECK) {
       // perform temporary check
-      if(event.isPlayerTemporary()) {
+      if (event.isPlayerTemporary()) {
         return;
       }
     }
     Player player = event.getPlayer();
-    if(player == null) {
+    if (player == null) {
       return;
     }
     User user = UserRepository.userOf(player);
-    if(user == null) {
+    if (user == null) {
       return;
     }
-    if(user.shouldIgnoreNextOutboundPacket()) {
+    if (user.shouldIgnoreNextOutboundPacket()) {
       user.receiveNextOutboundPacket();
       return;
     }
@@ -58,17 +58,17 @@ public final class ForwardingPacketAdapter extends IntavePacketAdapter {
   public void onPacketReceiving(PacketEvent event) {
     if (TEMP_PLAYER_CHECK) {
       // perform temporary check
-      if(event.isPlayerTemporary()) {
+      if (event.isPlayerTemporary()) {
 //          Timings.packetProcessing.stop();
         return;
       }
     }
 
     User user = UserRepository.userOf(event.getPlayer());
-    if(user == null) {
+    if (user == null) {
       return;
     }
-    if(user.shouldIgnoreNextPacket()) {
+    if (user.shouldIgnoreNextPacket()) {
       user.receiveNextPacket();
       return;
     }

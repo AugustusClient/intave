@@ -49,7 +49,7 @@ public final class IntaveLogger {
   }
 
   public void violation(String violation) {
-    if(CONSOLE_OUTPUT) {
+    if (CONSOLE_OUTPUT) {
       pushPrintln("[Intave] Violation: " + violation);
     }
     logToFile("(DET) " + violation);
@@ -95,9 +95,9 @@ public final class IntaveLogger {
 
     try {
       boolean compressLogsLater = false;
-      if(activeFileName != null) {
-        if(AccessHelper.now() - lastNameCheck > 10000) {
-          if(!activeFileName.equalsIgnoreCase(activeFileName())) {
+      if (activeFileName != null) {
+        if (AccessHelper.now() - lastNameCheck > 10000) {
+          if (!activeFileName.equalsIgnoreCase(activeFileName())) {
             setup();
             activeFileName = activeFileName();
             compressLogsLater = true;
@@ -116,7 +116,7 @@ public final class IntaveLogger {
         printWriter.flush();
       });
 
-      if(compressLogsLater) {
+      if (compressLogsLater) {
         BackgroundExecutor.execute(this::performCompression);
       }
     } catch (Exception exception) {
@@ -134,7 +134,7 @@ public final class IntaveLogger {
         activeFile.getParentFile().mkdirs();
         activeFile.createNewFile();
       }
-      if(printWriter != null) {
+      if (printWriter != null) {
         printWriter.close();
       }
       this.printWriter = new PrintWriter(new FileWriter(activeFile, true));
@@ -144,20 +144,20 @@ public final class IntaveLogger {
   }
 
   public void shutdown() {
-    if(printWriter != null) {
+    if (printWriter != null) {
       printWriter.close();
     }
   }
 
   public synchronized void performCompression() {
     File[] pendingFiles = pendingLogFiles();
-    if(pendingFiles == null || pendingFiles.length == 0) {
+    if (pendingFiles == null || pendingFiles.length == 0) {
       return;
     }
     Map<File, File> filesToArchive = new HashMap<>();
     for (File pendingFile : pendingFiles) {
       File archiveFile = archiveFileOf(pendingFile);
-      if(pendingFile.exists() && !archiveFile.exists()) {
+      if (pendingFile.exists() && !archiveFile.exists()) {
         filesToArchive.put(pendingFile, archiveFile);
       }
     }
@@ -166,7 +166,7 @@ public final class IntaveLogger {
       File originalFile = file.getKey();
       File archiveFile = file.getValue();
 //      BackgroundExecutor.execute(() -> {
-        if(originalFile.exists() && !archiveFile.exists()) {
+        if (originalFile.exists() && !archiveFile.exists()) {
           archiver.archiveAndDeleteFile(originalFile, archiveFile);
           info("Compressed \"" + originalFile + "\"");
         }

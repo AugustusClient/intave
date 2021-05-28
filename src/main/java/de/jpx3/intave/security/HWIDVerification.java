@@ -15,7 +15,7 @@ public final class HWIDVerification {
 
   @Native
   public static String publicHardwareIdentifier() {
-    if(encryptedResource == null) {
+    if (encryptedResource == null) {
       encryptedResource = new EncryptedResource("hardware-id", false);
     }
     if (!encryptedResource.exists()) {
@@ -24,7 +24,7 @@ public final class HWIDVerification {
       encryptedResource.write(inputStream);
     }
 
-    if(identifier == null) {
+    if (identifier == null) {
       identifier = new Scanner(new InputStreamReader(encryptedResource.read())).next();
     }
     return identifier;

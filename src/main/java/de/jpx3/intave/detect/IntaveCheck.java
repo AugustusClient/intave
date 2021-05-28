@@ -40,7 +40,7 @@ public abstract class IntaveCheck implements EventProcessor {
   }
 
   protected void appendCheckPart(IntaveCheckPart<?> checkPart) {
-    if(checkPart.parentCheck() != this) {
+    if (checkPart.parentCheck() != this) {
       throw new IntaveInternalException("Child lacks reference to parent");
     }
     checkParts.add(checkPart);

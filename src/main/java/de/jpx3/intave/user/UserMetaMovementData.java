@@ -168,7 +168,7 @@ public final class UserMetaMovementData {
   public void applySizeUpdate() {
     widthRounded = Math.round(width * 50d) / 100d;
     heightRounded = Math.round(height * 100d) / 100d;
-//    if(user.meta().clientData().roundEnvironmentNumbers()) {
+//    if (user.meta().clientData().roundEnvironmentNumbers()) {
 //      widthRounded = Math.round(width * 500d) / 1000d;
 //      heightRounded = Math.round(height * 10000d) / 10000d;
 //    } else {

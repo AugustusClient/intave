@@ -31,14 +31,14 @@ final class PatchyTranslator {
   @Native
   public static byte[] translateClass(byte[] inputBytes) {
     ClassNode classNode = classNodeOf(inputBytes);
-    if(IntaveControl.OUTPUT_PATCHY_RESULT) {
+    if (IntaveControl.OUTPUT_PATCHY_RESULT) {
       IntaveLogger.logger().pushPrintln("[Intave/Patchy] Translating " + classNode.name);
     }
     translateClassDependencies(classNode);
 //    IntaveLogger.logger().globalPrintLn("Translating methods..");
     processMethods(selectedMethodsIn(classNode));
 
-    if(IntaveControl.OUTPUT_PATCHY_RESULT) {
+    if (IntaveControl.OUTPUT_PATCHY_RESULT) {
       IntaveLogger.logger().pushPrintln(classNode.name + " " + classNode.superName);
       IntaveLogger.logger().pushPrintln(classNode.name + " " + classNode.superName);
       for (MethodNode method : classNode.methods) {
@@ -51,7 +51,7 @@ final class PatchyTranslator {
       }
     }
 
-    if(IntaveControl.OUTPUT_PATCHY_RESULT) {
+    if (IntaveControl.OUTPUT_PATCHY_RESULT) {
       IntaveLogger.logger().pushPrintln("[Intave/Patchy] Done");
     }
 
@@ -75,7 +75,7 @@ final class PatchyTranslator {
   private static String translateDependency(String original) {
     int versionBeginIndex = original.indexOf("/v") + 1;
     int versionEndIndex = original.indexOf("/", versionBeginIndex);
-    if(versionBeginIndex <= 0 || versionEndIndex <= 0) {
+    if (versionBeginIndex <= 0 || versionEndIndex <= 0) {
       return original;
     }
     String extractedVersion = original.substring(versionBeginIndex, versionEndIndex);
@@ -98,11 +98,11 @@ final class PatchyTranslator {
   private static void processMethodDescription(MethodNode methodNode) {
     PatchyTranslationConfiguration configuration = PatchyTranslationConfiguration.createFrom(methodNode);
 
-    if(!configuration.translateParameters()) {
+    if (!configuration.translateParameters()) {
       return;
     }
 
-    if(!configuration.translateEverything()) {
+    if (!configuration.translateEverything()) {
       throw new IllegalStateException("Custom translations not yet supported for parameters");
     }
 
@@ -112,7 +112,7 @@ final class PatchyTranslator {
 
     int versionBeginIndex = desc.indexOf("/v") + 1;
     int versionEndIndex = desc.indexOf("/", versionBeginIndex);
-    if(versionBeginIndex <= 0 || versionEndIndex <= 0) {
+    if (versionBeginIndex <= 0 || versionEndIndex <= 0) {
       return;
     }
 
@@ -128,7 +128,7 @@ final class PatchyTranslator {
     PatchyTranslationConfiguration configuration = PatchyTranslationConfiguration.createFrom(methodNode);
 
     for (AbstractInsnNode instruction : methodNode.instructions) {
-      if(instruction instanceof MethodInsnNode) {
+      if (instruction instanceof MethodInsnNode) {
         MethodInsnNode methodInsnNode = (MethodInsnNode) instruction;
         InstructionTarget originalInstruction = InstructionTarget.methodInstructionTarget(
           methodInsnNode.owner, methodInsnNode.name, methodInsnNode.desc
@@ -147,16 +147,16 @@ final class PatchyTranslator {
         methodInsnNode.desc = instructionTarget.desc;
 
         // TODO: 08/18/20 permute stack load order to account for parameter changes?
-      } else if(instruction instanceof TypeInsnNode) {
+      } else if (instruction instanceof TypeInsnNode) {
         TypeInsnNode typeInsnNode = (TypeInsnNode) instruction;
         int versionBeginIndex = typeInsnNode.desc.indexOf("/v") + 1;
         int versionEndIndex = typeInsnNode.desc.indexOf("/", versionBeginIndex);
-        if(versionBeginIndex <= 0 || versionEndIndex <= 0) {
+        if (versionBeginIndex <= 0 || versionEndIndex <= 0) {
           continue;
         }
         String extractedVersion = typeInsnNode.desc.substring(versionBeginIndex, versionEndIndex);
         typeInsnNode.desc = typeInsnNode.desc.replace(extractedVersion, CURRENT_SERVER_VERSION);
-      } else if(instruction instanceof FieldInsnNode) {
+      } else if (instruction instanceof FieldInsnNode) {
         FieldInsnNode fieldInsnNode = (FieldInsnNode) instruction;
         InstructionTarget instructionTarget = InstructionTarget.fieldInstructionTarget(
           fieldInsnNode.owner, fieldInsnNode.name, fieldInsnNode.desc
@@ -165,7 +165,7 @@ final class PatchyTranslator {
         fieldInsnNode.owner = instructionTarget.owner;
         fieldInsnNode.name = instructionTarget.name;
         fieldInsnNode.desc = instructionTarget.desc;
-      } else if(instruction instanceof InvokeDynamicInsnNode) {
+      } else if (instruction instanceof InvokeDynamicInsnNode) {
         InvokeDynamicInsnNode invokeDynamicInsnNode = (InvokeDynamicInsnNode) instruction;
         //todo lambda resolve
       }
@@ -175,19 +175,19 @@ final class PatchyTranslator {
 
   @Native
   private static InstructionTarget process(InstructionTarget original, PatchyTranslationConfiguration configuration) {
-//    if(!isServerClass(original.owner)) {
+//    if (!isServerClass(original.owner)) {
 //      return original;
 //    }
 
 //    IntaveLogger.logger().globalPrintLn("Processing method instruction " + original);
 
-//    if(original.isMethod()) {
+//    if (original.isMethod()) {
       VersionMethodReference translatedversionMethodReference =
         configuration.resolveCustomMethodDescriptor(original.owner, original.name, original.desc);
 
-      if(translatedversionMethodReference == null) {
+      if (translatedversionMethodReference == null) {
 //        IntaveLogger.logger().globalPrintLn("No custom translation configuration found");
-        if(configuration.translateEverything()) {
+        if (configuration.translateEverything()) {
 //          IntaveLogger.logger().globalPrintLn("Attempting heuristic replacement..");
           // heuristic replacement
           // maybe find better solution?
@@ -197,7 +197,7 @@ final class PatchyTranslator {
 
           int versionBeginIndex = original.owner.indexOf("/v") + 1;
           int versionEndIndex = original.owner.indexOf("/", versionBeginIndex);
-          if(versionBeginIndex <= 0 || versionEndIndex <= 0) {
+          if (versionBeginIndex <= 0 || versionEndIndex <= 0) {
             newOwner = original.owner;
           } else {
             extractedVersion = original.owner.substring(versionBeginIndex, versionEndIndex);
@@ -206,7 +206,7 @@ final class PatchyTranslator {
 
           versionBeginIndex = original.desc.indexOf("/v") + 1;
           versionEndIndex = original.desc.indexOf("/", versionBeginIndex);
-          if(versionBeginIndex <= 0 || versionEndIndex <= 0) {
+          if (versionBeginIndex <= 0 || versionEndIndex <= 0) {
             newDesc = original.desc;
           } else {
             extractedVersion = original.desc.substring(versionBeginIndex, versionEndIndex);
@@ -243,7 +243,7 @@ final class PatchyTranslator {
     annotationNodes.addAll(methodNode.visibleAnnotations == null ? Collections.emptyList() : methodNode.visibleAnnotations);
     annotationNodes.addAll(methodNode.visibleTypeAnnotations == null ? Collections.emptyList() : methodNode.visibleTypeAnnotations);
 
-    if(!annotationNodes.isEmpty()) {
+    if (!annotationNodes.isEmpty()) {
       for (AnnotationNode visibleAnnotation : annotationNodes) {
         String annotationClassName = className(visibleAnnotation);
 

@@ -29,7 +29,7 @@ public class LabyModChannelHelper {
     // Writing the message-key to the buffer
     writeString(byteBuf, messageKey);
 
-    if(messageContents != null) {
+    if (messageContents != null) {
       // Writing the contents to the buffer
       writeString(byteBuf, messageContents);
     }

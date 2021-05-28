@@ -17,7 +17,7 @@ public final class YamlTrustFactorConfiguration implements TrustFactorConfigurat
 
   private void apply(YamlConfiguration trustFactorSettings) {
     for (Map.Entry<String, Object> configEntry : trustFactorSettings.getValues(true).entrySet()) {
-      if(configEntry.getValue() instanceof ArrayList) {
+      if (configEntry.getValue() instanceof ArrayList) {
         List<?> values = (List<?>) configEntry.getValue();
         apply(configEntry.getKey(), (List<Integer>) values);
       }
@@ -35,7 +35,7 @@ public final class YamlTrustFactorConfiguration implements TrustFactorConfigurat
   @Override
   public int resolveSetting(String key, TrustFactor trustFactor) {
     EnumMap<TrustFactor, Integer> trustFactorIntegerEnumMap = settingsMap.get(key.toLowerCase(Locale.ROOT));
-    if(trustFactorIntegerEnumMap == null) {
+    if (trustFactorIntegerEnumMap == null) {
       return 0;
     }
     try {

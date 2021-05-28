@@ -51,11 +51,11 @@ public final class TrustFactorService implements BukkitEventSubscriber {
     User user = UserRepository.userOf(player);
     user.setTrustFactor(defaultTrustFactor);
 
-    if(IntaveControl.APPLY_GLOBAL_LOW_TRUSTFACTOR) {
+    if (IntaveControl.APPLY_GLOBAL_LOW_TRUSTFACTOR) {
       user.setTrustFactor(TrustFactor.RED);
       return;
     }
-    if(trustFactorResolver == null) {
+    if (trustFactorResolver == null) {
       trustFactorResolver = new DefaultForwardingPermissionTrustFactorResolver(new DefaultTrustFactorResolver());
     }
     trustFactorResolver.resolve(player,

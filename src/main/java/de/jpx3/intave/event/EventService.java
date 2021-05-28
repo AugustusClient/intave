@@ -78,11 +78,11 @@ public final class EventService implements BukkitEventSubscriber {
     Version version = plugin.versionList().versionInformation(currentVersion);
 
     Synchronizer.synchronize(() -> {
-      if(version == null) {
+      if (version == null) {
         sendPrefixedMessage(ChatColor.YELLOW + "This server is running an experimental version of Intave (" + currentVersion + ")", player);
         sendPrefixedMessage(ChatColor.YELLOW + "It is possible that bugs occur", player);
       } else {
-        if(version.typeClassifier() == Version.Status.OUTDATED) {
+        if (version.typeClassifier() == Version.Status.OUTDATED) {
           long duration = AccessHelper.now() - version.release();
           String durationAsString = DurationTranslator.translateDuration(duration);
 
@@ -95,7 +95,7 @@ public final class EventService implements BukkitEventSubscriber {
 
   @BukkitEventSubscription
   public void on(PlayerTeleportEvent teleport) {
-    if(IntaveControl.DEBUG_TELEPORT_CAUSE_AND_CAUSER) {
+    if (IntaveControl.DEBUG_TELEPORT_CAUSE_AND_CAUSER) {
       PluginInvocation pluginInvocation = CallerResolver.callerPluginInfo();
       String pluginClass = pluginInvocation == null ? "no other plugin" : pluginInvocation.className();
       teleport.getPlayer().sendMessage("Teleport " + teleport.getCause() + " " + teleport.getTo() + " by " + pluginClass);

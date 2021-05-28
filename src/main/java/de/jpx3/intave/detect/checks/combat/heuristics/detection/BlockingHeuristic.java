@@ -51,7 +51,7 @@ public final class BlockingHeuristic extends IntaveMetaCheckPart<Heuristics, Blo
     BlockingMeta meta = metaOf(user);
     UserMetaMovementData movementData = user.meta().movementData();
 
-    if(movementData.lastTeleport == 0) {
+    if (movementData.lastTeleport == 0) {
       return;
     }
 
@@ -64,7 +64,7 @@ public final class BlockingHeuristic extends IntaveMetaCheckPart<Heuristics, Blo
     }
 
     if (meta.heldItemOperations > 1) {
-      if(meta.blocksPlacedThisTick == 0 || meta.heldItemOperations > 2) {
+      if (meta.blocksPlacedThisTick == 0 || meta.heldItemOperations > 2) {
         String description = "sent too many item operations (operations: " + meta.heldItemOperations + ")";
         description += " (version " + user.meta().clientData().versionString() + ")";
         Anomaly anomaly = Anomaly.anomalyOf("144", Confidence.NONE, Anomaly.Type.KILLAURA, description, 0);
@@ -189,7 +189,7 @@ public final class BlockingHeuristic extends IntaveMetaCheckPart<Heuristics, Blo
       return;
     }
 
-    if(meta.heldItemOperations > 0) {
+    if (meta.heldItemOperations > 0) {
       PacketContainer clonedPacket = event.getPacket().deepClone();
       meta.unsendPackets.add(clonedPacket);
       event.setCancelled(true);

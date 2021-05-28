@@ -79,7 +79,7 @@ public final class IntaveAccessService {
       @Override
       public PlayerAccess player(Player player) {
         Preconditions.checkNotNull(player);
-        if(!UserRepository.hasUser(player)) {
+        if (!UserRepository.hasUser(player)) {
           throw new UnknownPlayerException("Player " + player.getName() + " couldn't be found");
         }
         return playerAccessor.playerAccessOf(player);

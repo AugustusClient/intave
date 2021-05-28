@@ -46,7 +46,7 @@ public final class MultiChunkKeyOCBlockShapeAccess implements OCBlockShapeAccess
       this.chunkX = chunkX;
       this.chunkZ = chunkZ;
       double distance = Math.hypot(chunkX - originChunkX, chunkZ - originChunkZ);
-      if(distance > 2 || blockCache.size() > 4096) {
+      if (distance > 2 || blockCache.size() > 4096) {
         this.originChunkX = chunkX;
         this.originChunkZ = chunkZ;
         blockCache.clear();
@@ -57,7 +57,7 @@ public final class MultiChunkKeyOCBlockShapeAccess implements OCBlockShapeAccess
     long key = bigKey(posX, posY, posZ);
 
     BlockShape blockShape = indexedReplacements.get(key);
-    if(blockShape != null) {
+    if (blockShape != null) {
       return blockShape.boundingBoxes();
     }
 
@@ -85,7 +85,7 @@ public final class MultiChunkKeyOCBlockShapeAccess implements OCBlockShapeAccess
       this.chunkX = chunkX;
       this.chunkZ = chunkZ;
       double distance = Math.hypot(chunkX - originChunkX, chunkZ - originChunkZ);
-      if(distance > 2 || blockCache.size() > 4096) {
+      if (distance > 2 || blockCache.size() > 4096) {
         this.originChunkX = chunkX;
         this.originChunkZ = chunkZ;
         blockCache.clear();
@@ -96,7 +96,7 @@ public final class MultiChunkKeyOCBlockShapeAccess implements OCBlockShapeAccess
     long key = bigKey(posX, posY, posZ);
 
     BlockShape blockShape = indexedReplacements.get(key);
-    if(blockShape != null) {
+    if (blockShape != null) {
       return blockShape.type();
     }
 
@@ -124,7 +124,7 @@ public final class MultiChunkKeyOCBlockShapeAccess implements OCBlockShapeAccess
       this.chunkX = chunkX;
       this.chunkZ = chunkZ;
       double distance = Math.hypot(chunkX - originChunkX, chunkZ - originChunkZ);
-      if(distance > 2 || blockCache.size() > 4096) {
+      if (distance > 2 || blockCache.size() > 4096) {
         this.originChunkX = chunkX;
         this.originChunkZ = chunkZ;
         blockCache.clear();
@@ -135,7 +135,7 @@ public final class MultiChunkKeyOCBlockShapeAccess implements OCBlockShapeAccess
     long key = bigKey(posX, posY, posZ);
 
     BlockShape blockShape = indexedReplacements.get(key);
-    if(blockShape != null) {
+    if (blockShape != null) {
       return blockShape.data();
     }
 
@@ -155,7 +155,7 @@ public final class MultiChunkKeyOCBlockShapeAccess implements OCBlockShapeAccess
 
   private BlockShape lookup(World world, Block block, int posX, int posY, int posZ) {
     Material type = block.getType();
-    if(type == Material.AIR) {
+    if (type == Material.AIR) {
       return EMPTY_CACHE_ENTRY;
     } else {
       BoundingBoxAccessFlowStudy.incremLookups();
@@ -191,7 +191,7 @@ public final class MultiChunkKeyOCBlockShapeAccess implements OCBlockShapeAccess
   public void override(World world, int posX, int posY, int posZ, Material type, int blockState) {
     invalidateOverride(posX, posY, posZ);
     BlockShape blockShape;
-    if(type == Material.AIR) {
+    if (type == Material.AIR) {
       blockShape = EMPTY_CACHE_ENTRY;
     } else {
       blockShape = new BlockShape(
@@ -207,7 +207,7 @@ public final class MultiChunkKeyOCBlockShapeAccess implements OCBlockShapeAccess
   @Override
   public void invalidateOverridesInBounds(int chunkXMinPos, int chunkXMaxPos, int chunkZMinPos, int chunkZMaxPos) {
     for (Location location : locatedReplacements.keySet()) {
-      if(location.getX() >= chunkXMinPos && location.getX() < chunkXMaxPos &&
+      if (location.getX() >= chunkXMinPos && location.getX() < chunkXMaxPos &&
         location.getZ() >= chunkZMinPos && location.getZ() < chunkZMaxPos) {
         long key = bigKey(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         locatedReplacements.remove(location);
@@ -241,7 +241,7 @@ public final class MultiChunkKeyOCBlockShapeAccess implements OCBlockShapeAccess
   }
 
   public void purgeOverrides() {
-    if(indexedReplacements.isEmpty()) {
+    if (indexedReplacements.isEmpty()) {
       return;
     }
     indexedReplacements.values().removeIf(BlockShape::expired);

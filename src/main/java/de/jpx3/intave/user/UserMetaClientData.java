@@ -34,7 +34,7 @@ public final class UserMetaClientData {
   }
 
   private String versionAsString() {
-    if(protocolVersion < 0)
+    if (protocolVersion < 0)
       return "1.0";
     if (protocolVersion <= 47)
       return "1.8";
@@ -109,7 +109,7 @@ public final class UserMetaClientData {
   public float hitBoxHeightWhenSneaking() {
     if (protocolVersion >= SOMETHING_BETWEEN) {
       return 1.5F;
-    } else if(protocolVersion >= PROTOCOL_VERSION_COMBAT_UPDATE) {
+    } else if (protocolVersion >= PROTOCOL_VERSION_COMBAT_UPDATE) {
       return 1.65F;
     }
     return 1.8F;
@@ -175,7 +175,7 @@ public final class UserMetaClientData {
   private Boolean behind;
 
   public boolean clientVersionBehindServerVersion() {
-    if(behind == null || refreshes < 2) {
+    if (behind == null || refreshes < 2) {
       MinecraftVersion server = MinecraftVersion.getCurrentVersion();
       MinecraftVersion client = new MinecraftVersion(versionAsString());
       behind = !client.isAtLeast(server);

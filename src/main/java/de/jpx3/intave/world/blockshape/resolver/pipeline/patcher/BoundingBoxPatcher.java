@@ -51,7 +51,7 @@ public final class BoundingBoxPatcher {
   }
 
   private static List<WrappedAxisAlignedBB> transpose(List<WrappedAxisAlignedBB> boundingBoxes, int posX, int posY, int posZ) {
-    if(boundingBoxes.isEmpty()) {
+    if (boundingBoxes.isEmpty()) {
       return boundingBoxes;
     }
     for (int i = 0; i < boundingBoxes.size(); i++) {
@@ -64,7 +64,7 @@ public final class BoundingBoxPatcher {
   }
 
   private static List<WrappedAxisAlignedBB> reposeIfRequired(BoundingBoxPatch patch, List<WrappedAxisAlignedBB> boundingBoxes, int posX, int posY, int posZ) {
-    if(!patch.requireRepose() || boundingBoxes.isEmpty()) {
+    if (!patch.requireRepose() || boundingBoxes.isEmpty()) {
       return boundingBoxes;
     }
     List<WrappedAxisAlignedBB> reposedList = new ArrayList<>(boundingBoxes);

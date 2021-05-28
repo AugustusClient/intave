@@ -25,7 +25,7 @@ public final class ClientDataList {
   }
 
   public static ClientDataList generate() {
-    if(!CACHED_RESOURCE.available()) {
+    if (!CACHED_RESOURCE.available()) {
       return new ClientDataList(new ArrayList<>());
     }
     Scanner scanner = new Scanner(CACHED_RESOURCE.read());

@@ -36,7 +36,7 @@ public final class ClassRelocator {
     Type[] argumentTypes = Type.getArgumentTypes(signature);
     Class<?>[] params = Arrays.stream(argumentTypes).map(argumentType -> findClass(argumentType.getClassName())).toArray(Class<?>[]::new);
     try {
-      if(methodMapper == null) {
+      if (methodMapper == null) {
         return clazz.getMethod(name, params);
       } else {
         Type returnType = Type.getReturnType(signature);

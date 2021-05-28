@@ -55,7 +55,7 @@ public final class CheckAccessor {
 
       @Override
       public double violationLevelOf(Player player, String threshold) {
-        if(!UserRepository.hasUser(player)) {
+        if (!UserRepository.hasUser(player)) {
           throw new UnknownPlayerException("Player " + player.getName() + " couldn't be found");
         }
 
@@ -65,7 +65,7 @@ public final class CheckAccessor {
 
       @Override
       public void addViolationPoints(Player player, String threshold, double amount) {
-        if(!UserRepository.hasUser(player)) {
+        if (!UserRepository.hasUser(player)) {
           throw new UnknownPlayerException("Player " + player.getName() + " couldn't be found");
         }
         Map<String, Map<String, Double>> violationLevel = UserRepository.userOf(player).meta().violationLevelData().violationLevel;
@@ -74,7 +74,7 @@ public final class CheckAccessor {
 
       @Override
       public void resetViolationLevel(Player player, String threshold) {
-        if(!UserRepository.hasUser(player)) {
+        if (!UserRepository.hasUser(player)) {
           throw new UnknownPlayerException("Player " + player.getName() + " couldn't be found");
         }
         Map<String, Map<String, Double>> violationLevel = UserRepository.userOf(player).meta().violationLevelData().violationLevel;

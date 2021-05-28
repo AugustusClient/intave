@@ -112,7 +112,7 @@ public final class BlockThinPatch extends BoundingBoxPatch {
         }
 
         // via version emulates 1.8 behaviour of panes, we can account for it
-        if(!(north || east || south || west) && user.meta().clientData().waterUpdate()) {
+        if (!(north || east || south || west) && user.meta().clientData().waterUpdate()) {
           north = south = east = west = true;
         }
 

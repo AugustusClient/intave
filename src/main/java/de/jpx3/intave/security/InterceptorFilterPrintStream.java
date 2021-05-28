@@ -15,7 +15,7 @@ public final class InterceptorFilterPrintStream extends PrintStream {
 
   @Override
   public void println(String input) {
-    if(input != null && input.startsWith("[Interceptor]")) {
+    if (input != null && input.startsWith("[Interceptor]")) {
       foundInterceptor = true;
     }
     super.println(input);

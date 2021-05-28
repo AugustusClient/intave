@@ -14,7 +14,7 @@ public final class ServerAccessor {
   }
 
   public synchronized ServerAccess serverAccess() {
-    if(serverAccess == null) {
+    if (serverAccess == null) {
       serverAccess = newServerAccess();
     }
     return serverAccess;

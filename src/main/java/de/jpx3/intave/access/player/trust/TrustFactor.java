@@ -24,7 +24,7 @@ public enum TrustFactor implements Comparable<TrustFactor> {
   }
 
   public TrustFactor safer() {
-    if(this == GREEN) {
+    if (this == GREEN) {
       return GREEN;
     }
     TrustFactor[] values = values();
@@ -32,7 +32,7 @@ public enum TrustFactor implements Comparable<TrustFactor> {
   }
 
   public TrustFactor unsafer() {
-    if(this == BYPASS) {
+    if (this == BYPASS) {
       return BYPASS;
     }
     TrustFactor[] values = values();

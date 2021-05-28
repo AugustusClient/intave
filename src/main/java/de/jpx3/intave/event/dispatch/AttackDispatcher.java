@@ -137,7 +137,7 @@ public final class AttackDispatcher implements EventProcessor {
         item.setItemMeta(itemMeta);
       }
     }
-//    if(IntaveControl.GOMME_MODE) {
+//    if (IntaveControl.GOMME_MODE) {
 //      if (item.containsEnchantment(Enchantment.KNOCKBACK)) {
 //        int level = item.getEnchantmentLevel(Enchantment.KNOCKBACK);
 //        item.removeEnchantment(Enchantment.KNOCKBACK);

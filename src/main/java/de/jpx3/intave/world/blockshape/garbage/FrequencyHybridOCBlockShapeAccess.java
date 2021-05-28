@@ -57,7 +57,7 @@ public final class FrequencyHybridOCBlockShapeAccess implements OCBlockShapeAcce
       blockCache.clear();
       purgeOverrides();
 
-      if(AccessHelper.now() - frequencyCheckReset > 1000) {
+      if (AccessHelper.now() - frequencyCheckReset > 1000) {
         frequencyCache.clear();
         frequencyCounter = 0;
         frequencyCheckReset = AccessHelper.now();
@@ -65,15 +65,15 @@ public final class FrequencyHybridOCBlockShapeAccess implements OCBlockShapeAcce
       frequencyCounter++;
     }
 
-    if(!indexedReplacements.isEmpty()) {
+    if (!indexedReplacements.isEmpty()) {
       long key = bigKey(posX, posY, posZ);
       BlockShape entry = indexedReplacements.get(key);
-      if(entry != null) {
+      if (entry != null) {
         return entry.boundingBoxes();
       }
     }
 
-    if(frequencyCounter > FREQUENCY_OVERFLOW) {
+    if (frequencyCounter > FREQUENCY_OVERFLOW) {
       long daBigKey = bigKey(posX, posY, posZ);
       BlockShape blockShape = frequencyCache.get(daBigKey);
       if (blockShape == null) {
@@ -120,7 +120,7 @@ public final class FrequencyHybridOCBlockShapeAccess implements OCBlockShapeAcce
       blockCache.clear();
       purgeOverrides();
 
-      if(AccessHelper.now() - frequencyCheckReset > 1000) {
+      if (AccessHelper.now() - frequencyCheckReset > 1000) {
         frequencyCache.clear();
         frequencyCounter = 0;
         frequencyCheckReset = AccessHelper.now();
@@ -128,15 +128,15 @@ public final class FrequencyHybridOCBlockShapeAccess implements OCBlockShapeAcce
       frequencyCounter++;
     }
 
-    if(!indexedReplacements.isEmpty()) {
+    if (!indexedReplacements.isEmpty()) {
       long key = bigKey(posX, posY, posZ);
       BlockShape entry = indexedReplacements.get(key);
-      if(entry != null) {
+      if (entry != null) {
         return entry.type();
       }
     }
 
-    if(frequencyCounter > FREQUENCY_OVERFLOW) {
+    if (frequencyCounter > FREQUENCY_OVERFLOW) {
       long daBigKey = bigKey(posX, posY, posZ);
       BlockShape blockShape = frequencyCache.get(daBigKey);
       if (blockShape == null) {
@@ -183,7 +183,7 @@ public final class FrequencyHybridOCBlockShapeAccess implements OCBlockShapeAcce
       blockCache.clear();
       purgeOverrides();
 
-      if(AccessHelper.now() - frequencyCheckReset > 1000) {
+      if (AccessHelper.now() - frequencyCheckReset > 1000) {
         frequencyCache.clear();
         frequencyCounter = 0;
         frequencyCheckReset = AccessHelper.now();
@@ -191,15 +191,15 @@ public final class FrequencyHybridOCBlockShapeAccess implements OCBlockShapeAcce
       frequencyCounter++;
     }
 
-    if(!indexedReplacements.isEmpty()) {
+    if (!indexedReplacements.isEmpty()) {
       long key = bigKey(posX, posY, posZ);
       BlockShape entry = indexedReplacements.get(key);
-      if(entry != null) {
+      if (entry != null) {
         return entry.data();
       }
     }
 
-    if(frequencyCounter > FREQUENCY_OVERFLOW) {
+    if (frequencyCounter > FREQUENCY_OVERFLOW) {
       long daBigKey = bigKey(posX, posY, posZ);
       BlockShape blockShape = frequencyCache.get(daBigKey);
       if (blockShape == null) {
@@ -234,7 +234,7 @@ public final class FrequencyHybridOCBlockShapeAccess implements OCBlockShapeAcce
 
   private BlockShape lookup(World world, Block block, int posX, int posY, int posZ) {
     Material type = block.getType();
-    if(type == Material.AIR) {
+    if (type == Material.AIR) {
       return EMPTY_CACHE_ENTRY;
     } else {
       BoundingBoxAccessFlowStudy.incremLookups();
@@ -274,7 +274,7 @@ public final class FrequencyHybridOCBlockShapeAccess implements OCBlockShapeAcce
   public void override(World world, int posX, int posY, int posZ, Material type, int blockState) {
     invalidateOverride(posX, posY, posZ);
     BlockShape BlockShape;
-    if(type == Material.AIR) {
+    if (type == Material.AIR) {
       BlockShape = EMPTY_CACHE_ENTRY;
     } else {
       BlockShape = new BlockShape(
@@ -290,7 +290,7 @@ public final class FrequencyHybridOCBlockShapeAccess implements OCBlockShapeAcce
   @Override
   public void invalidateOverridesInBounds(int chunkXMinPos, int chunkXMaxPos, int chunkZMinPos, int chunkZMaxPos) {
     for (Location location : locatedReplacements.keySet()) {
-      if(
+      if (
         location.getX() >= chunkXMinPos && location.getX() < chunkXMaxPos &&
           location.getZ() >= chunkZMinPos && location.getZ() < chunkZMaxPos
       ) {
@@ -325,7 +325,7 @@ public final class FrequencyHybridOCBlockShapeAccess implements OCBlockShapeAcce
   }
 
   public void purgeOverrides() {
-    if(indexedReplacements.isEmpty()) {
+    if (indexedReplacements.isEmpty()) {
       return;
     }
     indexedReplacements.values().removeIf(BlockShape::expired);

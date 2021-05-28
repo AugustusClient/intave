@@ -38,14 +38,14 @@ public final class MappingFileCompiler {
       .findFirst()
       .orElseThrow(() -> new IntaveException("Unknown applier"));
     line = line.substring(type.name().length() + 1);
-    if(!line.startsWith("\"")) {
+    if (!line.startsWith("\"")) {
       throw new IllegalStateException("Parenthesis required at start of original");
     }
     line = line.substring(1);
     StringBuilder originalBuilder = new StringBuilder();
     int index = 0;
     char cha;
-    while((cha = line.charAt(index)) != '\"') {
+    while ((cha = line.charAt(index)) != '\"') {
       originalBuilder.append(cha);
       index++;
     }
@@ -59,12 +59,12 @@ public final class MappingFileCompiler {
       .orElseThrow(() -> new IllegalStateException("Unknown operator"));
     line = line.substring(operator.name().length());
     line = line.substring(1);
-    if(!line.startsWith("\"")) {
+    if (!line.startsWith("\"")) {
       throw new IllegalStateException("Parenthesis required at start of target");
     }
     StringBuilder targetBuilder = new StringBuilder();
     index = 0;
-    while((cha = line.charAt(index)) != '\"') {
+    while ((cha = line.charAt(index)) != '\"') {
       targetBuilder.append(cha);
       index++;
     }
@@ -73,10 +73,10 @@ public final class MappingFileCompiler {
   }
 
   private static void verifyFile(File mappingFile) {
-    if(!mappingFile.exists()) {
+    if (!mappingFile.exists()) {
       throw new IntaveException("Unable to locate file " + mappingFile);
     }
-    if(!mappingFile.isDirectory()) {
+    if (!mappingFile.isDirectory()) {
       throw new IntaveException("Mapping file is directory?");
     }
   }

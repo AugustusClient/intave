@@ -57,7 +57,7 @@ public final class IntaveRootStage extends CommandStage {
       timings.sort(Timing::compareTo);
 
       timings.forEach(timing -> {
-        if(timing.isPacketEventTiming() || timing.isBukkitEventTiming()) {
+        if (timing.isPacketEventTiming() || timing.isBukkitEventTiming()) {
           return;
         }
         boolean suspicious = timing.averageCallDurationInMillis() > 0.5d;
@@ -70,7 +70,7 @@ public final class IntaveRootStage extends CommandStage {
           (suspicious ? (dumping ? ChatColor.RED : ChatColor.YELLOW) : ChatColor.GREEN) + "" +
             MathHelper.formatDouble(timing.averageCallDurationInMillis(), 8)
         );
-        if(!fullSpecifier.isEmpty() && !timing.name().toLowerCase(Locale.ROOT).contains(fullSpecifier)) {
+        if (!fullSpecifier.isEmpty() && !timing.name().toLowerCase(Locale.ROOT).contains(fullSpecifier)) {
           message = ChatColor.GRAY + ChatColor.stripColor(message);
         }
         player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
@@ -96,7 +96,7 @@ public final class IntaveRootStage extends CommandStage {
       timings.sort(Timing::compareTo);
 
       timings.forEach(timing -> {
-        if(!timing.isBukkitEventTiming()) return;
+        if (!timing.isBukkitEventTiming()) return;
         boolean suspicious = timing.averageCallDurationInMillis() > 0.5d;
         boolean dumping = timing.averageCallDurationInMillis() > 1.5d;
         String message = String.format(
@@ -108,7 +108,7 @@ public final class IntaveRootStage extends CommandStage {
             MathHelper.formatDouble(timing.averageCallDurationInMillis(), 8)
           + ChatColor.WHITE
         );
-        if(!fullSpecifier.isEmpty() && !timing.name().toLowerCase(Locale.ROOT).contains(fullSpecifier)) {
+        if (!fullSpecifier.isEmpty() && !timing.name().toLowerCase(Locale.ROOT).contains(fullSpecifier)) {
           message = ChatColor.GRAY + ChatColor.stripColor(message);
         }
         player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
@@ -134,7 +134,7 @@ public final class IntaveRootStage extends CommandStage {
       timings.sort(Timing::compareTo);
 
       timings.forEach(timing -> {
-        if(!timing.isPacketEventTiming()) return;
+        if (!timing.isPacketEventTiming()) return;
         boolean suspicious = timing.averageCallDurationInMillis() > 0.5d;
         boolean dumping = timing.averageCallDurationInMillis() > 1.5d;
         String message = String.format(
@@ -145,7 +145,7 @@ public final class IntaveRootStage extends CommandStage {
           (suspicious ? (dumping ? ChatColor.RED : ChatColor.YELLOW) : ChatColor.GREEN) + "" +
             MathHelper.formatDouble(timing.averageCallDurationInMillis(), 8)
         );
-        if(!fullSpecifier.isEmpty() && !timing.name().toLowerCase(Locale.ROOT).contains(fullSpecifier)) {
+        if (!fullSpecifier.isEmpty() && !timing.name().toLowerCase(Locale.ROOT).contains(fullSpecifier)) {
           message = ChatColor.GRAY + ChatColor.stripColor(message);
         }
         player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
@@ -342,7 +342,7 @@ public final class IntaveRootStage extends CommandStage {
   )
   @Native
   public void setTrustFactor(User user, TrustFactor trustFactor, @Optional Player target) {
-    if(target == null) {
+    if (target == null) {
       target = user.player();
     }
     UserRepository.userOf(target).setTrustFactor(trustFactor);
@@ -357,7 +357,7 @@ public final class IntaveRootStage extends CommandStage {
   )
   @Native
   public void lookupTrust(User user, @Optional Player target) {
-    if(target == null) {
+    if (target == null) {
       target = user.player();
     }
     TrustFactor trustFactor = UserRepository.userOf(target).trustFactor();

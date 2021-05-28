@@ -195,13 +195,13 @@ public class AirClickLimitHeuristic extends IntaveMetaCheckPart<Heuristics, AirC
       meta.flaggCounter++;
       double timeDiffrenceInSeconds = (System.currentTimeMillis() - meta.lastFlagTimeStamp) / 1000d;
 
-      if(sum > meta.maxCPS) {
+      if (sum > meta.maxCPS) {
         meta.maxCPS = sum;
       }
 
-      if(timeDiffrenceInSeconds > 30) {
+      if (timeDiffrenceInSeconds > 30) {
         Confidence confidence;
-        if(meta.flaggCounter > 10 && meta.maxCPS > 15) {
+        if (meta.flaggCounter > 10 && meta.maxCPS > 15) {
           confidence = Confidence.LIKELY;
         } else {
           confidence = Confidence.PROBABLE;
@@ -215,7 +215,7 @@ public class AirClickLimitHeuristic extends IntaveMetaCheckPart<Heuristics, AirC
         );
         parentCheck().saveAnomaly(player, anomaly);
 
-        if(meta.flaggCounter > 20 && meta.maxCPS > 18) {
+        if (meta.flaggCounter > 20 && meta.maxCPS > 18) {
           //dmc27
           user.applyAttackNerfer(AttackNerfStrategy.GARBAGE_HITS, "27");
           user.applyAttackNerfer(AttackNerfStrategy.BLOCKING, "27");
@@ -226,7 +226,7 @@ public class AirClickLimitHeuristic extends IntaveMetaCheckPart<Heuristics, AirC
         meta.flaggCounter = 0;
       }
     } else {
-      if(meta.flaggCounter == 0) {
+      if (meta.flaggCounter == 0) {
         meta.lastFlagTimeStamp = System.currentTimeMillis();
       }
     }

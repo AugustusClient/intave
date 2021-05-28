@@ -44,7 +44,7 @@ public final class VersionList {
 
   public Version versionInformation(String version) {
     for (Version versionInformation : content) {
-      if(versionInformation.version().equalsIgnoreCase(version)) {
+      if (versionInformation.version().equalsIgnoreCase(version)) {
         return versionInformation;
       }
     }

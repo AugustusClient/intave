@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 public final class DurationTranslator {
 
   public static String translateDuration(long duration) {
-    if(duration <= 0) {
+    if (duration <= 0) {
       return "invalid";
     }
     int hours = (int) (duration / (1000 * 60 * 60));
@@ -14,14 +14,14 @@ public final class DurationTranslator {
     String firstType = stringifyType(TimeUnit.DAYS, days);
     String secondType = stringifyType(TimeUnit.HOURS, hours);
     String output = firstType + (firstType.isEmpty() ? "" : " and ") + secondType;
-    if(output.trim().isEmpty()) {
+    if (output.trim().isEmpty()) {
       output = "a few hours";
     }
     return output;
   }
 
   private static String stringifyType(TimeUnit unit, long conv) {
-    if(conv == 0) {
+    if (conv == 0) {
       return "";
     }
     String name = unit.name().toLowerCase();

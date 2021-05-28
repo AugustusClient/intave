@@ -21,7 +21,7 @@ public final class ServerStatisticAccessor {
   }
 
   public synchronized ServerHealthStatisticAccess serverStatisticAccess() {
-    if(statisticAccess == null) {
+    if (statisticAccess == null) {
       statisticAccess = newServerStatisticAccess();
       loadScheduler();
     }
@@ -40,7 +40,7 @@ public final class ServerStatisticAccessor {
   }
 
   public void shutdownScheduler() {
-    if(schedulerId > 0 && statisticAccess != null) {
+    if (schedulerId > 0 && statisticAccess != null) {
       plugin.getServer().getScheduler().cancelTask(schedulerId);
     }
   }

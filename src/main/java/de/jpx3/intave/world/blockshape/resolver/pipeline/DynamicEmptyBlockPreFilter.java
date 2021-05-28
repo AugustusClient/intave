@@ -20,7 +20,7 @@ public final class DynamicEmptyBlockPreFilter implements BoundingBoxResolvePipel
 
   @Override
   public List<WrappedAxisAlignedBB> nativeResolve(World world, Player player, Material type, int blockState, int posX, int posY, int posZ) {
-    if(isEmpty(type)) {
+    if (isEmpty(type)) {
       BoundingBoxAccessFlowStudy.incremDynamic();
       return Collections.emptyList();
     }
@@ -29,7 +29,7 @@ public final class DynamicEmptyBlockPreFilter implements BoundingBoxResolvePipel
 
   @Override
   public List<WrappedAxisAlignedBB> customResolve(World world, Player player, Material type, int blockState, int posX, int posY, int posZ) {
-    if(isEmpty(type)) {
+    if (isEmpty(type)) {
       BoundingBoxAccessFlowStudy.incremDynamic();
       return Collections.emptyList();
     }
@@ -37,7 +37,7 @@ public final class DynamicEmptyBlockPreFilter implements BoundingBoxResolvePipel
   }
 
   private boolean isEmpty(Material type) {
-    if(MaterialLogic.isLiquid(type)) {
+    if (MaterialLogic.isLiquid(type)) {
       return true;
     }
     switch (type) {

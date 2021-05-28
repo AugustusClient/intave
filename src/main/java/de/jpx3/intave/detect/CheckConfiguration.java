@@ -47,14 +47,14 @@ public final class CheckConfiguration {
     }
 
     public Map<Integer, List<String>> thresholdsBy(String key) {
-      if(thresholds.containsKey(key)) {
+      if (thresholds.containsKey(key)) {
         return thresholds.get(key);
       }
       ConfigurationSection configurationSection = (ConfigurationSection) access.get(key);
       Map<Integer, List<String>> thresholdMap = new LinkedHashMap<>();
       Set<String> section = configurationSection.getKeys(false);
 
-      if(section == null) {
+      if (section == null) {
         throw new IntaveInternalException("Unable to locate threshold section " + key + " in check " + configurationCache.check().name());
       }
 

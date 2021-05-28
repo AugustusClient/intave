@@ -25,7 +25,7 @@ public final class PlayerClickStatisticsAccessor {
   public void pushClicks(Player player, int cps) {
     List<Consumer<Integer>> subscriptionList = subscriptions.get(player.getUniqueId());
 
-    if(subscriptionList != null) {
+    if (subscriptionList != null) {
       for (Consumer<Integer> integerConsumer : subscriptionList) {
         integerConsumer.accept(cps);
       }

@@ -9,7 +9,7 @@ public final class PlaceholderCombiner {
   public static PlaceholderContext combine(PlaceholderContext... contexts) {
     Map<String, String> globalContext = Maps.newHashMap();
     for (PlaceholderContext context : contexts) {
-      if(context == null) continue;
+      if (context == null) continue;
       globalContext.putAll(context.replacements());
     }
     Map<String, String> immutableContextMap = ImmutableMap.copyOf(globalContext);
