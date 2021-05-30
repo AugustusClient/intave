@@ -212,9 +212,10 @@ public final class SimulationProcessor {
 
     int keyForward = movementData.lastKeyForward;
     int keyStrafe = movementData.lastKeyStrafe;
+    boolean inventoryOpen = inventoryData.inventoryOpen();
 
     // return if prediction bias already has calculated this keys
-    if (keyForward == movementData.keyForward && keyStrafe == movementData.keyStrafe) {
+    if (!inventoryOpen && keyForward == movementData.keyForward && keyStrafe == movementData.keyStrafe) {
       Timings.CHECK_PHYSICS_PROC_LK_BIA.stop();
       Timings.CHECK_PHYSICS_PROC_BIA.stop();
       return INVALID_SIMULATION;
