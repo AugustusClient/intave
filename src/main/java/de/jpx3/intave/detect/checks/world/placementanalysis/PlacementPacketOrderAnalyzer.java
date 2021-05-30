@@ -1,12 +1,10 @@
 package de.jpx3.intave.detect.checks.world.placementanalysis;
 
-import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.detect.IntaveMetaCheckPart;
 import de.jpx3.intave.detect.checks.world.PlacementAnalysis;
-import de.jpx3.intave.event.packet.PacketId;
 import de.jpx3.intave.event.packet.PacketSubscription;
 import de.jpx3.intave.event.violation.Violation;
 import de.jpx3.intave.event.violation.ViolationContext;
@@ -32,7 +30,17 @@ public final class PlacementPacketOrderAnalyzer extends IntaveMetaCheckPart<Plac
 
   @PacketSubscription(
     packetsIn = {
-      PacketId.Client.FLYING, POSITION, POSITION_LOOK, LOOK, BLOCK_PLACE
+      FLYING, POSITION, POSITION_LOOK, LOOK
+    }
+  )
+  public void receiveMovement(PacketEvent event) {
+    Player player = event.getPlayer();
+    metaOf(player).lastMovePacket = AccessHelper.now();
+  }
+
+  @PacketSubscription(
+    packetsIn = {
+    BLOCK_PLACE
     }
   )
   public void checkPlacementPacketOrder(PacketEvent event) {
@@ -41,46 +49,41 @@ public final class PlacementPacketOrderAnalyzer extends IntaveMetaCheckPart<Plac
     PacketContainer packet = event.getPacket();
     PlacementOrderMeta meta = metaOf(player);
 
-    PacketType packetType = event.getPacketType();
     long now = AccessHelper.now();
-    if (packetType == PacketType.Play.Client.BLOCK_PLACE) {
-      if (blockingPlacementPacket(packet)) {
-        return;
-      }
+    if (blockingPlacementPacket(packet)) {
+      return;
+    }
 
-      long timeDiff = now - meta.lastMovePacket;
-      meta.placementDifferences.add(timeDiff);
+    long timeDiff = now - meta.lastMovePacket;
+    meta.placementDifferences.add(timeDiff);
 
-      if (meta.placementDifferences.size() == 4) {
-        double average = RotationMathHelper.averageOf(meta.placementDifferences);
+    if (meta.placementDifferences.size() == 4) {
+      double average = RotationMathHelper.averageOf(meta.placementDifferences);
 
-        if (average < 20) {
-          long permutePacketIncrementDiff = now - meta.lastIncrement;
+      if (average < 20) {
+        long permutePacketIncrementDiff = now - meta.lastIncrement;
 
-          if (permutePacketIncrementDiff > 20) {
-            if (meta.packetOrderBalance++ >= 2) {
-              Violation violation = Violation.builderFor(PlacementAnalysis.class)
-                .forPlayer(player)
-                .withMessage(COMMON_FLAG_MESSAGE)
-                .withVL(2)
-                .build();
-              ViolationContext violationContext = plugin.violationProcessor().processViolation(violation);
-              if (violationContext.violationLevelAfter() > 5) {
-                //dmc2
-                parentCheck().applyPlacementAnalysisDamageCancel(user, "2");
-              }
+        if (permutePacketIncrementDiff > 20) {
+          if (meta.packetOrderBalance++ >= 2) {
+            Violation violation = Violation.builderFor(PlacementAnalysis.class)
+              .forPlayer(player)
+              .withMessage(COMMON_FLAG_MESSAGE)
+              .withVL(2)
+              .build();
+            ViolationContext violationContext = plugin.violationProcessor().processViolation(violation);
+            if (violationContext.violationLevelAfter() > 5) {
+              //dmc2
+              parentCheck().applyPlacementAnalysisDamageCancel(user, "2");
             }
-            meta.lastIncrement = now;
           }
-
-        } else if (meta.packetOrderBalance >= 0) {
-          meta.packetOrderBalance--;
+          meta.lastIncrement = now;
         }
 
-        meta.placementDifferences.clear();
+      } else if (meta.packetOrderBalance >= 0) {
+        meta.packetOrderBalance--;
       }
-    } else {
-      meta.lastMovePacket = now;
+
+      meta.placementDifferences.clear();
     }
   }
 
