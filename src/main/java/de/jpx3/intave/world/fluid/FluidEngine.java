@@ -11,6 +11,10 @@ import org.bukkit.Material;
 import org.bukkit.World;
 
 public abstract class FluidEngine {
+  protected abstract WrappedFluid fluidAt(User user, int x, int y, int z);
+
+  protected abstract WrappedVector flowVectorAt(User user, int x, int y, int z);
+
   protected boolean handleFluidAcceleration(User user, WrappedAxisAlignedBB boundingBox) {
     World world = user.player().getWorld();
     UserMetaMovementData movementData = user.meta().movementData();
@@ -75,8 +79,4 @@ public abstract class FluidEngine {
     WrappedFluid wrappedFluid = fluidAt(user, blockX, blockPlayerViewPositionY, blockZ);
     return wrappedFluid.fluidTag() == FluidTag.WATER;
   }
-
-  protected abstract WrappedFluid fluidAt(User user, int x, int y, int z);
-
-  protected abstract WrappedVector flowVectorAt(User user, int x, int y, int z);
 }
