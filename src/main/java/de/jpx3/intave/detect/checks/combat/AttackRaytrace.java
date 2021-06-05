@@ -369,8 +369,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
     }
     if (expandHitbox > 0.1f) {
       vl /= 2;
-    }
-    if (entity.verifiedPosition) {
+    } else if (entity.verifiedPosition) {
       vl *= 2.5;
     }
     if (movementData.inVehicle()) {

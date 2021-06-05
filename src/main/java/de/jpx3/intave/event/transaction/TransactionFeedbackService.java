@@ -48,7 +48,7 @@ public final class TransactionFeedbackService implements PacketEventSubscriber {
   }
 
   public <T> void doubleSynchronize(Player player, PacketContainer encapsulate, T target, TFCallback<T> firstCallback, TFCallback<T> secondCallback) {
-    doubleSynchronize(player, encapsulate, target, firstCallback, secondCallback);
+    doubleSynchronize(player, encapsulate, target, firstCallback, secondCallback, 0);
   }
 
   public <T> void doubleSynchronize(Player player, PacketContainer encapsulate, T target, TFCallback<T> firstCallback, TFCallback<T> secondCallback, int options) {
