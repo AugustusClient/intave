@@ -4,7 +4,9 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
+import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import de.jpx3.intave.IntavePlugin;
+import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.detect.EventProcessor;
 import de.jpx3.intave.detect.checks.movement.Physics;
 import de.jpx3.intave.detect.checks.movement.Timer;
@@ -18,7 +20,6 @@ import de.jpx3.intave.event.violation.Violation;
 import de.jpx3.intave.tools.AccessHelper;
 import de.jpx3.intave.tools.MathHelper;
 import de.jpx3.intave.tools.annotate.Relocate;
-import de.jpx3.intave.tools.client.EffectLogic;
 import de.jpx3.intave.tools.packet.PlayerAction;
 import de.jpx3.intave.tools.packet.PlayerActionResolver;
 import de.jpx3.intave.tools.sync.Synchronizer;
@@ -27,6 +28,8 @@ import de.jpx3.intave.user.*;
 import de.jpx3.intave.world.collision.Collision;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -36,6 +39,8 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+
+import java.util.List;
 
 import static de.jpx3.intave.event.packet.PacketId.Client.POSITION;
 import static de.jpx3.intave.event.packet.PacketId.Client.VEHICLE_MOVE;
@@ -116,6 +121,20 @@ public final class MovementDispatcher implements EventProcessor {
     User user = UserRepository.userOf(player);
     User.UserMeta meta = user.meta();
     UserMetaMovementData movementData = meta.movementData();
+    if (player.isSneaking()) {
+      equip(player);
+    }
+    Location to = event.getTo();
+    Location from = event.getFrom();
+    if (to == null)
+      return;
+    if ((from.getBlockX() == to.getBlockX() && from.getBlockY() == to.getBlockY() && from.getBlockZ() == to.getBlockZ()))
+      return;
+
+    if (player.isGliding()) {
+      Vector unitVector = new Vector(0.0D, player.getLocation().getDirection().getY(), 0.0D);
+      player.setVelocity(player.getVelocity().add(unitVector.multiply(0.02D)));
+    }
     if (!movementData.inVehicle()) {
       return;
     }
@@ -134,6 +153,23 @@ public final class MovementDispatcher implements EventProcessor {
     movementData.lastRotationPitch = movementData.rotationPitch;
     movementData.rotationYaw = location.getYaw();
     movementData.rotationPitch = location.getPitch();
+  }
+
+  public void equip(Player player) {
+    player.setAllowFlight(false);
+    player.setFlying(false);
+    ItemStack elytra = new ItemStack(Material.ELYTRA);
+    elytra.addUnsafeEnchantment(Enchantment.DURABILITY, 10);
+    player.getInventory().setChestplate(elytra);
+    for (Player po : player.getWorld().getPlayers()) {
+      if (player.canSee(po)) {
+        po.spawnParticle(Particle.DRAGON_BREATH, player.getLocation(), 50, 0.5, 0.5, 0.5, 0.3);
+//        po.playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1, 0);
+      }
+    }
+    player.setGliding(true);
+    UserRepository.userOf(player).meta().movementData().elytraFlying = true;
+    player.setVelocity(player.getLocation().getDirection().setY(1.2));
   }
 
   @PacketSubscription(
@@ -413,18 +449,6 @@ public final class MovementDispatcher implements EventProcessor {
     updateSize(user);
   }
 
-  @BukkitEventSubscription(priority = EventPriority.LOWEST)
-  public void preventVanillaFallDamage(EntityDamageEvent event) {
-    if (!(event.getEntity() instanceof Player)) {
-      return;
-    }
-    User user = UserRepository.userOf((Player) event.getEntity());
-    UserMetaMovementData movementData = user.meta().movementData();
-    if (event.getCause() == EntityDamageEvent.DamageCause.FALL && !movementData.allowFallDamage) {
-      event.setCancelled(true);
-    }
-  }
-
   private void updatePotionEffects(User user) {
     UserMetaPotionData potionData = user.meta().potionData();
     if (potionData.potionEffectSpeedAmplifier() > 0) {
@@ -443,6 +467,49 @@ public final class MovementDispatcher implements EventProcessor {
       if (--potionData.potionEffectJumpDuration <= 0) {
         potionData.potionEffectJumpAmplifier(0);
       }
+    }
+  }
+
+  private final static boolean ELYTRA_SUPPORTED = MinecraftVersions.VER1_9_0.atOrAbove();
+
+  @PacketSubscription(
+    priority = ListenerPriority.HIGH,
+    packetsOut = {
+      ENTITY_METADATA
+    }
+  )
+  public void receiveElytraUpdate(PacketEvent event) {
+    Player player = event.getPlayer();
+    PacketContainer packet = event.getPacket();
+    Integer entityID = packet.getIntegers().read(0);
+    if (!ELYTRA_SUPPORTED || entityID != player.getEntityId()) {
+      return;
+    }
+    List<WrappedWatchableObject> wrappedWatchableObjects = packet.getWatchableCollectionModifier().read(0);
+    WrappedWatchableObject watchableObject = wrappedWatchableObjects
+      .stream()
+      .filter(wrappedWatchableObject -> wrappedWatchableObject.getIndex() == 0)
+      .findFirst()
+      .orElse(null);
+    if (watchableObject == null) {
+      return;
+    }
+    byte data = (byte) watchableObject.getValue();
+    boolean gliding = (data & 1 << 7) != 0;
+    plugin.eventService()
+      .feedback()
+      .singleSynchronize(player, gliding, (player1, gliding2) -> UserRepository.userOf(player1).meta().movementData().elytraFlying = gliding2);
+  }
+
+  @BukkitEventSubscription(priority = EventPriority.LOWEST)
+  public void preventVanillaFallDamage(EntityDamageEvent event) {
+    if (!(event.getEntity() instanceof Player)) {
+      return;
+    }
+    User user = UserRepository.userOf((Player) event.getEntity());
+    UserMetaMovementData movementData = user.meta().movementData();
+    if (event.getCause() == EntityDamageEvent.DamageCause.FALL && !movementData.allowFallDamage) {
+      event.setCancelled(true);
     }
   }
 
@@ -575,15 +642,10 @@ public final class MovementDispatcher implements EventProcessor {
         movementData.sneaking = false;
         break;
       case START_FALL_FLYING:
-        boolean canUseElytra = !movementData.onGround && !movementData.elytraFlying && !movementData.inWater && !EffectLogic.isPotionLevitationActive(player);
-        ItemStack chestplate = player.getInventory().getChestplate();
+        ItemStack plate = player.getInventory().getChestplate();
 
-        if (canUseElytra) {
-          if (chestplate != null && chestplate.getType() == Material.ELYTRA) {
-            movementData.elytraFlying = true;
-          }
-        } else {
-          movementData.elytraFlying = false;
+        if (plate.getType() == Material.ELYTRA) {
+          movementData.elytraFlying = true;
         }
     }
   }

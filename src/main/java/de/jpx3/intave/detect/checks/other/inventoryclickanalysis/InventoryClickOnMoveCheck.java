@@ -2,6 +2,7 @@ package de.jpx3.intave.detect.checks.other.inventoryclickanalysis;
 
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.detect.IntaveCheckPart;
+import de.jpx3.intave.detect.checks.movement.physics.Pose;
 import de.jpx3.intave.detect.checks.other.InventoryClickAnalysis;
 import de.jpx3.intave.event.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.event.violation.Violation;
@@ -39,6 +40,10 @@ public final class InventoryClickOnMoveCheck extends IntaveCheckPart<InventoryCl
     UserMetaMovementData movementData = meta.movementData();
     int keyForward = movementData.keyForward;
     int keyStrafe = movementData.keyStrafe;
+
+    if (movementData.movementPoseType() == Pose.ELYTRA) {
+      return;
+    }
 
     // Be more lenient when a flying packet was sent
     if (movementData.inWeb || movementData.recentlyEncounteredFlyingPacket(2)) {

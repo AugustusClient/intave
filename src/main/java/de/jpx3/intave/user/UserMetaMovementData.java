@@ -235,9 +235,6 @@ public final class UserMetaMovementData {
       yawCosine = SinusCache.cos(rotationYaw * (float) Math.PI / 180.0F, false);
     }
     // I could not find a better solution :(
-    if(elytraFlying && onGround) {
-      elytraFlying = false;
-    }
     updateEntityMovement();
   }
 

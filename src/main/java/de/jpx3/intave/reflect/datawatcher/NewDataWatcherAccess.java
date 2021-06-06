@@ -57,7 +57,11 @@ public final class NewDataWatcherAccess implements DataWatcherAccess {
   @Override
   @PatchyAutoTranslation
   public boolean getDataWatcherFlag(Player player, int key) {
-    throw new IntaveInternalException("Operation not implemented");
+    Entity handle = ((CraftEntity) player).getHandle();
+    DataWatcher dataWatcher = handle.getDataWatcher();
+    //noinspection unchecked
+    DataWatcherObject<Byte> byteDataWatcherObject = (DataWatcherObject<Byte>) accessLivingFlags();
+    return (dataWatcher.get(byteDataWatcherObject) & 1 << key) != 0;
   }
 
   private Object accessLivingFlags() {
