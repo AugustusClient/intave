@@ -26,38 +26,38 @@ public final class EntityNoCollisionService implements PacketEventSubscriber {
     plugin.packetSubscriptionLinker().linkSubscriptionsIn(this);
   }
 
-  @PacketSubscription(
-    priority = ListenerPriority.HIGHEST,
-    packetsOut = {
-      PLAYER_INFO
-    }
-  )
-  public void receiveTabListName(PacketEvent event) {
-    Player player = event.getPlayer();
-    PacketContainer packet = event.getPacket();
-    EnumWrappers.PlayerInfoAction action = packet.getPlayerInfoAction().read(0);
-    if (action != EnumWrappers.PlayerInfoAction.ADD_PLAYER) {
-      return;
-    }
-    List<PlayerInfoData> playerInformationList = packet.getPlayerInfoDataLists().readSafely(0);
-    for (PlayerInfoData playerInfoData : playerInformationList) {
-      WrappedGameProfile profile = playerInfoData.getProfile();
-      String name = profile.getName();
-      disableCollisions(player, name);
-    }
-  }
-
-  @PacketSubscription(
-    priority = ListenerPriority.HIGHEST,
-    packetsOut = {
-      SPAWN_ENTITY_LIVING
-    }
-  )
-  public void receiveEntitySpawn(PacketEvent event) {
-    Player player = event.getPlayer();
-    PacketContainer packet = event.getPacket();
-    disableCollisions(player, packet.getUUIDs().read(0).toString());
-  }
+//  @PacketSubscription(
+//    priority = ListenerPriority.HIGHEST,
+//    packetsOut = {
+//      PLAYER_INFO
+//    }
+//  )
+//  public void receiveTabListName(PacketEvent event) {
+//    Player player = event.getPlayer();
+//    PacketContainer packet = event.getPacket();
+//    EnumWrappers.PlayerInfoAction action = packet.getPlayerInfoAction().read(0);
+//    if (action != EnumWrappers.PlayerInfoAction.ADD_PLAYER) {
+//      return;
+//    }
+//    List<PlayerInfoData> playerInformationList = packet.getPlayerInfoDataLists().readSafely(0);
+//    for (PlayerInfoData playerInfoData : playerInformationList) {
+//      WrappedGameProfile profile = playerInfoData.getProfile();
+//      String name = profile.getName();
+//      disableCollisions(player, name);
+//    }
+//  }
+//
+//  @PacketSubscription(
+//    priority = ListenerPriority.HIGHEST,
+//    packetsOut = {
+//      SPAWN_ENTITY_LIVING
+//    }
+//  )
+//  public void receiveEntitySpawn(PacketEvent event) {
+//    Player player = event.getPlayer();
+//    PacketContainer packet = event.getPacket();
+//    disableCollisions(player, packet.getUUIDs().read(0).toString());
+//  }
 
   @PacketSubscription(
     priority = ListenerPriority.HIGHEST,
