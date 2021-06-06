@@ -176,7 +176,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
      *   which could cause a too many packets kick
      */
 //    plugin.eventService().transactionFeedbackService().requestPong(event.getPlayer(), event, this::processEntitySpawn);
-    Thread.dumpStack();
+//    Thread.dumpStack();
     processEntitySpawn(event.getPlayer(), event);
   }
 
