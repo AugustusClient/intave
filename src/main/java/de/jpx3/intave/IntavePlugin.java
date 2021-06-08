@@ -149,6 +149,10 @@ public final class IntavePlugin extends JavaPlugin {
     InterceptorDetection.setup();
 
     try {
+      // We need to put this here before setting up the Synchronizer
+      componentLoader = new ComponentLoader(this);
+      componentLoader.loadComponents();
+
       SinusCache.setup();
       TpsResolver.setup();
       Synchronizer.setup();
@@ -156,10 +160,7 @@ public final class IntavePlugin extends JavaPlugin {
 
       trustFactorService = new TrustFactorService(this);
       // version mambo jumbo
-
       // stage 5
-      componentLoader = new ComponentLoader(this);
-      componentLoader.loadComponents();
 
       // we need to put this here
       BackgroundExecutor.start();
