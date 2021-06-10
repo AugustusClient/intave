@@ -3,6 +3,7 @@ package de.jpx3.intave.world.blockaccess;
 import com.comphenix.protocol.utility.MinecraftVersion;
 import de.jpx3.intave.access.IntaveInternalException;
 import de.jpx3.intave.adapter.ProtocolLibraryAdapter;
+import de.jpx3.intave.tools.annotate.Relocate;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import org.bukkit.Material;
@@ -11,6 +12,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Map;
 
+@Relocate
 public final class BlockTypeAccess {
   public static final Material WEB = resolveFrom("WEB", "COBWEB");
   public static final Material SNOW_LAYER = resolveFrom("SNOW", "SNOW_LAYER");

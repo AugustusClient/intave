@@ -9,6 +9,7 @@ import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.event.packet.tinyprotocol.InjectionService;
 import de.jpx3.intave.lib.asm.Type;
 import de.jpx3.intave.reflect.irx.IRXFactory;
+import de.jpx3.intave.tools.annotate.DoNotFlowObfuscate;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
@@ -19,6 +20,7 @@ import java.util.function.IntFunction;
 
 import static de.jpx3.intave.IntaveControl.DISABLE_CHUNK_PACKET_HOOK;
 
+@DoNotFlowObfuscate
 public final class PacketSubscriptionLinker {
   private final static boolean NO_CHAT_HOOKUP = false;
   private final IntavePlugin plugin;
@@ -134,8 +136,8 @@ public final class PacketSubscriptionLinker {
   }
 
   private PacketType[] translatePacketTypes(PacketId.Client[] clientPackets, PacketId.Server[] serverPackets) {
-    PacketType[] serverPacketTypes = Arrays.stream(clientPackets).map(this::translatePacketType).toArray(PacketType[]::new);
-    PacketType[] clientPacketTypes = Arrays.stream(serverPackets).map(this::translatePacketType).toArray(PacketType[]::new);
+    PacketType[] serverPacketTypes = Arrays.stream(clientPackets).map(this::translateClientPacketType).toArray(PacketType[]::new);
+    PacketType[] clientPacketTypes = Arrays.stream(serverPackets).map(this::translateServerPacketType).toArray(PacketType[]::new);
     PacketType[] packetTypes = merge(serverPacketTypes, clientPacketTypes);
     return distinct(excludeProblematic(packetTypes), PacketType[]::new);
   }
@@ -167,31 +169,23 @@ public final class PacketSubscriptionLinker {
     return false;
   }
 
-  private PacketType translatePacketType(PacketId.Server serverPacket) {
-    Set<PacketType> availableTypes = selectPacketTypesFor(ConnectionSide.SERVER_SIDE);
-    return searchByName(availableTypes, serverPacket.lookupName());
+  private PacketType translateClientPacketType(PacketId.Client clientPacket) {
+    return searchByName(selectPacketTypesFor(ConnectionSide.CLIENT_SIDE), clientPacket.lookupName());
   }
 
-  private PacketType translatePacketType(PacketId.Client clientPacket) {
-    Set<PacketType> availableTypes = selectPacketTypesFor(ConnectionSide.CLIENT_SIDE);
-    return searchByName(availableTypes, clientPacket.lookupName());
+  private PacketType translateServerPacketType(PacketId.Server serverPacket) {
+    return searchByName(selectPacketTypesFor(ConnectionSide.SERVER_SIDE), serverPacket.lookupName());
   }
 
   private Set<PacketType> selectPacketTypesFor(ConnectionSide connectionSide) {
     Set<PacketType> availableTypes = new HashSet<>();
-    if (connectionSide.isForServer()) {
-      availableTypes.addAll(PacketRegistry.getServerPacketTypes());
-    }
-    if (connectionSide.isForClient()) {
-      availableTypes.addAll(PacketRegistry.getClientPacketTypes());
-    }
+    if (connectionSide.isForServer()) availableTypes.addAll(PacketRegistry.getServerPacketTypes());
+    if (connectionSide.isForClient()) availableTypes.addAll(PacketRegistry.getClientPacketTypes());
     return availableTypes;
   }
 
   private PacketType searchByName(Collection<PacketType> packetPool, String name) {
-    return packetPool.stream()
-      .filter(packetType -> matches(packetType, name))
-      .findFirst().orElse(null);
+    return packetPool.stream().filter(packetType -> matches(packetType, name)).findFirst().orElse(null);
   }
 
   private boolean matches(PacketType packetType, String name) {

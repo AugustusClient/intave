@@ -1,6 +1,9 @@
 package de.jpx3.intave.event.packet;
 
+import de.jpx3.intave.tools.annotate.KeepEnumInternalNames;
+
 public final class PacketId {
+  @KeepEnumInternalNames
   public enum Client {
     ABILITIES("ABILITIES"),
     ADVANCEMENTS("ADVANCEMENTS"),
@@ -64,6 +67,7 @@ public final class PacketId {
     }
   }
 
+  @KeepEnumInternalNames
   public enum Server {
     ABILITIES("ABILITIES"),
     ADVANCEMENTS("ADVANCEMENTS"),

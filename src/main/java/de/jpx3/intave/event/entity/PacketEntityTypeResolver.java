@@ -117,6 +117,27 @@ public final class PacketEntityTypeResolver {
     }
   }
 
+  public EntityTypeData entityTypeDataOfEntityMetaData(PacketEvent event, int entityTypeId, List<WrappedWatchableObject> watchableObjects) {
+    PacketContainer packet = event.getPacket();
+    int entityId = packet.getIntegers().read(0);
+    Entity entity = ClientSideEntityService.serverEntityByIdentifier(event.getPlayer(), entityId);
+    if (entity != null) {
+      return entityTypeDataOfBukkitEntity(entity);
+    } else {
+      Boolean isChild = isChildByWatchableObjects(watchableObjects, entityTypeId);
+      if (isChild == null) {
+        return null;
+      } else {
+        EntityTypeData entityTypeData = DualEntityTypeAccess.resolveFromId(entityTypeId, false);
+        if (isChild) {
+          return convertHitboxBoundariesToBaby(entityTypeData);
+        } else {
+          return entityTypeData;
+        }
+      }
+    }
+  }
+
   private Boolean isChildByWatchableObjects(List<WrappedWatchableObject> watchableObjects, int entityTypeId) {
     final int correctIndex;
     if (AT_OR_ABOVE_1_9) {
@@ -153,14 +174,14 @@ public final class PacketEntityTypeResolver {
     }
 
     for (WrappedWatchableObject watchableObject : watchableObjects) {
+      // needs a lot of performance and affects tps
       int index = watchableObject.getIndex();
-      Object object = watchableObject.getRawValue();
-
-      if (object != null) {
-        if (index == correctIndex) {
+      if (index == correctIndex) {
+        // needs a lot of performance and affects tps
+        Object object = watchableObject.getRawValue();
+        if (object != null) {
           if (object instanceof Boolean) {
-            Boolean isChild = (Boolean) object;
-            return isChild;
+            return (Boolean) object;
           } else if (object instanceof Byte) {
             byte isChild = (byte) object;
             if (AT_OR_ABOVE_1_14 && entityTypeId == 30) {
@@ -174,30 +195,10 @@ public final class PacketEntityTypeResolver {
           }
         }
       }
+
     }
 
     return null;
-  }
-
-  public EntityTypeData entityTypeDataOfEntityMetaData(PacketEvent event, int entityTypeId, List<WrappedWatchableObject> watchableObjects) {
-    PacketContainer packet = event.getPacket();
-    int entityId = packet.getIntegers().read(0);
-    Entity entity = ClientSideEntityService.serverEntityByIdentifier(event.getPlayer(), entityId);
-    Boolean isChild = isChildByWatchableObjects(watchableObjects, entityTypeId);
-
-    if (entity != null) {
-      return entityTypeDataOfBukkitEntity(entity);
-    } else {
-      EntityTypeData entityTypeData = DualEntityTypeAccess.resolveFromId(entityTypeId, false);
-
-      if (isChild == null) {
-        return null;
-      } else if (isChild) {
-        return convertHitboxBoundariesToBaby(entityTypeData);
-      } else {
-        return entityTypeData;
-      }
-    }
   }
 
   private EntityTypeData convertHitboxBoundariesToBaby(EntityTypeData entityTypeData) {

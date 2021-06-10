@@ -5,7 +5,6 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import de.jpx3.intave.IntavePlugin;
-import de.jpx3.intave.access.player.trust.TrustFactor;
 import de.jpx3.intave.detect.CheckStatistics;
 import de.jpx3.intave.detect.CheckViolationLevelDecrementer;
 import de.jpx3.intave.detect.IntaveMetaCheck;
@@ -16,6 +15,7 @@ import de.jpx3.intave.event.violation.AttackNerfStrategy;
 import de.jpx3.intave.event.violation.Violation;
 import de.jpx3.intave.event.violation.ViolationContext;
 import de.jpx3.intave.tools.MathHelper;
+import de.jpx3.intave.tools.annotate.KeepEnumInternalNames;
 import de.jpx3.intave.tools.annotate.Native;
 import de.jpx3.intave.tools.sync.Synchronizer;
 import de.jpx3.intave.tools.wrapper.WrappedVector;
@@ -34,7 +34,6 @@ import java.util.Locale;
 import static de.jpx3.intave.event.entity.ClientSideEntityService.entityByIdentifier;
 import static de.jpx3.intave.event.packet.PacketId.Client.*;
 import static de.jpx3.intave.event.violation.Violation.ViolationFlags.DONT_PROCESS_VIOSTAT;
-import static de.jpx3.intave.user.UserMetaClientData.PROTOCOL_VERSION_BOUNTIFUL_UPDATE;
 import static de.jpx3.intave.user.UserMetaClientData.PROTOCOL_VERSION_COMBAT_UPDATE;
 
 public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackRaytraceMeta> {
@@ -87,8 +86,8 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
         }
       }
 
-      if (!event.isCancelled()) {
-        event.setCancelled(shouldResend);
+      if (shouldResend) {
+        event.setCancelled(true);
       }
 
       Attack attack = new Attack(packetClone, entityId, shouldResend);
@@ -142,8 +141,8 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
                 // 1.9+ beim still stehen oder wenn das entity nicht synchronisiert ist
                 cancelHit = processIterativeReachCheck(player, entity);
               }
-            }
-            if (clientData.protocolVersion() <= PROTOCOL_VERSION_BOUNTIFUL_UPDATE) {
+            } else
+            /*if (clientData.protocolVersion() <= PROTOCOL_VERSION_BOUNTIFUL_UPDATE) */{
               // <= 1.8.9
               if (!entity.clientSynchronized) {
                 // 1.8.x wenn das entity nicht synchronisiert ist
@@ -157,12 +156,10 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
               }
             }
 
-            if(cancelHit != null) {
-              if (cancelHit) {
-                statisticApply(user, CheckStatistics::increaseFails);
-              } else {
-                statisticApply(user, CheckStatistics::increasePasses);
-              }
+            if (cancelHit) {
+              statisticApply(user, CheckStatistics::increaseFails);
+            } else {
+              statisticApply(user, CheckStatistics::increasePasses);
             }
           }
         } else {
@@ -174,11 +171,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
               for (Player authenticatedPlayer : Bukkit.getOnlinePlayers()) {
                 if (plugin.sibylIntegrationService().isAuthenticated(authenticatedPlayer)) {
                   String message;
-                  if (entity == null) {
-                    message = ChatColor.RED + "[R] " + player.getName() + " attacked a null entity";
-                  } else {
-                    message = ChatColor.RED + "[R] " + player.getName() + " attacked entity while beeing dead";
-                  }
+                  message = ChatColor.RED + "[R] " + player.getName() + " attacked entity while being dead";
                   authenticatedPlayer.sendMessage(message);
                 }
               }
@@ -186,8 +179,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
           });
         }
       }
-      // Do not exclude packets if the player has bypass TrustFactor
-      if(cancelHit == null || cancelHit || user.trustFactor() == TrustFactor.BYPASS) {
+      if(cancelHit == null || !cancelHit) {
         if (!violationLevelData.isInActiveTeleportBundle && remainingAttack.shouldResend) {
           receiveExcludedPacket(player, remainingAttack.packet);
         }
@@ -552,6 +544,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
     }
   }
 
+  @KeepEnumInternalNames
   public enum AttackRaytraceResult {
     NORMAL,
     REACH,

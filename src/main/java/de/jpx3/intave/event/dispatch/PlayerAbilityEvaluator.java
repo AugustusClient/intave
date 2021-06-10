@@ -174,7 +174,7 @@ public final class PlayerAbilityEvaluator implements PacketEventSubscriber {
         return value;
       }
     }
-    throw new IllegalStateException("Unable to resolve GameMode with id " + id);
+    throw new IllegalStateException("Unable to resolve gamemode with id " + id);
   }
 
   public enum GameMode {

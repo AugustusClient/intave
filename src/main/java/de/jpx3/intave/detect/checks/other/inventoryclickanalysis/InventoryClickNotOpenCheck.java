@@ -4,7 +4,6 @@ import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.detect.IntaveCheckPart;
 import de.jpx3.intave.detect.checks.other.InventoryClickAnalysis;
 import de.jpx3.intave.event.bukkit.BukkitEventSubscription;
-import de.jpx3.intave.event.violation.Violation;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaClientData;
 import de.jpx3.intave.user.UserMetaInventoryData;
@@ -46,14 +45,16 @@ public final class InventoryClickNotOpenCheck extends IntaveCheckPart<InventoryC
       return;
     }
 
-    if (inventoryData.forceInventoryOnClickOpen && !inventoryOpen && pastInventoryOpen > 1) {
-      String message = "insufficient inventory-click (inventory not open)";
-      Violation violation = Violation.builderFor(InventoryClickAnalysis.class)
-        .forPlayer(player).withMessage(message)
-        .withVL(1)
-        .build();
-      plugin.violationProcessor().processViolation(violation);
-      event.setCancelled(true);
-    }
+    // has false positives, no easy fix available currently
+
+//    if (inventoryData.forceInventoryOnClickOpen && !inventoryOpen && pastInventoryOpen > 1) {
+//      String message = "insufficient inventory-click (inventory not open)";
+//      Violation violation = Violation.builderFor(InventoryClickAnalysis.class)
+//        .forPlayer(player).withMessage(message)
+//        .withVL(1)
+//        .build();
+//      plugin.violationProcessor().processViolation(violation);
+//      event.setCancelled(true);
+//    }
   }
 }
