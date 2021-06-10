@@ -492,7 +492,7 @@ public final class Physics extends IntaveCheck {
       String received = formatPosition(receivedMotionX, receivedMotionY, receivedMotionZ);
       String expected = formatPosition(predictedX, predictedY, predictedZ);
       String message = "moved incorrectly";
-      String details = received + " predict: " + expected;
+      String details = received + " pred: " + expected;
 
       if (velocityDetected) {
         details += ", strict";
