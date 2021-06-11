@@ -34,7 +34,7 @@ import java.util.Locale;
 import static de.jpx3.intave.event.entity.ClientSideEntityService.entityByIdentifier;
 import static de.jpx3.intave.event.packet.PacketId.Client.*;
 import static de.jpx3.intave.event.violation.Violation.ViolationFlags.DONT_PROCESS_VIOSTAT;
-import static de.jpx3.intave.user.UserMetaClientData.PROTOCOL_VERSION_COMBAT_UPDATE;
+import static de.jpx3.intave.user.UserMetaClientData.VER_1_9;
 
 public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackRaytraceMeta> {
   private final IntavePlugin plugin;
@@ -78,7 +78,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
           shouldResend = true;
         } else {
           if ((entity.clientSynchronized && !movementData.recentlyEncounteredFlyingPacket(2) && attackRaytraceMeta.lastFlyPacketCounterReach > 1)
-            || clientData.protocolVersion() == UserMetaClientData.PROTOCOL_VERSION_BOUNTIFUL_UPDATE) {
+            || clientData.protocolVersion() == UserMetaClientData.VER_1_8) {
             shouldResend = validReachWalking(user, entity);
           } else {
             shouldResend = validReachStanding(user, entity);
@@ -129,7 +129,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
         if (health > 0) {
           // bypass when the entity is null or on entities which are riding and players which are mounted on entities
           if(entity != null && entity.mountedEntity() == null && entity.isEntityLiving) {
-            if (clientData.protocolVersion() >= PROTOCOL_VERSION_COMBAT_UPDATE) {
+            if (clientData.protocolVersion() >= VER_1_9) {
               // >= 1.9.x
               if (entity.clientSynchronized
                 && !movementData.recentlyEncounteredFlyingPacket(2)
@@ -244,7 +244,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
     UserMetaPunishmentData punishmentData = meta.punishmentData();
 
     double blockReachDistance = Raytracer.reachDistance(player.getGameMode() == GameMode.CREATIVE);
-    boolean alternativePositionY = clientData.protocolVersion() == UserMetaClientData.PROTOCOL_VERSION_BOUNTIFUL_UPDATE;
+    boolean alternativePositionY = clientData.protocolVersion() == UserMetaClientData.VER_1_8;
     boolean hasAlwaysMouseDelayFix = clientData.protocolVersion() >= 314;
     float rotationYaw = movementData.rotationYaw % 360f;
     float lastRotationYaw = movementData.lastRotationYaw % 360f;
@@ -411,7 +411,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
     Player player = user.player();
     User.UserMeta meta = user.meta();
     UserMetaClientData clientData = meta.clientData();
-    boolean alternativePositionY = clientData.protocolVersion() == UserMetaClientData.PROTOCOL_VERSION_BOUNTIFUL_UPDATE;
+    boolean alternativePositionY = clientData.protocolVersion() == UserMetaClientData.VER_1_8;
     UserMetaMovementData movementData = meta.movementData();
     float rotationYaw = movementData.rotationYaw % 360;
     float lastRotationYaw = movementData.lastRotationYaw % 360;
@@ -458,7 +458,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
 
     // when standing still
     if (movementData.recentlyEncounteredFlyingPacket(1)
-      && user.meta().clientData().protocolVersion() >= UserMetaClientData.PROTOCOL_VERSION_COMBAT_UPDATE) {
+      && user.meta().clientData().protocolVersion() >= VER_1_9) {
       for (WrappedEntity.EntityPositionContext possiblePosition : entity.positionHistory) {
         // TODO: 01/07/21 add general packet based length tolerance
         clonedEntity.position = possiblePosition.clone();
