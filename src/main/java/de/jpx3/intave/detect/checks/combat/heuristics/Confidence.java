@@ -5,7 +5,7 @@ import java.util.Arrays;
 public enum Confidence {
   CERTAIN("!!", 100000),
   VERY_LIKELY("!", 320),
-  LIKELY("?!", 160),
+  LIKELY("?!", 80),
   PROBABLE("?", 40),
   MAYBE("??", 10),
   NONE("-", 0),
