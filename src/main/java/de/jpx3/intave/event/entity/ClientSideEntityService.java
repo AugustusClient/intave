@@ -557,8 +557,9 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
   private void synchronizePlayerHealth(Player player, PacketContainer packet) {
     Float health = readHealthOf(packet.getWatchableCollectionModifier().read(0));
     if (health != null) {
+      UserMetaAbilityData abilityData = UserRepository.userOf(player).meta().abilityData();
+      abilityData.unsynchroniszedHealth = health;
       plugin.eventService().feedback().singleSynchronize(player, health, (p, retrievedHealth) -> {
-        UserMetaAbilityData abilityData = UserRepository.userOf(p).meta().abilityData();
         abilityData.health = retrievedHealth;
         abilityData.ticksToLastHealthUpdate = 0;
       });

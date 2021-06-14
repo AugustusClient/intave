@@ -4,6 +4,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
+import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.detect.CheckStatistics;
 import de.jpx3.intave.detect.CheckViolationLevelDecrementer;
@@ -14,6 +15,7 @@ import de.jpx3.intave.event.packet.PacketSubscription;
 import de.jpx3.intave.event.violation.AttackNerfStrategy;
 import de.jpx3.intave.event.violation.Violation;
 import de.jpx3.intave.event.violation.ViolationContext;
+import de.jpx3.intave.logging.IntaveLogger;
 import de.jpx3.intave.tools.MathHelper;
 import de.jpx3.intave.tools.annotate.Native;
 import de.jpx3.intave.tools.sync.Synchronizer;
@@ -70,7 +72,10 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
       UserMetaMovementData movementData = user.meta().movementData();
       WrappedEntity entity = entityByIdentifier(user, entityId);
       UserMetaClientData clientData = user.meta().clientData();
-      if (entity == null) {
+      UserMetaAbilityData abilityData = user.meta().abilityData();
+      float unsynchroniszedHealth = abilityData.unsynchroniszedHealth;
+
+      if (entity == null || unsynchroniszedHealth <= 0) {
         shouldResend = true;
       } else {
         if (movementData.lastTeleport == 0 || violationLevelData.isInActiveTeleportBundle) {
@@ -121,13 +126,13 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
       WrappedEntity entity = entityByIdentifier(user, remainingAttack.entityId());
       Boolean cancelHit = null;
       UserMetaAbilityData abilityData = user.meta().abilityData();
-      float health = abilityData.health;
+      float unsynchroniszedHealth = abilityData.unsynchroniszedHealth;
 
-      if(!player.isInsideVehicle()) {
-        // stops raytrace if the entity is null or the player is in the death screen
-        if (health > 0) {
-          // bypass when the entity is null or on entities which are riding and players which are mounted on entities
-          if(entity != null && entity.mountedEntity() == null && entity.isEntityLiving) {
+      // stops raytrace if the entity is null or the player is in the death screen
+      if (unsynchroniszedHealth > 0) {
+        // bypass when the entity is null or on entities which are riding and players which are mounted on entities
+        if(entity != null) {
+          if (entity.mountedEntity() == null && !player.isInsideVehicle() && entity.isEntityLiving) {
             if (clientData.protocolVersion() >= VER_1_9) {
               // >= 1.9.x
               if (entity.clientSynchronized
@@ -140,8 +145,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
                 // 1.9+ beim still stehen oder wenn das entity nicht synchronisiert ist
                 cancelHit = processIterativeReachCheck(player, entity);
               }
-            } else
-            /*if (clientData.protocolVersion() <= PROTOCOL_VERSION_BOUNTIFUL_UPDATE) */{
+            } else {
               // <= 1.8.9
               if (!entity.clientSynchronized) {
                 // 1.8.x wenn das entity nicht synchronisiert ist
@@ -157,12 +161,12 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
 
             if (cancelHit) {
               statisticApply(user, CheckStatistics::increaseFails);
-            } else {
-              statisticApply(user, CheckStatistics::increasePasses);
             }
           }
         } else {
-          cancelHit = true;
+          if(IntaveControl.DISABLE_LICENSE_CHECK) {
+            IntaveLogger.logger().error(player.getName() + " attacked a null entity");
+          }
           Synchronizer.synchronize(new Runnable() {
             @Native
             @Override
@@ -170,18 +174,22 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
               for (Player authenticatedPlayer : Bukkit.getOnlinePlayers()) {
                 if (plugin.sibylIntegrationService().isAuthenticated(authenticatedPlayer)) {
                   String message;
-                  message = ChatColor.RED + "[R] " + player.getName() + " attacked entity while being dead";
+                  message = ChatColor.RED + "[R] " + player.getName() + " attacked a null entity";
                   authenticatedPlayer.sendMessage(message);
                 }
               }
             }
           });
         }
+      } else {
+        cancelHit = true;
       }
       if(cancelHit == null || !cancelHit) {
         if (!violationLevelData.isInActiveTeleportBundle && remainingAttack.shouldResend) {
           receiveExcludedPacket(player, remainingAttack.packet);
         }
+        // increaseFails should not be increased here because hits can be canceled when health are under 0
+        statisticApply(user, CheckStatistics::increasePasses);
       }
     }
     remainingAttacks.clear();
