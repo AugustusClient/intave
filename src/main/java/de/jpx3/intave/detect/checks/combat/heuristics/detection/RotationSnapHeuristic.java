@@ -335,6 +335,9 @@ public class RotationSnapHeuristic extends IntaveMetaCheckPart<Heuristics, Rotat
       vl /= 2;
     }
 
+    // added the division because there are false flaggs when a player has less than 20 fps
+    vl /= 3;
+
     return Math.min(160, vl);
   }
 
