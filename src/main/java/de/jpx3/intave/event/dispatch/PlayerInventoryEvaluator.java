@@ -1,5 +1,6 @@
 package de.jpx3.intave.event.dispatch;
 
+import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
@@ -25,6 +26,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.lang.reflect.InvocationTargetException;
 
 import static de.jpx3.intave.event.packet.PacketId.Client.HELD_ITEM_SLOT;
 import static de.jpx3.intave.event.packet.PacketId.Client.*;
@@ -288,12 +291,25 @@ public final class PlayerInventoryEvaluator implements PacketEventSubscriber, Bu
     PacketContainer packet = event.getPacket();
     EnumWrappers.PlayerDigType digType = packet.getPlayerDigTypes().read(0);
 
+    boolean usedFoodItem = inventoryData.foodItem() && inventoryData.handActive();
     switch (digType) {
       case RELEASE_USE_ITEM:
       case DROP_ALL_ITEMS:
       case DROP_ITEM: {
         inventoryData.deactivateHand();
         break;
+      }
+    }
+
+    // Fix eating while sprinting bug: https://www.youtube.com/watch?v=5ZHMrVmtdNY
+    if (digType == EnumWrappers.PlayerDigType.DROP_ITEM && usedFoodItem) {
+      PacketContainer unblockPacket = packet.deepClone();
+      unblockPacket.getPlayerDigTypes().write(0, EnumWrappers.PlayerDigType.RELEASE_USE_ITEM);
+      try {
+        user.ignoreNextPacket();
+        ProtocolLibrary.getProtocolManager().recieveClientPacket(player, unblockPacket);
+      } catch (IllegalAccessException | InvocationTargetException e) {
+        e.printStackTrace();
       }
     }
   }
