@@ -13,7 +13,7 @@ import de.jpx3.intave.user.UserCustomCheckMeta;
 import de.jpx3.intave.user.UserMetaMovementData;
 import org.bukkit.entity.Player;
 
-import static de.jpx3.intave.event.packet.PacketId.Client.ENTITY_ACTION;
+import static de.jpx3.intave.event.packet.PacketId.Client.*;
 
 public final class DoubleEntityActionHeuristic extends IntaveMetaCheckPart<Heuristics, DoubleEntityActionHeuristic.DoubleEntityActionHeuristicMeta> {
 
@@ -55,7 +55,8 @@ public final class DoubleEntityActionHeuristic extends IntaveMetaCheckPart<Heuri
       }
     }
 
-    if(message != null) {
+    DoubleEntityActionHeuristicMeta meta = metaOf(user);
+    if(message != null && meta.ticksSinceJoin > 10) {
       // Be careful before setting a confidence because it false flags when reloading the server
       Anomaly anomaly = Anomaly.anomalyOf("190",
         Confidence.NONE,
@@ -66,6 +67,20 @@ public final class DoubleEntityActionHeuristic extends IntaveMetaCheckPart<Heuri
     }
   }
 
+  @PacketSubscription(
+    packetsIn = {
+      POSITION, POSITION_LOOK
+    }
+  )
+  public void receivePositonPacket(PacketEvent event) {
+    Player player = event.getPlayer();
+    User user = userOf(player);
+    DoubleEntityActionHeuristicMeta meta = metaOf(user);
+
+    meta.ticksSinceJoin++;
+  }
+
   public static class DoubleEntityActionHeuristicMeta extends UserCustomCheckMeta {
+    int ticksSinceJoin = 0;
   }
 }
