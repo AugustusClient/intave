@@ -129,6 +129,11 @@ public final class SameRotationHeuristic extends IntaveMetaCheckPart<Heuristics,
     // Guckt ob die rotation die ein Spieler hat schon mal zuvor gesendet wurde wärend der Spieler sich schnell gedreht hat
     boolean containedPitch = meta.pitchRotations.contains(meta.lastTick.pitch);
 
+    if(Math.abs(meta.lastTick.pitchMotion) > 35 && Math.abs(meta.lastTick.pitchMotion) < 38) {
+      // This is a fix for the Labymod bug where the rotation Pitch gets send to the server when selecting the Emote with the "x" key ingame
+      return;
+    }
+
     if (containedPitch && Math.abs(meta.lastTick.pitch) != 90) {
       String description = "same rotation (Pitch:" + meta.lastTick.pitch + ", PitchMotion:" + MathHelper.formatDouble(meta.lastTick.pitchMotion, 2) + ")";
       Anomaly anomaly = Anomaly.anomalyOf("181", Confidence.NONE, Anomaly.Type.KILLAURA, description, options());
