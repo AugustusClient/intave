@@ -13,6 +13,7 @@ import de.jpx3.intave.tools.items.InventoryUseItemHelper;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.user.*;
 import de.jpx3.intave.world.collision.Collision;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -79,7 +80,9 @@ public final class SprintResetHeuristic extends IntaveMetaCheckPart<Heuristics, 
     SprintResetHeuristicMeta meta = metaOf(user);
 
     if(meta.stopSprint) {
-      playerUnsprinted(player, meta, event.getPacketType());
+      if(!user.meta().abilityData().inGameMode(GameMode.CREATIVE)) {
+        playerUnsprinted(player, meta);
+      }
     }
     if(meta.startSprint) {
       playerStartSprinting( meta);
@@ -103,7 +106,7 @@ public final class SprintResetHeuristic extends IntaveMetaCheckPart<Heuristics, 
     meta.sprintingTicksLeft = 600;
   }
 
-  private void playerUnsprinted(Player player, SprintResetHeuristicMeta meta, PacketType packetType) {
+  private void playerUnsprinted(Player player, SprintResetHeuristicMeta meta) {
     User user = userOf(player);
     UserMetaInventoryData inventoryData = user.meta().inventoryData();
     ItemStack heldItem = inventoryData.heldItem();
