@@ -45,8 +45,14 @@ public final class Raytracer {
     }
   }
 
-  public static float reachDistance(boolean creative) {
-    return creative ? 5.0F : 3.0F;
+  public static float reachDistance(Player player) {
+    return reachDistance(UserRepository.userOf(player));
+  }
+  public static float reachDistance(User user) {
+    return reachDistance(user.meta());
+  }
+  public static float reachDistance(User.UserMeta meta) {
+    return meta.abilityData().inGameMode(GameMode.CREATIVE) ? 5.0F : 3.0F;
   }
 
   /**
@@ -59,7 +65,7 @@ public final class Raytracer {
     float lastRotationYaw,
     float rotationYaw, float rotationPitch,
     double expandHitbox, boolean withoutMouseDelayFix) {
-    double blockReachDistance = reachDistance(player.getGameMode() == GameMode.CREATIVE);
+    double blockReachDistance = Raytracer.reachDistance(player);
 //    float rotationYaw = movementData.rotationYaw % 360;
 
     // mouse delay fix
@@ -145,7 +151,7 @@ public final class Raytracer {
     Timings.SERVICE_RAYTRACER_ENTITY.start();
     WrappedVector eyeVector = positionEyes(player, prevPosX, prevPosY, prevPosZ);
     double blockReachDistance = 6d;
-    double attackReachDistance = reachDistance(UserRepository.userOf(player).meta().abilityData().inGameMode(GameMode.CREATIVE));
+    double attackReachDistance = reachDistance(player);
     double lastReach = 10;
     WrappedVector lastHitVec = null;
     for(boolean fastMath : BOOLEANSTATES) {

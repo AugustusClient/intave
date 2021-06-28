@@ -213,7 +213,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
   private boolean validReachStanding(User user, WrappedEntity entity) {
     Player player = user.player();
     double minReach = findLowestPossibleReachIterative(user, entity, false, true);
-    double blockReachDistance = Raytracer.reachDistance(player.getGameMode() == GameMode.CREATIVE);
+    double blockReachDistance = Raytracer.reachDistance(player);
 
     return minReach > blockReachDistance;
   }
@@ -221,7 +221,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
   private boolean validReachWalking(User user, WrappedEntity entity) {
     UserMetaMovementData movementData = user.meta().movementData();
     Player player = user.player();
-    double blockReachDistance = Raytracer.reachDistance(player.getGameMode() == GameMode.CREATIVE);
+    double blockReachDistance = Raytracer.reachDistance(player);
     float rotationYaw = movementData.rotationYaw % 360;
 
     // mouse delay fix
@@ -250,7 +250,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
     UserMetaClientData clientData = meta.clientData();
     UserMetaPunishmentData punishmentData = meta.punishmentData();
 
-    double blockReachDistance = Raytracer.reachDistance(player.getGameMode() == GameMode.CREATIVE);
+    double blockReachDistance = Raytracer.reachDistance(meta);
     boolean alternativePositionY = clientData.protocolVersion() == UserMetaClientData.VER_1_8;
     boolean hasAlwaysMouseDelayFix = clientData.protocolVersion() >= 314;
     float rotationYaw = movementData.rotationYaw % 360f;
@@ -375,7 +375,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
     UserMetaMovementData movementData = meta.movementData();
     UserMetaClientData clientData = user.meta().clientData();
 
-    double blockReachDistance = Raytracer.reachDistance(player.getGameMode() == GameMode.CREATIVE);
+    double blockReachDistance = Raytracer.reachDistance(meta);
     boolean hasAlwaysMouseDelayFix = clientData.protocolVersion() >= 314;
     double minReach = findLowestPossibleReachIterative(user, attackedEntity, hasAlwaysMouseDelayFix, false);
     // TODO: 01/07/21 clear after last possible position
@@ -422,7 +422,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
     UserMetaMovementData movementData = meta.movementData();
     float rotationYaw = movementData.rotationYaw % 360;
     float lastRotationYaw = movementData.lastRotationYaw % 360;
-    double blockReachDistance = Raytracer.reachDistance(player.getGameMode() == GameMode.CREATIVE);
+    double blockReachDistance = Raytracer.reachDistance(meta);
 
     double minReach = 10;
     for (WrappedEntity.EntityPositionContext possiblePosition : clonedEntity.positionHistory) {
