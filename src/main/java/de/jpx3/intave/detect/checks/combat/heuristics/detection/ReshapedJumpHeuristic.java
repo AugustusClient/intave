@@ -75,7 +75,7 @@ public final class ReshapedJumpHeuristic extends IntaveMetaCheckPart<Heuristics,
         if (Math.abs(postDistance - 0.2) < leniency * 2) {
 //          if (heuristicMeta.balance++ >= 1) {
           heuristicMeta.balance++;
-            String description = "xz-motion not corrected with jump vl:" + MathHelper.formatDouble(heuristicMeta.balance, 1);
+            String description = "horizontal motion corrected with jump vl:" + MathHelper.formatDouble(heuristicMeta.balance, 1);
             if (recentlyAttacked) {
               description += " | attacked";
             }
