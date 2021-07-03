@@ -50,7 +50,6 @@ public final class IntaveCommandExecutionEvent extends IntaveEvent implements Ca
 
   public void setCommand(String command) {
     Preconditions.checkNotNull(command);
-
     this.command = command;
   }
 

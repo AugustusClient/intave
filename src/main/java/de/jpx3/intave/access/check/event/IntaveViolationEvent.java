@@ -84,7 +84,6 @@ public final class IntaveViolationEvent extends IntaveEvent implements Cancellab
 
   public void suggestReaction(Reaction reaction) {
     Preconditions.checkNotNull(reaction);
-
     this.reaction = reaction;
   }
 

@@ -152,7 +152,7 @@ public final class ViolationContext {
   ) {
     boolean enterprise = (UserMetaClientData.VERSION_DETAILS & 0x200) != 0;
     boolean partner = (UserMetaClientData.VERSION_DETAILS & 0x100) != 0;
-    boolean fullMessage = enterprise && type == ViolationPlaceholderContext.DetailScope.FULL;
+    boolean fullMessage = /*enterprise && */type == ViolationPlaceholderContext.DetailScope.FULL;
     return new ViolationPlaceholderContext(
       initialViolation.check().name(),
       initialViolation.message(),

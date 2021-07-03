@@ -46,12 +46,12 @@ public final class IntaveProxyStage extends CommandStage {
     permission = "intave.command.proxy",
     description = "Remotely kicks the target player from the proxy"
   )
-  public void proxyKick(CommandSender sender, Player target, @Optional String[] reasonParts) {
+  public void proxyKick(CommandSender sender, Player target, @Optional String[] message) {
     if (!plugin.proxyMessenger().isChannelOpen()) {
       sender.sendMessage(IntavePlugin.prefix() + ChatColor.RED + "Not connected to a proxy");
       return;
     }
-    String reason = reasonParts == null ? "None provided" : Arrays.stream(reasonParts).map(commandPart -> commandPart + " ").collect(Collectors.joining()).trim();
+    String reason = message == null ? "None provided" : Arrays.stream(message).map(commandPart -> commandPart + " ").collect(Collectors.joining()).trim();
     performPunishment(target, IntavePacketOutPunishment.PunishmentType.KICK, reason);
     sender.sendMessage(IntavePlugin.prefix() + "Remote kick execution issued");
   }

@@ -21,7 +21,7 @@ import java.util.function.Function;
 
 @Relocate
 public final class UserMetaPunishmentData {
-  private final static Function<Double, Double> GARBAGE_HITS_RANDOM_DISTRIBUTION_CURVE = CubicBezierCurve.identityCurve(0,.8,1,.2).functional(.005);
+  private final static Function<Double, Double> GARBAGE_HITS_RANDOM_DISTRIBUTION_CURVE = CubicBezierCurve.identityCurve(0,.8,1,.2).functionalMapBake(.005);
 
   public final static long DAMAGE_CANCEL_LIGHT_DURATION = 40_000;
   private final static long DAMAGE_CANCEL_MEDIUM_DURATION = 40_000;

@@ -20,6 +20,7 @@ import de.jpx3.intave.security.LicenseVerification;
 import de.jpx3.intave.tools.GarbageCollector;
 import de.jpx3.intave.tools.annotate.Native;
 import de.jpx3.intave.tools.sync.Synchronizer;
+import de.jpx3.intave.user.UserMessageSubscriptions;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.bukkit.entity.Player;
@@ -182,7 +183,8 @@ public final class SibylAuthentication implements BukkitEventSubscriber {
 
   @Native
   private void setAuthState(Player player, SibylAuthenticationState state) {
-//    IntaveLogger.logger().globalPrintLn("SIBYL AUTH STATE FOR " + player.getName() + " -> " + state);
+//    IntaveLogger.logger().info("SIBYL AUTH STATE FOR " + player.getName() + " -> " + state);
+    UserMessageSubscriptions.setSibyl(player, state == SibylAuthenticationState.ATH);
     authStates.put(player.getUniqueId(), state);
   }
 

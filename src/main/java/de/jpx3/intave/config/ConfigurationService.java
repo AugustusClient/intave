@@ -3,6 +3,7 @@ package de.jpx3.intave.config;
 import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.IntaveException;
+import de.jpx3.intave.logging.IntaveLogger;
 import de.jpx3.intave.tools.AccessHelper;
 import de.jpx3.intave.tools.annotate.Native;
 import de.jpx3.intave.user.UserMetaClientData;
@@ -44,7 +45,7 @@ public final class ConfigurationService {
       }
       return configurationIdentifier;
     } catch (FileNotFoundException exception) {
-      throw new IntaveException("It seems like Intave is unable to create the default configuration file");
+      throw new IntaveException("It seems like we are unable to create the default configuration file");
     } catch (InvalidConfigurationException | IOException exception) {
       throw new IntaveException("It seems like your configuration is invalid", exception);
     }
@@ -68,8 +69,10 @@ public final class ConfigurationService {
     if (requiredState == null ||  /* no connection to our servers */
       requiredState.equalsIgnoreCase(String.valueOf(latestKnownState)) /* configuration is up to date */
     ) {
+      IntaveLogger.logger().info("Loading configuration from cache");
       loader.loadConfiguration();
     } else {
+      IntaveLogger.logger().info("Loading configuration from server");
       loader.loadConfigurationUpdatedForcefully();
     }
   }

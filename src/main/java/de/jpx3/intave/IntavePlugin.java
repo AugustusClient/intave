@@ -460,24 +460,23 @@ public final class IntavePlugin extends JavaPlugin {
         }
       } else {
         boolean writeSuccessLog = true;
-        InputStream input = contextStatusResource.read();
-        Scanner scanner = new Scanner(input);
-        StringBuilder text = new StringBuilder();
-        while (scanner.hasNext()) {
-          text.append(scanner.next());
-        }
-        String textString = text.toString();
-        if (textString.startsWith("success")) {
-          Long lastSuccessfulStart = null;
-          try {
-            lastSuccessfulStart = Long.valueOf(textString.split("/")[1]);
-          } catch (Exception ignored) {}
-          if (lastSuccessfulStart != null) {
-            if (AccessHelper.now() - lastSuccessfulStart < TimeUnit.DAYS.toMillis(2)) {
-              writeSuccessLog = false;
+        try {
+          if (contextStatusResource.exists()) {
+            InputStream input = contextStatusResource.read();
+            Scanner scanner = new Scanner(input);
+            StringBuilder text = new StringBuilder();
+            while (scanner.hasNext()) {
+              text.append(scanner.next());
+            }
+            String textString = text.toString();
+            if (textString.startsWith("success")) {
+              Long lastSuccessfulStart = Long.valueOf(textString.split("/")[1]);
+              if (AccessHelper.now() - lastSuccessfulStart < TimeUnit.DAYS.toMillis(2)) {
+                writeSuccessLog = false;
+              }
             }
           }
-        }
+        } catch (Exception ignored) {}
         if (writeSuccessLog) {
           contextStatusResource.write(new ByteArrayInputStream(("success/" + AccessHelper.now()).getBytes(StandardCharsets.UTF_8)));
         }

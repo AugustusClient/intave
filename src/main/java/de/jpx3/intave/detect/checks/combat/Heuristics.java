@@ -21,10 +21,7 @@ import de.jpx3.intave.tools.AccessHelper;
 import de.jpx3.intave.tools.annotate.Native;
 import de.jpx3.intave.tools.annotate.Nullable;
 import de.jpx3.intave.tools.sync.Synchronizer;
-import de.jpx3.intave.user.User;
-import de.jpx3.intave.user.UserCustomCheckMeta;
-import de.jpx3.intave.user.UserMetaAttackData;
-import de.jpx3.intave.user.UserMetaClientData;
+import de.jpx3.intave.user.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
@@ -112,7 +109,7 @@ public final class Heuristics extends IntaveMetaCheck<Heuristics.HeuristicMeta> 
       IntaveLogger.logger().pushPrintln(message);
     }
 
-    for (Player authenticatedPlayer : Bukkit.getOnlinePlayers()) {
+    for (Player authenticatedPlayer : UserMessageSubscriptions.sibylReceivers()/*Bukkit.getOnlinePlayers()*/) {
       if (plugin.sibylIntegrationService().isAuthenticated(authenticatedPlayer)) {
         authenticatedPlayer.sendMessage(message);
       }

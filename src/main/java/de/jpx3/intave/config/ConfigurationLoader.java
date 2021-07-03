@@ -3,6 +3,7 @@ package de.jpx3.intave.config;
 import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.IntaveException;
+import de.jpx3.intave.logging.IntaveLogger;
 import de.jpx3.intave.security.ContextSecrets;
 import de.jpx3.intave.security.LicenseVerification;
 import de.jpx3.intave.security.SSLConnectionVerifier;
@@ -117,14 +118,17 @@ public final class ConfigurationLoader {
 
   @Native
   public void loadConfigurationUpdatedForcefully() {
+    IntaveLogger.logger().info("Downloading configuration..");
     YamlConfiguration configuration = tryDownloadConfiguration();
     if (configuration == null) {
+      IntaveLogger.logger().info("Download failed");
       try {
         configuration = (YamlConfiguration) readConfiguration();
       } catch (IllegalStateException exception) {
         throw new IllegalStateException("Unable to prepare configuration");
       }
     } else {
+      IntaveLogger.logger().info("Saving configuration..");
       saveConfiguration(configuration);
     }
     this.configuration = configuration;
@@ -134,6 +138,7 @@ public final class ConfigurationLoader {
   public void loadConfiguration() {
     YamlConfiguration configuration;
     if (!configurationCacheExists()) {
+      IntaveLogger.logger().info("No configuration found in cache? Downloading instead..");
       configuration = tryDownloadConfiguration();
       if (configuration == null) {
         try {
@@ -142,6 +147,7 @@ public final class ConfigurationLoader {
           throw new IllegalStateException("Unable to prepare configuration");
         }
       } else {
+        IntaveLogger.logger().info("Saving downloaded config to cache..");
         saveConfiguration(configuration);
       }
     } else {
@@ -152,6 +158,7 @@ public final class ConfigurationLoader {
         if (configuration == null) {
           throw exception;
         }
+        saveConfiguration(configuration);
       }
     }
     this.configuration = configuration;
@@ -242,7 +249,9 @@ public final class ConfigurationLoader {
     try {
       YamlConfiguration configuration = (YamlConfiguration) configurationObj;
       int state = configuration.getInt("state");
-      saveState(state);
+      if (state != latestState()) {
+        saveState(state);
+      }
       File configurationCache = configurationCache();
       if (configurationCache.exists()) {
         configurationCache.delete();

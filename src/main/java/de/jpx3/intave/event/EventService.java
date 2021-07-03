@@ -111,8 +111,9 @@ public final class EventService implements BukkitEventSubscriber {
 
   @BukkitEventSubscription
   public void on(PlayerQuitEvent quit) {
-    GarbageCollector.clear(quit.getPlayer());
-    GarbageCollector.clear(quit.getPlayer().getUniqueId());
+    Player player = quit.getPlayer();
+    GarbageCollector.clear(player);
+    GarbageCollector.clear(player.getUniqueId());
   }
 
   public void sendPrefixedMessage(String message, CommandSender target) {

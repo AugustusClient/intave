@@ -18,12 +18,12 @@ public final class CubicBezierCurve {
     this.end = new Point2d(endX, endZ);
   }
 
-  public Function<Double, Double> functional(double accuracy) {
-    Map<Double, Point2d> interpolation = interpolate(accuracy);
+  public Function<Double, Double> functionalMapBake(double accuracy) {
+    Map<Double, Point2d> interpolation = bakeToMap(accuracy);
     return x -> interpolation.get(Math.round(x * (1 / accuracy)) / (1 / accuracy)).posZ;
   }
 
-  public Map<Double, Point2d> interpolate(double accuracy) {
+  public Map<Double, Point2d> bakeToMap(double accuracy) {
     Map<Double, Point2d> traverse = new HashMap<>();
     for (double time = 0; time <= 1 + accuracy /* small overflow */; time += accuracy) {
       traverse.put(Math.round(time * (1 / accuracy)) / (1 / accuracy), animate(time));

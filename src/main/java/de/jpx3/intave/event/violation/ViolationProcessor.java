@@ -189,9 +189,9 @@ public final class ViolationProcessor {
     String vlAfterViolation = MathHelper.formatDouble(violationContext.violationLevelAfter(), 2);
     String message = violation.message().trim();
     String details = violation.details().isEmpty() ? "" : "(" + violation.details().trim() + ")" + " ";
-    if (!enterprise) {
-      details = "";
-    }
+//    if (!enterprise) {
+//      details = "";
+//    }
     String consoleMessage = String.format(
       LOGGER_MESSAGE_LAYOUT, player.getName(), trustFactor,
       message, details, vlAdded, vlAfterViolation, checkName
@@ -210,7 +210,7 @@ public final class ViolationProcessor {
       String checkName = violation.check().name().toLowerCase(Locale.ROOT);
       String threshold = violation.threshold();
       double violationLevelAfter = violationContext.violationLevelAfter();
-      violationMapOf(player).get(checkName).put(threshold, violationLevelAfter);
+      violationMapOf(player).computeIfAbsent(checkName, s -> new HashMap<>()).put(threshold, violationLevelAfter);
     } catch (Exception ignored) {}
   }
 
@@ -300,7 +300,7 @@ public final class ViolationProcessor {
 
   public void broadcastNotify(String fullMessage) {
     String notifyMessage = MessageFormatter.resolveNotifyReplacements(new TextContext(fullMessage));
-    for (Player allPlayers : Bukkit.getOnlinePlayers()) {
+    for (Player allPlayers : UserMessageSubscriptions.activeListenersOf(NOTIFY_MESSAGE_CHANNEL)/*Bukkit.getOnlinePlayers()*/) {
       User user = UserRepository.userOf(allPlayers);
       if (user.receives(NOTIFY_MESSAGE_CHANNEL)) {
         synchronizedMessage(allPlayers, notifyMessage);
@@ -322,7 +322,7 @@ public final class ViolationProcessor {
     UserMessageChannel channel,
     String message
   ) {
-    for (Player allPlayers : Bukkit.getOnlinePlayers()) {
+    for (Player allPlayers : UserMessageSubscriptions.activeListenersOf(channel)/*Bukkit.getOnlinePlayers()*/) {
       User allUsers = UserRepository.userOf(allPlayers);
       if (!allUsers.receives(channel)) {
         continue;

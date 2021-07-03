@@ -15,7 +15,6 @@ import de.jpx3.intave.access.player.trust.TrustFactor;
 import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.detect.CheckViolationLevelDecrementer;
 import de.jpx3.intave.detect.IntaveMetaCheck;
-import de.jpx3.intave.detect.checks.movement.physics.MotionVector;
 import de.jpx3.intave.event.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.event.dispatch.PlayerAbilityEvaluator;
 import de.jpx3.intave.event.packet.ListenerPriority;
@@ -783,7 +782,7 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
   }
 
   private void writeBlockPosition(PacketContainer packet, BlockPosition blockPosition) {
-    if (BLOCK_DATA_WRAPPED_IN_MOVING_OBJECT_POSITION) {
+    if (BLOCK_DATA_WRAPPED_IN_MOVING_OBJECT_POSITION && !packet.getType().equals(PacketType.Play.Client.BLOCK_DIG)) {
       MovingObjectPositionBlock movingObjectPositionBlock = packet.getMovingBlockPositions().readSafely(0);
       movingObjectPositionBlock.setBlockPosition(blockPosition);
     } else {
@@ -802,7 +801,7 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
   }
 
   private void writeEnumDirection(PacketContainer packet, WrappedEnumDirection enumDirection) {
-    if (BLOCK_DATA_WRAPPED_IN_MOVING_OBJECT_POSITION) {
+    if (BLOCK_DATA_WRAPPED_IN_MOVING_OBJECT_POSITION && !packet.getType().equals(PacketType.Play.Client.BLOCK_DIG)) {
       MovingObjectPositionBlock movingObjectPositionBlock = packet.getMovingBlockPositions().readSafely(0);
       movingObjectPositionBlock.setDirection(enumDirection.toDirection());
     } else {
@@ -812,15 +811,6 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
         packet.getIntegers().write(0, enumDirection.getIndex());
       }
     }
-  }
-
-  private Vector resolvePositionMotion(User user, MotionVector vector) {
-    UserMetaMovementData movementData = user.meta().movementData();
-    return new Vector(
-      movementData.positionX + vector.motionX,
-      movementData.positionY + vector.motionY,
-      movementData.positionZ + vector.motionZ
-    );
   }
 
   public enum InteractionType {

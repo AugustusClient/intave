@@ -8,10 +8,10 @@ import de.jpx3.intave.logging.IntaveLogger;
 import de.jpx3.intave.tools.annotate.Native;
 import de.jpx3.intave.tools.sync.Synchronizer;
 import de.jpx3.intave.user.User;
+import de.jpx3.intave.user.UserMessageSubscriptions;
 import de.jpx3.intave.user.UserMetaPunishmentData;
 import de.jpx3.intave.user.UserMetaPunishmentData.AttackNerfer;
 import de.jpx3.intave.user.UserRepository;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -78,7 +78,7 @@ public final class CombatMitigator implements BukkitEventSubscriber {
       IntaveLogger.logger().pushPrintln("[Intave] " + ChatColor.stripColor(message));
     }
 
-    for (Player authenticatedPlayer : Bukkit.getOnlinePlayers()) {
+    for (Player authenticatedPlayer : UserMessageSubscriptions.sibylReceivers()/*Bukkit.getOnlinePlayers()*/) {
       if (plugin.sibylIntegrationService().isAuthenticated(authenticatedPlayer)) {
         authenticatedPlayer.sendMessage(message);
       }

@@ -229,7 +229,8 @@ public final class User {
   public void setDefaultMessagingChannel() {
     for (UserMessageChannel channel : UserMessageChannel.values()) {
       if (channel.enabledByDefault && BukkitPermissionCheck.permissionCheck(player(), channel.permission())) {
-        receivingUserChannels.add(channel);
+//        receivingUserChannels.add(channel);
+        toggleReceive(channel);
       }
     }
   }
@@ -249,12 +250,14 @@ public final class User {
     if (!hasPlayer) {
       return;
     }
-    if (receives(channel)) {
+    boolean remove = receives(channel);
+    if (remove) {
       receivingUserChannels.remove(channel);
     } else {
       receivingUserChannels.add(channel);
       removeChannelConstraint(channel);
     }
+    UserMessageSubscriptions.setChannelActivation(player(), channel, !remove);
   }
 
   public void setChannelConstraint(UserMessageChannel channel, Predicate<Player> constraint) {
@@ -316,7 +319,7 @@ public final class User {
   }
 
   public void synchronizedDisconnect(String reason) {
-    if (!hasOnlinePlayer()) {
+    if (!hasPlayer) {
       return;
     }
     IntaveLogger.logger().info("Performed manual disconnect of player " + player().getName() + " with reason \"" + reason + "\"");
@@ -333,6 +336,11 @@ public final class User {
       fakePlayer.despawn();
     }
     EntityNoDamageTickChanger.removeNoDamageTickChangeOf(this);
+    if (hasPlayer) {
+      for (UserMessageChannel value : UserMessageChannel.values()) {
+        UserMessageSubscriptions.setChannelActivation(player(), value, false);
+      }
+    }
   }
 
   public void refreshSprintState() {

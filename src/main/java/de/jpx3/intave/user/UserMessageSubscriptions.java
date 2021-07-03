@@ -1,0 +1,45 @@
+package de.jpx3.intave.user;
+
+import de.jpx3.intave.tools.GarbageCollector;
+import org.bukkit.entity.Player;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+public final class UserMessageSubscriptions {
+  private final static Collection<Player> sibylRepo = GarbageCollector.watch(new CopyOnWriteArrayList<>());
+
+  public static Collection<? extends Player> sibylReceivers() {
+    return sibylRepo;
+  }
+
+  public static void setSibyl(Player player, boolean sibyl) {
+    if(sibyl) {
+      if (!sibylRepo.contains(player)) {
+        sibylRepo.add(player);
+      }
+    } else {
+      sibylRepo.remove(player);
+    }
+  }
+
+  private final static Map<UserMessageChannel, List<Player>> messageChannelSubscriptions = new ConcurrentHashMap<>();
+
+  public static Iterable<? extends Player> activeListenersOf(UserMessageChannel channel) {
+    return messageChannelSubscriptions.get(channel);
+  }
+
+  public static void setChannelActivation(Player player, UserMessageChannel channel, boolean status) {
+    List<Player> players = messageChannelSubscriptions.computeIfAbsent(channel, channel1 -> new CopyOnWriteArrayList<>());
+    if (status) {
+      if (!players.contains(player)) {
+        players.add(player);
+      }
+    } else {
+      players.remove(player);
+    }
+  }
+}
