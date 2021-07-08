@@ -5,7 +5,7 @@ import org.bukkit.Material;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class BlockSlipperiness {
+public final class Slipperiness {
   private static final Map<Material, Float> registry = new HashMap<>();
 
   public static void setup() {

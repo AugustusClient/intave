@@ -33,7 +33,6 @@ public final class v13BoundingBoxResolver implements BoundingBoxResolvePipeline 
     WorldServer handle = ((CraftWorld) world).getHandle();
     BlockPosition blockPosition = new BlockPosition(posX, posY, posZ);
     IBlockData blockData = CraftMagicNumbers.getBlock(type, (byte) blockState);
-
     if (blockData == null) {
       return Collections.emptyList();
     }

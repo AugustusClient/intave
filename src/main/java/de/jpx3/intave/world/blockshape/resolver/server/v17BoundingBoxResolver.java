@@ -31,7 +31,6 @@ public final class v17BoundingBoxResolver implements BoundingBoxResolvePipeline 
     Location location = new Location(world, posX, posY, posZ);
     org.bukkit.block.Block block = BukkitBlockAccess.blockAccess(location);
     return customResolve(world, player, type, BlockDataAccess.dataAccess(block), posX, posY, posZ);
-//    return new ArrayList<>();
   }
 
   private final static boolean NEW_MATERIAL_PROCESSING = MinecraftVersions.VER1_14_0.atOrAbove();
@@ -43,9 +42,9 @@ public final class v17BoundingBoxResolver implements BoundingBoxResolvePipeline 
     BlockPosition blockPosition = new BlockPosition(posX, posY, posZ);
     IBlockData blockData;
     if (NEW_MATERIAL_PROCESSING) {
-      blockData = CraftMagicNumbers.getBlock(type, (byte) blockState);
-    } else {
       blockData = (IBlockData) RuntimeBlockDataIndexer.modernStateFromIndex(type, blockState);
+    } else {
+      blockData = CraftMagicNumbers.getBlock(type, (byte) blockState);
     }
     if (blockData == null) {
       return Collections.emptyList();
@@ -56,7 +55,6 @@ public final class v17BoundingBoxResolver implements BoundingBoxResolvePipeline 
       return Collections.emptyList();
     }
     return translate(nativeBoxes, posX, posY, posZ);
-//    return new ArrayList<>();
   }
 
   private List<WrappedAxisAlignedBB> translate(List<?> bbs, int posX, int posY, int posZ) {

@@ -165,11 +165,6 @@ public final class MultiChunkKeyOCBlockShapeAccess implements OCBlockShapeAccess
 
   @Override
   public void invalidate0(int posX, int posY, int posZ) {
-//    int chunkX = this.originChunkX;
-//    int chunkZ = this.originChunkZ;
-//    if (posX < chunkX || posZ < chunkZ || chunkX + 16 <= posX || chunkZ + 16 <= posZ) {
-//      return;
-//    }
     blockCache.remove(bigKey(posX, posY, posZ));
   }
 

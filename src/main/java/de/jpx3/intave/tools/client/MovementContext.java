@@ -5,8 +5,8 @@ import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import de.jpx3.intave.user.*;
 import de.jpx3.intave.world.blockaccess.BlockTypeAccess;
 import de.jpx3.intave.world.blockaccess.BukkitBlockAccess;
-import de.jpx3.intave.world.blockphysics.BlockSlipperiness;
 import de.jpx3.intave.world.blockphysics.ClimbableBlocks;
+import de.jpx3.intave.world.blockphysics.Slipperiness;
 import de.jpx3.intave.world.collision.Collision;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -54,7 +54,7 @@ public final class MovementContext {
 
   public static float currentSlipperiness(User user, Location location) {
     Material type = BukkitBlockAccess.cacheAppliedTypeAccess(user, location);
-    return BlockSlipperiness.ofType(type) * 0.91f;
+    return Slipperiness.ofType(type) * 0.91f;
   }
 
   public static boolean isOffsetPositionInLiquid(

@@ -24,11 +24,10 @@ final class BlockPhysicWeb implements BlockPhysic {
 
   @Override
   public Vector entityCollidedWithBlock(User user, Location location, Location from, double motionX, double motionY, double motionZ) {
+    UserMetaClientData clientData = user.meta().clientData();
     UserMetaMovementData movementData = user.meta().movementData();
     movementData.inWeb = true;
     movementData.artificialFallDistance = 0;
-
-    UserMetaClientData clientData = user.meta().clientData();
     if (clientData.protocolVersion() >= VER_1_15) {
       return new Vector(motionX * 0.25, motionY * 0.05f, motionZ * 0.25);
     }

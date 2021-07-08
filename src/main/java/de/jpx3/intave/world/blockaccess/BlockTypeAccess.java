@@ -50,8 +50,7 @@ public final class BlockTypeAccess {
   /**
    * This method performs a direct type lookup, which will be quite heavy
    * if the underlying chunk has not been loaded yet.
-   *
-   * To avoid performance-bottlenecks, use <code>{@link BukkitBlockAccess#cacheAppliedTypeAccess(User, World, int, int, int)}</code> instead,
+   * To avoid performance-bottlenecks, use {@link BukkitBlockAccess#cacheAppliedTypeAccess(User, World, int, int, int)} instead,
    * providing fast performance, cache implementation and stable chunk fallback
    */
   @Deprecated
@@ -62,8 +61,7 @@ public final class BlockTypeAccess {
   /**
    * This method performs a direct type lookup, which will be quite heavy
    * if the underlying chunk has not been loaded yet.
-   *
-   * To avoid performance-bottlenecks, use <code>{@link BukkitBlockAccess#cacheAppliedTypeAccess(User, World, int, int, int)}</code> instead,
+   * To avoid performance-bottlenecks, use {@link BukkitBlockAccess#cacheAppliedTypeAccess(User, World, int, int, int)} instead,
    * providing fast performance, cache implementation and stable chunk fallback
    */
   @Deprecated
