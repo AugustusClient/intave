@@ -35,11 +35,11 @@ public abstract class BlockStateData<T> {
   public static final class BlockStateServerBridge {
     private final static boolean INTERFACE_RESOLVE = !MinecraftVersions.VER1_14_0.atOrAbove();
 
-    @PatchyAutoTranslation
     public static <T> T valueOf(Block block, BlockStateData<T> blockStateData) {
       return INTERFACE_RESOLVE ? invokeInterfaceResolve(block, blockStateData) : invokeSpecialResolve(block, blockStateData);
     }
 
+    @PatchyAutoTranslation
     private static <T> T invokeSpecialResolve(Block block, BlockStateData<T> blockStateData) {
       CraftBlock craftBlock = (CraftBlock) block;
       CraftBlockData craftBlockData = (CraftBlockData) craftBlock.getBlockData();
@@ -55,6 +55,7 @@ public abstract class BlockStateData<T> {
     }
 
     // Fixes an IncompatibleClassChangeError
+    @PatchyAutoTranslation
     private static <T> T invokeInterfaceResolve(Block block, BlockStateData<T> blockStateData) {
       org.bukkit.craftbukkit.v1_13_R2.block.CraftBlock craftBlock = (org.bukkit.craftbukkit.v1_13_R2.block.CraftBlock) block;
       org.bukkit.craftbukkit.v1_13_R2.block.data.CraftBlockData craftBlockData = (org.bukkit.craftbukkit.v1_13_R2.block.data.CraftBlockData) craftBlock.getBlockData();
