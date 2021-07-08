@@ -17,7 +17,7 @@ public final class UserMessageSubscriptions {
   }
 
   public static void setSibyl(Player player, boolean sibyl) {
-    if(sibyl) {
+    if (sibyl) {
       if (!sibylRepo.contains(player)) {
         sibylRepo.add(player);
       }
@@ -28,12 +28,12 @@ public final class UserMessageSubscriptions {
 
   private final static Map<UserMessageChannel, List<Player>> messageChannelSubscriptions = new ConcurrentHashMap<>();
 
-  public static Iterable<? extends Player> activeListenersOf(UserMessageChannel channel) {
+  public static Collection<? extends Player> activeListenersOf(UserMessageChannel channel) {
     return messageChannelSubscriptions.computeIfAbsent(channel, theChannel -> new CopyOnWriteArrayList<>());
   }
 
   public static void setChannelActivation(Player player, UserMessageChannel channel, boolean status) {
-    List<Player> players = messageChannelSubscriptions.computeIfAbsent(channel, theChannel -> new CopyOnWriteArrayList<>());
+    Collection<Player> players = messageChannelSubscriptions.computeIfAbsent(channel, theChannel -> new CopyOnWriteArrayList<>());
     if (status) {
       if (!players.contains(player)) {
         players.add(player);

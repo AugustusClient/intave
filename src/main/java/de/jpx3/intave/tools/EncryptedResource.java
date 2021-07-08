@@ -3,6 +3,7 @@ package de.jpx3.intave.tools;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.IntaveInternalException;
 import de.jpx3.intave.security.ContextSecrets;
+import de.jpx3.intave.security.HashAccess;
 import de.jpx3.intave.tools.annotate.Native;
 
 import javax.crypto.Cipher;
@@ -14,7 +15,10 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.util.Locale;
@@ -26,6 +30,9 @@ public final class EncryptedResource {
   private final static int CLASS_VERSION = 4;
   private final String name;
   private final boolean versionDependent;
+
+  private FileLock lock;
+  private FileChannel lockChannel;
 
   public EncryptedResource(String name, boolean versionDependent) {
     this.name = name;
@@ -39,14 +46,10 @@ public final class EncryptedResource {
     }
     fileStore().setLastModified(AccessHelper.now());
     try {
-      FileInputStream fileInputStream = new FileInputStream(fileStore());
+
+      FileChannel fileInputStream = acquireFile();//new FileInputStream(fileStore());
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-      byte[] buf = new byte[4096];
-      int read;
-      while ((read = fileInputStream.read(buf)) != -1) {
-        byteArrayOutputStream.write(buf, 0, read);
-      }
-      byteArrayOutputStream.close();
+      fileInputStream.transferTo(0, Long.MAX_VALUE, Channels.newChannel(byteArrayOutputStream));
       ByteBuffer byteBuffer = ByteBuffer.wrap(byteArrayOutputStream.toByteArray());
       byte[] iv = new byte[byteBuffer.getInt()];
       byteBuffer.get(iv);
@@ -60,6 +63,7 @@ public final class EncryptedResource {
       GCMParameterSpec parameterSpec = new GCMParameterSpec(128, iv);
       cipher.init(Cipher.DECRYPT_MODE, secretKey, parameterSpec);
       fileInputStream.close();
+      removeFileLock(fileInputStream);
       return new ByteArrayInputStream(cipher.doFinal(cipherBytes));
     } catch (Exception | Error throwable) {
       throw new IntaveInternalException("Unable to access resource file \"" + resourceId() + "\" (\"" + name + "\"), is it corrupted?", throwable);
@@ -80,7 +84,7 @@ public final class EncryptedResource {
     }
     try {
       // lock file early
-      FileOutputStream fileOutputStream = new FileOutputStream(file);
+      FileChannel fileChannel = acquireFile();//new FileOutputStream(file);
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
       byte[] buf = new byte[4096];
       int i;
@@ -105,14 +109,48 @@ public final class EncryptedResource {
       byteBuffer.put(iv);
       byteBuffer.put(encryptedData);
       ReadableByteChannel byteChannel = Channels.newChannel(new ByteArrayInputStream(byteBuffer.array()));
-      fileOutputStream.getChannel().transferFrom(byteChannel, 0, Long.MAX_VALUE);
+      fileChannel.transferFrom(byteChannel, 0, Long.MAX_VALUE);
       file.setLastModified(AccessHelper.now());
-      fileOutputStream.close();
+      fileChannel.close();
+      removeFileLock(fileChannel);
     } catch (Exception exception) {
 //      exception.printStackTrace();
       return false;
     }
     return file.exists();
+  }
+
+
+  @Native
+  private FileChannel acquireFile() {
+    File file = fileStore();
+    File lockFile = new File(file + ".sig");
+    try {
+      lockFile.createNewFile();
+      RandomAccessFile accessFile = new RandomAccessFile(lockFile, "rw");
+      lockChannel = accessFile.getChannel();
+      String hash = HashAccess.hashOf(file);
+      lockChannel.write(ByteBuffer.wrap(hash.getBytes(StandardCharsets.UTF_8)));
+      lock = lockChannel.lock();
+      FileInputStream in = new FileInputStream(file);
+      return in.getChannel();
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  @Native
+  private void removeFileLock(FileChannel channel) {
+    File file = fileStore();
+    File lockFile = new File(file + ".sig");
+    try {
+      channel.close();
+      lock.close();
+      lockChannel.close();
+      lockFile.delete();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   public boolean exists() {

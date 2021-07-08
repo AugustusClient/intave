@@ -2,6 +2,7 @@ package de.jpx3.intave.tools;
 
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.security.ContextSecrets;
+import de.jpx3.intave.security.HashAccess;
 import de.jpx3.intave.tools.annotate.Native;
 
 import javax.crypto.Cipher;
@@ -15,7 +16,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.util.*;
@@ -29,6 +33,9 @@ public final class CachedResource {
   private final String name;
   private final String uri;
   private final long expireDuration;
+
+  private FileLock lock;
+  private FileChannel lockChannel;
 
   public CachedResource(
     String name, String uri,
@@ -83,16 +90,12 @@ public final class CachedResource {
     if (!fileStore().exists()) {
       return new ByteArrayInputStream(new byte[0]);
     }
-//    fileStore().setLastModified(AccessHelper.now());
     try {
-      FileInputStream fileInputStream = new FileInputStream(fileStore());
+      FileChannel fileInputChannel = acquireFile();
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-      byte[] buf = new byte[4096];
-      int read;
-      while ((read = fileInputStream.read(buf)) != -1) {
-        byteArrayOutputStream.write(buf, 0, read);
-      }
-      fileInputStream.close();
+      fileInputChannel.transferTo(0, Long.MAX_VALUE, Channels.newChannel(byteArrayOutputStream));
+      removeFileLock(fileInputChannel);
+      fileInputChannel.close();
       byteArrayOutputStream.close();
       ByteBuffer byteBuffer = ByteBuffer.wrap(byteArrayOutputStream.toByteArray());
       byte[] iv = new byte[byteBuffer.getInt()];
@@ -107,9 +110,42 @@ public final class CachedResource {
       GCMParameterSpec parameterSpec = new GCMParameterSpec(128, iv);
       cipher.init(Cipher.DECRYPT_MODE, secretKey, parameterSpec);
       return new ByteArrayInputStream(cipher.doFinal(cipherBytes));
-    } catch (Exception | Error e) {
+    } catch (Exception | Error exception) {
+      exception.printStackTrace();
       fileStore().delete();
       return new ByteArrayInputStream(new byte[0]);
+    }
+  }
+
+  @Native
+  private FileChannel acquireFile() {
+    File file = fileStore();
+    File lockFile = new File(file + ".sig");
+    try {
+      lockFile.createNewFile();
+      RandomAccessFile accessFile = new RandomAccessFile(lockFile, "rw");
+      lockChannel = accessFile.getChannel();
+      String hash = HashAccess.hashOf(file);
+      lockChannel.write(ByteBuffer.wrap(hash.getBytes(StandardCharsets.UTF_8)));
+      lock = lockChannel.lock();
+      FileInputStream in = new FileInputStream(file);
+      return in.getChannel();
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  @Native
+  private void removeFileLock(FileChannel channel) {
+    File file = fileStore();
+    File lockFile = new File(file + ".sig");
+    try {
+      channel.close();
+      lock.close();
+      lockChannel.close();
+      lockFile.delete();
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 
@@ -152,20 +188,17 @@ public final class CachedResource {
       byteBuffer.put(iv);
       byteBuffer.put(encryptedData);
       ReadableByteChannel byteChannel = Channels.newChannel(new ByteArrayInputStream(byteBuffer.array()));
-
-      if (file.exists()) {
-        file.delete();
-      }
       try {
+        file.delete();
         file.createNewFile();
       } catch (IOException e) {
         throw new IllegalStateException(e);
       }
-
-      FileOutputStream outputStream = new FileOutputStream(fileStore());
-      outputStream.getChannel().transferFrom(byteChannel, 0, Long.MAX_VALUE);
+      FileChannel outputChannel = acquireFile();//new FileOutputStream(fileStore());
+      outputChannel.transferFrom(byteChannel, 0, Long.MAX_VALUE);
       file.setLastModified(AccessHelper.now());
-      outputStream.close();
+      removeFileLock(outputChannel);
+      outputChannel.close();
     } catch (Exception exception) {
 //      exception.printStackTrace();
       return false;
