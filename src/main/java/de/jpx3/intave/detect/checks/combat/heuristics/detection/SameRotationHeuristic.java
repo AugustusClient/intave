@@ -39,8 +39,14 @@ public final class SameRotationHeuristic extends IntaveMetaCheckPart<Heuristics,
     }
     User user = userOf(player);
     SameRotationHeuristicMeta meta = metaOf(user);
-    UserMetaMovementData movementData = user.meta().movementData();
-    UserMetaViolationLevelData violationLevelData = user.meta().violationLevelData();
+    User.UserMeta userMeta = user.meta();
+    UserMetaMovementData movementData = userMeta.movementData();
+    UserMetaViolationLevelData violationLevelData = userMeta.violationLevelData();
+    UserMetaAbilityData userMetaAbilityData = userMeta.abilityData();
+
+    if(userMetaAbilityData.health <= 0 || userMetaAbilityData.unsynchroniszedHealth <= 0) {
+      meta.ticksSinceRespawn = 0;
+    }
 
     if (movementData.lastTeleport == 0 || violationLevelData.isInActiveTeleportBundle) {
       meta.rotationsSinceTeleport = 0;
@@ -53,7 +59,7 @@ public final class SameRotationHeuristic extends IntaveMetaCheckPart<Heuristics,
       Math.abs(movementData.lastRotationPitch - movementData.rotationPitch)
     );
 
-    if (movementData.lastTeleport > 5 && isPartner() && meta.rotationsSinceTeleport > 6) {
+    if (movementData.lastTeleport > 5 && isPartner() && meta.rotationsSinceTeleport > 6 && meta.ticksSinceRespawn > 5) {
       if (meta.lastLastTick.yawMotion < 10 && meta.lastTick.yawMotion > 45 && currentTick.yawMotion < 10) {
         checkSameRotationYaw(meta, player);
         checkExactRotationMotionYaw(meta, player);
@@ -199,6 +205,8 @@ public final class SameRotationHeuristic extends IntaveMetaCheckPart<Heuristics,
   private void prepareNextTick(User user, Tick currentTick, PacketType packetType) {
     SameRotationHeuristicMeta meta = metaOf(user);
 
+    meta.ticksSinceRespawn++;
+
     meta.lastLastTick = meta.lastTick;
     meta.lastTick = currentTick;
 
@@ -223,6 +231,7 @@ public final class SameRotationHeuristic extends IntaveMetaCheckPart<Heuristics,
     private int rotationsSinceTeleport;
     private Tick lastLastTick = new Tick();
     private Tick lastTick = new Tick();
+    private int ticksSinceRespawn;
   }
 }
 
