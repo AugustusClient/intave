@@ -9,6 +9,7 @@ import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.detect.CheckStatistics;
 import de.jpx3.intave.detect.CheckViolationLevelDecrementer;
 import de.jpx3.intave.detect.IntaveMetaCheck;
+import de.jpx3.intave.event.entity.DeadWrappedEntity;
 import de.jpx3.intave.event.entity.WrappedEntity;
 import de.jpx3.intave.event.packet.ListenerPriority;
 import de.jpx3.intave.event.packet.PacketSubscription;
@@ -74,7 +75,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
       UserMetaAbilityData abilityData = user.meta().abilityData();
       float unsynchroniszedHealth = abilityData.unsynchroniszedHealth;
 
-      if (entity == null || unsynchroniszedHealth <= 0) {
+      if (entity == null || entity instanceof DeadWrappedEntity || unsynchroniszedHealth <= 0) {
         shouldResend = true;
       } else {
         if (movementData.lastTeleport == 0 || violationLevelData.isInActiveTeleportBundle) {
@@ -127,10 +128,10 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
       UserMetaAbilityData abilityData = user.meta().abilityData();
       float unsynchroniszedHealth = abilityData.unsynchroniszedHealth;
 
-      // stops raytrace if the entity is null or the player is in the death screen
-      if (unsynchroniszedHealth > 0) {
-        // bypass when the entity is null or on entities which are riding and players which are mounted on entities
-        if(entity != null) {
+      // bypass when the entity is null or on entities which are riding and players which are mounted on entities
+      if (entity != null) {
+        // stops raytrace if the entity is null or the player is in the death screen
+        if (unsynchroniszedHealth > 0 && !(entity instanceof DeadWrappedEntity)) {
           if (entity.mountedEntity() == null && !player.isInsideVehicle() && entity.isEntityLiving && !abilityData.ignoringMovementPackets()) {
             if (clientData.protocolVersion() >= VER_1_9) {
               // >= 1.9.x
@@ -163,27 +164,27 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
             }
           }
         } else {
-          if(IntaveControl.DISABLE_LICENSE_CHECK) {
-            IntaveLogger.logger().error(player.getName() + " attacked a null entity");
-          }
-          Synchronizer.synchronize(new Runnable() {
-            @Native
-            @Override
-            public void run() {
-              for (Player authenticatedPlayer : Bukkit.getOnlinePlayers()) {
-                if (plugin.sibylIntegrationService().isAuthenticated(authenticatedPlayer)) {
-                  String message;
-                  message = ChatColor.RED + "[R] " + player.getName() + " attacked a null entity";
-                  authenticatedPlayer.sendMessage(message);
-                }
-              }
-            }
-          });
+          cancelHit = true;
         }
       } else {
-        cancelHit = true;
+        if (IntaveControl.DISABLE_LICENSE_CHECK) {
+          IntaveLogger.logger().error(player.getName() + " attacked a null entity");
+        }
+        Synchronizer.synchronize(new Runnable() {
+          @Native
+          @Override
+          public void run() {
+            for (Player authenticatedPlayer : Bukkit.getOnlinePlayers()) {
+              if (plugin.sibylIntegrationService().isAuthenticated(authenticatedPlayer)) {
+                String message;
+                message = ChatColor.RED + "[R] " + player.getName() + " attacked a null entity";
+                authenticatedPlayer.sendMessage(message);
+              }
+            }
+          }
+        });
       }
-      if(cancelHit == null || !cancelHit) {
+      if (cancelHit == null || !cancelHit) {
         if (!violationLevelData.isInActiveTeleportBundle && remainingAttack.shouldResend) {
           receiveExcludedPacket(player, remainingAttack.packet);
         }

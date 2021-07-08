@@ -34,7 +34,6 @@ import java.util.Map;
 import static de.jpx3.intave.event.packet.PacketId.Client.POSITION;
 import static de.jpx3.intave.event.packet.PacketId.Client.*;
 import static de.jpx3.intave.event.packet.PacketId.Server.*;
-import static de.jpx3.intave.event.transaction.TransactionFeedbackService.TransactionOptions.APPEND;
 import static de.jpx3.intave.event.transaction.TransactionFeedbackService.TransactionOptions.APPEND_ON_OVERFLOW;
 
 public final class ClientSideEntityService implements PacketEventSubscriber {
@@ -186,8 +185,8 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
      */
 //    plugin.eventService().transactionFeedbackService().requestPong(event.getPlayer(), event, this::processEntitySpawn);
 //    Thread.dumpStack();
-//    processEntitySpawn(event.getPlayer(), event);
-    plugin.eventService().feedback().singleSynchronize(event.getPlayer(), event, this::processEntitySpawn, APPEND_ON_OVERFLOW);
+    processEntitySpawn(event.getPlayer(), event);
+//    plugin.eventService().feedback().singleSynchronize(event.getPlayer(), event, this::processEntitySpawn, APPEND_ON_OVERFLOW);
   }
 
   private void processEntitySpawn(Player player, PacketEvent event) {
@@ -243,12 +242,18 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
     When you respawn the server sends a destroy entity packet and a spawn entity packet pretty fast one after another and if the
     destroy entity packet gets executed after the spawn packet the entity will be destroyed right after it gets spawned
      */
-    TFCallback<Object> task = (player1, object) -> {
-      for (int entityID : entityIDs) {
+
+    User user = UserRepository.userOf(player);
+    UserMetaConnectionData synchronizeData = user.meta().connectionData();
+
+    for (int entityID : entityIDs) {
+      WrappedEntity wrappedEntity = synchronizeData.synchronizedEntityMap().get(entityID);
+      if (wrappedEntity instanceof WrappedEntityFirework) {
+        plugin.eventService().feedback().singleSynchronize(player, entityID, this::processEntityDestroy, APPEND_ON_OVERFLOW);
+      } else {
         processEntityDestroy(player, entityID);
       }
-    };
-    plugin.eventService().feedback().singleSynchronize(player, null, task, APPEND_ON_OVERFLOW);
+    }
   }
 
   private void processEntityDestroy(Player player, int entityId) {
@@ -256,7 +261,8 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
     UserMetaAttackData attackData = user.meta().attackData();
     UserMetaConnectionData synchronizeData = user.meta().connectionData();
     Map<Integer, WrappedEntity> synchronizedEntityMap = synchronizeData.synchronizedEntityMap();
-    synchronizedEntityMap.remove(entityId);
+//    synchronizedEntityMap.remove(entityId);
+    synchronizedEntityMap.put(entityId, WrappedEntity.deadEntity());
     if (attackData.lastAttackedEntity() != null && attackData.lastAttackedEntityID() == entityId) {
       attackData.nullifyLastAttackedEntity();
     }
@@ -319,11 +325,8 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
         plugin.eventService().feedback().singleSynchronize(player, event, task);
       }
     } else {
-      TFCallback<Object> task = (player1, object) -> {
-        entity.handleEntityTeleport(packet);
-        entity.clientSynchronized = false;
-      };
-      plugin.eventService().feedback().singleSynchronize(player, null, task, APPEND);
+      entity.handleEntityTeleport(packet);
+      entity.clientSynchronized = false;
     }
   }
 
@@ -375,11 +378,8 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
         plugin.eventService().feedback().singleSynchronize(player, event, task);
       }
     } else {
-      TFCallback<Object> task = (player1, object) -> {
-        entity.handleEntityMovement(packet);
-        entity.clientSynchronized = false;
-      };
-      plugin.eventService().feedback().singleSynchronize(player, null, task, APPEND);
+      entity.handleEntityMovement(packet);
+      entity.clientSynchronized = false;
     }
   }
 
