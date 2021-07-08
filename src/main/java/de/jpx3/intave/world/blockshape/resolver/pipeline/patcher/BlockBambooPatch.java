@@ -4,12 +4,12 @@ import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import de.jpx3.intave.world.blockaccess.BlockDataAccess;
 import de.jpx3.intave.world.blockaccess.BlockTypeAccess;
+import de.jpx3.intave.world.blockshape.resolver.BoundingBoxBuilder;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
 import java.util.List;
 
 public final class BlockBambooPatch extends BoundingBoxPatch {
@@ -30,7 +30,9 @@ public final class BlockBambooPatch extends BoundingBoxPatch {
     double offsetX = ((double) ((float) (randomCoordinate & 15L) / 15.0F) - 0.5D) * 0.5D;
     double offsetZ = ((double) ((float) (randomCoordinate >> 8 & 15L) / 15.0F) - 0.5D) * 0.5D;
     double offsetY = 0.0;
-    return Collections.singletonList(COLLISION_BOX.offset(offsetX, offsetY, offsetZ));
+    BoundingBoxBuilder builder = BoundingBoxBuilder.create();
+    builder.shape(COLLISION_BOX.offset(offsetX, offsetY, offsetZ));
+    return builder.applyAndResolve();
   }
 
   @Override
