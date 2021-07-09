@@ -142,7 +142,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
     Map<Integer, WrappedEntity> synchronizedEntityMap = synchronizeData.synchronizedEntityMap();
     WrappedEntity sittingEntity = synchronizedEntityMap.get(entityID);
 
-    if (sittingEntity != null && !(sittingEntity instanceof DeadWrappedEntity)) {
+    if (sittingEntity != null) {
       // Another entity
       if (vehicleEntityID == -1) {
         // when an entity dismounts
@@ -150,7 +150,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
       } else {
         // mounts on entity
         WrappedEntity sittingOnEntity = synchronizedEntityMap.get(vehicleEntityID);
-        if (sittingOnEntity != null && !(sittingOnEntity instanceof DeadWrappedEntity)) {
+        if (sittingOnEntity != null) {
           sittingEntity.mountToEntity(sittingOnEntity);
         } else {
           if (IntaveControl.DISABLE_LICENSE_CHECK) {
@@ -268,7 +268,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
     }
     if (NEW_POSITION_PROCESSING_1_9) {
       for (WrappedEntity wrappedEntity : synchronizedEntityMap.values()) {
-        if (wrappedEntity.mountedEntity() != null && !(wrappedEntity.mountedEntity() instanceof DeadWrappedEntity)) {
+        if (wrappedEntity.mountedEntity() != null) {
           if (wrappedEntity.mountedEntity().entityId() == entityId) {
             wrappedEntity.unmountFromEntity();
           }
