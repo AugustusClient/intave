@@ -180,11 +180,11 @@ public final class BlockingHeuristic extends IntaveMetaCheckPart<Heuristics, Blo
       }
     }
 
-    if(meta.unsendPackets.size() != 0) {
-      PacketContainer packetContainer = meta.unsendPackets.get(0);
-      receiveExcludedPacket(player, packetContainer);
-      meta.unsendPackets.clear();
-    }
+//    if(meta.unsendPackets.size() != 0) {
+//      PacketContainer packetContainer = meta.unsendPackets.get(0);
+//      receiveExcludedPacket(player, packetContainer);
+//      meta.unsendPackets.clear();
+//    }
 
     meta.blocksPlacedThisTick = 0;
   }
@@ -236,13 +236,13 @@ public final class BlockingHeuristic extends IntaveMetaCheckPart<Heuristics, Blo
       return;
     }
 
-    if(!movementData.recentlyEncounteredFlyingPacket(2) || clientData.protocolVersion() < VER_1_9) {
-      if (meta.heldItemOperations > 0) {
-        PacketContainer clonedPacket = event.getPacket().deepClone();
-        meta.unsendPackets.add(clonedPacket);
-        event.setCancelled(true);
-      }
-    }
+//    if(!movementData.recentlyEncounteredFlyingPacket(2) || clientData.protocolVersion() < VER_1_9) {
+//      if (meta.heldItemOperations > 0) {
+//        PacketContainer clonedPacket = event.getPacket().deepClone();
+//        meta.unsendPackets.add(clonedPacket);
+//        event.setCancelled(true);
+//      }
+//    }
 
     meta.heldItemOperations++;
   }
