@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static de.jpx3.intave.event.packet.PacketId.Client.*;
-import static de.jpx3.intave.world.raytrace.Raytracing.distanceOf;
 
 public final class RotationSnapHeuristic extends IntaveMetaCheckPart<Heuristics, RotationSnapHeuristic.RotationSnapHeuristicMeta> {
 
@@ -214,24 +213,24 @@ public final class RotationSnapHeuristic extends IntaveMetaCheckPart<Heuristics,
 
         if (lastEntityPosition != null && tick != null) {
           WrappedAxisAlignedBB lastBoundingBox = WrappedEntity.entityBoundingBoxFrom(lastEntityPosition, wrappedEntity);
-          Raytracing.EntityInteractionRaytrace last = distanceOf(
+          Raytracing.EntityInteractionRaytrace last = Raytracing.entityRaytrace(
             player,
             lastBoundingBox,
             0,
             tick.posX, tick.posY, tick.posZ,
             tick.yaw, tick.pitch,
             0.1f,
-            false
+            Raytracing.EntityRaytraceBlockConstraint.IGNORE_BLOCKS
           );
 
-          Raytracing.EntityInteractionRaytrace now = distanceOf(
+          Raytracing.EntityInteractionRaytrace now = Raytracing.entityRaytrace(
             player,
             wrappedEntity.entityBoundingBox(),
             0,
             movementData.lastPositionX, movementData.lastPositionY, movementData.lastPositionZ,
             movementData.lastRotationYaw, movementData.lastRotationPitch,
             0.1f,
-            false
+            Raytracing.EntityRaytraceBlockConstraint.IGNORE_BLOCKS
           );
 
           changedLookToEntity = (last.reach != 10) != (now.reach != 10);

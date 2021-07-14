@@ -83,7 +83,7 @@ public final class RotationModuloResetHeuristic extends IntaveMetaCheckPart<Heur
     UserMetaMovementData movementData = meta.movementData();
     UserMetaClientData clientData = meta.clientData();
     boolean alternativePositionY = clientData.protocolVersion() == UserMetaClientData.VER_1_8;
-    Raytracing.EntityInteractionRaytrace rayTraceResult = Raytracing.distanceOfIgnoringBlocks(
+    Raytracing.EntityInteractionRaytrace rayTraceResult = Raytracing.blockIgnoringEntityRaytrace(
       user.player(),
       attackData.lastAttackedEntity(),
       alternativePositionY,

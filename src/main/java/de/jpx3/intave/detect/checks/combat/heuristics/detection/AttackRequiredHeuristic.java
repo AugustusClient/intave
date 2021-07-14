@@ -21,7 +21,6 @@ import org.bukkit.inventory.ItemStack;
 
 import static de.jpx3.intave.event.packet.PacketId.Client.*;
 import static de.jpx3.intave.user.UserMetaClientData.VER_1_8;
-import static de.jpx3.intave.world.raytrace.Raytracing.distanceOf;
 
 public final class AttackRequiredHeuristic extends IntaveMetaCheckPart<Heuristics, AttackRequiredHeuristic.AttackRequiredMeta> {
   private final IntavePlugin plugin;
@@ -153,7 +152,7 @@ public final class AttackRequiredHeuristic extends IntaveMetaCheckPart<Heuristic
     boolean alternativePositionY = clientData.protocolVersion() == VER_1_8;
     boolean hasAlwaysMouseDelayFix = clientData.protocolVersion() >= 314;
     // mouse delay fix
-    Raytracing.EntityInteractionRaytrace distanceOfResult = distanceOf(
+    Raytracing.EntityInteractionRaytrace distanceOfResult = Raytracing.blockConstraintEntityRaytrace(
       player,
       entity, alternativePositionY,
       movementData.lastPositionX, movementData.lastPositionY, movementData.lastPositionZ,
@@ -165,7 +164,7 @@ public final class AttackRequiredHeuristic extends IntaveMetaCheckPart<Heuristic
     }
     if (!hasAlwaysMouseDelayFix) {
       // normal
-      distanceOfResult = distanceOf(
+      distanceOfResult = Raytracing.blockConstraintEntityRaytrace(
         player,
         entity, true,
         movementData.lastPositionX, movementData.lastPositionY, movementData.lastPositionZ,
