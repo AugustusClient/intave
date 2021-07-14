@@ -42,7 +42,7 @@ public final class ReshapedJumpHeuristic extends IntaveMetaCheckPart<Heuristics,
 
     boolean recentlyAttacked = attackData.recentlyAttacked(1000);
     boolean jump = Math.abs(movementData.jumpMotion() - movementData.motionY()) < 1e-5;
-    if (jump && movementData.sprinting && movementData.lastTeleport > 5) {
+    if (jump && movementData.sprinting && movementData.lastTeleport > 5 && movementData.suspiciousMovement && !movementData.collidedHorizontally) {
       float rotationYaw = movementData.rotationYaw;
       float yawSine = SinusCache.sin(rotationYaw * (float) Math.PI / 180.0F, false);
       float yawCosine = SinusCache.cos(rotationYaw * (float) Math.PI / 180.0F, false);
@@ -72,20 +72,18 @@ public final class ReshapedJumpHeuristic extends IntaveMetaCheckPart<Heuristics,
         physicsCalculateRelativeMovement(motion, friction, yawSine, yawCosine, moveForward, moveStrafe);
         double alternativeDistance = Math.hypot(motion.getX() - movementData.motionX(), motion.getZ() - movementData.motionZ());
         if (Math.abs(alternativeDistance - 0.2) < leniency * 2) {
-//          if (heuristicMeta.balance++ >= 1) {
           heuristicMeta.balance++;
-            String description = "horizontal motion not correlated with jump vl:" + MathHelper.formatDouble(heuristicMeta.balance, 1);
-            if (recentlyAttacked) {
-              description += " | attacked";
-            }
-            description += " | pre-dist:" + preDistance + ", alt-dist:" + alternativeDistance;
-            description += " | " + user.meta().clientData().versionString();
-            int options = Anomaly.AnomalyOption.LIMIT_8 | Anomaly.AnomalyOption.SUGGEST_MINING;
-            Anomaly anomaly = Anomaly.anomalyOf("61", Confidence.NONE, Anomaly.Type.KILLAURA, description, options);
-            parentCheck().saveAnomaly(player, anomaly);
-            //dmc15
+          String description = "horizontal motion not correlated with jump vl:" + MathHelper.formatDouble(heuristicMeta.balance, 1);
+          if (recentlyAttacked) {
+            description += " | attacked";
+          }
+          description += " | pre-dist:" + preDistance + ", alt-dist:" + alternativeDistance;
+          description += " | " + user.meta().clientData().versionString();
+          int options = Anomaly.AnomalyOption.LIMIT_8 | Anomaly.AnomalyOption.SUGGEST_MINING;
+          Anomaly anomaly = Anomaly.anomalyOf("61", Confidence.NONE, Anomaly.Type.KILLAURA, description, options);
+          parentCheck().saveAnomaly(player, anomaly);
+          //dmc15
 //            user.applyAttackNerfer(AttackNerfStrategy.HT_MEDIUM, "15");
-//          }
         }
       } else {
         heuristicMeta.balance -= heuristicMeta.balance > 0 ? 0.2 : 0;
