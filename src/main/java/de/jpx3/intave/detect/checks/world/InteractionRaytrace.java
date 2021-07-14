@@ -93,11 +93,12 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
     boolean interactionIsPlacement = heldItemType != Material.AIR && heldItemType.isBlock() && !clickableInteraction;
 
     EnumWrappers.Hand handSlot = packet.getHands().readSafely(0);
+    handSlot = handSlot == null ? EnumWrappers.Hand.MAIN_HAND : handSlot;
+
     Interaction interaction = new Interaction(
-      player.getWorld(), player, blockPosition, enumDirection, packet.deepClone(),
+      packet.deepClone(), player.getWorld(), player, blockPosition, enumDirection,
       interactionIsPlacement ? InteractionType.PLACE : InteractionType.INTERACT,
-      heldItemType, handSlot == null ? EnumWrappers.Hand.MAIN_HAND : handSlot,
-      false, false
+      heldItemType, handSlot, null
     );
 
     boolean mustPostValidate = interactionMeta.remainingBlockStart > 0 || interactionMeta.isBreakingBlock || movementData.awaitTeleport;
@@ -146,11 +147,9 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
 
     InteractionMeta interactionMeta = metaOf(user);
     Interaction interaction = new Interaction(
-      player.getWorld(), player, blockPosition, enumDirection, packet.deepClone(), breakBlock ? InteractionType.BREAK : InteractionType.INTERACT,
-      user.meta().inventoryData().heldItemType(),
-      EnumWrappers.Hand.MAIN_HAND,
-      playerDigType == ABORT_DESTROY_BLOCK,
-      playerDigType == START_DESTROY_BLOCK
+      packet.deepClone(), player.getWorld(), player, blockPosition, enumDirection,
+      breakBlock ? InteractionType.BREAK : InteractionType.INTERACT,
+      user.meta().inventoryData().heldItemType(), EnumWrappers.Hand.MAIN_HAND, playerDigType
     );
 
     boolean mustPostValidate = interactionMeta.remainingBlockStart > 0 || interactionMeta.isBreakingBlock || movementData.awaitTeleport;
@@ -163,6 +162,7 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
         interactionMeta.remainingBlockStart++;
       }
     }
+
     if (breakBlock || playerDigType == ABORT_DESTROY_BLOCK) {
       interactionMeta.isBreakingBlock = false;
     } else if (playerDigType == START_DESTROY_BLOCK) {
@@ -258,7 +258,7 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
     User user = userOf(player);
     InteractionMeta interactionMeta = metaOf(player);
 
-    if (interaction.isStartBlockBreak()) {
+    if (interaction.digType() == START_DESTROY_BLOCK) {
       interactionMeta.remainingBlockStart--;
     }
 
@@ -312,7 +312,8 @@ public final class InteractionRaytrace extends IntaveMetaCheck<InteractionRaytra
       WrappedMovingObjectPosition movingObjectPosition = estimateMouseDelayFix ? raycastResultmdf : raycastResult;
       Location location = estimateMouseDelayFix ? playerLocationmdf : playerLocation;
       boolean atLeastLookingAtBlock = movingObjectPosition != null && atLeastLookingAtBlock(user, location, targetLocation, movingObjectPosition);
-      flag = enabled && !interaction.isIgnoreFlags() && performFlag(interaction, raycastResult, targetLocation, raycastLocation, hitMiss, atLeastLookingAtBlock);
+      boolean isAbortDestroyBlock = interaction.digType() == ABORT_DESTROY_BLOCK;
+      flag = enabled && !isAbortDestroyBlock && performFlag(interaction, raycastResult, targetLocation, raycastLocation, hitMiss, atLeastLookingAtBlock);
       flagEnforce = false;
     }
 

@@ -8,38 +8,34 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 public final class Interaction {
+  private final PacketContainer thePacket;
   private final World world;
   private final Player player;
   private final BlockPosition targetBlock;
   private final int targetDirection;
-  private final PacketContainer thePacket;
   private final InteractionType type;
   private final Material itemTypeInHand;
   private final EnumWrappers.Hand hand;
-  private boolean ignoreFlags;
-  private boolean isStartBlockBreak;
+  private final EnumWrappers.PlayerDigType digType;
   private boolean entered = false;
-  private boolean changeLocked = true;
 
   public Interaction(
-    World world, Player player,
-    BlockPosition targetBlock,
-    int targetDirection,
     PacketContainer thePacket,
+    World world, Player player,
+    BlockPosition targetBlock, int targetDirection,
     InteractionType type,
     Material itemTypeInHand, EnumWrappers.Hand hand,
-    boolean ignoreFlags,
-    boolean isStartBlockBreak) {
+    EnumWrappers.PlayerDigType digType
+  ) {
+    this.thePacket = thePacket;
     this.world = world;
     this.player = player;
     this.targetBlock = targetBlock;
     this.targetDirection = targetDirection;
-    this.thePacket = thePacket;
     this.type = type;
     this.itemTypeInHand = itemTypeInHand;
     this.hand = hand;
-    this.ignoreFlags = ignoreFlags;
-    this.isStartBlockBreak = isStartBlockBreak;
+    this.digType = digType;
   }
 
   public PacketContainer thePacket() {
@@ -66,19 +62,6 @@ public final class Interaction {
     return hand;
   }
 
-  public void unlock() {
-    changeLocked = false;
-  }
-
-  public boolean isChangeLocked() {
-    return changeLocked;
-  }
-
-  public boolean isIgnoreFlags() {
-    return ignoreFlags;
-  }
-
-
   public BlockPosition targetBlock() {
     return targetBlock;
   }
@@ -87,8 +70,8 @@ public final class Interaction {
     return targetDirection;
   }
 
-  public boolean isEntered() {
-    return entered;
+  public EnumWrappers.PlayerDigType digType() {
+    return digType;
   }
 
   public void enter() {
@@ -97,10 +80,6 @@ public final class Interaction {
 
   public boolean entered() {
     return entered;
-  }
-
-  public boolean isStartBlockBreak() {
-    return isStartBlockBreak;
   }
 
   @Override
