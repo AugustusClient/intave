@@ -94,7 +94,7 @@ public class WrappedMovingObjectPosition {
         Object entity = field.get(movingObjectPosition);
         return new WrappedMovingObjectPosition(serverEntityByIdentifier((int) entity.getClass().getMethod("getId").invoke(entity)));
       } else {
-        Field movingObjectPositionBaseField = movingObjectPositionBase.getDeclaredField("pos");
+        Field movingObjectPositionBaseField = ReflectiveAccess.lookupServerField("MovingObjectPosition", "pos");/*movingObjectPositionBase.getDeclaredField("pos");*/
         if (!movingObjectPositionBaseField.isAccessible())
           movingObjectPositionBaseField.setAccessible(true);
         Object pos = movingObjectPositionBaseField.get(movingObjectPosition);

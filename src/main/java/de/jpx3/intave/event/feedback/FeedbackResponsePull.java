@@ -62,16 +62,16 @@ public final class FeedbackResponsePull implements PacketEventSubscriber {
     short transactionIdentifier;
     if (packet.getShorts().size() == 0) {
       int inputInteger = packet.getIntegers().readSafely(0);
-      boolean hasMask = (inputInteger ^ PING_MASK) >> Short.SIZE - 1 == 0;
-      if (!hasMask) {
+      if ((inputInteger & 0xffff0000) != PING_MASK) {
+        System.out.println("[Intave] Corrupt ping packet: " + Integer.toBinaryString(inputInteger) + " / " + Integer.toBinaryString(PING_MASK));
         return;
       }
-      transactionIdentifier = (short) (inputInteger & Short.MAX_VALUE);
+      transactionIdentifier = (short) (inputInteger & 0xffff);
     } else {
       transactionIdentifier = packet.getShorts().readSafely(0);
     }
 
-    if (transactionIdentifier <= TRANSACTION_MAX_CODE) {
+    if (transactionIdentifier <= TRANSACTION_MAX_CODE || USE_PING_PONG_PACKETS) {
       Request<?> transactionResponse = transactionShortKeyMap.get(transactionIdentifier);
       if (transactionResponse == null) {
         return;

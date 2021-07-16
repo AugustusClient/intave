@@ -1,6 +1,7 @@
 package de.jpx3.intave.reflect.hitbox.typeaccess;
 
 import de.jpx3.intave.access.IntaveInternalException;
+import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.patchy.annotate.PatchyAutoTranslation;
 import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.reflect.hitbox.HitBoxBoundaries;
@@ -10,10 +11,13 @@ import net.minecraft.server.v1_16_R1.IChatBaseComponent;
 import net.minecraft.server.v1_16_R1.IRegistry;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 @PatchyAutoTranslation
 public final class DirectEntityTypeResolver {
   private static Field entitySizeField;
+  private static Method componentExtractionMethod;
 
   static void setup() {
     try {
@@ -25,12 +29,17 @@ public final class DirectEntityTypeResolver {
           break;
         }
       }
+      String methodName = "g";
+      if (MinecraftVersions.VER1_17_0.atOrAbove()) {
+        methodName = "h";
+      }
+      componentExtractionMethod = ReflectiveAccess.lookupServerClass("EntityTypes").getMethod(methodName);
       if (entitySizeField == null) {
         throw new IntaveInternalException("EntitySize field does not exist in " + entityTypesClass);
       }
       ReflectiveAccess.ensureAccessible(entitySizeField);
-    } catch (Exception e) {
-      throw new IntaveInternalException(e);
+    } catch (Exception exception) {
+      throw new IntaveInternalException(exception);
     }
   }
 
@@ -48,7 +57,12 @@ public final class DirectEntityTypeResolver {
   @PatchyAutoTranslation
   public static String resolveNameOf(int type) {
     EntityTypes<?> entityTypes = IRegistry.ENTITY_TYPE.fromId(type);
-    IChatBaseComponent component = entityTypes.g();
+    IChatBaseComponent component;
+    try {
+      component = (IChatBaseComponent) componentExtractionMethod.invoke(entityTypes);
+    } catch (IllegalAccessException | InvocationTargetException exception) {
+      throw new IntaveInternalException(exception);
+    }
     return component.getString();
   }
 }

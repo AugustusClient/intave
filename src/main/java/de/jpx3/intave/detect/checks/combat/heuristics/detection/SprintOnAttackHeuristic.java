@@ -1,5 +1,6 @@
 package de.jpx3.intave.detect.checks.combat.heuristics.detection;
 
+import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import de.jpx3.intave.detect.IntaveMetaCheckPart;
@@ -51,8 +52,11 @@ public final class SprintOnAttackHeuristic extends IntaveMetaCheckPart<Heuristic
     Player player = event.getPlayer();
     User user = userOf(player);
     SprintOnAttackHeuristicMeta meta = metaOf(user);
-    EnumWrappers.EntityUseAction action = event.getPacket().getEntityUseActions().read(0);
-
+    PacketContainer packet = event.getPacket();
+    EnumWrappers.EntityUseAction action = packet.getEntityUseActions().readSafely(0);
+    if (action == null) {
+      action = packet.getEnumEntityUseActions().read(0).getAction();
+    }
     if(action == EnumWrappers.EntityUseAction.ATTACK) {
       meta.lastAttack = 0;
     }

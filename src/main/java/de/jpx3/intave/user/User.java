@@ -20,6 +20,7 @@ import de.jpx3.intave.reflect.ReflectiveHandleAccess;
 import de.jpx3.intave.tools.AccessHelper;
 import de.jpx3.intave.tools.annotate.Relocate;
 import de.jpx3.intave.tools.placeholder.PlayerContext;
+import de.jpx3.intave.tools.placeholder.PlayerIdentificationContext;
 import de.jpx3.intave.tools.sync.Synchronizer;
 import de.jpx3.intave.world.blockaccess.BlockTypeAccess;
 import de.jpx3.intave.world.blockshape.BlankUserOCBlockShapeAccess;
@@ -34,9 +35,11 @@ import org.bukkit.entity.Player;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
@@ -48,6 +51,7 @@ public final class User {
 
   private final WeakReference<Player> playerRef;
   private final WeakReference<Object> nmsEntity;
+  private final WeakReference<Object> playerConnection;
   private final UserMeta userMeta;
   private final BukkitPermissionCache permissionCache;
   private final ComplexColliderProcessor complexColliderProcessor;
@@ -65,12 +69,14 @@ public final class User {
   private final long birthTimestamp = AccessHelper.now();
 
   private final PlayerContext playerPlaceholderContext = new PlayerContext(this);
+  private final PlayerIdentificationContext playerIdentificationContext;
   private TrustFactor trustFactor = TrustFactor.DARK_RED;
 
   private User(Player player) {
     this.playerRef = new WeakReference<>(player);
     this.hasPlayer = player != null;
     this.nmsEntity = new WeakReference<>(hasPlayer ? ReflectiveHandleAccess.handleOf(player) : null);
+    this.playerConnection = new WeakReference<>(hasPlayer ? ReflectiveHandleAccess.playerConnectionOf(player) : null);
     this.userMeta = new UserMeta(player, this);
     this.userMeta.setup();
     this.permissionCache = new BukkitPermissionCache();
@@ -83,6 +89,12 @@ public final class User {
     this.simpleColliderProcessor = Collider.suitableSimpleColliderProcessorFor(this);
     if (hasPlayer) {
       Synchronizer.synchronize(this::setDefaultMessagingChannel);
+    }
+
+    if (hasPlayer) {
+      playerIdentificationContext = new PlayerIdentificationContext(player.getName(), player.getUniqueId(), player.getAddress().getAddress());
+    } else {
+      playerIdentificationContext = new PlayerIdentificationContext("", new UUID(0,0), InetAddress.getLoopbackAddress());
     }
   }
 
@@ -111,6 +123,10 @@ public final class User {
 
   public Object playerHandle() {
     return nmsEntity.get();
+  }
+
+  public Object playerConnection() {
+    return playerConnection.get();
   }
 
   public Player player() {
@@ -221,6 +237,10 @@ public final class User {
     return simpleColliderProcessor;
   }
 
+  public PlayerIdentificationContext playerIdentificationContext() {
+    return playerIdentificationContext;
+  }
+
   public TrustFactor trustFactor() {
     return trustFactor;
   }
@@ -299,7 +319,7 @@ public final class User {
     return meta().connectionData().latencyJitter;
   }
 
-  public PlayerContext userPlaceholderContext() {
+  public PlayerContext playerAttributeContext() {
     return playerPlaceholderContext;
   }
 

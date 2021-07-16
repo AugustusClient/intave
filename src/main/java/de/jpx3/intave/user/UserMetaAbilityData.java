@@ -18,7 +18,7 @@ public final class UserMetaAbilityData {
 
   private float flySpeed = 0.05f;
   private float walkSpeed = 0.1f;
-  public float unsynchroniszedHealth;
+  public float unsynchronizedHealth;
   public float health;
   public int ticksToLastHealthUpdate;
   public boolean hasViewEntity;
@@ -29,7 +29,7 @@ public final class UserMetaAbilityData {
       this.allowFlying = player.getAllowFlight();
       this.flying = player.isFlying();
       this.health = (float) player.getHealth();
-      this.unsynchroniszedHealth = this.health;
+      this.unsynchronizedHealth = this.health;
       setupDefaultGameMode(player.getGameMode());
 
       this.walkSpeed = player.getWalkSpeed() / 2.0f;
@@ -37,7 +37,7 @@ public final class UserMetaAbilityData {
     } else {
       this.allowFlying = this.flying = false;
       this.health = 20.0f;
-      this.unsynchroniszedHealth = this.health;
+      this.unsynchronizedHealth = this.health;
     }
   }
 

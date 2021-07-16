@@ -4,6 +4,7 @@ import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.IntaveException;
 import de.jpx3.intave.access.IntaveInternalException;
+import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.detect.checks.movement.Physics;
 import de.jpx3.intave.logging.IntaveLogger;
 import de.jpx3.intave.reflect.ReflectiveAccess;
@@ -37,17 +38,20 @@ import java.util.List;
 import java.util.Set;
 
 public final class MovementEmulationEngine {
+  private final static boolean WEIRD_BOOLEAN_IN_INVOKE = MinecraftVersions.VER1_17_0.atOrAbove();
+
   private final IntavePlugin plugin;
   private final Physics physicsCheck;
   private final Set<Object> teleportFlags = new HashSet<>();
+  private Method internalTeleportMethod;
 
   public MovementEmulationEngine(IntavePlugin plugin) {
     this.plugin = plugin;
     this.physicsCheck = plugin.checkService().searchCheck(Physics.class);
-    this.loadTeleportFlags();
+    this.setup();
   }
 
-  private void loadTeleportFlags() {
+  private void setup() {
     try {
 //      Class<?> teleportFlagsClass = ReflectiveAccess.lookupServerClass("PacketPlayOutPosition$EnumPlayerTeleportFlags");
       if (teleportFlags.isEmpty()) {
@@ -56,7 +60,18 @@ public final class MovementEmulationEngine {
 //        teleportFlags.add(teleportFlagsClass.getField("X_ROT").get(null));
 //        teleportFlags.add(teleportFlagsClass.getField("Y_ROT").get(null));
       }
-    } catch (IllegalAccessException exception) {
+
+      Class<?> playerConnectionClass = ReflectiveAccess.lookupServerClass("PlayerConnection");
+      if (WEIRD_BOOLEAN_IN_INVOKE) {
+        internalTeleportMethod = playerConnectionClass.getDeclaredMethod("internalTeleport", Double.TYPE, Double.TYPE, Double.TYPE, Float.TYPE, Float.TYPE, Set.class, Boolean.TYPE);
+      } else {
+        internalTeleportMethod = playerConnectionClass.getDeclaredMethod("internalTeleport", Double.TYPE, Double.TYPE, Double.TYPE, Float.TYPE, Float.TYPE, Set.class);
+      }
+      if (!internalTeleportMethod.isAccessible()) {
+        internalTeleportMethod.setAccessible(true);
+      }
+
+    } catch (IllegalAccessException | NoSuchMethodException exception) {
       throw new IntaveInternalException(exception);
     }
   }
@@ -391,17 +406,14 @@ public final class MovementEmulationEngine {
       try {
         Object playerHandle = UserRepository.userOf(player).playerHandle();
         Object playerConnection = ReflectiveAccess.lookupServerField("EntityPlayer", "playerConnection").get(playerHandle);
-        Class<?> playerConnectionClass = ReflectiveAccess.lookupServerClass("PlayerConnection");
-        Method internalTeleport = playerConnectionClass.getDeclaredMethod("internalTeleport", Double.TYPE, Double.TYPE, Double.TYPE, Float.TYPE, Float.TYPE, Set.class);
-        if (!internalTeleport.isAccessible()) {
-          internalTeleport.setAccessible(true);
-        }
+
         Location dest = event.getTo();
         if (dest == null) {
           throw new IntaveException("Setback location cannot be null");
         }
         if (Math.abs(nativeYaw) > 360f) {
-          internalTeleport.invoke(playerConnection, dest.getX(), dest.getY(), dest.getZ(), nativeYaw % 360f, nativePitch, Collections.emptySet());
+//          internalTeleportMethod.invoke(playerConnection, dest.getX(), dest.getY(), dest.getZ(), nativeYaw % 360f, nativePitch, Collections.emptySet());
+          internalTeleportExecution(player, dest,  nativeYaw % 360f, nativePitch, false);
         } else {
           Field yawField = ReflectiveAccess.lookupServerField("Entity", "yaw");
           Field pitchField = ReflectiveAccess.lookupServerField("Entity", "pitch");
@@ -409,13 +421,31 @@ public final class MovementEmulationEngine {
           float pitch = (float) pitchField.get(playerHandle);
           yawField.set(playerHandle, 0f);
           pitchField.set(playerHandle, 0f);
-          internalTeleport.invoke(playerConnection, dest.getX(), dest.getY(), dest.getZ(), 0, 0, teleportFlags);
+//          internalTeleportMethod.invoke(playerConnection, dest.getX(), dest.getY(), dest.getZ(), 0, 0, teleportFlags);
+          internalTeleportExecution(player, dest, 0, 0, true);
           yawField.set(playerHandle, yaw);
           pitchField.set(playerHandle, pitch);
         }
-      } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException exception) {
+      } catch (IllegalAccessException exception) {
         throw new IntaveInternalException(exception);
       }
+    }
+  }
+
+  private void internalTeleportExecution(Player player, Location dest, float yaw, float pitch, boolean rotationFlags) {
+    try {
+      Object playerConnection = UserRepository.userOf(player).playerConnection();
+      Set<Object> rFlags = rotationFlags ? teleportFlags : Collections.emptySet();
+      double posX = dest.getX();
+      double posY = dest.getY();
+      double posZ = dest.getZ();
+      if (WEIRD_BOOLEAN_IN_INVOKE) {
+        internalTeleportMethod.invoke(playerConnection, posX, posY, posZ, yaw, pitch, rFlags, false);
+      } else {
+        internalTeleportMethod.invoke(playerConnection, posX, posY, posZ, yaw, pitch, rFlags);
+      }
+    } catch (InvocationTargetException | IllegalAccessException exception) {
+      exception.printStackTrace();
     }
   }
 

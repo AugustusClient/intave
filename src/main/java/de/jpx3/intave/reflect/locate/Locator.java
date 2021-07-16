@@ -59,7 +59,7 @@ public final class Locator {
       }
       return declaredField;
     } catch (NoSuchFieldException exception) {
-      throw new IntaveInternalException(exception);
+      throw new IntaveInternalException("Unable to locate " + classKey + "/" + fieldKey, exception);
     }
   }
 

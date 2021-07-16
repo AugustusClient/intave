@@ -44,7 +44,7 @@ public final class SameRotationHeuristic extends IntaveMetaCheckPart<Heuristics,
     UserMetaViolationLevelData violationLevelData = userMeta.violationLevelData();
     UserMetaAbilityData userMetaAbilityData = userMeta.abilityData();
 
-    if(userMetaAbilityData.health <= 0 || userMetaAbilityData.unsynchroniszedHealth <= 0) {
+    if(userMetaAbilityData.health <= 0 || userMetaAbilityData.unsynchronizedHealth <= 0) {
       meta.ticksSinceRespawn = 0;
     }
 

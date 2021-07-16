@@ -120,7 +120,10 @@ public final class AttackInInvalidStateHeuristic extends IntaveMetaCheckPart<Heu
     if (clientData.protocolVersion() != VER_1_8) {
       return;
     }
-    EnumWrappers.EntityUseAction action = packet.getEntityUseActions().read(0);
+    EnumWrappers.EntityUseAction action = packet.getEntityUseActions().readSafely(0);
+    if (action == null) {
+      action = packet.getEnumEntityUseActions().read(0).getAction();
+    }
     if (action == EnumWrappers.EntityUseAction.ATTACK && entity.dead) {
       String description = "attacked a dead entity " + entity.entityName();
       Anomaly anomaly = Anomaly.anomalyOf("161", Confidence.NONE, Anomaly.Type.KILLAURA, description);

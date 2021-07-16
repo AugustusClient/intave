@@ -1,6 +1,7 @@
 package de.jpx3.intave.detect.checks.combat;
 
 import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import de.jpx3.intave.IntavePlugin;
@@ -41,9 +42,13 @@ public final class ClickSpeedLimiter extends IntaveMetaCheck<ClickSpeedLimiter.C
     Player player = event.getPlayer();
     User user = userOf(player);
     ClickSpeedLimiterMeta meta = metaOf(user);
-    EnumWrappers.EntityUseAction entityUseAction = event.getPacket().getEntityUseActions().read(0);
+    PacketContainer packet = event.getPacket();
+    EnumWrappers.EntityUseAction action = packet.getEntityUseActions().readSafely(0);
+    if (action == null) {
+      action = packet.getEnumEntityUseActions().read(0).getAction();
+    }
 
-    if (entityUseAction == EnumWrappers.EntityUseAction.ATTACK) {
+    if (action == EnumWrappers.EntityUseAction.ATTACK) {
       if (user.meta().clientData().protocolVersion() <= UserMetaClientData.VER_1_8) {
         meta.attackCountArray[meta.attackArrayIndex]++;
       } else {

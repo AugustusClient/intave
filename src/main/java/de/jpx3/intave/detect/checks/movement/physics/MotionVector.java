@@ -4,7 +4,7 @@ import de.jpx3.intave.tools.MathHelper;
 import de.jpx3.intave.user.UserMetaMovementData;
 import org.bukkit.util.Vector;
 
-public class MotionVector {
+public final class MotionVector {
   public double motionX;
   public double motionY;
   public double motionZ;

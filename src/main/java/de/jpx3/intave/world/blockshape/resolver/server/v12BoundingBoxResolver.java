@@ -36,7 +36,7 @@ public final class v12BoundingBoxResolver implements BoundingBoxResolvePipeline 
       ALWAYS_COLLIDING_BOX,
       bbs,
       null,
-      true
+      false
     );
     return translate(bbs);
   }
@@ -57,7 +57,7 @@ public final class v12BoundingBoxResolver implements BoundingBoxResolvePipeline 
       ALWAYS_COLLIDING_BOX,
       bbs,
       null,
-      true
+      false
     );
     return translate(bbs);
   }

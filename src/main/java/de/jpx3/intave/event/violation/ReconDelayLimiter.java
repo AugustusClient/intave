@@ -5,6 +5,7 @@ import de.jpx3.intave.event.bukkit.BukkitEventSubscriber;
 import de.jpx3.intave.event.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.tools.AccessHelper;
 import de.jpx3.intave.tools.placeholder.Placeholders;
+import de.jpx3.intave.tools.placeholder.PlayerIdentificationContext;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
@@ -41,18 +42,19 @@ public final class ReconDelayLimiter implements BukkitEventSubscriber {
   }
 
   @BukkitEventSubscription
-  public void on(AsyncPlayerPreLoginEvent e) {
-    long ipDelayLeft = AccessHelper.now() - lastKicked.getOrDefault(e.getUniqueId(), 0L);
-    long accDelayLeft = AccessHelper.now() - lastKickedIp.getOrDefault(e.getAddress(), 0L);
+  public void on(AsyncPlayerPreLoginEvent login) {
+    long ipDelayLeft = AccessHelper.now() - lastKicked.getOrDefault(login.getUniqueId(), 0L);
+    long accDelayLeft = AccessHelper.now() - lastKickedIp.getOrDefault(login.getAddress(), 0L);
 
     if (ipDelayLeft < delay || accDelayLeft < delay) {
       String message = rawMessage;
-      message = Placeholders.replacePlaceholders(message, Placeholders.PLUGIN_CONTEXT);
+      PlayerIdentificationContext playerIdentificationContext = new PlayerIdentificationContext(login.getName(), login.getUniqueId(), login.getAddress());
+      message = Placeholders.replacePlaceholders(message, Placeholders.PLUGIN_CONTEXT, playerIdentificationContext);
       message = ChatColor.translateAlternateColorCodes('&', message);
-      e.setKickMessage(message);
-      e.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST);
+      login.setKickMessage(message);
+      login.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_WHITELIST);
       if (refresh) {
-        ban(e.getAddress(), e.getUniqueId(), "rejoin");
+        ban(login.getAddress(), login.getUniqueId(), "rejoin");
       }
     }
   }

@@ -62,9 +62,11 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
     User user = userOf(player);
     AttackRaytraceMeta attackRaytraceMeta = metaOf(player);
     UserMetaViolationLevelData violationLevelData = user.meta().violationLevelData();
-    EnumWrappers.EntityUseAction useAction = packet.getEntityUseActions().readSafely(0);
-
-    if (useAction == EnumWrappers.EntityUseAction.ATTACK) {
+    EnumWrappers.EntityUseAction action = packet.getEntityUseActions().readSafely(0);
+    if (action == null) {
+      action = packet.getEnumEntityUseActions().read(0).getAction();
+    }
+    if (action == EnumWrappers.EntityUseAction.ATTACK) {
       PacketContainer packetClone = packet.deepClone();
       int entityId = packet.getIntegers().read(0);
 
@@ -73,7 +75,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
       WrappedEntity entity = entityByIdentifier(user, entityId);
       UserMetaClientData clientData = user.meta().clientData();
       UserMetaAbilityData abilityData = user.meta().abilityData();
-      float unsynchroniszedHealth = abilityData.unsynchroniszedHealth;
+      float unsynchroniszedHealth = abilityData.unsynchronizedHealth;
 
       if (entity == null || entity instanceof DeadWrappedEntity || unsynchroniszedHealth <= 0) {
         shouldResend = true;
@@ -126,7 +128,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
       WrappedEntity entity = entityByIdentifier(user, remainingAttack.entityId());
       Boolean cancelHit = null;
       UserMetaAbilityData abilityData = user.meta().abilityData();
-      float unsynchroniszedHealth = abilityData.unsynchroniszedHealth;
+      float unsynchroniszedHealth = abilityData.unsynchronizedHealth;
 
       // bypass when the entity is null or on entities which are riding and players which are mounted on entities
       if (entity != null) {
@@ -184,8 +186,10 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
           }
         });
       }
+      System.out.println("CancelHit: " + cancelHit);
       if (cancelHit == null || !cancelHit) {
         if (!violationLevelData.isInActiveTeleportBundle && remainingAttack.shouldResend) {
+          System.out.println("Receives packets");
           receiveExcludedPacket(player, remainingAttack.packet);
         }
         // increaseFails should not be increased here because hits can be canceled when health are under 0
@@ -225,7 +229,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
     float rotationYaw = movementData.rotationYaw % 360;
 
     // mouse delay fix
-    Raytracing.EntityInteractionRaytrace distanceOfResult = Raytracing.complexDoubleEntityRaytrace(
+    Raytracing.EntityInteractionRaytrace distanceOfResult = Raytracing.doubleMDFEntityRaytrace(
       player,
       entity, true,
       movementData.positionX, movementData.positionY, movementData.positionZ,
@@ -257,7 +261,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
     float lastRotationYaw = movementData.lastRotationYaw % 360f;
 
     // mouse delay fix
-    Raytracing.EntityInteractionRaytrace distanceOfResult = Raytracing.complexDoubleEntityRaytrace(
+    Raytracing.EntityInteractionRaytrace distanceOfResult = Raytracing.doubleMDFEntityRaytrace(
       player,
       entity, alternativePositionY,
       movementData.lastPositionX, movementData.lastPositionY, movementData.lastPositionZ,
@@ -428,7 +432,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
     for (WrappedEntity.EntityPositionContext possiblePosition : clonedEntity.positionHistory) {
       clonedEntity.position = possiblePosition.clone();
       // mouse delay fix
-      Raytracing.EntityInteractionRaytrace resultWithoutIncrement = Raytracing.complexDoubleEntityRaytrace(
+      Raytracing.EntityInteractionRaytrace resultWithoutIncrement = Raytracing.doubleMDFEntityRaytrace(
         player,
         clonedEntity,
         alternativePositionY,
@@ -445,7 +449,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
       while (clonedEntity.position.newPosRotationIncrements > 0) {
         clonedEntity.onUpdate();
         // mouse delay fix
-        Raytracing.EntityInteractionRaytrace result = Raytracing.complexDoubleEntityRaytrace(
+        Raytracing.EntityInteractionRaytrace result = Raytracing.doubleMDFEntityRaytrace(
           player,
           clonedEntity,
           alternativePositionY,
@@ -470,7 +474,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
         // TODO: 01/07/21 add general packet based length tolerance
         clonedEntity.position = possiblePosition.clone();
         // mouse delay fix
-        Raytracing.EntityInteractionRaytrace resultWithoutIncrement = Raytracing.complexDoubleEntityRaytrace(
+        Raytracing.EntityInteractionRaytrace resultWithoutIncrement = Raytracing.doubleMDFEntityRaytrace(
           player,
           clonedEntity,
           false,
@@ -488,7 +492,7 @@ public final class AttackRaytrace extends IntaveMetaCheck<AttackRaytrace.AttackR
         while (clonedEntity.position.newPosRotationIncrements > 0) {
           clonedEntity.onUpdate();
           // mouse delay fix
-          Raytracing.EntityInteractionRaytrace result = Raytracing.complexDoubleEntityRaytrace(
+          Raytracing.EntityInteractionRaytrace result = Raytracing.doubleMDFEntityRaytrace(
             player,
             clonedEntity,
             false,

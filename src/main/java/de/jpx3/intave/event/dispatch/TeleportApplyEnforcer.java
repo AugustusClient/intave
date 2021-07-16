@@ -11,6 +11,7 @@ import de.jpx3.intave.event.packet.ListenerPriority;
 import de.jpx3.intave.event.packet.PacketEventSubscriber;
 import de.jpx3.intave.event.packet.PacketSubscription;
 import de.jpx3.intave.logging.IntaveLogger;
+import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.tools.MathHelper;
 import de.jpx3.intave.tools.annotate.DispatchCrossCall;
 import de.jpx3.intave.tools.annotate.KeepEnumInternalNames;
@@ -256,10 +257,18 @@ public final class TeleportApplyEnforcer implements PacketEventSubscriber {
   }
 
   private static final class TeleportPositionFlagsHelper {
-    private static final Class<?> FLAGS_CLASS = MinecraftReflection.getMinecraftClass(
-      "EnumPlayerTeleportFlags",
-      "PacketPlayOutPosition$EnumPlayerTeleportFlags"
-    );
+    private static final Class<?> FLAGS_CLASS;
+
+    static {
+      if (MinecraftVersions.VER1_17_0.atOrAbove()) {
+        FLAGS_CLASS = ReflectiveAccess.lookupServerClass("PacketPlayOutPosition$EnumPlayerTeleportFlags");
+      } else {
+        FLAGS_CLASS = MinecraftReflection.getMinecraftClass(
+          "EnumPlayerTeleportFlags",
+          "PacketPlayOutPosition$EnumPlayerTeleportFlags"
+        );
+      }
+    }
 
     private static StructureModifier<Set<PlayerTeleportFlag>> flagsModifier(PacketContainer packet) {
       return packet.getSets(EnumWrappers.getGenericConverter(FLAGS_CLASS, PlayerTeleportFlag.class));

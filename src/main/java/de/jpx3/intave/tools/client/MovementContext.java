@@ -3,7 +3,6 @@ package de.jpx3.intave.tools.client;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import de.jpx3.intave.user.*;
-import de.jpx3.intave.world.blockaccess.BlockTypeAccess;
 import de.jpx3.intave.world.blockaccess.BukkitBlockAccess;
 import de.jpx3.intave.world.blockphysic.Climbables;
 import de.jpx3.intave.world.blockphysic.Slipperiness;
@@ -138,7 +137,12 @@ public final class MovementContext {
       WrappedMathHelper.floor(positionY),
       WrappedMathHelper.floor(positionZ)
     );
-    Material type = BlockTypeAccess.typeAccess(block, player);
+    Material type = BukkitBlockAccess.cacheAppliedTypeAccess(
+      user, player.getWorld(),
+      WrappedMathHelper.floor(positionX),
+      WrappedMathHelper.floor(positionY),
+      WrappedMathHelper.floor(positionZ)
+    );
     if (clientData.combatUpdate() && type.name().contains("TRAP_DOOR") && canGoThroughTrapDoorOnLadder(block)) {
       return true;
     }

@@ -1,5 +1,6 @@
 package de.jpx3.intave.detect.checks.combat.heuristics.detection;
 
+import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.EnumWrappers;
@@ -51,9 +52,12 @@ public final class AirClickLimitHeuristic extends IntaveMetaCheckPart<Heuristics
     User user = userOf(player);
     AirClickLimitHeuristicMeta meta = metaOf(user);
 
-    EnumWrappers.EntityUseAction entityUseAction = event.getPacket().getEntityUseActions().read(0);
-
-    if (entityUseAction == EnumWrappers.EntityUseAction.ATTACK) {
+    PacketContainer packet = event.getPacket();
+    EnumWrappers.EntityUseAction action = packet.getEntityUseActions().readSafely(0);
+    if (action == null) {
+      action = packet.getEnumEntityUseActions().read(0).getAction();
+    }
+    if (action == EnumWrappers.EntityUseAction.ATTACK) {
       meta.resetedLeftClickCounterThisTick = true;
     }
   }

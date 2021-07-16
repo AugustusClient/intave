@@ -68,7 +68,11 @@ public final class AttackDispatcher implements EventProcessor {
 
     PacketContainer packet = event.getPacket();
     Integer entityId = packet.getIntegers().read(0);
-    EnumWrappers.EntityUseAction action = packet.getEntityUseActions().read(0);
+    EnumWrappers.EntityUseAction action = packet.getEntityUseActions().readSafely(0);
+    if (action == null) {
+      action = packet.getEnumEntityUseActions().read(0).getAction();
+    }
+
     UserMetaInventoryData inventoryData = user.meta().inventoryData();
     ItemStack itemStack = inventoryData.heldItem();
     boolean knockbackEnchantment = itemStack != null && itemStack.containsEnchantment(Enchantment.KNOCKBACK);

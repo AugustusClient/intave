@@ -50,9 +50,11 @@ public final class Raytracing {
   public static float reachDistance(Player player) {
     return reachDistance(UserRepository.userOf(player));
   }
+
   public static float reachDistance(User user) {
     return reachDistance(user.meta());
   }
+
   public static float reachDistance(User.UserMeta meta) {
     return meta.abilityData().inGameMode(GameMode.CREATIVE) ? 5.0F : 3.0F;
   }
@@ -61,7 +63,7 @@ public final class Raytracing {
    * Calculates the reach with and without mouse delay fix and returns the smallest calculated reach
    * @return
    */
-  public static EntityInteractionRaytrace complexDoubleEntityRaytrace(
+  public static EntityInteractionRaytrace doubleMDFEntityRaytrace(
     Player player, WrappedEntity entity, boolean alternativePositionY,
     double lastPositionX, double lastPositionY, double lastPositionZ,
     float lastRotationYaw,

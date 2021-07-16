@@ -1,6 +1,7 @@
 package de.jpx3.intave.detect.checks.combat.heuristics.detection;
 
 import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import de.jpx3.intave.IntavePlugin;
@@ -46,7 +47,11 @@ public final class PacketOrderSwingHeuristic extends IntaveMetaCheckPart<Heurist
     User user = userOf(player);
     UserMetaClientData clientData = user.meta().clientData();
     PacketOrderSwingHeuristicMeta heuristicMeta = metaOf(player);
-    EnumWrappers.EntityUseAction action = event.getPacket().getEntityUseActions().read(0);
+    PacketContainer packet = event.getPacket();
+    EnumWrappers.EntityUseAction action = packet.getEntityUseActions().readSafely(0);
+    if (action == null) {
+      action = packet.getEnumEntityUseActions().read(0).getAction();
+    }
     if (user.meta().abilityData().ignoringMovementPackets()) {
       return;
     }

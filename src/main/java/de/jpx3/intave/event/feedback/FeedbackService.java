@@ -25,6 +25,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import static de.jpx3.intave.event.feedback.FeedbackService.TransactionOptions.*;
 
 public final class FeedbackService implements PacketEventSubscriber {
+  public final static boolean USE_PING_PONG_PACKETS = MinecraftVersions.VER1_17_0.atOrAbove();
   public final static long TRANSACTION_TIMEOUT = 3000;
   public final static long TRANSACTION_TIMEOUT_KICK = 20000;
   public final static short TRANSACTION_MIN_CODE = -32768;
@@ -165,7 +166,7 @@ public final class FeedbackService implements PacketEventSubscriber {
     User user = UserRepository.userOf(player);
     UserMetaConnectionData synchronizeData = user.meta().connectionData();
     Map<Short, Request<?>> transactionFeedBackMap = synchronizeData.transactionShortKeyMap();
-    short counter = TRANSACTION_MIN_CODE;
+    short counter = USE_PING_PONG_PACKETS ? 13 : TRANSACTION_MIN_CODE;
     while (transactionFeedBackMap.containsKey(counter)) counter++;
     return counter;
   }
@@ -183,9 +184,9 @@ public final class FeedbackService implements PacketEventSubscriber {
 
   private void sendTransactionPacket(Player receiver, short id) {
     PacketContainer packet;
-    if (MinecraftVersions.VER1_17_0.atOrAbove()) {
+    if (USE_PING_PONG_PACKETS) {
       packet = protocolManager.createPacket(PacketType.Play.Server.PING);
-      packet.getIntegers().write(0, ((int) id) | PING_MASK);
+      packet.getIntegers().write(0, PING_MASK | id);
     } else {
       packet = protocolManager.createPacket(PacketType.Play.Server.TRANSACTION);
       packet.getIntegers().write(0, 0);

@@ -10,7 +10,6 @@ import de.jpx3.intave.reflect.ReflectiveHandleAccess;
 import de.jpx3.intave.tools.annotate.Nullable;
 import de.jpx3.intave.tools.client.*;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
-import de.jpx3.intave.world.blockaccess.BlockTypeAccess;
 import de.jpx3.intave.world.blockaccess.BukkitBlockAccess;
 import de.jpx3.intave.world.blockphysic.BlockPhysics;
 import org.bukkit.Bukkit;
@@ -270,8 +269,8 @@ public final class UserMetaMovementData {
 
   private float jumpFactor() {
     World world = player.getWorld();
-    float f = BlockPhysics.jumpFactor(user, BlockTypeAccess.typeAccess(BukkitBlockAccess.blockAccess(world, positionX, positionY, positionZ), player));
-    float f1 = BlockPhysics.jumpFactor(user, BlockTypeAccess.typeAccess(BukkitBlockAccess.blockAccess(world, positionX, positionY - frictionPosSubtraction, positionZ), player));
+    float f = BlockPhysics.jumpFactor(user, BukkitBlockAccess.cacheAppliedTypeAccess(user, world, positionX, positionY, positionZ));
+    float f1 = BlockPhysics.jumpFactor(user, BukkitBlockAccess.cacheAppliedTypeAccess(user, world, positionX, positionY - frictionPosSubtraction, positionZ));
     return (double) f == 1.0D ? f1 : f;
   }
 

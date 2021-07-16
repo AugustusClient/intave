@@ -49,7 +49,10 @@ public final class LongTermClickAccuracyHeuristic extends IntaveMetaCheckPart<He
     if (packetType == PacketType.Play.Client.ARM_ANIMATION) {
       heuristicMeta.swings++;
     } else {
-      EnumWrappers.EntityUseAction action = packet.getEntityUseActions().read(0);
+      EnumWrappers.EntityUseAction action = packet.getEntityUseActions().readSafely(0);
+      if (action == null) {
+        action = packet.getEnumEntityUseActions().read(0).getAction();
+      }
       if (action == EnumWrappers.EntityUseAction.ATTACK) {
         heuristicMeta.attacks++;
         heuristicMeta.swings--;

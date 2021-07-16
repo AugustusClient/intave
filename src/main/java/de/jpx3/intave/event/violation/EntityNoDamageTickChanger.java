@@ -1,6 +1,7 @@
 package de.jpx3.intave.event.violation;
 
 import de.jpx3.intave.logging.IntaveLogger;
+import de.jpx3.intave.reflect.ReflectiveAccess;
 import de.jpx3.intave.reflect.ReflectiveHandleAccess;
 import de.jpx3.intave.tools.sync.Synchronizer;
 import de.jpx3.intave.user.User;
@@ -54,9 +55,10 @@ public final class EntityNoDamageTickChanger {
   private static int resolveNoDamageTicksOf(Player player) {
     try {
       Object handle = ReflectiveHandleAccess.handleOf(player);
-      Field maxDamageTicks = handle.getClass().getField("maxNoDamageTicks");
+      Field maxDamageTicks = ReflectiveAccess.lookupServerField("EntityLiving", "maxNoDamageTicks");;
       return (int) maxDamageTicks.get(handle);
-    } catch (NoSuchFieldException | IllegalAccessException e) {
+    } catch (IllegalAccessException exception) {
+      exception.printStackTrace();
       IntaveLogger.logger().error("Intave has problems accessing an entity field");
       hitDelayLinkageError = true;
     }
@@ -65,10 +67,11 @@ public final class EntityNoDamageTickChanger {
 
   public static void setNoDamageTicksOf(Player player, int noDamageTicks) {
     try {
+      Field maxDamageTicks = ReflectiveAccess.lookupServerField("EntityLiving", "maxNoDamageTicks");//handle.getClass().getField("maxNoDamageTicks");
       Object handle = ReflectiveHandleAccess.handleOf(player);
-      Field maxDamageTicks = handle.getClass().getField("maxNoDamageTicks");
       maxDamageTicks.set(handle, noDamageTicks);
-    } catch (NoSuchFieldException | IllegalAccessException e) {
+    } catch (IllegalAccessException exception) {
+      exception.printStackTrace();
       IntaveLogger.logger().error("Intave has problems accessing an entity field");
       hitDelayLinkageError = true;
     }

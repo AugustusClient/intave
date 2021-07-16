@@ -1,5 +1,6 @@
 package de.jpx3.intave.detect.checks.combat.heuristics.detection;
 
+import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import de.jpx3.intave.detect.IntaveMetaCheckPart;
@@ -33,9 +34,12 @@ public final class NoSwingHeuristic extends IntaveMetaCheckPart<Heuristics, NoSw
     User user = userOf(player);
     NoSwingMeta meta = metaOf(user);
 
-    EnumWrappers.EntityUseAction entityUseAction = event.getPacket().getEntityUseActions().read(0);
-
-    if (entityUseAction == EnumWrappers.EntityUseAction.ATTACK) {
+    PacketContainer packet = event.getPacket();
+    EnumWrappers.EntityUseAction action = packet.getEntityUseActions().readSafely(0);
+    if (action == null) {
+      action = packet.getEnumEntityUseActions().read(0).getAction();
+    }
+    if (action == EnumWrappers.EntityUseAction.ATTACK) {
 //      if (meta.swingsThisTick == 0 && meta.attacksThisTick == 0
 //        && user.meta().clientData().protocolVersion() == 47
 //      ) {

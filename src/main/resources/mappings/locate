@@ -48,8 +48,8 @@ Entity -> {
   17 -> "net/minecraft/world/entity/Entity"
   fields {
     17 -> {
-      "yaw" -> "a"
-      "pitch" -> "b"
+      "yaw" -> "ay"
+      "pitch" -> "az"
       "onGround" -> "z"
     }
   }
@@ -71,6 +71,11 @@ EntitySize -> {
 
 EntityLiving -> {
   17 -> "net/minecraft/world/entity/EntityLiving"
+  fields {
+    17 -> {
+      "maxNoDamageTicks" -> "aU"
+    }
+  }
 }
 
 EntityPlayer -> {
@@ -117,6 +122,11 @@ MinecraftServer -> {
 
 MovingObjectPosition -> {
   17 -> "net/minecraft/world/phys/MovingObjectPosition"
+  fields {
+    17 -> {
+      "pos" -> "a"
+    }
+  }
 }
 
 MovingObjectPositionEntity -> {
@@ -199,10 +209,16 @@ ServerConnection -> {
 
 TagsFluid -> {
   17 -> "net/minecraft/tags/TagsFluid"
+  fields {
+    17 -> {
+      "WATER" -> "b"
+      "LAVA" -> "c"
+    }
+  }
 }
 
 Vec3D -> {
-  17 -> "net/minecraft/world/phys/Vec3d"
+  17 -> "net/minecraft/world/phys/Vec3D"
   fields {
     17 -> {
       "x" -> "b"

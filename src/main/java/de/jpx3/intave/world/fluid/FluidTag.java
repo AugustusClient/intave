@@ -30,8 +30,8 @@ public enum FluidTag {
 
   private Object resolveNativeTag() {
     try {
-      return ReflectiveAccess.lookupServerClass("TagsFluid").getField(name()).get(null);
-    } catch (NoSuchFieldException | IllegalAccessException e) {
+      return ReflectiveAccess.lookupServerField("TagsFluid", name()).get(null);
+    } catch (IllegalAccessException e) {
       throw new IntaveInternalException("Cannot access fluid tag", e);
     }
   }

@@ -44,7 +44,7 @@ public final class IntaveCommandStage extends CommandStage {
 
     if (user.receives(UserMessageChannel.VERBOSE)) {
       if (selectedPlayers != null && !user.hasChannelConstraint(UserMessageChannel.VERBOSE)) {
-        List<UUID> uniqueIds = Arrays.stream(selectedPlayers).map(Entity::getUniqueId).collect(Collectors.toList());
+        List<UUID> uniqueIds = Arrays.stream(selectedPlayers).map(Entity::getUniqueId).distinct().collect(Collectors.toList());
         String names = Arrays.stream(selectedPlayers).map(Entity::getName).map(s -> s + " ").collect(Collectors.joining()).trim();
         user.setChannelConstraint(UserMessageChannel.VERBOSE, player1 -> uniqueIds.contains(player1.getUniqueId()));
         String target = ChatColor.RED + names;
@@ -62,7 +62,7 @@ public final class IntaveCommandStage extends CommandStage {
         String target = ChatColor.RED + "global";
         player.sendMessage(IntavePlugin.prefix() + "You are " + ChatColor.GREEN + "now " + IntavePlugin.defaultColor() + "receiving verbose output for: " + target);
       } else {
-        List<UUID> uniqueIds = Arrays.stream(selectedPlayers).map(Entity::getUniqueId).collect(Collectors.toList());
+        List<UUID> uniqueIds = Arrays.stream(selectedPlayers).map(Entity::getUniqueId).distinct().collect(Collectors.toList());
         String names = Arrays.stream(selectedPlayers).map(Entity::getName).map(s -> s + " ").collect(Collectors.joining()).trim();
         user.setChannelConstraint(UserMessageChannel.VERBOSE, player1 -> uniqueIds.contains(player1.getUniqueId()));
         String target = ChatColor.RED + names;
@@ -98,25 +98,6 @@ public final class IntaveCommandStage extends CommandStage {
   public void versionCommand(CommandSender commandSender) {
     sendVersionMessage(commandSender);
   }
-
-/*
-  @SubCommand(
-    selectors = "restart",
-    usage = "",
-    permission = "intave.command.restart",
-    description = "Restart Intave"
-  )
-  public void restartCommand(CommandSender commandSender) {
-    IntavePlugin plugin = IntavePlugin.singletonInstance();
-    Synchronizer.synchronize(() -> {
-      plugin.getServer().getPluginManager().disablePlugin(plugin);
-      plugin.onLoad();
-      plugin.getServer().getPluginManager().enablePlugin(plugin);
-      commandSender.sendMessage(IntavePlugin.prefix() + "Intave has been restarted");
-//      plugin.violationProcessor().broadcastNotify("Intave has been restarted by " + commandSender.getName());
-    });
-  }
-*/
 
   @SubCommand(
     selectors = "proxy",
@@ -190,7 +171,7 @@ public final class IntaveCommandStage extends CommandStage {
       }
       version += ")";
     } else {
-      version = IntavePlugin.version() + " (experimental)";
+      version = IntavePlugin.version() + " (unlisted)";
     }
 
     boolean enterprise = (UserMetaClientData.VERSION_DETAILS & 0x200) != 0;
@@ -204,13 +185,13 @@ public final class IntaveCommandStage extends CommandStage {
     });
 
     if (IntaveControl.GOMME_MODE) {
-      player.sendMessage(prefix + "Certified for GommeHDnet / vemyb");
+      player.sendMessage(prefix + "Certified for GommeHDnet (verified)");
     } else if (IntavePlugin.isInOfflineMode()) {
       player.sendMessage(prefix + "Unable to verify certificate " + LicenseVerification.licenseKey() + ". Intave servers down?");
     } else if (LicenseVerification.network().equals("~bypass")){
       player.sendMessage(prefix + "This self-issued version does not require certification");
     } else {
-      player.sendMessage(prefix + "Certified for " + LicenseVerification.network() + (enterprise || partner ? " (verified)" : " (not verified)"));
+      player.sendMessage(prefix + "Certified for " + LicenseVerification.network() + (enterprise || partner ? " (verified)" : /*" (not verified)"*/""));
     }
   }
 

@@ -239,23 +239,30 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
   )
   public void receiveEntityDestroy(PacketEvent event) {
     Player player = event.getPlayer();
-    int[] entityIDs = event.getPacket().getIntegerArrays().read(0);
+    PacketContainer packet = event.getPacket();
+    if (packet.getIntegers().size() == 0) {
+      int[] entityIDs = packet.getIntegerArrays().read(0);
+      for (int entityID : entityIDs) {
+        enterEntityDestroy(player, entityID);
+      }
+    } else {
+      enterEntityDestroy(player, packet.getIntegers().read(0));
+    }
+  }
+
+  private void enterEntityDestroy(Player player, int entityID) {
     /*
     Important: When the destroy entity packet is synchronised the spawn entity packet needs also be synchronized because:
     When you respawn the server sends a destroy entity packet and a spawn entity packet pretty fast one after another and if the
     destroy entity packet gets executed after the spawn packet the entity will be destroyed right after it gets spawned
      */
-
     User user = UserRepository.userOf(player);
     UserMetaConnectionData synchronizeData = user.meta().connectionData();
-
-    for (int entityID : entityIDs) {
-      WrappedEntity wrappedEntity = synchronizeData.synchronizedEntityMap().get(entityID);
-      if (wrappedEntity instanceof WrappedEntityFirework) {
-        plugin.eventService().feedback().singleSynchronize(player, entityID, this::processEntityDestroy, APPEND_ON_OVERFLOW);
-      } else {
-        processEntityDestroy(player, entityID);
-      }
+    WrappedEntity wrappedEntity = synchronizeData.synchronizedEntityMap().get(entityID);
+    if (wrappedEntity instanceof WrappedEntityFirework) {
+      plugin.eventService().feedback().singleSynchronize(player, entityID, this::processEntityDestroy, APPEND_ON_OVERFLOW);
+    } else {
+      processEntityDestroy(player, entityID);
     }
   }
 
@@ -600,7 +607,7 @@ public final class ClientSideEntityService implements PacketEventSubscriber {
     Float health = readHealthOf(packet.getWatchableCollectionModifier().read(0));
     if (health != null) {
       UserMetaAbilityData abilityData = UserRepository.userOf(player).meta().abilityData();
-      abilityData.unsynchroniszedHealth = health;
+      abilityData.unsynchronizedHealth = health;
       plugin.eventService().feedback().singleSynchronize(player, health, (p, retrievedHealth) -> {
         abilityData.health = retrievedHealth;
         abilityData.ticksToLastHealthUpdate = 0;

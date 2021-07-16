@@ -51,7 +51,10 @@ public final class AttackRequiredHeuristic extends IntaveMetaCheckPart<Heuristic
   public void receiveAttack(PacketEvent event) {
     Player player = event.getPlayer();
     PacketContainer packet = event.getPacket();
-    EnumWrappers.EntityUseAction action = packet.getEntityUseActions().read(0);
+    EnumWrappers.EntityUseAction action = packet.getEntityUseActions().readSafely(0);
+    if (action == null) {
+      action = packet.getEnumEntityUseActions().read(0).getAction();
+    }
     if (action == EnumWrappers.EntityUseAction.ATTACK) {
       metaOf(player).didAttack = true;
     }

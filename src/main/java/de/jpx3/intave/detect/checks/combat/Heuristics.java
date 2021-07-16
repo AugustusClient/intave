@@ -294,7 +294,11 @@ public final class Heuristics extends IntaveMetaCheck<Heuristics.HeuristicMeta> 
     Player player = event.getPlayer();
     HeuristicMeta heuristicMeta = metaOf(player);
     PacketContainer packet = event.getPacket();
-    if (packet.getEntityUseActions().read(0) == EnumWrappers.EntityUseAction.ATTACK) {
+    EnumWrappers.EntityUseAction action = packet.getEntityUseActions().readSafely(0);
+    if (action == null) {
+      action = packet.getEnumEntityUseActions().read(0).getAction();
+    }
+    if (action == EnumWrappers.EntityUseAction.ATTACK) {
       if (heuristicMeta.overallAttacks++ == 0) {
         heuristicMeta.firstAttack = AccessHelper.now();
       }

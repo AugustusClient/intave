@@ -13,6 +13,9 @@ public final class DurationTranslator {
     hours = hours % 24;
     String firstType = stringifyType(TimeUnit.DAYS, days);
     String secondType = stringifyType(TimeUnit.HOURS, hours);
+    if (secondType.isEmpty()) {
+      secondType = "0 hours";
+    }
     String output = firstType + (firstType.isEmpty() ? "" : " and ") + secondType;
     if (output.trim().isEmpty()) {
       output = "a few hours";

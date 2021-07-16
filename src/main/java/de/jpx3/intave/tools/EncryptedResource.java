@@ -23,6 +23,7 @@ import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static de.jpx3.intave.IntaveControl.GOMME_MODE;
 
@@ -153,14 +154,14 @@ public final class EncryptedResource {
       RandomAccessFile accessFile = null;
       Exception exceptionReserve = null;
       int k = 4 * 8;
-      while (k-- > 0) {
+      while (k-- > 0) { // god why
         try {
           accessFile = new RandomAccessFile(lockFile, "rw");
           break;
         } catch (Exception exception) {
           exceptionReserve = exception;
           try {
-            Thread.sleep(250);
+            Thread.sleep(ThreadLocalRandom.current().nextInt(125, 350));
           } catch (InterruptedException e) {
             e.printStackTrace();
           }
