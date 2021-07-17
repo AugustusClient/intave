@@ -144,6 +144,7 @@ public final class SprintResetHeuristic extends IntaveMetaCheckPart<Heuristics, 
       && movementData.pastFlyingPacketAccurate() > 2
       // could also use other values to activate the check (for example could a scaffold walk flag this check)
       && meta.lastAttack < 80
+      && !sendFlyingPacket
     ) {
       boolean collided = movementData.collidedHorizontally;
       if(!collided) {
@@ -152,7 +153,7 @@ public final class SprintResetHeuristic extends IntaveMetaCheckPart<Heuristics, 
       if(!collided) {
         UserMetaClientData clientData = user.meta().clientData();
         String details = "unsprinted and pressed W " + clientData.versionString() + " " + meta.lastAttack;
-        Anomaly anomaly = Anomaly.anomalyOf("210",
+        Anomaly anomaly = Anomaly.anomalyOf("220",
           Confidence.NONE,
           Anomaly.Type.KILLAURA,
           details,
