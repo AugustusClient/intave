@@ -102,7 +102,7 @@ public final class BlockingHeuristic extends IntaveMetaCheckPart<Heuristics, Blo
           user.applyAttackNerfer(AttackNerfStrategy.BLOCKING, "6");
           user.applyAttackNerfer(AttackNerfStrategy.DMG_LIGHT, "6");
           punishmentData.timeLastBlockCancel = AccessHelper.now();
-          Synchronizer.synchronize(() -> ReflectiveDataWatcherAccess.setDataWatcherFlag(player, ReflectiveDataWatcherAccess.DATA_WATCHER_BLOCKING_ID, false));
+          Synchronizer.synchronize(() -> ReflectiveDataWatcherAccess.setDataWatcherFlag(player, ReflectiveDataWatcherAccess.WATCHER_BLOCKING_ID, false));
         }
 
       }

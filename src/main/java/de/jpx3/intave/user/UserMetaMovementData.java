@@ -6,10 +6,10 @@ import de.jpx3.intave.detect.checks.movement.physics.MotionVector;
 import de.jpx3.intave.detect.checks.movement.physics.Pose;
 import de.jpx3.intave.detect.checks.movement.physics.SimulationProcessor;
 import de.jpx3.intave.event.entity.WrappedEntity;
+import de.jpx3.intave.reflect.ReflectiveDataWatcherAccess;
 import de.jpx3.intave.reflect.ReflectiveHandleAccess;
 import de.jpx3.intave.tools.annotate.Nullable;
 import de.jpx3.intave.tools.client.*;
-import de.jpx3.intave.tools.items.PlayerEnchantmentHelper;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.world.blockaccess.BukkitBlockAccess;
 import de.jpx3.intave.world.blockphysic.BlockProperties;
@@ -83,6 +83,7 @@ public final class UserMetaMovementData {
   public int pastInventoryOpen = 100;
   public boolean onLadderLast;
   public boolean aquaticUpdateInLava;
+  public boolean sprintResetNextTick;
 
   public int physicsPacketRelinkFlyVL; // In Air
   public boolean invalidMovement, suspiciousMovement;
@@ -214,6 +215,11 @@ public final class UserMetaMovementData {
     lastPositionX = positionX;
     lastPositionY = positionY;
     lastPositionZ = positionZ;
+
+    if (sprintResetNextTick) {
+      ReflectiveDataWatcherAccess.setDataWatcherFlag(player, ReflectiveDataWatcherAccess.WATCHER_SPRINT_ID, true);
+      sprintResetNextTick = false;
+    }
 
     if (hasMovement) {
       StructureModifier<Double> modifier = packet.getDoubles();
@@ -408,6 +414,14 @@ public final class UserMetaMovementData {
       baseSpeed *= 0.2;
     }
     return baseSpeed;
+  }
+
+  public void sprintReset() {
+    UserMetaInventoryData inventoryData = user.meta().inventoryData();
+    if (player.getFoodLevel() >= 6 && !inventoryData.inventoryOpen()) {
+      ReflectiveDataWatcherAccess.setDataWatcherFlag(player, ReflectiveDataWatcherAccess.WATCHER_SPRINT_ID, false);
+      sprintResetNextTick = true;
+    }
   }
 
   public void dismountRidingEntity() {

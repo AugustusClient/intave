@@ -18,7 +18,7 @@ import de.jpx3.intave.user.*;
 import org.bukkit.entity.Player;
 
 import static de.jpx3.intave.event.packet.PacketId.Client.*;
-import static de.jpx3.intave.reflect.ReflectiveDataWatcherAccess.DATA_WATCHER_SNEAK_ID;
+import static de.jpx3.intave.reflect.ReflectiveDataWatcherAccess.WATCHER_SNEAK_ID;
 
 public final class PacketPlayerActionToggleHeuristic extends IntaveMetaCheckPart<Heuristics, PacketPlayerActionToggleHeuristic.PacketSprintToggleHeuristicMeta> {
   private final IntavePlugin plugin;
@@ -98,7 +98,7 @@ public final class PacketPlayerActionToggleHeuristic extends IntaveMetaCheckPart
             user.applyAttackNerfer(AttackNerfStrategy.CANCEL, "12");
           } else {
             punishmentData.timeLastSneakToggleCancel = AccessHelper.now();
-            Synchronizer.synchronize(() -> ReflectiveDataWatcherAccess.setDataWatcherFlag(player, DATA_WATCHER_SNEAK_ID, false));
+            Synchronizer.synchronize(() -> ReflectiveDataWatcherAccess.setDataWatcherFlag(player, WATCHER_SNEAK_ID, false));
           }
         }
       }

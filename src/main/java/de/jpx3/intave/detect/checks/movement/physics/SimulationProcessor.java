@@ -17,7 +17,7 @@ import de.jpx3.intave.world.collider.complex.ComplexColliderSimulationResult;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import static de.jpx3.intave.reflect.ReflectiveDataWatcherAccess.DATA_WATCHER_BLOCKING_ID;
+import static de.jpx3.intave.reflect.ReflectiveDataWatcherAccess.WATCHER_BLOCKING_ID;
 
 @Relocate
 public final class SimulationProcessor {
@@ -116,7 +116,7 @@ public final class SimulationProcessor {
       }
     }
     if (!ViaVersionAdapter.ignoreBlocking(user.player())) {
-      Synchronizer.synchronize(() -> ReflectiveDataWatcherAccess.setDataWatcherFlag(user.player(), DATA_WATCHER_BLOCKING_ID, false));
+      Synchronizer.synchronize(() -> ReflectiveDataWatcherAccess.setDataWatcherFlag(user.player(), WATCHER_BLOCKING_ID, false));
     }
   }
 

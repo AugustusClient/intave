@@ -155,7 +155,9 @@ public final class MovementDispatcher implements EventProcessor {
     User user = UserRepository.userOf(player);
     UserMetaMovementData movementData = user.meta().movementData();
     WrappedAttribute attribute = genericMovementSpeedAttributeOf(event.getPacket());
-    if (attribute == null) {
+    PacketContainer packet = event.getPacket();
+    Integer entityID = packet.getIntegers().read(0);
+    if (attribute == null || entityID != player.getEntityId()) {
       return;
     }
     boolean found = false;
@@ -192,9 +194,16 @@ public final class MovementDispatcher implements EventProcessor {
   public void sentRespawn(PacketEvent event) {
     Player player = event.getPlayer();
     User user = UserRepository.userOf(player);
-    UserMetaViolationLevelData violationLevelData = user.meta().violationLevelData();
+    User.UserMeta meta = user.meta();
+    UserMetaMovementData movementData = meta.movementData();
+    UserMetaAbilityData abilityData = meta.abilityData();
+    UserMetaViolationLevelData violationLevelData = meta.violationLevelData();
     violationLevelData.physicsVelocityVL = 0;
     violationLevelData.physicsVL = Math.max(0, violationLevelData.physicsVL - 10);
+    // check for gui screen
+    if (abilityData.health <= 0f) {
+      Synchronizer.synchronize(movementData::sprintReset);
+    }
     synchronizeRespawn(player);
   }
 
