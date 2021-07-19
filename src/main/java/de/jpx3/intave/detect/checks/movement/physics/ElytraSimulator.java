@@ -1,6 +1,5 @@
-package de.jpx3.intave.detect.checks.movement.physics.simulator;
+package de.jpx3.intave.detect.checks.movement.physics;
 
-import de.jpx3.intave.detect.checks.movement.physics.MotionVector;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserMetaMovementData;
@@ -8,7 +7,7 @@ import de.jpx3.intave.world.collider.Collider;
 import de.jpx3.intave.world.collider.complex.ComplexColliderSimulationResult;
 import org.bukkit.util.Vector;
 
-public final class ElytraMoveSimulator extends DefaultMoveSimulator {
+public final class ElytraSimulator extends DefaultSimulator {
   @Override
   public ComplexColliderSimulationResult performSimulation(
     User user, MotionVector context,
@@ -65,6 +64,11 @@ public final class ElytraMoveSimulator extends DefaultMoveSimulator {
   @Override
   public void prepareNextTick(User user, double positionX, double positionY, double positionZ, double motionX, double motionY, double motionZ) {
     super.prepareNextTick(user, positionX, positionY, positionZ, motionX, motionY, motionZ);
+  }
+
+  @Override
+  public String debugName() {
+    return "ELYTRA";
   }
 
   @Override

@@ -1,14 +1,10 @@
-package de.jpx3.intave.detect.checks.movement.physics.simulator;
+package de.jpx3.intave.detect.checks.movement.physics;
 
 import de.jpx3.intave.adapter.MinecraftVersions;
-import de.jpx3.intave.detect.checks.movement.physics.MotionVector;
-import de.jpx3.intave.detect.checks.movement.physics.Pose;
-import de.jpx3.intave.detect.checks.movement.physics.SimulationEngine;
 import de.jpx3.intave.event.entity.WrappedEntity;
 import de.jpx3.intave.tools.client.EffectLogic;
 import de.jpx3.intave.tools.client.Materials;
 import de.jpx3.intave.tools.client.MovementContext;
-import de.jpx3.intave.tools.client.PoseHelper;
 import de.jpx3.intave.tools.items.PlayerEnchantmentHelper;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
@@ -35,7 +31,7 @@ import java.util.Collection;
 
 import static de.jpx3.intave.user.UserMetaClientData.VER_1_14;
 
-public class DefaultMoveSimulator extends SimulationEngine {
+public class DefaultSimulator extends Simulator {
   @Override
   public ComplexColliderSimulationResult performSimulation(
     User user, MotionVector context,

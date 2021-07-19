@@ -2,10 +2,7 @@ package de.jpx3.intave.user;
 
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.reflect.StructureModifier;
-import de.jpx3.intave.detect.checks.movement.physics.MotionVector;
-import de.jpx3.intave.detect.checks.movement.physics.Pose;
-import de.jpx3.intave.detect.checks.movement.physics.SimulationProcessor;
-import de.jpx3.intave.detect.checks.movement.physics.SimulationEngines;
+import de.jpx3.intave.detect.checks.movement.physics.*;
 import de.jpx3.intave.event.entity.WrappedEntity;
 import de.jpx3.intave.reflect.ReflectiveDataWatcherAccess;
 import de.jpx3.intave.reflect.ReflectiveHandleAccess;
@@ -68,7 +65,7 @@ public final class UserMetaMovementData {
   public float rotationYaw, rotationPitch;
   public float lastRotationYaw, lastRotationPitch;
   private Pose pose = Pose.STANDING;
-  private SimulationEngines simulationEngines = SimulationEngines.PLAYER;
+  private Simulator simulator = Simulators.PLAYER;
   private final SimulationProcessor.IterativeSimulationContext iterativeSimulation = new SimulationProcessor.IterativeSimulationContext();
   private Material blockOnPosition = Material.AIR;
 
@@ -589,8 +586,8 @@ public final class UserMetaMovementData {
     return pastFlyingPacketAccurate;
   }
 
-  public SimulationEngines simulationService() {
-    return simulationEngines;
+  public Simulator simulator() {
+    return simulator;
   }
 
   public Pose pose() {
@@ -646,8 +643,8 @@ public final class UserMetaMovementData {
     this.verifiedLocation = verifiedLocation;
   }
 
-  public void setMovementPoseType(SimulationEngines movementSimulationEnginesType) {
-    this.simulationEngines = movementSimulationEnginesType;
+  public void setSimulator(Simulator simulator) {
+    this.simulator = simulator;
   }
 
   public void setPastFlyingPacketAccurate(int pastFlyingPacketAccurate) {

@@ -105,8 +105,8 @@ public final class Physics extends IntaveCheck {
   }
 
   private void linkCheckToPoseSimulators() {
-    for (SimulationEngines simulationEngines : SimulationEngines.values()) {
-      simulationEngines.simulator().checkLinkage(this);
+    for (Simulator simulator : Simulators.simulators()) {
+      simulator.enterLinkage(this);
     }
   }
 
@@ -147,7 +147,7 @@ public final class Physics extends IntaveCheck {
     UserMetaMovementData movementData = meta.movementData();
     UserMetaClientData clientData = meta.clientData();
 
-    movementData.setMovementPoseType(poseOf(user));
+    movementData.setSimulator(selectSimulator(user));
 
     if (clientData.waterUpdate() && movementData.sneaking && movementData.inWater) {
       handleSneakInWater(user);
@@ -158,7 +158,7 @@ public final class Physics extends IntaveCheck {
 
     Timings.CHECK_PHYSICS_PROC_TOT.start();
     predictFlyingPacketBeforeVelocity(user);
-    ComplexColliderSimulationResult predictedMovement = simulationProcessor.simulate(user, movementData.simulationService());
+    ComplexColliderSimulationResult predictedMovement = simulationProcessor.simulate(user, movementData.simulator());
     movementData.onGround = predictedMovement.onGround();
     movementData.collidedHorizontally = predictedMovement.collidedHorizontally();
     movementData.collidedVertically = predictedMovement.collidedVertically();
@@ -174,19 +174,19 @@ public final class Physics extends IntaveCheck {
     movementData.pastRiptideSpin++;
   }
 
-  private SimulationEngines poseOf(User user) {
+  private Simulator selectSimulator(User user) {
     UserMetaMovementData movementData = user.meta().movementData();
     if (movementData.hasRidingEntity()) {
-      return SimulationEngines.HORSE;
+      return Simulators.HORSE;
     } else {
       boolean inLava = movementData.inLava();
       boolean inWater = movementData.inWater;
       Pose pose = movementData.pose();
       if (pose == Pose.FALL_FLYING && !inWater && !inLava) {
-        return SimulationEngines.ELYTRA;
+        return Simulators.ELYTRA;
       }
     }
-    return SimulationEngines.PLAYER;
+    return Simulators.PLAYER;
   }
 
   @DispatchCrossCall
@@ -196,8 +196,7 @@ public final class Physics extends IntaveCheck {
     double motionY = movementData.motionY();
     double motionZ = movementData.motionZ();
     if (hasMovement) {
-      SimulationEngines movementSimulationEnginesType = movementData.simulationService();
-      SimulationEngine simulator = movementSimulationEnginesType.simulator();
+      Simulator simulator = movementData.simulator();
       if (movementData.pastVelocity == 0) {
         if (movementData.physicsJumped && movementData.lastVelocityApplicableForJumpDenial()) {
           movementData.physicsJumpedOverrideVL++;
@@ -366,7 +365,7 @@ public final class Physics extends IntaveCheck {
     }
 
     double violationLevelIncrease = horizontalViolationIncrease + verticalViolationIncrease;
-    if (movementData.simulationService() == SimulationEngines.HORSE && !IntaveControl.GOMME_MODE) {
+    if (movementData.simulator() == Simulators.HORSE && !IntaveControl.GOMME_MODE) {
       violationLevelIncrease = 0;
     }
     if (distance > 1e-3) {
@@ -822,7 +821,6 @@ public final class Physics extends IntaveCheck {
     UserMetaViolationLevelData violationLevelData = meta.violationLevelData();
     UserMetaMovementData movementData = meta.movementData();
 
-    SimulationEngines movementSimulationEnginesType = movementData.simulationService();
     double motionX = movementData.motionX();
     double motionZ = movementData.motionZ();
     double distanceMoved = MathHelper.resolveHorizontalDistance(
@@ -831,7 +829,7 @@ public final class Physics extends IntaveCheck {
     );
     double predictedDistanceMoved = Math.hypot(predictedX, predictedZ);
 
-    if (movementSimulationEnginesType == SimulationEngines.HORSE) {
+    if (movementData.simulator() == Simulators.HORSE) {
 
 //      user.player().sendMessage(distanceMoved + " " + predictedDistanceMoved);
 

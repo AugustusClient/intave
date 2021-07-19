@@ -4,10 +4,10 @@ import de.jpx3.intave.detect.checks.movement.Physics;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.world.collider.complex.ComplexColliderSimulationResult;
 
-public abstract class SimulationEngine {
+public abstract class Simulator {
   private Physics physics;
 
-  public final void checkLinkage(Physics physics) {
+  public final void enterLinkage(Physics physics) {
     this.physics = physics;
   }
 
@@ -22,6 +22,10 @@ public abstract class SimulationEngine {
     double positionX, double positionY, double positionZ,
     double motionX, double motionY, double motionZ
   );
+
+  public String debugName() {
+    return "";
+  }
 
   public Physics physics() {
     return physics;
