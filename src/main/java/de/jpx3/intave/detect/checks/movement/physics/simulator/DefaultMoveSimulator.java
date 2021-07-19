@@ -8,6 +8,7 @@ import de.jpx3.intave.event.entity.WrappedEntity;
 import de.jpx3.intave.tools.client.EffectLogic;
 import de.jpx3.intave.tools.client.Materials;
 import de.jpx3.intave.tools.client.MovementContext;
+import de.jpx3.intave.tools.client.PoseHelper;
 import de.jpx3.intave.tools.items.PlayerEnchantmentHelper;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.tools.wrapper.WrappedMathHelper;
@@ -55,8 +56,7 @@ public class DefaultMoveSimulator extends SimulationEngine {
     boolean elytraFlying = pose == Pose.FALL_FLYING;
     boolean swimming = pose == Pose.SWIMMING;
     boolean waterUpdate = clientData.waterUpdate();
-    boolean ignoreSneakingInput = swimming && clientData.beeUpdate();
-    if (pose == Pose.CROUCHING && !ignoreSneakingInput) {
+    if (pose == Pose.CROUCHING || !clientData.beeUpdate() && movementData.sneaking) {
       strafe = (float) ((double) strafe * 0.3);
       forward = (float) ((double) forward * 0.3);
     }

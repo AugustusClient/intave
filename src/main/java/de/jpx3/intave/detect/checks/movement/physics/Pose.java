@@ -39,9 +39,6 @@ public enum Pose {
     .put(CROUCHING, HitBoxBoundaries.of(0.6f, 1.5f))
     .build();
 
-  Pose() {
-  }
-
   public WrappedAxisAlignedBB boundingBoxOf(User user) {
     UserMetaMovementData movementData = user.meta().movementData();
     return boundingBoxOf(user, movementData.positionX, movementData.positionY, movementData.positionZ);
