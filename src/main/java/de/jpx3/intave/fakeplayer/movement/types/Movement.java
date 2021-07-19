@@ -3,9 +3,13 @@ package de.jpx3.intave.fakeplayer.movement.types;
 import de.jpx3.intave.fakeplayer.movement.HeadRotationMovement;
 import de.jpx3.intave.fakeplayer.movement.LocationUtils;
 import de.jpx3.intave.tools.AccessHelper;
+import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
+import de.jpx3.intave.world.collider.simple.SimpleColliderSimulationResult;
+import de.jpx3.intave.world.collision.Collision;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class Movement extends HeadRotationMovement {
@@ -54,21 +58,20 @@ public abstract class Movement extends HeadRotationMovement {
     move(parentLocation);
     double startMotionX = this.motionX;
     double startMotionZ = this.motionZ;
-//    QuickColliderSimulationResult result = Collider.simulateQuickCollision(
-//      location.getWorld(),
-//      location.getX(), location.getY(), location.getZ(),
-//      motionX, motionY, motionZ
-//    );
-//    if (doBlockCollisions()) {
-////      this.motionX = result.motionX();
-//      this.motionY = result.motionY();
-////      this.motionZ = result.motionZ();
-//      if (this.velocityChanged) {
-//        this.velocityChanged = false;
-//      }
-//      this.collidedHorizontally = result.motionX() != motionX || result.motionZ() != motionZ;
-//    }
-//    this.onGround = result.onGround();
+    SimpleColliderSimulationResult result = collide(
+      WrappedAxisAlignedBB.createFromPosition(location.getX(), location.getY(), location.getZ()),
+      motionX, motionY, motionZ
+    );
+    if (doBlockCollisions()) {
+//      this.motionX = result.motionX();
+      this.motionY = result.motionY();
+//      this.motionZ = result.motionZ();
+      if (this.velocityChanged) {
+        this.velocityChanged = false;
+      }
+      this.collidedHorizontally = result.motionX() != motionX || result.motionZ() != motionZ;
+    }
+    this.onGround = result.onGround();
 
     // Renew location
     this.prevLocation = this.location.clone();
@@ -87,6 +90,24 @@ public abstract class Movement extends HeadRotationMovement {
     updateHeadRotation(this.motionX, this.motionZ, distanceMoved(), parentLocation.getYaw());
     this.location.setYaw(this.rotationYaw);
     this.location.setPitch(this.rotationPitch);
+  }
+
+  private SimpleColliderSimulationResult collide(WrappedAxisAlignedBB boundingBox, double motionX, double motionY, double motionZ) {
+    List<WrappedAxisAlignedBB> collisionBoxes = Collision.resolve(location.getWorld(), boundingBox.addCoord(motionX, motionY, motionZ));
+    double startMotionY = motionY;
+    for (WrappedAxisAlignedBB collisionBox : collisionBoxes) {
+      motionY = collisionBox.calculateYOffset(boundingBox, motionY);
+    }
+    boundingBox = (boundingBox.offset(0.0D, motionY, 0.0D));
+    boolean onGround = startMotionY != motionY && startMotionY < 0.0D;
+    for (WrappedAxisAlignedBB collisionBox : collisionBoxes) {
+      motionX = collisionBox.calculateXOffset(boundingBox, motionX);
+    }
+    boundingBox = boundingBox.offset(motionX, 0.0D, 0.0D);
+    for (WrappedAxisAlignedBB collisionBox : collisionBoxes) {
+      motionZ = collisionBox.calculateZOffset(boundingBox, motionZ);
+    }
+    return new SimpleColliderSimulationResult(motionX, motionY, motionZ, onGround, startMotionY != motionY);
   }
 
   public boolean shouldMove(Location parentLocation) {

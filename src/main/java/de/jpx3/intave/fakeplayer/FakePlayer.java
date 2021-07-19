@@ -151,7 +151,7 @@ public final class FakePlayer implements TickTaskScheduler {
 
     // Entity
     PlayerMetaDataHelper.setMetadata(wrappedDataWatcher, 0, Byte.class, (byte) 0);
-    PlayerMetaDataHelper.setMetadata(wrappedDataWatcher, 1, Integer.class, 300);
+    PlayerMetaDataHelper.setMetadata(wrappedDataWatcher, 1, Short.class, (short)300);
     PlayerMetaDataHelper.setMetadata(wrappedDataWatcher, 2, String.class, "");
     PlayerMetaDataHelper.setMetadata(wrappedDataWatcher, 3, Byte.class, (byte) 0);
     PlayerMetaDataHelper.setMetadata(wrappedDataWatcher, 4, Byte.class, (byte) 0);

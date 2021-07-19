@@ -20,6 +20,7 @@ public final class CommandProcessor implements CommandExecutor, TabCompleter {
   static {
     IntaveCommandStage.singletonInstance();
     IntaveInternalsStage.singletonInstance();
+    IntaveBotStage.singletonInstance();
     IntaveRootStage.singletonInstance();
     IntaveDiagnosticsStage.singletonInstance();
     IntaveProxyStage.singletonInstance();
