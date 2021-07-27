@@ -30,7 +30,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import static de.jpx3.intave.IntaveControl.GOMME_MODE;
 
 public final class EncryptedResource {
-  private final static int CLASS_VERSION = 5;
+  private final static int CLASS_VERSION = 4;
   private final String name;
   private final boolean versionDependent;
 
@@ -59,7 +59,7 @@ public final class EncryptedResource {
       ByteBuffer byteBuffer = ByteBuffer.wrap(byteArrayOutputStream.toByteArray());
       byte[] iv = new byte[byteBuffer.getInt()];
       byteBuffer.get(iv);
-      KeySpec spec = new PBEKeySpec("BYf5HGzDyNsduV73GwZp2k40pGCHHYe5c8QzR4OGY4da6hQrpitMR8ftJwadOPc4".toCharArray(), iv, 65536, 128); // AES-128
+      KeySpec spec = new PBEKeySpec("adXUOhsZW7H5m4dlOyrNV7ZvHBBB071Sy2jCiuUZ91QMAcYyexjxwDQmXL1LR1nV".toCharArray(), iv, 65536, 128); // AES-128
       SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
       byte[] key = secretKeyFactory.generateSecret(spec).getEncoded();
       SecretKey secretKey = new SecretKeySpec(key, "AES");
@@ -105,7 +105,7 @@ public final class EncryptedResource {
       SecureRandom secureRandom = new SecureRandom();
       byte[] iv = new byte[12];
       secureRandom.nextBytes(iv);
-      KeySpec spec = new PBEKeySpec("BYf5HGzDyNsduV73GwZp2k40pGCHHYe5c8QzR4OGY4da6hQrpitMR8ftJwadOPc4".toCharArray(), iv, 65536, 128); // AES-128
+      KeySpec spec = new PBEKeySpec("adXUOhsZW7H5m4dlOyrNV7ZvHBBB071Sy2jCiuUZ91QMAcYyexjxwDQmXL1LR1nV".toCharArray(), iv, 65536, 128); // AES-128
       SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
       byte[] key = secretKeyFactory.generateSecret(spec).getEncoded();
       SecretKey secretKey = new SecretKeySpec(key, "AES");

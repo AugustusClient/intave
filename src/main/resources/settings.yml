@@ -4,13 +4,12 @@ state: 0
 check:
   physics:
 
-    # Toggle overall
-    high-tolerance: false
+    high-tolerance: true
 
     # Mitigation mode
     # Choose between AGGRESSIVE, CAREFUL, LENIENT and SILENT
     # Trustfactor mappings and high-tolerance modes are supported throughout all of them
-    mitigation: AGGRESSIVE
+    mitigation: CAREFUL
 
     thresholds:
       50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is moving incorrectly"
@@ -22,7 +21,7 @@ check:
 
   timer:
 
-    high-tolerance: false
+    high-tolerance: true
 
     thresholds:
       50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is moving too frequently / is lagging"
@@ -56,10 +55,6 @@ check:
   attackraytrace:
 
     enabled: true
-
-    uncertainty-vl: false
-
-    apply-hitbox-vl: true
 
     applicable-thresholds:
       reach:

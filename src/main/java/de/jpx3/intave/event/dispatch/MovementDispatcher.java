@@ -87,6 +87,15 @@ public final class MovementDispatcher implements EventProcessor {
   }
 
   @BukkitEventSubscription
+  public void worldChange(PlayerChangedWorldEvent worldChange) {
+    Player player = worldChange.getPlayer();
+    User user = UserRepository.userOf(player);
+    User.UserMeta meta = user.meta();
+    UserMetaMovementData movementData = meta.movementData();
+    movementData.dismountRidingEntity();
+  }
+
+  @BukkitEventSubscription
   public void receiveRespawn(PlayerRespawnEvent event) {
     Player player = event.getPlayer();
     User user = UserRepository.userOf(player);
