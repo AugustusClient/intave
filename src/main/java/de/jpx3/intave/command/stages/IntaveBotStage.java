@@ -12,8 +12,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Locale;
-
 public final class IntaveBotStage extends CommandStage {
   private static IntaveBotStage singletonInstance;
   private final IntavePlugin plugin;
@@ -51,10 +49,6 @@ public final class IntaveBotStage extends CommandStage {
         break;
     }
     commandSender.sendMessage(IntavePlugin.prefix() + ChatColor.GRAY + "Summoned bot to " + ChatColor.RED + target.player().getName());
-  }
-
-  private String firstToUppercase(String string) {
-    return string.substring(0, 1).toUpperCase(Locale.ROOT) + string.substring(1).toLowerCase(Locale.ROOT);
   }
 
   @KeepEnumInternalNames

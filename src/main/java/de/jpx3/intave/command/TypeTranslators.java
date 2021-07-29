@@ -35,8 +35,10 @@ public final class TypeTranslators {
           return enumConstant;
         }
       }
-      List<String> types = Arrays.stream(enumConstants).map(enumConstant -> niceifyEnumName(enumConstant.name()).toUpperCase(Locale.ROOT)).collect(Collectors.toList());
-      return "Unknown element \"" + element + "\" of enum: Expected " + describeListSelection(types);
+      List<String> types = Arrays.stream(enumConstants)
+        .map(enumConstant -> niceifyEnumName(enumConstant.name()))
+        .collect(Collectors.toList());
+      return "Unknown element \"" + element + "\": Expected " + describeListSelection(types);
     }
     TypeTranslator<?> typeTranslator = typeTranslatorMap.get(type);
     if (typeTranslator == null) {
@@ -70,6 +72,14 @@ public final class TypeTranslators {
   }
 
   private static String niceifyEnumName(String input) {
-    return input.toLowerCase(Locale.ROOT).replace("_", "");
+    return firstToUppercase(
+      input
+        .toLowerCase(Locale.ROOT)
+        .replace("_", "")
+    );
+  }
+
+  private static String firstToUppercase(String string) {
+    return string.substring(0, 1).toUpperCase(Locale.ROOT) + string.substring(1).toLowerCase(Locale.ROOT);
   }
 }
