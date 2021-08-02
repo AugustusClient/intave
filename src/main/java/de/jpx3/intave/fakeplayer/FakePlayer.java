@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
+import static de.jpx3.intave.event.feedback.FeedbackService.TransactionOptions.SELF_SYNCHRONIZATION;
 import static de.jpx3.intave.fakeplayer.FakePlayerAttribute.*;
 import static de.jpx3.intave.fakeplayer.MetadataAccess.updateHealthFor;
 import static de.jpx3.intave.fakeplayer.ProfileLookup.acquireGameProfile;
@@ -223,7 +224,7 @@ public final class FakePlayer extends FakePlayerBody {
         attackData.fakePlayerLastReportedX = target.getX();
         attackData.fakePlayerLastReportedY = target.getY();
         attackData.fakePlayerLastReportedZ = target.getZ();
-      });
+      }, SELF_SYNCHRONIZATION);
   }
 
   public void movementUpdate(Location to, Location prevLocation, boolean onGround) {
@@ -236,7 +237,7 @@ public final class FakePlayer extends FakePlayerBody {
         attackData.fakePlayerLastReportedX = target.getX();
         attackData.fakePlayerLastReportedY = target.getY();
         attackData.fakePlayerLastReportedZ = target.getZ();
-      });
+      }, SELF_SYNCHRONIZATION);
   }
 
   public boolean teleportRequired(Location location1, Location location2) {
