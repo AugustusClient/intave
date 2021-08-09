@@ -23,6 +23,7 @@ public final class BlockProperties {
     Property.of("WEEPING_VINES_PLANT").climbable().build().exists(BlockProperties::append);
     Property.of("TWISTING_VINES").climbable().build().exists(BlockProperties::append);
     Property.of("TWISTING_VINES_PLANT").climbable().build().exists(BlockProperties::append);
+    Property.of("CAVE_VINES_PLANT").climbable().build().exists(BlockProperties::append);
     Property.of(Material.SOUL_SAND).speedFactor(0.4f).soulSpeedAffected().build().exists(BlockProperties::append);
     Property.of("SOUL_SOIL").soulSpeedAffected().build().exists(BlockProperties::append);
     Property.of("HONEY_BLOCK").jumpFactor(0.5f).speedFactor(0.4f).build().exists(BlockProperties::append);
