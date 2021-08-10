@@ -1,13 +1,13 @@
-package de.jpx3.intave.world.blockshape.boxresolver.pipeline.drill;
+package de.jpx3.intave.world.blockshape.boxresolver.drill;
 
 import de.jpx3.intave.patchy.annotate.PatchyAutoTranslation;
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.tools.wrapper.link.WrapperLinkage;
-import de.jpx3.intave.world.blockshape.boxresolver.pipeline.ResolverPipeline;
-import de.jpx3.intave.world.blockshape.boxresolver.pipeline.drill.acbbs.v9AlwaysCollidingBoundingBox;
-import net.minecraft.server.v1_9_R2.*;
+import de.jpx3.intave.world.blockshape.boxresolver.ResolverPipeline;
+import de.jpx3.intave.world.blockshape.boxresolver.drill.acbbs.v12AlwaysCollidingBoundingBox;
+import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_9_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -15,8 +15,8 @@ import java.util.Collections;
 import java.util.List;
 
 @PatchyAutoTranslation
-public final class v9BoundingBoxDrill implements ResolverPipeline {
-  private final static v9AlwaysCollidingBoundingBox ALWAYS_COLLIDING_BOX = new v9AlwaysCollidingBoundingBox();
+public final class v12BoundingBoxDrill implements ResolverPipeline {
+  private final static v12AlwaysCollidingBoundingBox ALWAYS_COLLIDING_BOX = new v12AlwaysCollidingBoundingBox();
 
   @Override
   @PatchyAutoTranslation
@@ -28,7 +28,7 @@ public final class v9BoundingBoxDrill implements ResolverPipeline {
     }
     WorldServer worldServer = ((CraftWorld) world).getHandle();
     List<AxisAlignedBB> bbs = new ArrayList<>();
-    blockData.getBlock().a(blockData, worldServer, blockposition, ALWAYS_COLLIDING_BOX, bbs, null);
+    blockData.getBlock().a(blockData, worldServer, blockposition, ALWAYS_COLLIDING_BOX, bbs, null, false);
     return translate(bbs);
   }
 

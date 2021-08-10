@@ -92,7 +92,8 @@ public final class PacketEntityTypeResolver {
         Class<? extends Entity> entityClass = entityType.getEntityClass();
         String entityClassName = entityClass.getSimpleName();
         if (IntaveControl.DISABLE_LICENSE_CHECK) {
-          IntaveLogger.logger().info("Zero BoundingBox 2");
+          // still necessary?
+          IntaveLogger.logger().info("Zero BoundingBox 2 (Entity " + entityClassName+ ")");
         }
         return new EntityTypeData(entityClassName, HitBoxBoundaries.zero(), -2, false);
       }

@@ -10,6 +10,8 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import static de.jpx3.intave.diagnostics.timings.Timings.SERVICE_TYPE_LOOKUP;
+
 @Relocate
 public final class BlockTypeAccess {
   public static final Material WEB = resolveFrom("WEB", "COBWEB");
@@ -55,7 +57,12 @@ public final class BlockTypeAccess {
    */
   @Deprecated
   public static Material typeAccess(Block block) {
-    return BlockAccessProvider.blockAccessor().typeAccess(block);
+    try {
+      SERVICE_TYPE_LOOKUP.start();
+      return BlockAccessProvider.blockAccessor().typeAccess(block);
+    } finally {
+      SERVICE_TYPE_LOOKUP.stop();
+    }
   }
 
   /**

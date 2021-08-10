@@ -1,7 +1,7 @@
-package de.jpx3.intave.world.blockshape.boxresolver.pipeline;
+package de.jpx3.intave.world.blockshape.boxresolver;
 
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
-import de.jpx3.intave.world.blockshape.boxresolver.pipeline.patcher.BoundingBoxPatcher;
+import de.jpx3.intave.world.blockshape.boxresolver.patcher.BoundingBoxPatcher;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;

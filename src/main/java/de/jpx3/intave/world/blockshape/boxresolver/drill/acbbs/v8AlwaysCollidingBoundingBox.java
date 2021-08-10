@@ -1,4 +1,4 @@
-package de.jpx3.intave.world.blockshape.boxresolver.pipeline.drill.acbbs;
+package de.jpx3.intave.world.blockshape.boxresolver.drill.acbbs;
 
 import de.jpx3.intave.patchy.annotate.PatchyAutoTranslation;
 import de.jpx3.intave.patchy.annotate.PatchyTranslateParameters;

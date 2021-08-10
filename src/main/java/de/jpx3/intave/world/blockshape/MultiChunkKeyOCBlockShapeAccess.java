@@ -6,7 +6,7 @@ import de.jpx3.intave.world.blockaccess.BlockDataAccess;
 import de.jpx3.intave.world.blockaccess.BlockTypeAccess;
 import de.jpx3.intave.world.blockaccess.BukkitBlockAccess;
 import de.jpx3.intave.world.blockshape.boxresolver.BoundingBoxResolver;
-import de.jpx3.intave.world.blockshape.boxresolver.pipeline.ResolverPipeline;
+import de.jpx3.intave.world.blockshape.boxresolver.ResolverPipeline;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;

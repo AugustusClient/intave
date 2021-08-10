@@ -31,6 +31,8 @@ public class Timings {
   public static final Timing CHECK_PHYSICS_PROC_ITR = Timing.of("Check/Physics/ProcItr", "Check/Physics/ProcTot");
   public static final Timing CHECK_PHYSICS_EVAL = Timing.of("Check/Physics/Eval", "Check/Physics/ProcTot");
 
+  public static final Timing SERVICE_TYPE_LOOKUP = Timing.of("Service/Lookup/Type");
+
   public static final Timing SERVICE_RAYTRACER_ENTITY = Timing.of("Service/Raytracer/Entity", "Exe/Netty");
   public static final Timing SERVICE_RAYTRACER_BLOCK = Timing.of("Service/Raytracer/Block", "Exe/Netty");
 

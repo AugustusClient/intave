@@ -24,7 +24,6 @@ import de.jpx3.intave.world.fluid.LegacyWaterflow;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -495,8 +494,7 @@ public class DefaultSimulator extends Simulator {
     if (clientData.protocolVersion() >= VER_1_14 && movementData.pose() != Pose.FALL_FLYING) {
       int soulSandModifier = PlayerEnchantmentHelper.resolveSoulSpeedModifier(player);
       if (soulSandModifier == 0 || !movementData.blockOnPositionSoulSpeedAffected()) {
-        Block blockAccess = BukkitBlockAccess.blockAccess(world, positionX, positionY - 0.5000001, positionZ);
-        float speedFactor = BlockProperties.ofType(blockAccess.getType()).speedFactor();
+        float speedFactor = BlockProperties.ofType(BukkitBlockAccess.cacheAppliedTypeAccess(user, world, positionX, positionY - 0.5000001, positionZ)).speedFactor();
         context.motionX *= speedFactor;
         context.motionZ *= speedFactor;
       }

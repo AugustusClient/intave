@@ -4,31 +4,30 @@ import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.IntaveInternalException;
 import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.patchy.PatchyLoadingInjector;
-import de.jpx3.intave.world.blockshape.boxresolver.pipeline.*;
 
 public final class BoundingBoxResolver {
   private static ResolverPipeline resolver;
 
   public static void createNew() {
     // ugly, the way ZKM likes it
-    String drillClassName = "de.jpx3.intave.world.blockshape.resolver.pipeline.drill.v8BoundingBoxDrill";
-    String acClass = "de.jpx3.intave.world.blockshape.resolver.pipeline.drill.acbbs.v8AlwaysCollidingBoundingBox";
+    String drillClassName = "de.jpx3.intave.world.blockshape.boxresolver.drill.v8BoundingBoxDrill";
+    String acClass = "de.jpx3.intave.world.blockshape.boxresolver.drill.acbbs.v8AlwaysCollidingBoundingBox";
 
     if (MinecraftVersions.VER1_17_1.atOrAbove()) {
-      drillClassName = "de.jpx3.intave.world.blockshape.resolver.pipeline.drill.v17b1BoundingBoxDrill";
+      drillClassName = "de.jpx3.intave.world.blockshape.boxresolver.drill.v17b1BoundingBoxDrill";
       acClass = "";
     } else if (MinecraftVersions.VER1_14_0.atOrAbove()) {
-      drillClassName = "de.jpx3.intave.world.blockshape.resolver.pipeline.drill.v14BoundingBoxDrill";
+      drillClassName = "de.jpx3.intave.world.blockshape.boxresolver.drill.v14BoundingBoxDrill";
       acClass = "";
     } else if (MinecraftVersions.VER1_13_0.atOrAbove()) {
-      drillClassName = "de.jpx3.intave.world.blockshape.resolver.pipeline.drill.v13BoundingBoxDrill";
+      drillClassName = "de.jpx3.intave.world.blockshape.boxresolver.drill.v13BoundingBoxDrill";
       acClass = "";
     } else if (MinecraftVersions.VER1_12_0.atOrAbove()) {
-      drillClassName = "de.jpx3.intave.world.blockshape.resolver.pipeline.drill.v12BoundingBoxDrill";
-      acClass = "de.jpx3.intave.world.blockshape.resolver.pipeline.drill.acbbs.v12AlwaysCollidingBoundingBox";
+      drillClassName = "de.jpx3.intave.world.blockshape.boxresolver.drill.v12BoundingBoxDrill";
+      acClass = "de.jpx3.intave.world.blockshape.boxresolver.drill.acbbs.v12AlwaysCollidingBoundingBox";
     } else if (MinecraftVersions.VER1_9_0.atOrAbove()) {
-      drillClassName = "de.jpx3.intave.world.blockshape.resolver.pipeline.drill.v9BoundingBoxDrill";
-      acClass = "de.jpx3.intave.world.blockshape.resolver.pipeline.drill.acbbs.v9AlwaysCollidingBoundingBox";
+      drillClassName = "de.jpx3.intave.world.blockshape.boxresolver.drill.v9BoundingBoxDrill";
+      acClass = "de.jpx3.intave.world.blockshape.boxresolver.drill.acbbs.v9AlwaysCollidingBoundingBox";
     }
 
     PatchyLoadingInjector.loadUnloadedClassPatched(IntavePlugin.class.getClassLoader(), acClass);

@@ -14,9 +14,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 public final class BlockInnerAccess {
-  private final static boolean NEW_BLOCK_ACCESS = MinecraftVersions.VER1_13_0.atOrAbove();
   private final static boolean MODERN_MATERIAL_PROCESSING = MinecraftVersions.VER1_14_0.atOrAbove();
-
   private final static Set<Material> clickableMaterials = new HashSet<>();
   private final static Set<Material> legacyMaterials = new HashSet<>();
 

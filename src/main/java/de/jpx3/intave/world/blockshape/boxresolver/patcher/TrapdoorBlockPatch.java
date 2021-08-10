@@ -1,4 +1,4 @@
-package de.jpx3.intave.world.blockshape.boxresolver.pipeline.patcher;
+package de.jpx3.intave.world.blockshape.boxresolver.patcher;
 
 import de.jpx3.intave.tools.wrapper.WrappedAxisAlignedBB;
 import de.jpx3.intave.world.blockaccess.BlockTypeAccess;

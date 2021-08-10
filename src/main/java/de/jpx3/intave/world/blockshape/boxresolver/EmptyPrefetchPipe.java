@@ -1,4 +1,4 @@
-package de.jpx3.intave.world.blockshape.boxresolver.pipeline;
+package de.jpx3.intave.world.blockshape.boxresolver;
 
 import de.jpx3.intave.diagnostics.BoundingBoxAccessFlowStudy;
 import de.jpx3.intave.tools.client.Materials;

@@ -129,6 +129,10 @@ IChatBaseComponent -> {
   17 -> "net/minecraft/network/chat/IChatBaseComponent"
 }
 
+IChunkProvider -> {
+  17 -> "net/minecraft/world/level/chunk/IChunkProvider"
+}
+
 InventoryClickType -> {
   17 -> "net/minecraft/world/inventory/InventoryClickType"
 }
