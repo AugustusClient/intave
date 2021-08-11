@@ -146,7 +146,7 @@ public final class IntavePlugin extends JavaPlugin {
     SecurityManager securityManager = System.getSecurityManager();
     if (securityManager != null) {
       logger.error("A security manager of class " + securityManager.getClass().getName() + " is present, unable to start");
-      bootFailure();
+      bootFailure("Internal failure");
       return;
     }
 
@@ -299,7 +299,7 @@ public final class IntavePlugin extends JavaPlugin {
         }
         if (bad) {
           contextStatusResource.write(new ByteArrayInputStream(("failure-"+response).getBytes(StandardCharsets.UTF_8)));
-          bootFailure();
+          bootFailure(message);
           performShutdown();
           return;
         }
@@ -325,7 +325,7 @@ public final class IntavePlugin extends JavaPlugin {
           if (properties.isEmpty()) {
             logger.error("Invalid server response " + response);
             contextStatusResource.write(new ByteArrayInputStream(("failure-"+response).getBytes(StandardCharsets.UTF_8)));
-            bootFailure();
+            bootFailure("Internal failure");
             performShutdown();
             return;
           }
@@ -358,7 +358,7 @@ public final class IntavePlugin extends JavaPlugin {
           if (!validResponse || foundInterceptor) {
             logger.error("Unable to boot: Authentication response not trustworthy");
             contextStatusResource.write(new ByteArrayInputStream(("failure-"+response).getBytes(StandardCharsets.UTF_8)));
-            bootFailure();
+            bootFailure("Internal failure");
             performShutdown();
             return;
           }
@@ -427,14 +427,14 @@ public final class IntavePlugin extends JavaPlugin {
 
         if (allowLeniency && !configurationService().loader().configurationCacheExists()) {
           logger().error("Unable to boot: Intave requires an internet connection for first-time startup");
-          bootFailure();
+          bootFailure("No internet connection");
           performShutdown();
           return;
         }
 
         if (!allowLeniency) {
           logger().error("Unable to boot: Internet connection required to proceed");
-          bootFailure();
+          bootFailure("No internet connection");
           performShutdown();
           return;
         }
@@ -539,7 +539,7 @@ public final class IntavePlugin extends JavaPlugin {
       exception.printStackTrace();
 
       clearCacheFiles();
-      bootFailure();
+      bootFailure("Internal error occurred");
       performShutdown();
       return;
     }
@@ -628,7 +628,7 @@ public final class IntavePlugin extends JavaPlugin {
         case DISABLED:
         case INVALID:
           logger().error("Unable to boot: This version has been deactivated");
-          bootFailure();
+          bootFailure("Version deactivated");
           performShutdown();
           throw new IntaveInternalException("Escape exception");
       }
@@ -742,9 +742,9 @@ public final class IntavePlugin extends JavaPlugin {
   }
 
   @Native
-  public void bootFailure() {
+  public void bootFailure(String reason) {
     getCommand("intave").setExecutor((commandSender, command, s, strings) -> {
-      commandSender.sendMessage(prefix() + ChatColor.RED + "Intave couldn't boot properly");
+      commandSender.sendMessage(prefix() + ChatColor.RED + "Intave couldn't boot properly: " + reason);
       return false;
     });
   }

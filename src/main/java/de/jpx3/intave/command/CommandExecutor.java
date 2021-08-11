@@ -150,7 +150,15 @@ public final class CommandExecutor {
         continue;
       }
       Class<?> expectedType = allTypes[i];
-      Object output = TypeTranslators.tryTranslate(sender, expectedType, arg, executedCommand);
+      StringBuilder followingCommand = new StringBuilder();
+      String[] executedCommandTypes = executedCommand.split(" ");
+      for (int j = 0; j < executedCommandTypes.length; j++) {
+        String executedCommandType = executedCommandTypes[j];
+        if (j >= i) {
+          followingCommand.append(executedCommandType).append(" ");
+        }
+      }
+      Object output = TypeTranslators.tryTranslate(sender, expectedType, arg, followingCommand.toString());
       if (output == null) {
         return null;
       }
