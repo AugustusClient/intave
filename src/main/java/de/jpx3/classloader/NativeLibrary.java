@@ -80,6 +80,7 @@ public final class NativeLibrary {
       while ((nread = fis.read(dataBytes)) != -1) {
         md.update(dataBytes, 0, nread);
       }
+      fis.close();
       byte[] mdbytes = md.digest();
       for (byte mdbyte : mdbytes) {
         jarChecksum.append(Integer.toString((mdbyte & 0xff) + 0x100, 16).substring(1));

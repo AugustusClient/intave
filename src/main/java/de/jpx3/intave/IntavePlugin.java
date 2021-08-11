@@ -538,7 +538,7 @@ public final class IntavePlugin extends JavaPlugin {
       logger.error("Unable to boot: " + exception.getMessage());
       exception.printStackTrace();
 
-      clearCacheFiles();
+      invalidateCaches();
       bootFailure("Internal error occurred");
       performShutdown();
       return;
@@ -636,7 +636,7 @@ public final class IntavePlugin extends JavaPlugin {
     }
   }
 
-  public final static long INTEGRITY_ERASE_BUFFER = TimeUnit.MINUTES.toMillis(1);
+//  public final static long INTEGRITY_ERASE_BUFFER = TimeUnit.MINUTES.toMillis(1);
 
   @Native
   public void clearIntegrityGarbage() {
@@ -646,17 +646,23 @@ public final class IntavePlugin extends JavaPlugin {
         .map(Path::toFile)
         .filter(File::canRead)
         .filter(File::canWrite)
-        .filter(file -> file.getName().equalsIgnoreCase("deleteme") && file.getParentFile().getName().toLowerCase(Locale.ROOT).contains("intave"))
-        .filter(file -> (AccessHelper.now() - file.lastModified()) > INTEGRITY_ERASE_BUFFER)
-        .map(File::getParentFile)
+//        .map(File::getParentFile)
+        .filter(parentFile -> {
+          String name = parentFile.getName();
+          boolean isIntave = name.toLowerCase(Locale.ROOT).startsWith("intave") && Character.isDigit(name.charAt(name.length() - 1));
+          boolean isJNIC = name.startsWith("lib") && name.endsWith(".tmp");
+          return isIntave || isJNIC;
+        })
         .filter(File::canRead)
         .filter(File::canWrite)
         .forEach(file -> {
           try {
-            clearDirectory(file);
-          } catch (IOException exception) {
-//            exception.printStackTrace();
-          }
+            if (file.isDirectory()) {
+              clearDirectory(file);
+            } else {
+              file.delete();
+            }
+          } catch (IOException ignored) {}
         });
     } catch (Exception exception) {
 //      exception.printStackTrace();
@@ -734,7 +740,7 @@ public final class IntavePlugin extends JavaPlugin {
   }
 
   @Native
-  public void clearCacheFiles() {
+  public void invalidateCaches() {
     if (configurationService != null) {
       configurationService.deleteCache();
     }

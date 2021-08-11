@@ -16,7 +16,12 @@ public final class DurationTranslator {
     if (secondType.isEmpty()) {
       secondType = "0 hours";
     }
-    String output = firstType + (firstType.isEmpty() ? "" : " and ") + secondType;
+    String output;
+    if (days >= 7) {
+      output = firstType;
+    } else {
+      output = firstType + (firstType.isEmpty() ? "" : " and ") + secondType;
+    }
     if (output.trim().isEmpty()) {
       output = "a few hours";
     }

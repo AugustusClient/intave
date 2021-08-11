@@ -592,7 +592,7 @@ public final class Physics extends Check {
 
     if (IntaveControl.DEBUG_MOVEMENT) {
       ChatColor chatColor = violationLevelIncrease == 0 ? ChatColor.GRAY : ChatColor.YELLOW;
-      String motion = movementData.pose().name() + " ";
+      String poseName = movementData.pose().name();
       String displayPhysicsVL = formatDouble(violationLevelData.physicsVL, 4);
       String displayHorizontalVL = formatDouble(horizontalViolationIncrease, 3);
       String displayVerticalVL = formatDouble(verticalViolationIncrease, 3);
@@ -604,7 +604,9 @@ public final class Physics extends Check {
       } else {
         violationLevelInfo = "g:" + displayPhysicsVL;
       }
-      String debug = chatColor + motion + " ";
+      String debug = String.valueOf(chatColor);
+//      debug += poseName;
+      debug += " ";
 //      debug += movementData.movementPoseType().debugPrefix();
       if (movementData.recentlyEncounteredFlyingPacket(0)) {
         debug += "f";
@@ -612,7 +614,7 @@ public final class Physics extends Check {
       debug += "(" + key + ")";
       debug += " " + violationLevelInfo;
 
-      debug += " (sprint " + movementData.sprinting + ")";
+//      debug += " (sprint " + movementData.sprinting + ")";
 //      debug += " (sneak " + movementData.sneaking + "/"+movementData.actualSneaking()+")";
 //      debug += " (size:" + movementData.width + "," + movementData.height + ")";
 //      debug += "handActive=" + inventoryData.handActive();
@@ -623,7 +625,7 @@ public final class Physics extends Check {
 
       List<String> tags = new ArrayList<>();
 
-      tags.add("dist=" + formatDouble(distance, 10));
+      tags.add("dist=" + (movementData.recentlyEncounteredFlyingPacket(1) && violationLevelIncrease == 0 ? formatDouble(0d, 10) : formatDouble(distance, 10)));
       if (collidedWithBoat) {
         tags.add("boat");
       }
