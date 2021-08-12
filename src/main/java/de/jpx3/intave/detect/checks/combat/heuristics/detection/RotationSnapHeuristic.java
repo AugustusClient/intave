@@ -267,7 +267,11 @@ public final class RotationSnapHeuristic extends MetaCheckPart<Heuristics, Rotat
 
     if (liteFlag) {
       String description = "rotation snap scaffold [" +  MathHelper.formatDouble(meta.yawMotions[0], 2) + "]";
-      handleConfidence(user, "103", 10, description);
+      int addedViolationLevel = 10;
+      if(IntaveControl.GOMME_MODE) {
+        addedViolationLevel = 30;
+      }
+      handleConfidence(user, "103", addedViolationLevel, description);
     }
 
     prepareNextTick(meta, yawMotion, user);
@@ -280,7 +284,7 @@ public final class RotationSnapHeuristic extends MetaCheckPart<Heuristics, Rotat
     Confidence confidence = Confidence.confidenceFrom(violationToAdd + meta.internalViolation);
     meta.internalViolation += violationToAdd;
 
-    if (confidence.level() >= 30 && IntaveControl.GOMME_MODE) {
+    if (confidence.level() >= 30) {
       meta.internalViolation -= confidence.level();
       if (user.meta().protocol().protocolVersion() > 47) {
         description += " " + user.meta().protocol().protocolVersion();
@@ -288,16 +292,16 @@ public final class RotationSnapHeuristic extends MetaCheckPart<Heuristics, Rotat
 
       Anomaly anomaly = Anomaly.anomalyOf(key, confidence, Anomaly.Type.KILLAURA, description, anomalyOptions(isPartner()));
       parentCheck().saveAnomaly(player, anomaly);
+    } else {
+      description += "NONFLAG";
+      Anomaly anomaly = Anomaly.anomalyOf(key, Confidence.NONE, Anomaly.Type.KILLAURA, description, anomalyOptions(isPartner()));
+      parentCheck().saveAnomaly(player, anomaly);
     }
   }
 
   @Native
   public boolean isPartner() {
     return (ProtocolMetadata.VERSION_DETAILS & 0x100) != 0;
-  }
-  @Native
-  public boolean isEnterprise() {
-    return (ProtocolMetadata.VERSION_DETAILS & 0x200) != 0;
   }
 
   private int anomalyOptions(boolean isPartner) {
@@ -351,7 +355,10 @@ public final class RotationSnapHeuristic extends MetaCheckPart<Heuristics, Rotat
     // added the division because there are false flaggs when a player has less than 20 fps
     vl /= 3;
 
-    return Math.min(160, vl);
+    if(vl > 160 && valueOfSnap < 360) {
+      vl = 160;
+    }
+    return vl;
   }
 
   private void prepareNextTick(RotationSnapHeuristicMeta meta, double yawMotion, User user) {
