@@ -48,7 +48,6 @@ import java.util.function.Consumer;
   private MitigationStrategy mitigationStrategy;
   private MitigationStrategy defaultMitigationStrategy = MitigationStrategy.NOT_SUPPORTED;
 
-
   public Check(String checkName, String configurationKey) {
     this.plugin = IntavePlugin.singletonInstance();
     this.checkName = checkName;
