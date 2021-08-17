@@ -95,8 +95,6 @@ public final class IntavePlugin extends JavaPlugin {
   private SibylIntegrationService sibylIntegrationService;
   private ConfigurationService configurationService;
   private ComponentLoader componentLoader;
-  private BukkitEventSubscriptionLinker eventLinker;
-  private PacketSubscriptionLinker packetSubscriptionLinker;
   private EventService eventService;
   private FakePlayerEventService fakePlayerEventService;
   private CustomEventService customEventService;
@@ -135,10 +133,7 @@ public final class IntavePlugin extends JavaPlugin {
   @Override
   public void onLoad() {
     // stage 3
-
     modules.proceedBoot(BootSegment.STAGE_3);
-    // event links must be available throughout the entire onEnable call
-    eventLinker = new BukkitEventSubscriptionLinker(this);
   }
 
   @Native
@@ -192,7 +187,7 @@ public final class IntavePlugin extends JavaPlugin {
       // we need to put this here
       BackgroundExecutor.start();
 
-      packetSubscriptionLinker = new PacketSubscriptionLinker(this);
+//      packetSubscriptionLinker = new PacketSubscriptionLinker(this);
 
       // stage 7
       configurationService = new ConfigurationService(this);
@@ -580,7 +575,7 @@ public final class IntavePlugin extends JavaPlugin {
       logger.info(ChatColor.RED + "Upgrading to Java 16 has incredible performance benefits for the entire server");
     }
 
-    packetSubscriptionLinker.refreshLinkages();
+    modules().packetSubscriptionLinker().refreshLinkages();
     displayVersionInformation();
     logger.info( "Intave booted successfully");
 

@@ -73,7 +73,7 @@ public final class PacketEntityTypeResolver {
     PacketContainer packet = event.getPacket();
 
     int entityId = packet.getIntegers().read(0);
-    Entity entity = ClientEntityTracker.serverEntityByIdentifier(event.getPlayer(), entityId);
+    Entity entity = EntityTracker.serverEntityByIdentifier(event.getPlayer(), entityId);
 
     if (entity != null) {
       return entityTypeDataOfBukkitEntity(entity);
@@ -105,7 +105,7 @@ public final class PacketEntityTypeResolver {
     PacketContainer packet = event.getPacket();
 
     int entityId = packet.getIntegers().read(0);
-    Entity entity = ClientEntityTracker.serverEntityByIdentifier(event.getPlayer(), entityId);
+    Entity entity = EntityTracker.serverEntityByIdentifier(event.getPlayer(), entityId);
 
     if (entity != null) {
       return entityTypeDataOfBukkitEntity(entity);
@@ -129,7 +129,7 @@ public final class PacketEntityTypeResolver {
   public EntityTypeData entityTypeDataOfEntityMetaData(PacketEvent event, int entityTypeId, List<WrappedWatchableObject> watchableObjects) {
     PacketContainer packet = event.getPacket();
     int entityId = packet.getIntegers().read(0);
-    Entity entity = ClientEntityTracker.serverEntityByIdentifier(event.getPlayer(), entityId);
+    Entity entity = EntityTracker.serverEntityByIdentifier(event.getPlayer(), entityId);
     if (entity != null) {
       return entityTypeDataOfBukkitEntity(entity);
     } else {

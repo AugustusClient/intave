@@ -96,6 +96,7 @@ public final class FeedbackResponsePull implements PacketEventSubscriber {
   }
 
   private void receiveRequest(User user, Request<?> transactionResponse) {
+//    System.out.println("received request " + transactionResponse);
     Player player = user.player();
     ConnectionMetadata synchronizeData = user.meta().connection();
     synchronizeData.lastSynchronization = transactionResponse.requested();
@@ -109,15 +110,6 @@ public final class FeedbackResponsePull implements PacketEventSubscriber {
       appendixMap.remove(transactionResponse.num());
     }
     transactionResponse.acknowledge(player);
-  }
-
-  private <T> T convertInstanceOfObject(Object o) {
-    try {
-      //noinspection unchecked
-      return (T) o;
-    } catch (ClassCastException e) {
-      return null;
-    }
   }
 
   @PacketSubscription(

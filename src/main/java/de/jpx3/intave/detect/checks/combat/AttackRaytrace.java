@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
-import static de.jpx3.intave.module.tracker.entity.ClientEntityTracker.entityByIdentifier;
+import static de.jpx3.intave.module.tracker.entity.EntityTracker.entityByIdentifier;
 import static de.jpx3.intave.user.meta.ProtocolMetadata.VER_1_9;
 import static de.jpx3.intave.violation.Violation.ViolationFlags.DONT_PROCESS_VIOSTAT;
 

@@ -42,7 +42,7 @@ import static de.jpx3.intave.module.linker.packet.PacketId.Client.POSITION;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
 import static de.jpx3.intave.module.linker.packet.PacketId.Server.*;
 
-public final class ClientEntityTracker extends Module {
+public final class EntityTracker extends Module {
   /*
   TODO: when a entity gets spawned and the spawn packet gets send to the client and the entity gets teleported right after,
    the check will try to create the entity by the teleport packet bevor the entity spawn packet can be executed
@@ -56,7 +56,7 @@ public final class ClientEntityTracker extends Module {
   private final static boolean HEALTH_PROCESSING_1_10 = ProtocolLibraryAdapter.serverVersion().isAtLeast(MinecraftVersions.VER1_10_0);
   private final static boolean HEALTH_PROCESSING_1_14 = ProtocolLibraryAdapter.serverVersion().isAtLeast(MinecraftVersions.VER1_14_0);
 
-  public ClientEntityTracker(IntavePlugin plugin) {
+  public EntityTracker(IntavePlugin plugin) {
     this.plugin = plugin;
     this.entityTypeResolver = new PacketEntityTypeResolver(plugin);
 //    plugin.packetSubscriptionLinker().linkSubscriptionsIn(this);

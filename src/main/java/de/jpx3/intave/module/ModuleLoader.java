@@ -4,7 +4,7 @@ import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.IntaveInternalException;
 import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscriptionLinker;
 import de.jpx3.intave.module.linker.packet.PacketSubscriptionLinker;
-import de.jpx3.intave.module.tracker.entity.ClientEntityTracker;
+import de.jpx3.intave.module.tracker.entity.EntityTracker;
 import de.jpx3.intave.module.warning.ClientWarningModule;
 
 import java.lang.reflect.InvocationTargetException;
@@ -19,8 +19,8 @@ public final class ModuleLoader {
 
   public void setup() {
     prepareModule(BukkitEventSubscriptionLinker.class, ModuleSettings.builder().bootAt(BootSegment.STAGE_3).build());
-    prepareModule(PacketSubscriptionLinker.class, ModuleSettings.builder().requiresProtocolLib().bootAt(BootSegment.STAGE_3).build());
-    prepareModule(ClientEntityTracker.class, ModuleSettings.builder().requiresProtocolLib().bootAt(BootSegment.STAGE_7).build());
+    prepareModule(PacketSubscriptionLinker.class, ModuleSettings.builder().requiresProtocolLib().bootAt(BootSegment.STAGE_5).build());
+    prepareModule(EntityTracker.class, ModuleSettings.builder().requiresProtocolLib().bootAt(BootSegment.STAGE_7).build());
     prepareModule(ClientWarningModule.class, ModuleSettings.builder().requiresProtocolLib().bootAt(BootSegment.STAGE_7).build());
 
 

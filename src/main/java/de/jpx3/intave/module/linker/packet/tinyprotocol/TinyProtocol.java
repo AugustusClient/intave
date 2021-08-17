@@ -333,8 +333,10 @@ public class TinyProtocol {
         try {
           channel.pipeline().addBefore("packet_handler", handlerName, interceptor);
         } catch (Exception exception) {
-          System.out.println("Available channel: " + channel.pipeline().names());
-          throw new IllegalStateException("Unable to find packet_handler", exception);
+          System.out.println("[Intave] Failed to find packet_handler pipeline element for " + channel);
+          System.out.println("[Intave] Netty broken?!");
+//          System.out.println("Available channel: " + channel.pipeline().names());
+//          throw new IllegalStateException("Unable to find packet_handler", exception);
         }
         uninjectedChannels.remove(channel);
       }

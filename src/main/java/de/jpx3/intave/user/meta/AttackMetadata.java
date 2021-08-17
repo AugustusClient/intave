@@ -5,7 +5,7 @@ import de.jpx3.intave.annotate.Relocate;
 import de.jpx3.intave.detect.checks.combat.heuristics.MiningStrategy;
 import de.jpx3.intave.detect.checks.combat.heuristics.mining.MiningStrategyContainer;
 import de.jpx3.intave.fakeplayer.FakePlayer;
-import de.jpx3.intave.module.tracker.entity.ClientEntityTracker;
+import de.jpx3.intave.module.tracker.entity.EntityTracker;
 import de.jpx3.intave.module.tracker.entity.WrappedEntity;
 import de.jpx3.intave.module.tracker.entity.WrappedEntity.EntityPositionContext;
 import de.jpx3.intave.tools.AccessHelper;
@@ -112,7 +112,7 @@ public final class AttackMetadata {
     this.lastAttackedEntityID = lastAttackedEntityID;
 
     WrappedEntity lastAttackedEntity = this.lastAttackedEntity;
-    WrappedEntity attackedEntity = ClientEntityTracker.entityByIdentifier(UserRepository.userOf(player), lastAttackedEntityID);
+    WrappedEntity attackedEntity = EntityTracker.entityByIdentifier(UserRepository.userOf(player), lastAttackedEntityID);
     if (attackedEntity != null && attackedEntity != lastAttackedEntity) {
       this.lastEntitySwitch = AccessHelper.now();
     }

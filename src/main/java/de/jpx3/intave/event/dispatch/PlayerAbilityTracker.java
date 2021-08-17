@@ -9,7 +9,7 @@ import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketEventSubscriber;
 import de.jpx3.intave.module.linker.packet.PacketId;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
-import de.jpx3.intave.module.tracker.entity.ClientEntityTracker;
+import de.jpx3.intave.module.tracker.entity.EntityTracker;
 import de.jpx3.intave.reflect.Lookup;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
@@ -47,7 +47,7 @@ public final class PlayerAbilityTracker implements PacketEventSubscriber {
   private void synchronizeCameraUpdate(Player player, int entityID) {
     User user = UserRepository.userOf(player);
     AbilityMetadata abilityData = user.meta().abilities();
-    Entity entity = ClientEntityTracker.serverEntityByIdentifier(player, entityID);
+    Entity entity = EntityTracker.serverEntityByIdentifier(player, entityID);
     abilityData.hasViewEntity = entity != player;
   }
 
