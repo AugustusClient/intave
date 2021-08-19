@@ -457,7 +457,7 @@ public final class MovementEmulationEngine {
         if (IntaveControl.DEBUG_INTAVE_TELEPORT_EVENT_CANCELS && cancel) {
           PluginInvocation pluginInvocation = CallerResolver.callerPluginInfo();
           if (pluginInvocation == null) {
-            IntaveLogger.logger().pushPrintln("[Intave] Intaves teleport event was cancelled anonymously");
+            IntaveLogger.logger().pushPrintln("[Intave] Intave's teleport event was cancelled anonymously");
           } else {
             IntaveLogger.logger().pushPrintln("[Intave] " + pluginInvocation.pluginName() + " cancelled Intave's teleport event (" + pluginInvocation.className() + ": " + pluginInvocation.methodName() + ")");
           }

@@ -40,13 +40,13 @@ public interface IntaveAccess {
   void setDefaultTrustFactor(TrustFactor defaultTrustFactor);
 
   /**
-   * Subscribe a {@link PrintStream} to Intaves console output.
-   * @param stream the stream to receive Intaves console output.
+   * Subscribe a {@link PrintStream} to Intave's console output.
+   * @param stream the stream to receive Intave's console output.
    */
   void subscribeOutputStream(PrintStream stream);
 
   /**
-   * Remove a subscription to Intaves console output.
+   * Remove a subscription to Intave's console output.
    * @param stream the stream to unsubscribe
    */
   void unsubscribeOutputStream(PrintStream stream);

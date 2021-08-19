@@ -185,7 +185,7 @@ public final class IntaveViolationEvent extends IntaveEvent implements Cancellab
   }
 
   /**
-   * A reaction setting is used to allow flexibility when modifying Intaves violation mitigation IG.
+   * A reaction setting is used to allow flexibility when modifying Intave's violation mitigation IG.
    * Select IGNORE to completely ignore the detected thread,
    * select INTERRUPT to block the thread without adding VL or outputing to the verbose channel.
    * select INTERRUPT_AND_REPORT to suggest adding vl and  - when Intave approves it - mitigating the action.
