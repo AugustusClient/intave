@@ -3,7 +3,7 @@ package de.jpx3.intave.world.blockshape;
 import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.diagnostic.MemoryTraced;
 import de.jpx3.intave.tool.AccessHelper;
-import de.jpx3.intave.world.blockaccess.RuntimeBlockVariantIndexer;
+import de.jpx3.intave.world.blockaccess.BlockVariantRegister;
 import de.jpx3.intave.world.wrapper.WrappedAxisAlignedBB;
 import org.bukkit.Material;
 
@@ -18,7 +18,7 @@ import java.util.Objects;
  * @see BlockShapeAccess
  * @see WrappedAxisAlignedBB
  * @see Material
- * @see RuntimeBlockVariantIndexer
+ * @see BlockVariantRegister
  */
 public final class BlockShape extends MemoryTraced {
   private final List<WrappedAxisAlignedBB> boxes;

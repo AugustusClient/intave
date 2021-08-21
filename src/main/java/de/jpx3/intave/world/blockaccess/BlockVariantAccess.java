@@ -48,22 +48,16 @@ public final class BlockVariantAccess {
    */
   @Deprecated
   public static int variantAccess(Block block) {
-    if (MODERN_MATERIAL_PROCESSING) {
-      Material type = BlockTypeAccess.typeAccess(block);
-      int index = RuntimeBlockVariantIndexer.variantIndexOf(type, nativeBlockDataOf(block));
-      return Math.max(index, 0);
-    } else {
-      return BlockAccessProvider.accessor().variantOf(block);
-    }
+    return BlockAccessProvider.accessor().variantOf(block);
   }
 
-  public static int variantAccess(WrappedBlockData wrappedBlockData) {
+  public static int variantAccess(WrappedBlockData blockData) {
     if(!MODERN_MATERIAL_PROCESSING) {
-      return wrappedBlockData.getData();
+      return blockData.getData();
     }
-    Material type = wrappedBlockData.getType();
-    Object handle = wrappedBlockData.getHandle();
-    int index = RuntimeBlockVariantIndexer.variantIndexOf(type, handle);
+    Material type = blockData.getType();
+    Object handle = blockData.getHandle();
+    int index = BlockVariantRegister.variantIndexOf(type, handle);
     if (index < 0) {
       throw new IllegalStateException("Invalid block data update: " + type + "/" + handle);
     }

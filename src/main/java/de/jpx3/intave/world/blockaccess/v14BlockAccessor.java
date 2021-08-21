@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_14_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_14_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
@@ -48,7 +49,10 @@ public final class v14BlockAccessor implements BlockAccessor {
   @Override
   @PatchyAutoTranslation
   public int variantOf(Block block) {
-    throw new UnsupportedOperationException("This minecraft version does not support shared block variant indices");
+    Material type = typeOf(block);
+    IBlockData blockData = ((CraftBlock) block).getNMS();
+    int variantIndex = BlockVariantRegister.variantIndexOf(type, blockData);
+    return Math.max(variantIndex, 0);
   }
 
   @Override

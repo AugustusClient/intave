@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-public final class RuntimeBlockVariantIndexer {
+public final class BlockVariantRegister {
   private final static boolean required = MinecraftVersions.VER1_14_0.atOrAbove();
   private final static Map<Material, Map<Object, Integer>> blockDataIndex = new EnumMap<>(Material.class);
   private final static Map<Material, Map<Integer, Object>> blockDataRegister = new EnumMap<>(Material.class);
@@ -26,7 +26,7 @@ public final class RuntimeBlockVariantIndexer {
 
   static {
     if (required) {
-      PatchyLoadingInjector.loadUnloadedClassPatched(IntavePlugin.class.getClassLoader(), "de.jpx3.intave.world.blockaccess.RuntimeBlockVariantIndexer$Indexer");
+      PatchyLoadingInjector.loadUnloadedClassPatched(IntavePlugin.class.getClassLoader(), "de.jpx3.intave.world.blockaccess.BlockVariantRegister$Indexer");
     }
   }
 

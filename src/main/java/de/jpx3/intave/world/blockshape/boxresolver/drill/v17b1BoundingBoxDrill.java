@@ -1,7 +1,7 @@
 package de.jpx3.intave.world.blockshape.boxresolver.drill;
 
 import de.jpx3.intave.reflect.patchy.annotate.PatchyAutoTranslation;
-import de.jpx3.intave.world.blockaccess.RuntimeBlockVariantIndexer;
+import de.jpx3.intave.world.blockaccess.BlockVariantRegister;
 import de.jpx3.intave.world.wrapper.WrappedAxisAlignedBB;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.server.level.WorldServer;
@@ -23,7 +23,7 @@ public final class v17b1BoundingBoxDrill extends AbstractBoundingBoxDrill {
   public List<WrappedAxisAlignedBB> resolve(World world, Player player, Material type, int blockState, int posX, int posY, int posZ) {
     WorldServer handle = ((CraftWorld) world).getHandle();
     BlockPosition blockPosition = new BlockPosition(posX, posY, posZ);
-    IBlockData blockData = (IBlockData) RuntimeBlockVariantIndexer.rawBlockDataOf(type, blockState);
+    IBlockData blockData = (IBlockData) BlockVariantRegister.rawBlockDataOf(type, blockState);
     if (blockData == null) {
       return Collections.emptyList();
     }

@@ -475,7 +475,7 @@ public final class IntavePlugin extends JavaPlugin {
       Modules.proceedBoot(BootSegment.STAGE_7);
 
       SSLConnectionVerifier.setup();
-      RuntimeBlockVariantIndexer.prepareIndex();
+      BlockVariantRegister.prepareIndex();
 
       WrappedEntity.setup();
       ReflectiveAccess.setup();
