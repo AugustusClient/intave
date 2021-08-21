@@ -6,10 +6,7 @@ import de.jpx3.intave.reflect.patchy.annotate.PatchyAutoTranslation;
 import de.jpx3.intave.reflect.patchy.annotate.PatchyTranslateParameters;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
-import net.minecraft.server.v1_14_R1.ChunkProviderServer;
-import net.minecraft.server.v1_14_R1.IBlockAccess;
-import net.minecraft.server.v1_14_R1.IBlockData;
-import net.minecraft.server.v1_14_R1.WorldServer;
+import net.minecraft.server.v1_14_R1.*;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -55,6 +52,16 @@ public final class v14BlockAccessor implements BlockAccessor {
     IBlockData blockData = ((CraftBlock) block).getNMS();
     int variantIndex = BlockVariantRegister.variantIndexOf(type, blockData);
     return Math.max(variantIndex, 0);
+  }
+
+  @Override
+  public Object blockHandle(Block block) {
+    WorldServer worldServer = ((CraftWorld) block.getWorld()).getHandle();
+    IBlockAccess blockAccess = worldServer.getChunkProvider().c(block.getX() >> 4, block.getZ() >> 4);
+    if (blockAccess == null) {
+      return Blocks.AIR;
+    }
+    return blockAccess.getType(positionOfBlock(block)).getBlock();
   }
 
   @Override
