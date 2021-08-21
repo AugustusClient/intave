@@ -8,7 +8,7 @@ import de.jpx3.intave.resource.EncryptedResource;
 import de.jpx3.intave.security.ContextSecrets;
 import de.jpx3.intave.security.LicenseAccess;
 import de.jpx3.intave.security.SSLConnectionVerifier;
-import de.jpx3.intave.tools.AccessHelper;
+import de.jpx3.intave.tool.AccessHelper;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import javax.crypto.Cipher;

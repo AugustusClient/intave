@@ -1,5 +1,6 @@
 package de.jpx3.intave.world.wrapper;
 
+import de.jpx3.intave.diagnostic.MemoryTraced;
 import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.MovementMetadata;
@@ -7,7 +8,7 @@ import de.jpx3.intave.user.meta.ProtocolMetadata;
 import de.jpx3.intave.world.wrapper.link.WrapperLinkage;
 import org.bukkit.Location;
 
-public final class WrappedAxisAlignedBB {
+public final class WrappedAxisAlignedBB extends MemoryTraced {
   public final double minX, minY, minZ;
   public final double maxX, maxY, maxZ;
 

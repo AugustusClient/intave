@@ -17,7 +17,7 @@ import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.module.tracker.entity.WrappedEntity;
-import de.jpx3.intave.tools.AccessHelper;
+import de.jpx3.intave.tool.AccessHelper;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.*;

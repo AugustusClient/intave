@@ -21,7 +21,7 @@ import java.util.List;
 
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.LOOK;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.POSITION_LOOK;
-import static de.jpx3.intave.tools.RotationUtilities.averageOf;
+import static de.jpx3.intave.tool.RotationUtilities.averageOf;
 
 public final class RotationUnlikelyAccuracyHeuristic extends MetaCheckPart<Heuristics, RotationUnlikelyAccuracyHeuristic.ULMeta> {
   public RotationUnlikelyAccuracyHeuristic(Heuristics parentCheck) {

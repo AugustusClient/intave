@@ -13,7 +13,7 @@ import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.reflect.access.ReflectiveDataWatcherAccess;
 import de.jpx3.intave.reflect.converters.PlayerAction;
 import de.jpx3.intave.reflect.converters.PlayerActionResolver;
-import de.jpx3.intave.tools.AccessHelper;
+import de.jpx3.intave.tool.AccessHelper;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.*;
 import org.bukkit.entity.Player;

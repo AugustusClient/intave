@@ -1,11 +1,11 @@
-package de.jpx3.intave.diagnostics.report;
+package de.jpx3.intave.diagnostic.report;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-public final class PlaytimeReport extends Report {
-  public PlaytimeReport() {
-    super("playtime");
+public final class PerformanceReport extends Report {
+  public PerformanceReport() {
+    super("performance");
   }
 
   @Override

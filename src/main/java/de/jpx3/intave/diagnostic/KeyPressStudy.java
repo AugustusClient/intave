@@ -1,4 +1,4 @@
-package de.jpx3.intave.diagnostics;
+package de.jpx3.intave.diagnostic;
 
 import java.util.HashMap;
 import java.util.Map;

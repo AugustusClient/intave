@@ -14,7 +14,7 @@ import de.jpx3.intave.event.mitigate.placeholder.ViolationPlaceholderContext;
 import de.jpx3.intave.event.mitigate.placeholder.ViolationPlaceholderContext.DetailScope;
 import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.math.MathHelper;
-import de.jpx3.intave.tools.AccessHelper;
+import de.jpx3.intave.tool.AccessHelper;
 import de.jpx3.intave.user.MessageChannel;
 import de.jpx3.intave.user.MessageChannelSubscriptions;
 import de.jpx3.intave.user.User;

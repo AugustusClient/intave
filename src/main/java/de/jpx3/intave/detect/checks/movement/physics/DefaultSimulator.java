@@ -2,7 +2,7 @@ package de.jpx3.intave.detect.checks.movement.physics;
 
 import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.module.tracker.entity.WrappedEntity;
-import de.jpx3.intave.tools.MovementContext;
+import de.jpx3.intave.tool.MovementContext;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.MetadataBundle;
 import de.jpx3.intave.user.meta.MovementMetadata;

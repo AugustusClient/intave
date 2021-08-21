@@ -11,7 +11,7 @@ import de.jpx3.intave.fakeplayer.movement.FloatingMovement;
 import de.jpx3.intave.fakeplayer.movement.Movement;
 import de.jpx3.intave.fakeplayer.movement.PositionRotationLookup;
 import de.jpx3.intave.fakeplayer.movement.WalkingMovement;
-import de.jpx3.intave.tools.AccessHelper;
+import de.jpx3.intave.tool.AccessHelper;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.AttackMetadata;

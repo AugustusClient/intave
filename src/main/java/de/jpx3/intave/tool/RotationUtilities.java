@@ -1,4 +1,4 @@
-package de.jpx3.intave.tools;
+package de.jpx3.intave.tool;
 
 import java.util.List;
 

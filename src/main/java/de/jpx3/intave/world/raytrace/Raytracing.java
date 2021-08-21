@@ -1,7 +1,7 @@
 package de.jpx3.intave.world.raytrace;
 
 import de.jpx3.intave.adapter.MinecraftVersions;
-import de.jpx3.intave.diagnostics.timings.Timings;
+import de.jpx3.intave.diagnostic.timings.Timings;
 import de.jpx3.intave.math.SinusCache;
 import de.jpx3.intave.module.tracker.entity.WrappedEntity;
 import de.jpx3.intave.reflect.patchy.PatchyLoadingInjector;

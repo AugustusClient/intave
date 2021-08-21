@@ -13,7 +13,7 @@ import de.jpx3.intave.reflect.Lookup;
 import de.jpx3.intave.reflect.caller.CallerResolver;
 import de.jpx3.intave.reflect.caller.PluginInvocation;
 import de.jpx3.intave.reflect.method.InternalTeleportMethodContainer;
-import de.jpx3.intave.tools.MovementContext;
+import de.jpx3.intave.tool.MovementContext;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.MetadataBundle;

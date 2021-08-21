@@ -1,4 +1,4 @@
-package de.jpx3.intave.metrics;
+package de.jpx3.intave.metric;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

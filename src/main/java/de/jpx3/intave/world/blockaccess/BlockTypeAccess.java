@@ -10,7 +10,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import static de.jpx3.intave.diagnostics.timings.Timings.SERVICE_TYPE_LOOKUP;
+import static de.jpx3.intave.diagnostic.timings.Timings.SERVICE_TYPE_LOOKUP;
 
 @Relocate
 public final class BlockTypeAccess {

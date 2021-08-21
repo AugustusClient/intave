@@ -8,7 +8,7 @@ import de.jpx3.intave.command.Optional;
 import de.jpx3.intave.command.SubCommand;
 import de.jpx3.intave.detect.Check;
 import de.jpx3.intave.detect.CheckStatistics;
-import de.jpx3.intave.diagnostics.MemoryTraced;
+import de.jpx3.intave.diagnostic.MemoryTraced;
 import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.user.User;
 import org.bukkit.ChatColor;
@@ -45,7 +45,6 @@ public final class DiagnosticsStage extends CommandStage {
     }
 
     Map<Class<?>, AtomicInteger> traces = MemoryTraced.tracedClasses();
-
     traces.forEach((aClass, atomicInteger) -> {
       player.sendMessage(aClass + " has " + atomicInteger + " open instances");
     });

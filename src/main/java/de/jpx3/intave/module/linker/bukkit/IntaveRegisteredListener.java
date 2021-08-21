@@ -1,8 +1,8 @@
 package de.jpx3.intave.module.linker.bukkit;
 
 import de.jpx3.intave.IntavePlugin;
-import de.jpx3.intave.diagnostics.timings.Timing;
-import de.jpx3.intave.diagnostics.timings.Timings;
+import de.jpx3.intave.diagnostic.timings.Timing;
+import de.jpx3.intave.diagnostic.timings.Timings;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;

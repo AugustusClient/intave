@@ -1,4 +1,4 @@
-package de.jpx3.intave.tools;
+package de.jpx3.intave.tool;
 
 import de.jpx3.intave.annotate.refactoring.IdoNotBelongHere;
 import de.jpx3.intave.user.User;

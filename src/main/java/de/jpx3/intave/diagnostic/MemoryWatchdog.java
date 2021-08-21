@@ -1,4 +1,4 @@
-package de.jpx3.intave.diagnostics;
+package de.jpx3.intave.diagnostic;
 
 import de.jpx3.intave.agent.AgentAccessor;
 import de.jpx3.intave.executor.BackgroundExecutor;

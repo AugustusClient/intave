@@ -2,8 +2,8 @@ package de.jpx3.intave.detect.checks.movement.physics;
 
 import de.jpx3.intave.adapter.ViaVersionAdapter;
 import de.jpx3.intave.annotate.Relocate;
-import de.jpx3.intave.diagnostics.KeyPressStudy;
-import de.jpx3.intave.diagnostics.timings.Timings;
+import de.jpx3.intave.diagnostic.KeyPressStudy;
+import de.jpx3.intave.diagnostic.timings.Timings;
 import de.jpx3.intave.event.dispatch.AttackDispatcher;
 import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.math.MathHelper;

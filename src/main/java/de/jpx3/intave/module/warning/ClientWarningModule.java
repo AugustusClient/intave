@@ -10,7 +10,7 @@ import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.module.Module;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.reflect.Lookup;
-import de.jpx3.intave.tools.AccessHelper;
+import de.jpx3.intave.tool.AccessHelper;
 import io.netty.buffer.ByteBuf;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

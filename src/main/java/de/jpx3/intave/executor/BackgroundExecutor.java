@@ -2,7 +2,7 @@ package de.jpx3.intave.executor;
 
 import de.jpx3.intave.IntaveLogger;
 import de.jpx3.intave.IntavePlugin;
-import de.jpx3.intave.diagnostics.timings.Timings;
+import de.jpx3.intave.diagnostic.timings.Timings;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;

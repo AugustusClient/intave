@@ -7,7 +7,7 @@ import com.comphenix.protocol.wrappers.PlayerInfoData;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.reflect.converters.PlayerInfoDataConverter;
-import de.jpx3.intave.tools.AccessHelper;
+import de.jpx3.intave.tool.AccessHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;

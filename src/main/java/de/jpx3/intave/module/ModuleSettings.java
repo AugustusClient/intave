@@ -82,8 +82,9 @@ public final class ModuleSettings {
       return this;
     }
 
-    public void doNotLinkSubscriptions() {
+    public Builder doNotLinkSubscriptions() {
       this.linkSubscriptions = false;
+      return this;
     }
 
     public ModuleSettings build() {

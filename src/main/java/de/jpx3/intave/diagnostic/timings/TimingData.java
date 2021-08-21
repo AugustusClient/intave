@@ -1,4 +1,4 @@
-package de.jpx3.intave.diagnostics.timings;
+package de.jpx3.intave.diagnostic.timings;
 
 /**
  * Class generated using IntelliJ IDEA

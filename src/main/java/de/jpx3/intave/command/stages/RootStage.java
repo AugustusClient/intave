@@ -12,10 +12,10 @@ import de.jpx3.intave.detect.checks.combat.Heuristics;
 import de.jpx3.intave.detect.checks.combat.heuristics.Anomaly;
 import de.jpx3.intave.detect.checks.combat.heuristics.Confidence;
 import de.jpx3.intave.detect.checks.combat.heuristics.MiningStrategy;
-import de.jpx3.intave.diagnostics.KeyPressStudy;
-import de.jpx3.intave.diagnostics.MemoryWatchdog;
-import de.jpx3.intave.diagnostics.timings.Timing;
-import de.jpx3.intave.diagnostics.timings.Timings;
+import de.jpx3.intave.diagnostic.KeyPressStudy;
+import de.jpx3.intave.diagnostic.MemoryWatchdog;
+import de.jpx3.intave.diagnostic.timings.Timing;
+import de.jpx3.intave.diagnostic.timings.Timings;
 import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
@@ -32,7 +32,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-import static de.jpx3.intave.diagnostics.BoundingBoxAccessFlowStudy.*;
+import static de.jpx3.intave.diagnostic.BoundingBoxAccessFlowStudy.*;
 
 public final class RootStage extends CommandStage {
   private static RootStage singletonInstance;

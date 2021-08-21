@@ -17,7 +17,7 @@ import de.jpx3.intave.module.tracker.entity.EntityNoCollisionService;
 import de.jpx3.intave.module.tracker.entity.LazyEntityCollisionService;
 import de.jpx3.intave.reflect.caller.CallerResolver;
 import de.jpx3.intave.reflect.caller.PluginInvocation;
-import de.jpx3.intave.tools.AccessHelper;
+import de.jpx3.intave.tool.AccessHelper;
 import de.jpx3.intave.user.UserLifetimeService;
 import de.jpx3.intave.user.permission.BukkitPermissionCheck;
 import de.jpx3.intave.version.DurationTranslator;

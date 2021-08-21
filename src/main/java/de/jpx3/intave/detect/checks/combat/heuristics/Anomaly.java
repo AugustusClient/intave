@@ -1,6 +1,6 @@
 package de.jpx3.intave.detect.checks.combat.heuristics;
 
-import de.jpx3.intave.tools.AccessHelper;
+import de.jpx3.intave.tool.AccessHelper;
 
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;

@@ -1,6 +1,6 @@
 package de.jpx3.intave.world.blockshape.boxresolver;
 
-import de.jpx3.intave.diagnostics.BoundingBoxAccessFlowStudy;
+import de.jpx3.intave.diagnostic.BoundingBoxAccessFlowStudy;
 import de.jpx3.intave.world.blockphysic.MaterialMagic;
 import de.jpx3.intave.world.wrapper.WrappedAxisAlignedBB;
 import org.bukkit.Material;

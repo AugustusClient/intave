@@ -1,4 +1,4 @@
-package de.jpx3.intave.diagnostics.report;
+package de.jpx3.intave.diagnostic.report;
 
 import de.jpx3.intave.IntaveLogger;
 import de.jpx3.intave.cleanup.Shutdown;

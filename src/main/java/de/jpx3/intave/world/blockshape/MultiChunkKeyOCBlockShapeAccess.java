@@ -1,7 +1,7 @@
 package de.jpx3.intave.world.blockshape;
 
 import de.jpx3.intave.cleanup.ReferenceMap;
-import de.jpx3.intave.diagnostics.BoundingBoxAccessFlowStudy;
+import de.jpx3.intave.diagnostic.BoundingBoxAccessFlowStudy;
 import de.jpx3.intave.world.blockaccess.BlockDataAccess;
 import de.jpx3.intave.world.blockaccess.BlockTypeAccess;
 import de.jpx3.intave.world.blockaccess.BukkitBlockAccess;

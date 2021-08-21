@@ -5,8 +5,8 @@ import com.comphenix.protocol.events.PacketEvent;
 import de.jpx3.intave.IntaveLogger;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.UnsupportedFallbackOperationException;
-import de.jpx3.intave.diagnostics.timings.Timing;
-import de.jpx3.intave.diagnostics.timings.Timings;
+import de.jpx3.intave.diagnostic.timings.Timing;
+import de.jpx3.intave.diagnostic.timings.Timings;
 import de.jpx3.intave.user.UserRepository;
 
 import java.util.Arrays;

@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 
 public final class AllowAllPlacePermissionResolver implements BlockPlacePermissionCheck {
   @Override
-  public boolean hasPermission(Player player, World world, boolean mainHand, int blockX, int blockY, int blockZ, int enumDirection, Material type, byte data) {
+  public boolean hasPermission(Player player, World world, boolean mainHand, int blockX, int blockY, int blockZ, int enumDirection, Material type, int variant) {
     return true;
   }
 }

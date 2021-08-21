@@ -8,7 +8,7 @@ import de.jpx3.intave.fakeplayer.FakePlayer;
 import de.jpx3.intave.module.tracker.entity.EntityTracker;
 import de.jpx3.intave.module.tracker.entity.WrappedEntity;
 import de.jpx3.intave.module.tracker.entity.WrappedEntity.EntityPositionContext;
-import de.jpx3.intave.tools.AccessHelper;
+import de.jpx3.intave.tool.AccessHelper;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import org.bukkit.entity.Player;

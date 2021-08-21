@@ -1,4 +1,4 @@
-package de.jpx3.intave.diagnostics.report;
+package de.jpx3.intave.diagnostic.report;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
