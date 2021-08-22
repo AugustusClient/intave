@@ -5,7 +5,7 @@ import java.util.Map;
 
 // copied from jdk.internal.org.jline.utils.Levenshtein
 
-public final class Levenshtein {
+final class Levenshtein {
   public static int distance(CharSequence lhs, CharSequence rhs) {
     return distance(lhs, rhs, 1, 1, 1, 1);
   }

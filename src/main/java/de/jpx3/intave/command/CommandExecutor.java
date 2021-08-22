@@ -119,7 +119,7 @@ public final class CommandExecutor {
       args = new String[0];
     }
 
-    if (args.length < requiredTypes.length /*|| args.length > allTypes.length*/) {
+    if (args.length < requiredTypes.length) {
       List<String> commandPath = new ArrayList<>();
       CommandStage currentStage = stage;
       do {

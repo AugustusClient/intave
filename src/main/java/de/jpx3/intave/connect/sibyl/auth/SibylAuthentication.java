@@ -34,6 +34,8 @@ import java.net.URLConnection;
 import java.util.*;
 import java.util.function.Consumer;
 
+import static de.jpx3.intave.IntaveControl.SIBYL_DEBUG;
+
 
 /**
  *
@@ -87,6 +89,7 @@ public final class SibylAuthentication implements BukkitEventSubscriber {
         try {
           if ((boolean)whitelisted(player) && authStateOf(player) == SibylAuthenticationState.AW_AK) {
             String authkey = jsonObject.get("key").getAsString();
+            setAuthState(player, SibylAuthenticationState.AW_AKV);
             verifyAuthKey(authkey, success -> {
               JsonObject object = new JsonObject();
               object.addProperty("action", "verify");
@@ -94,7 +97,6 @@ public final class SibylAuthentication implements BukkitEventSubscriber {
               sendMessageToClient(player, "LMC", "sibyl-auth", object);
               setAuthState(player, success ? SibylAuthenticationState.ATH : SibylAuthenticationState.RGF);
             });
-            setAuthState(player, SibylAuthenticationState.AW_AKV);
           }
         } catch (RuntimeException e) {
           setAuthState(player, SibylAuthenticationState.RGF);
@@ -177,14 +179,16 @@ public final class SibylAuthentication implements BukkitEventSubscriber {
   }
 
   @Native
-  private SibylAuthenticationState authStateOf(Player player) {
+  public SibylAuthenticationState authStateOf(Player player) {
     UUID id = player.getUniqueId();
     return authStates.computeIfAbsent(id, uuid -> SibylAuthenticationState.N);
   }
 
   @Native
   private void setAuthState(Player player, SibylAuthenticationState state) {
-//    IntaveLogger.logger().info("SIBYL AUTH STATE FOR " + player.getName() + " -> " + state);
+    if (SIBYL_DEBUG) {
+      player.sendMessage("Sibyl -> " + state + "/" + state.ordinal());
+    }
     MessageChannelSubscriptions.setSibyl(player, state == SibylAuthenticationState.ATH);
     authStates.put(player.getUniqueId(), state);
   }

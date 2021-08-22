@@ -104,7 +104,7 @@ public abstract class CommandStage {
     String leftCommand = command.length > 1 ? command[1] : "";
     if (link.forwardClass() != null) {
       String permission = link.permission();
-      if (sender instanceof Player && permission.equals("sibyl") && !IntavePlugin.singletonInstance().sibylIntegrationService().isAuthenticated((Player) sender)) {
+      if (permission.equals("sibyl") && !(sender instanceof Player && IntavePlugin.singletonInstance().sibylIntegrationService().isAuthenticated((Player) sender))) {
         return null;
       } else if (sender instanceof Player && !permission.equals("none") && !permission.equals("sibyl") && !BukkitPermissionCheck.permissionCheck(sender, permission)) {
         return null;
@@ -125,22 +125,48 @@ public abstract class CommandStage {
       .collect(Collectors.toList());
   }
 
+  private final static int COMMAND_SHOW_LIMIT = 8;
+
   @Native
   protected void showAllCommands(CommandSender sender) {
     sender.sendMessage(IntavePlugin.prefix() + "Available subcommands:");
 
+    List<String> messages = new ArrayList<>();
     for (CommandExecutor commandExecutor : subCommandList) {
       if (commandExecutor.hideInHelp()) {
         continue;
       }
       String permission = commandExecutor.permission();
-      if (sender instanceof Player && permission.equals("sibyl") && !IntavePlugin.singletonInstance().sibylIntegrationService().isAuthenticated((Player) sender)) {
+      if (permission.equals("sibyl") && !(sender instanceof Player && IntavePlugin.singletonInstance().sibylIntegrationService().isAuthenticated((Player) sender))) {
         continue;
       } else if (sender instanceof Player && !permission.equals("none") && !permission.equals("sibyl") && !BukkitPermissionCheck.permissionCheck(sender, permission)) {
         continue;
       }
-      sender.sendMessage(IntavePlugin.prefix() + commandPath() + commandExecutor.selectors()[0] + ": " + commandExecutor.description());
+      messages.add(commandExecutor.selectors()[0] + ": " + commandExecutor.description());
     }
+
+    if (messages.size() < COMMAND_SHOW_LIMIT) {
+      for (String message : messages) {
+        sender.sendMessage(IntavePlugin.prefix() + commandPath() + message);
+      }
+    } else {
+      List<String> reducedMessages = messages.subList(0, COMMAND_SHOW_LIMIT);
+      for (String message : reducedMessages) {
+        sender.sendMessage(IntavePlugin.prefix() + commandPath() + message);
+      }
+      int remaining = messages.size() - COMMAND_SHOW_LIMIT;
+      sender.sendMessage(IntavePlugin.prefix() + "<Use tab completion to see " + nameOf(remaining) + " more>");
+    }
+  }
+
+  private static final String[] LITERALS = {
+    "zero", "one", "two", "three", "four", "five",
+    "six", "seven", "eight", "nine", "ten",
+    "eleven", "twelve"
+  };
+
+  private String nameOf(int number) {
+    return number > 12 || number < 0 ? String.valueOf(number) : LITERALS[number];
   }
 
   @Native
@@ -151,7 +177,7 @@ public abstract class CommandStage {
         continue;
       }
       String permission = commandExecutor.permission();
-      if (sender instanceof Player && permission.equals("sibyl") && !IntavePlugin.singletonInstance().sibylIntegrationService().isAuthenticated((Player) sender)) {
+      if (permission.equals("sibyl") && !(sender instanceof Player && IntavePlugin.singletonInstance().sibylIntegrationService().isAuthenticated((Player) sender))) {
         continue;
       } else if (sender instanceof Player && !permission.equals("none") && !permission.equals("sibyl") && !BukkitPermissionCheck.permissionCheck(sender, permission)) {
         continue;
@@ -185,17 +211,12 @@ public abstract class CommandStage {
   private LevenshteinPicker.SearchResult levenshteinSubCommandPick(CommandSender sender, String search) {
     List<String> haystacks = new ArrayList<>();
     for (CommandExecutor commandExecutor : subCommandList) {
-
-      if (commandExecutor.hideInHelp()) {
-        continue;
-      }
       String permission = commandExecutor.permission();
-      if (sender instanceof Player && permission.equals("sibyl") && !IntavePlugin.singletonInstance().sibylIntegrationService().isAuthenticated((Player) sender)) {
+      if (permission.equals("sibyl") && !(sender instanceof Player && IntavePlugin.singletonInstance().sibylIntegrationService().isAuthenticated((Player) sender))) {
         continue;
       } else if (sender instanceof Player && !permission.equals("none") && !permission.equals("sibyl") && !BukkitPermissionCheck.permissionCheck(sender, permission)) {
         continue;
       }
-
       Collections.addAll(haystacks, commandExecutor.selectors());
     }
     return LevenshteinPicker.search(haystacks, search);
@@ -204,10 +225,6 @@ public abstract class CommandStage {
   @Native
   private CommandExecutor subcommandBySelector(CommandSender sender, String search) {
     for (CommandExecutor subCommand : subCommandList) {
-
-      if (subCommand.hideInHelp()) {
-        continue;
-      }
       String permission = subCommand.permission();
       if (sender instanceof Player && permission.equals("sibyl") && !IntavePlugin.singletonInstance().sibylIntegrationService().isAuthenticated((Player) sender)) {
         continue;

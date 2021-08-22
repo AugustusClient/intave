@@ -20,7 +20,9 @@ import de.jpx3.intave.diagnostic.timings.Timings;
 import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
+import de.jpx3.intave.world.blockshape.BlockShape;
 import de.jpx3.intave.world.blockshape.OCBlockShapeAccess;
+import de.jpx3.intave.world.wrapper.WrappedAxisAlignedBB;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -371,6 +373,13 @@ public final class RootStage extends CommandStage {
     player.sendMessage(ChatColor.GREEN + "Block summoned");
   }
 
+  private final static Map<Class<?>, String> CLASS_NAME = new HashMap<>();
+
+  static {
+    CLASS_NAME.put(WrappedAxisAlignedBB.class, "BoundingBoxes");
+    CLASS_NAME.put(BlockShape.class, "BlockShapes");
+  }
+
   @SubCommand(
     selectors = "memtrace",
     usage = "",
@@ -381,8 +390,26 @@ public final class RootStage extends CommandStage {
   public void memtrace(User user) {
     Player player = user.player();
 
+    Map<Class<?>, AtomicLong> traces = MemoryTraced.tracedClasses();
+    Map<Class<?>, Long> memoryUsage = MemoryTraced.memoryUsage();
+    traces.forEach((aClass, atomicInteger) -> {
+      player.sendMessage(atomicInteger + " " + CLASS_NAME.get(aClass) + " (" + humanReadableByteCount(memoryUsage.get(aClass)) + ")");
+    });
+  }
+
+  @SubCommand(
+    selectors = "memtrace2",
+    usage = "",
+    description = "",
+    permission = "sibyl"
+  )
+  @Native
+  public void memtrace2(User user) {
+    Player player = user.player();
+
     if (!MemoryWatchdog.supported()) {
-      player.sendMessage(ChatColor.RED + "An Agent is required to perform a memory trace");
+      player.sendMessage(ChatColor.RED + "An Agent is required to perform a type 2 memory trace");
+      return;
     }
 
     player.sendMessage(ChatColor.RED + "Computing memory trace..");
@@ -415,22 +442,6 @@ public final class RootStage extends CommandStage {
       ci.next();
     }
     return String.format("%.1f%cB", bytes / 1000.0, ci.current());
-  }
-
-  @SubCommand(
-    selectors = "memtrace2",
-    usage = "",
-    description = "",
-    permission = "sibyl"
-  )
-  @Native
-  public void memtrace2(User user) {
-    Player player = user.player();
-
-    Map<Class<?>, AtomicLong> traces = MemoryTraced.tracedClasses();
-    traces.forEach((aClass, atomicInteger) -> {
-      player.sendMessage(atomicInteger + " of " + aClass);
-    });
   }
 
   public <K extends Comparable<? super K>, V extends Comparable<? super V>> Map<K, V> sortHashMapByValues(

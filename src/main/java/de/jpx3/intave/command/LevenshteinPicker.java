@@ -2,10 +2,15 @@ package de.jpx3.intave.command;
 
 import java.util.*;
 
-public final class LevenshteinPicker {
+final class LevenshteinPicker {
   public static SearchResult search(Collection<String> haystacks, String needle) {
     Map<String, Integer> levenshteinCandidates = searchWithLimit(haystacks, needle, 4);
     if (!levenshteinCandidates.isEmpty()) {
+      for (String candidate : levenshteinCandidates.keySet()) {
+        if (needle.equalsIgnoreCase(candidate)) {
+          return new SearchResult(Result.CONFIDENT, Collections.singletonList(candidate));
+        }
+      }
       if (levenshteinCandidates.size() == 1) {
         String haystack = levenshteinCandidates.keySet().iterator().next();
         Integer distance = levenshteinCandidates.values().iterator().next();
