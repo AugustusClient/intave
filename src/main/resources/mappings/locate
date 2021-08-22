@@ -146,6 +146,10 @@ IRegistry -> {
   }
 }
 
+Item -> {
+  17 -> "net/minecraft/world/item/Item"
+}
+
 IWorldReader -> {
   17 -> "net/minecraft/world/level/IWorldReader"
 }

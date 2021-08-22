@@ -55,6 +55,7 @@ public final class v14BlockAccessor implements BlockAccessor {
   }
 
   @Override
+  @PatchyAutoTranslation
   public Object blockHandle(Block block) {
     WorldServer worldServer = ((CraftWorld) block.getWorld()).getHandle();
     IBlockAccess blockAccess = worldServer.getChunkProvider().c(block.getX() >> 4, block.getZ() >> 4);

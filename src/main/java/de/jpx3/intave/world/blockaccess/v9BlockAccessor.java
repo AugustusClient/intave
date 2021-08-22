@@ -26,6 +26,7 @@ public final class v9BlockAccessor implements BlockAccessor {
   }
 
   @Override
+  @PatchyAutoTranslation
   public Object blockHandle(Block block) {
     return CraftMagicNumbers.getBlock(block).getBlockData();
   }

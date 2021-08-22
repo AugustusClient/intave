@@ -305,7 +305,6 @@ public final class SimulationEvaluator {
     return abuseHorizontally * multiplier;
   }
 
-
   private final static double RIPTIDE_TOLERANCE = 3.005;
   private final static double RIPTIDE_TOLERANCE_2 = 0.05;
   private final static double RIPTIDE_GROUND_TOLERANCE_2 = 2.5;

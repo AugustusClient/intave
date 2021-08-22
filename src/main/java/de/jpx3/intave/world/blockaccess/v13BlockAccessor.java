@@ -30,11 +30,12 @@ public final class v13BlockAccessor implements BlockAccessor {
   }
 
   @Override
+  @PatchyAutoTranslation
   public Object blockHandle(Block block) {
     return ((CraftBlock) block).getNMS();
   }
 
-    @Override
+  @Override
   @PatchyAutoTranslation
   public float blockDamage(Player player, ItemStack itemInHand, BlockPosition blockPosition) {
     WorldServer worldServer = ((CraftWorld) player.getWorld()).getHandle();
