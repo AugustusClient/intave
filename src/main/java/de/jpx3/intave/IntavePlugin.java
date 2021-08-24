@@ -577,7 +577,7 @@ public final class IntavePlugin extends JavaPlugin {
     if (JavaVersion.current() < 16) {
       String noticePrefix = ChatColor.DARK_RED + "Notice" + ChatColor.DARK_GRAY + ": ";
       logger.info(noticePrefix + ChatColor.RED + "Upgrading to Java 16 has incredible performance benefits");
-      logger.info(noticePrefix + ChatColor.RED + "We strongly recommend you update Java now");
+      logger.info(noticePrefix + ChatColor.RED + "We strongly recommend updating Java now");
       logger.info(noticePrefix + ChatColor.RED + "Support for older versions of Java might eventually be dropped");
     }
 
