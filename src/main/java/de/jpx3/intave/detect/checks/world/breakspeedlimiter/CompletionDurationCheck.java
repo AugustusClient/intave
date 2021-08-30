@@ -211,6 +211,10 @@ public final class CompletionDurationCheck extends MetaCheckPart<BreakSpeedLimit
     public BlockPosition targetBlockPosition;
     public float curBlockDamageMP = 0f;
     public float maximumBlockDamage;
+    /*
+    breakProcess won't be set to false if a player is stop breaking a block (only when destroying a block),
+    So isBreakingBlock is a boolean which determines if the player is breaking a block and is false when he stops breaking.
+     */
     public boolean breakProcess;
     public long breakProcessStartTime;
     public double balance;

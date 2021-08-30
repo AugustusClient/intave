@@ -285,6 +285,50 @@ public final class AirClickLimitHeuristic extends MetaCheckPart<Heuristics, AirC
 //    } catch (InvocationTargetException | IllegalAccessException exception) {
 //      exception.printStackTrace();
 //    }
+
+
+    /*
+    replacing the block to air doesn't work neither
+     */
+
+//
+//    World world = player.getWorld();
+//    Block block = meta.currentDiggedBlock.toLocation(world).getBlock();
+//    WrappedBlockData wrappedBlockData = WrappedBlockData.createData(block.getType());
+//
+//    FeedbackCallback<Integer> callback = (player1, value1) -> {
+//      try {
+//        Thread.sleep(1150);
+//      } catch (InterruptedException e) {
+//        e.printStackTrace();
+//      }
+//      Synchronizer.synchronize(() -> {
+//        // set block to old data
+//        try {
+//          PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.BLOCK_CHANGE);
+//          packet.getBlockPositionModifier().write(0, meta.currentDiggedBlock);
+//          packet.getBlockData().write(0, wrappedBlockData);
+//
+//          ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
+//        } catch (InvocationTargetException exception) {
+//          exception.printStackTrace();
+//        }
+//      });
+//    };
+//
+//    Modules.feedback().synchronize(player, 1, callback);
+//
+//    Bukkit.broadcastMessage("replaced block " + meta.currentDiggedBlock);
+//    // set block to air
+//    try {
+//      PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.BLOCK_CHANGE);
+//      packet.getBlockPositionModifier().write(0, meta.currentDiggedBlock);
+//      packet.getBlockData().write(0, WrappedBlockData.createData(Material.AIR));
+//
+//      ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
+//    } catch (InvocationTargetException exception) {
+//      exception.printStackTrace();
+//    }
   }
 
   public static class AirClickLimitHeuristicMeta extends CheckCustomMetadata {

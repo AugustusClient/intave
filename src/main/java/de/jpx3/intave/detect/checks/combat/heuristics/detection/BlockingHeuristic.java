@@ -104,7 +104,6 @@ public final class BlockingHeuristic extends MetaCheckPart<Heuristics, BlockingH
           parentCheck().saveAnomaly(player, anomaly);
           //dmc6
           user.applyAttackNerfer(AttackNerfStrategy.BLOCKING, "6");
-          user.applyAttackNerfer(AttackNerfStrategy.DMG_LIGHT, "6");
           punishmentData.timeLastBlockCancel = AccessHelper.now();
           Synchronizer.synchronize(() -> ReflectiveDataWatcherAccess.setDataWatcherFlag(player, ReflectiveDataWatcherAccess.WATCHER_BLOCKING_ID, false));
         }
@@ -120,8 +119,6 @@ public final class BlockingHeuristic extends MetaCheckPart<Heuristics, BlockingH
         parentCheck().saveAnomaly(player, anomaly);
         //dmc7
         user.applyAttackNerfer(AttackNerfStrategy.BLOCKING, "7");
-        user.applyAttackNerfer(AttackNerfStrategy.DMG_LIGHT, "7");
-        user.applyAttackNerfer(AttackNerfStrategy.CANCEL_FIRST_HIT, "7");
       }
 
       int clientTicksBetweenBlockingToggle = meta.clientTicksBetweenBlockingToggle;
