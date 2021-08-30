@@ -121,7 +121,7 @@ public final class InventoryMetadata {
   public void updateInventoryOpenState(boolean inventoryOpen) {
     User user = UserRepository.userOf(player);
     ProtocolMetadata clientData = user.meta().protocol();
-    if (!inventoryOpen && clientData.inventoryAchievementPacket()) {
+    if (!inventoryOpen && clientData.supportsInventoryAchievementPacket()) {
       this.forceInventoryOnClickOpen = true;
     }
     deactivateHand();

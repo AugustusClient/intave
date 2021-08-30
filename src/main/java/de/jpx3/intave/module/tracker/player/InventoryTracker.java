@@ -135,6 +135,7 @@ public final class InventoryTracker extends Module {
     User user = UserRepository.userOf(player);
     EnumWrappers.ClientCommand clientCommand = event.getPacket().getClientCommands().read(0);
     if (clientCommand == EnumWrappers.ClientCommand.OPEN_INVENTORY_ACHIEVEMENT) {
+      player.sendMessage(String.valueOf(clientCommand));
       openInventory(player, user);
     }
   }
@@ -251,13 +252,14 @@ public final class InventoryTracker extends Module {
     ItemStack heldItem = inventoryData.heldItem();
 
     boolean requestedItemUse = requestedItemUse(packet);
-    boolean useItem = ItemProperties.canItemBeUsed(player, heldItem);
+    boolean sword = heldItem != null && heldItem.getType().name().endsWith("_SWORD");
 
-    if (requestedItemUse && AccessHelper.now() - punishmentData.timeLastBlockCancel < 5000) {
+    if (requestedItemUse && sword && AccessHelper.now() - punishmentData.timeLastBlockCancel < 5000) {
       event.setCancelled(true);
       return;
     }
 
+    boolean useItem = ItemProperties.canItemBeUsed(player, heldItem);
     if (requestedItemUse && useItem) {
       inventoryData.activateHand();
     }

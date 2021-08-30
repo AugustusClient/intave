@@ -114,6 +114,8 @@ check:
 
     enabled: true
 
+    high-tolerance: true
+
     thresholds:
       50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is performing invalid item-operations"
       100:

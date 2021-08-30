@@ -16,6 +16,7 @@ public final class ProtocolMetadata {
   public static int VER_1_13_2 = 404; // 1.13.2
   public static int VER_1_13 = 393; // 1.13
   public static int VER_1_12 = 335; // 1.12
+  public static int VER_1_11_1 = 316;
   public static int VER_1_11 = 315;
   public static int VER_1_10 = 210;
   public static int VER_1_9 = 107; // 1.9
@@ -118,6 +119,7 @@ public final class ProtocolMetadata {
     }
   }
 
+  @Deprecated
   public float hitBoxHeightWhenSneaking() {
     if (protocolVersion >= VER_1_13_2) {
       return 1.5F;
@@ -131,8 +133,8 @@ public final class ProtocolMetadata {
     return protocolVersion <= VER_1_8 && !clientVersionOlderThanServerVersion();
   }
 
-  public boolean inventoryAchievementPacket() {
-    return protocolVersion <= VER_1_8;
+  public boolean supportsInventoryAchievementPacket() {
+    return protocolVersion <= VER_1_11_1;
   }
 
   public boolean applyModernCollider() {

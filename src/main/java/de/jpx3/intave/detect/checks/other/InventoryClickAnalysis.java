@@ -11,21 +11,19 @@ import de.jpx3.intave.detect.checks.other.inventoryclickanalysis.InventoryClickP
 public final class InventoryClickAnalysis extends Check {
   public final static double MAX_VL_DECREMENT_PER_SECOND = 1;
   private final CheckViolationLevelDecrementer decrementer;
+  private final boolean highToleranceMode;
 
   public InventoryClickAnalysis(IntavePlugin plugin) {
     super("InventoryClickAnalysis", "inventoryclickanalysis");
     decrementer = new CheckViolationLevelDecrementer(this, MAX_VL_DECREMENT_PER_SECOND);
-    this.setupChecks();
+    this.highToleranceMode = configuration().settings().boolBy("high-tolerance", false);
+    this.setupCheckParts();
   }
 
-  private void setupChecks() {
+  private void setupCheckParts() {
     appendCheckPart(new InventoryClickOnMoveCheck(this));
     appendCheckPart(new InventoryClickNotOpenCheck(this));
-    appendCheckPart(new InventoryClickDelayAnalyzer(this));
+    appendCheckPart(new InventoryClickDelayAnalyzer(this, highToleranceMode));
     appendCheckPart(new InventoryClickPacketDelayAnalyzer(this));
-  }
-
-  public CheckViolationLevelDecrementer decrementer() {
-    return decrementer;
   }
 }

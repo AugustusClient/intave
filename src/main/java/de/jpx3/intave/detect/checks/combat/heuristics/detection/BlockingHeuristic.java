@@ -114,7 +114,7 @@ public final class BlockingHeuristic extends MetaCheckPart<Heuristics, BlockingH
       boolean sword = itemInHand != null && itemInHand.getType().name().endsWith("_SWORD");
 
       if (meta.releasedItemAfterClientTick) {
-        String description = "sent multiple blocking interactions per tick";
+        String description = "sent multiple blocking interactions per tick (" + (itemInHand == null ? "null" : itemInHand.getType()) + ")";
         Anomaly anomaly = Anomaly.anomalyOf("141", Confidence.NONE, Anomaly.Type.KILLAURA, description);
         parentCheck().saveAnomaly(player, anomaly);
         //dmc7

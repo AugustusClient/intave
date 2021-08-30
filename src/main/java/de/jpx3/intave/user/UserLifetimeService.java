@@ -31,7 +31,7 @@ public final class UserLifetimeService implements BukkitEventSubscriber {
     Player player = event.getPlayer();
     UserRepository.registerUser(player);
     User user = UserRepository.userOf(player);
-    Synchronizer.synchronizeDelayed(user::delayedSetup, 10);
+    Synchronizer.synchronizeDelayed(user::delayedSetup, 20);
   }
 
   @BukkitEventSubscription(priority = EventPriority.HIGHEST)

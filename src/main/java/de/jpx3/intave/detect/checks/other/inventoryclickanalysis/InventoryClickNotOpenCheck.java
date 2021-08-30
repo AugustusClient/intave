@@ -1,17 +1,24 @@
 package de.jpx3.intave.detect.checks.other.inventoryclickanalysis;
 
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.reflect.StructureModifier;
 import de.jpx3.intave.IntavePlugin;
+import de.jpx3.intave.adapter.MinecraftVersions;
+import de.jpx3.intave.annotate.KeepEnumInternalNames;
 import de.jpx3.intave.detect.CheckPart;
 import de.jpx3.intave.detect.checks.other.InventoryClickAnalysis;
-import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscription;
+import de.jpx3.intave.executor.Synchronizer;
+import de.jpx3.intave.module.linker.packet.PacketSubscription;
+import de.jpx3.intave.reflect.Lookup;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.InventoryMetadata;
-import de.jpx3.intave.user.meta.MetadataBundle;
-import de.jpx3.intave.user.meta.ProtocolMetadata;
-import org.bukkit.entity.HumanEntity;
+import de.jpx3.intave.violation.Violation;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryClickEvent;
+
+import java.util.Locale;
+
+import static de.jpx3.intave.module.linker.packet.PacketId.Client.WINDOW_CLICK;
 
 public final class InventoryClickNotOpenCheck extends CheckPart<InventoryClickAnalysis> {
   private final IntavePlugin plugin;
@@ -21,41 +28,59 @@ public final class InventoryClickNotOpenCheck extends CheckPart<InventoryClickAn
     plugin = IntavePlugin.singletonInstance();
   }
 
-  @BukkitEventSubscription
-  public void receiveWindowClick(InventoryClickEvent event) {
-    HumanEntity whoClicked = event.getWhoClicked();
-    if (!(whoClicked instanceof Player)) {
-      return;
+  @PacketSubscription(
+    packetsIn = {
+      WINDOW_CLICK
     }
-    Player player = ((Player) whoClicked).getPlayer();
+  )
+  public void receiveWindowClick(PacketEvent event) {
+    Player player = event.getPlayer();
     User user = userOf(player);
-    MetadataBundle meta = user.meta();
-    ProtocolMetadata clientData = meta.protocol();
-    InventoryMetadata inventoryData = meta.inventory();
+    PacketContainer packet = event.getPacket();
+    InventoryMetadata inventory = user.meta().inventory();
 
-    // This check does only work on 1.8 or below
-    if (clientData.combatUpdate() || clientData.clientVersionOlderThanServerVersion()) {
-      return;
+    StructureModifier<Integer> integers = packet.getIntegers();
+    int container = integers.read(0);
+    int slot = integers.read(1);
+    InventoryClickType clickType = readClickTypeFrom(packet);
+
+    boolean isNativeInventoryClick = container == 0;
+    boolean forceInventoryOnClickOpen = user.meta().inventory().forceInventoryOnClickOpen;
+
+    if (!inventory.inventoryOpen()) {
+      if (user.meta().protocol().supportsInventoryAchievementPacket()) {
+        Violation violation = Violation.builderFor(InventoryClickAnalysis.class)
+          .forPlayer(player)
+          .withMessage("clicked in closed inventory")
+          .withDetails(clickType.name().toLowerCase(Locale.ROOT) + " on s" + slot + "/" + "c" + container)
+          .withVL(5).build();
+        plugin.violationProcessor().processViolation(violation);
+        Synchronizer.synchronize(player::updateInventory);
+        event.setCancelled(true);
+      } else if (forceInventoryOnClickOpen && isNativeInventoryClick) {
+        user.meta().inventory().updateInventoryOpenState(true);
+      }
     }
+  }
 
-    boolean inventoryOpen = inventoryData.inventoryOpen();
-    int pastInventoryOpen = meta.movement().pastInventoryOpen;
+  private final static Class<?> NATIVE_INVENTORY_CLICK_TYPE_CLASS = MinecraftVersions.VER1_9_0.atOrAbove() ? Lookup.serverClass("InventoryClickType") : Object.class;
 
-    ClickType click = event.getClick();
-    if (click == ClickType.CREATIVE) {
-      return;
+  private InventoryClickType readClickTypeFrom(PacketContainer packet) {
+    Integer manualSlot = packet.getIntegers().readSafely(3);
+    if (manualSlot != null) {
+      return InventoryClickType.values()[manualSlot];
     }
+    return packet.getEnumModifier(InventoryClickType.class, NATIVE_INVENTORY_CLICK_TYPE_CLASS).read(0);
+  }
 
-    // has false positives, no easy fix available currently
-
-//    if (inventoryData.forceInventoryOnClickOpen && !inventoryOpen && pastInventoryOpen > 1) {
-//      String message = "insufficient inventory-click (inventory not open)";
-//      Violation violation = Violation.builderFor(InventoryClickAnalysis.class)
-//        .forPlayer(player).withMessage(message)
-//        .withVL(1)
-//        .build();
-//      plugin.violationProcessor().processViolation(violation);
-//      event.setCancelled(true);
-//    }
+  @KeepEnumInternalNames
+  public enum InventoryClickType {
+    PICKUP,
+    QUICK_MOVE,
+    SWAP,
+    CLONE,
+    THROW,
+    QUICK_CRAFT,
+    PICKUP_ALL;
   }
 }

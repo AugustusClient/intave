@@ -27,17 +27,17 @@ import java.util.List;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.WINDOW_CLICK;
 
 public final class InventoryClickDelayAnalyzer extends MetaCheckPart<InventoryClickAnalysis, InventoryClickDelayAnalyzer.ClickDelayMeta> {
-  private final IntavePlugin plugin;
-  private final boolean newWindowClickVersion;
-  Class<?> clickType;
+  private final static boolean MODERN_WINDOW_CLICK = ProtocolLibraryAdapter.serverVersion().isAtLeast(MinecraftVersions.VER1_9_0);
 
-  public InventoryClickDelayAnalyzer(InventoryClickAnalysis parentCheck) {
+  private final IntavePlugin plugin;
+  private final boolean highToleranceMode;
+  private final Class<?> clickType;
+
+  public InventoryClickDelayAnalyzer(InventoryClickAnalysis parentCheck, boolean highToleranceMode) {
     super(parentCheck, ClickDelayMeta.class);
-    newWindowClickVersion = ProtocolLibraryAdapter.serverVersion().isAtLeast(MinecraftVersions.VER1_9_0);
-    plugin = IntavePlugin.singletonInstance();
-    if (newWindowClickVersion) {
-      clickType = Lookup.serverClass("InventoryClickType");
-    }
+    this.highToleranceMode = highToleranceMode;
+    this.plugin = IntavePlugin.singletonInstance();
+    this.clickType = MODERN_WINDOW_CLICK ? Lookup.serverClass("InventoryClickType") : null;
   }
 
   @PacketSubscription(
@@ -57,16 +57,6 @@ public final class InventoryClickDelayAnalyzer extends MetaCheckPart<InventoryCl
     User user = userOf(player);
     ClickDelayMeta meta = metaOf(user);
 
-//    for (Object object : event.getPacket().getModifier().getValues()) {
-//      String s;
-//      if (object == null) {
-//        s = "null";
-//      } else {
-//        s = "" + object + " " + object.getClass();
-//      }
-//      player.sendMessage(s);
-//    }
-
     if (user.meta().protocol().protocolVersion() >= ProtocolMetadata.VER_1_12) {
       // TODO: when a player shifts an item in 1.12+ he sends a "null" as itemStack which makes the check imcompatible
       return;
@@ -76,7 +66,7 @@ public final class InventoryClickDelayAnalyzer extends MetaCheckPart<InventoryCl
     ItemStack itemStack = event.getPacket().getItemModifier().read(0);
     int clickedItemID = itemStack.getData().getItemTypeId() * 16 + itemStack.getData().getData();
     boolean droppedAnItem;
-    if (newWindowClickVersion) {
+    if (MODERN_WINDOW_CLICK) {
       InventoryClickTypes clickTypes = event.getPacket().getEnumModifier(InventoryClickTypes.class, clickType).read(0);
       droppedAnItem = clickTypes == InventoryClickTypes.THROW && slot != -999;
     } else {
@@ -94,23 +84,20 @@ public final class InventoryClickDelayAnalyzer extends MetaCheckPart<InventoryCl
 
   private void checkWindowClick(Player player, ClickDelayMeta meta, int slot) {
     double time = (System.nanoTime() - meta.lastClickedTimeStamp) / 1000000000d;
-
     if (time < 2) {
       meta.clickDelayList.add(time);
     }
-
     if (meta.clickDelayList.size() > 10) {
       if(isPartner()) {
         processStandardDeviationCheck(player, meta);
       }
       meta.clickDelayList.clear();
     }
-
     processClickDelayAnalyzerCheck(player, meta, slot, time);
   }
 
   @Native
-  public boolean isPartner() {
+  private boolean isPartner() {
     return (ProtocolMetadata.VERSION_DETAILS & 0x100) != 0;
   }
 
@@ -118,23 +105,17 @@ public final class InventoryClickDelayAnalyzer extends MetaCheckPart<InventoryCl
     double distance = distanceBetween(slot, meta.lastClickedSlot);
     double speedAttr = distance / time;
 
-    boolean flag = speedAttr > 30;
-    boolean flag2 = speedAttr > 100;
+    boolean flag = speedAttr > (highToleranceMode ? 60 : 30);
+    boolean flag2 = speedAttr > (highToleranceMode ? 150 : 100);
 
     if (distance > 2 && flag && (flag2 || AccessHelper.now() - meta.lastFlagTimeStamp < 5000)) {
       Violation violation = Violation.builderFor(InventoryClickAnalysis.class)
         .forPlayer(player).withDefaultThreshold()
         .withMessage("is switching too quickly between item slots")
         .withDetails("moved from slot " + meta.lastClickedSlot + " to slot " + slot + " in " + MathHelper.formatDouble(time, 3) + " seconds")
-        .withVL(time > 0.01 ? 10 : 5).build();
+        .withVL(5).build();
 
-      //ViolationContext violationContext =
       plugin.violationProcessor().processViolation(violation);
-//          if (IntaveControl.GOMME_MODE) {
-//            if (distance > 0 && violationContext.violationLevelAfter() > 30) {
-//              userOf(player).applyAttackNerfer(AttackNerfStrategy.DMG_MEDIUM);
-//            }
-//          }
     }
 
     if (flag) {
@@ -150,8 +131,8 @@ public final class InventoryClickDelayAnalyzer extends MetaCheckPart<InventoryCl
     if (std < 2 && Math.abs(averageMovementPacketTimestamp - 50) < 40) {
       Violation violation = Violation.builderFor(InventoryClickAnalysis.class)
         .forPlayer(player).withDefaultThreshold()
-        .withMessage("is clicking suspiciously on items")
-        .withDetails("time details: " + MathHelper.formatDouble(std, 2))
+        .withMessage("is clicking with regular deviation on items")
+        .withDetails(MathHelper.formatDouble(std, 2) + " deviation")
         .withVL(5).build();
 //
       plugin.violationProcessor().processViolation(violation);

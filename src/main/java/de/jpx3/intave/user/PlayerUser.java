@@ -115,6 +115,9 @@ final class PlayerUser implements User {
     Player player = player();
     ProtocolMetadata clientData = meta().protocol();
     clientData.refresh(player);
+    if (clientData.protocolVersion() < 0) {
+      synchronizedDisconnect("Invalid version received");
+    }
     outputVersionJoinInfo();
     BlockTypeAccess.setupTranslationsFor(this);
   }
@@ -122,10 +125,9 @@ final class PlayerUser implements User {
   private void outputVersionJoinInfo() {
     Player player = player();
     ProtocolMetadata clientData = meta().protocol();
-    String string = player.getName() + " joined with version " + clientData.versionString() + " ";
-    string += "(" + clientData.protocolVersion() + ")";
+    String string = player.getName() + " joined with version " + clientData.versionString() + "/" + clientData.protocolVersion();
     if (clientData.clientVersionOlderThanServerVersion()) {
-      string += " (behind server)";
+      string += " (behind)";
     }
     IntaveLogger.logger().pushPrintln(string);
   }
