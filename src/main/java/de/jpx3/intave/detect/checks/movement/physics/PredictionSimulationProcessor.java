@@ -231,8 +231,8 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
   }
 
   private final static int[] forwardKeys = {1, 1, 0, -1, -1, -1, 0, 1, 1};
-
   private final static int[] strafeKeys = {0, -1, -1, -1, 0, 1, 1, 1, 0};
+
   private static int forwardKeyFrom(int direction) {
     return direction == -1 ? 0 : forwardKeys[direction];
   }

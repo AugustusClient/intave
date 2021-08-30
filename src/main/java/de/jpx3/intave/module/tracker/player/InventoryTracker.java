@@ -135,7 +135,6 @@ public final class InventoryTracker extends Module {
     User user = UserRepository.userOf(player);
     EnumWrappers.ClientCommand clientCommand = event.getPacket().getClientCommands().read(0);
     if (clientCommand == EnumWrappers.ClientCommand.OPEN_INVENTORY_ACHIEVEMENT) {
-      player.sendMessage(String.valueOf(clientCommand));
       openInventory(player, user);
     }
   }
