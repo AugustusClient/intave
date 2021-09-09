@@ -95,7 +95,7 @@ public final class PreAttackHeuristic extends MetaCheckPart<Heuristics, PreAttac
     if (entity == null || !entity.clientSynchronized || movementData.lastTeleport < 5) {
       return;
     }
-    if (clientData.protocolVersion() != VER_1_8 || clientData.clientVersionOlderThanServerVersion()) {
+    if (clientData.clientVersionOlderThanServerVersion()) {
       return;
     }
     boolean dead = entity.fakeDead || entity.dead;
@@ -120,10 +120,16 @@ public final class PreAttackHeuristic extends MetaCheckPart<Heuristics, PreAttac
         meta.attacks++;
       }
       if (meta.attacks >= 100) {
-//        player.sendMessage((((double)meta.preAttacks / ((double)meta.preAttacks + (double) meta.attacks) * 100) + "% unsuccessful"));
         if (meta.preAttacks < 4) {
-          String description = "attacks seem automated (" + meta.preAttacks + "f)";
-          Anomaly anomaly = Anomaly.anomalyOf("231", Confidence.PROBABLE, Anomaly.Type.KILLAURA, description, LIMIT_4);
+          boolean verifiedVersion = clientData.protocolVersion() == VER_1_8;
+          String description = "attacks seem automated (" + meta.preAttacks + "f) | " + clientData.versionString();
+          Confidence confidence;
+          if (verifiedVersion) {
+            confidence = meta.preAttacks == 0 ? Confidence.LIKELY : Confidence.PROBABLE;
+          } else {
+            confidence = Confidence.NONE;
+          }
+          Anomaly anomaly = Anomaly.anomalyOf("231", confidence, Anomaly.Type.KILLAURA, description, LIMIT_4);
           parentCheck().saveAnomaly(player, anomaly);
         }
         meta.attacks = 0;
