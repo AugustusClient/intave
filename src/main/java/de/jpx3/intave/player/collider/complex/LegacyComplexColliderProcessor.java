@@ -63,7 +63,7 @@ public final class LegacyComplexColliderProcessor implements ComplexColliderProc
         }
       }
     }
-    BlockShape collisionShape = Collision.colliderShapeIn(player, movementData.boundingBox().addCoord(context.motionX, context.motionY, context.motionZ));
+    BlockShape collisionShape = Collision.colliderShapeIn(player, movementData.boundingBox().expand(context.motionX, context.motionY, context.motionZ));
     BoundingBox startBoundingBox = movementData.boundingBox();
     BoundingBox entityBoundingBox = movementData.boundingBox();
     context.motionY = collisionShape.allowedYOffset(entityBoundingBox, context.motionY);
@@ -80,9 +80,9 @@ public final class LegacyComplexColliderProcessor implements ComplexColliderProc
       BoundingBox axisalignedbb3 = entityBoundingBox;
       entityBoundingBox = startBoundingBox;
       context.motionY = STEP_HEIGHT;
-      BlockShape collider = Collision.colliderShapeIn(player, entityBoundingBox.addCoord(startMotionX, context.motionY, startMotionZ));
+      BlockShape collider = Collision.colliderShapeIn(player, entityBoundingBox.expand(startMotionX, context.motionY, startMotionZ));
       BoundingBox axisalignedbb4 = entityBoundingBox;
-      BoundingBox axisalignedbb5 = axisalignedbb4.addCoord(startMotionX, 0.0D, startMotionZ);
+      BoundingBox axisalignedbb5 = axisalignedbb4.expand(startMotionX, 0.0D, startMotionZ);
       double d9 = context.motionY;
       d9 = collider.allowedYOffset(axisalignedbb5, d9);
       axisalignedbb4 = axisalignedbb4.offset(0.0D, d9, 0.0D);

@@ -165,7 +165,7 @@ public final class SprintResetHeuristic extends MetaCheckPart<Heuristics, Sprint
   }
 
   private boolean canCollideHorizontally(User user, MovementMetadata movementData) {
-    BoundingBox entityBoundingBox = movementData.boundingBox().expand(0.031d, 0, 0.031d);
+    BoundingBox entityBoundingBox = movementData.boundingBox().grow(0.031d, 0, 0.031d);
     return Collision.nonePresent(user.player(), entityBoundingBox);
   }
 

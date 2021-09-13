@@ -11,7 +11,7 @@ public final class UniversalSimpleColliderProcessor implements SimpleColliderPro
   public SimpleColliderSimulationResult collide(User user, BoundingBox boundingBox, double motionX, double motionY, double motionZ) {
     Player player = user.player();
     BlockShape collider = Collision.colliderShapeIn(
-      player, boundingBox.addCoord(motionX, motionY, motionZ)
+      player, boundingBox.expand(motionX, motionY, motionZ)
     );
     double startMotionY = motionY;
     motionY = collider.allowedYOffset(boundingBox, motionY);

@@ -423,7 +423,7 @@ public final class MovementEmulator {
     BoundingBox entityBoundingBox,
     double motionX, double motionY, double motionZ
   ) {
-    BlockShape collisionBox = Collision.colliderShapeIn(player, entityBoundingBox.addCoord(motionX, motionY, motionZ));
+    BlockShape collisionBox = Collision.colliderShapeIn(player, entityBoundingBox.expand(motionX, motionY, motionZ));
 
     // motion y
     motionY = collisionBox.allowedYOffset(entityBoundingBox, motionY);

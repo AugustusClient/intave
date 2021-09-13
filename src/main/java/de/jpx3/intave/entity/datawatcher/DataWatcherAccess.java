@@ -16,12 +16,12 @@ public final class DataWatcherAccess {
   static {
     String className;
     if (MODERN_ACCESS) {
-      className = "de.jpx3.intave.entity.datawatcher.ModernDataWatcherAccess";
+      className = "de.jpx3.intave.entity.datawatcher.ModernDataWatcherAccessor";
     } else {
-      className = "de.jpx3.intave.entity.datawatcher.LegacyDataWatcherAccess";
+      className = "de.jpx3.intave.entity.datawatcher.LegacyDataWatcherAccessor";
     }
     ClassLoader classLoader = DataWatcherAccess.class.getClassLoader();
-    PatchyLoadingInjector.loadUnloadedClassPatched(classLoader, "de.jpx3.intave.entity.datawatcher.ModernDataWatcherAccess");
+    PatchyLoadingInjector.loadUnloadedClassPatched(classLoader, className);
     try {
       nativeDataWatcherAccessor = (DataWatcherAccessor) Class.forName(className).newInstance();
     } catch (InstantiationException | IllegalAccessException | ClassNotFoundException exception) {

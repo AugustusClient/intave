@@ -90,7 +90,7 @@ public abstract class Movement extends HeadRotationMovement {
   }
 
   private SimpleColliderSimulationResult collide(BoundingBox boundingBox, double motionX, double motionY, double motionZ) {
-    List<BoundingBox> collisionBoxes = Collision.resolveBoxes(location.getWorld(), boundingBox.addCoord(motionX, motionY, motionZ));
+    List<BoundingBox> collisionBoxes = Collision.resolveBoxes(location.getWorld(), boundingBox.expand(motionX, motionY, motionZ));
     double startMotionY = motionY;
     for (BoundingBox collisionBox : collisionBoxes) {
       motionY = collisionBox.allowedYOffset(boundingBox, motionY);

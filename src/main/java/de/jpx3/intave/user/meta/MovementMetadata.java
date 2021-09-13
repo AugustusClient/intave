@@ -554,7 +554,7 @@ public final class MovementMetadata {
     if (clientData.waterUpdate()) {
       return aquaticUpdateInLava;
     } else {
-      BoundingBox lavaBoundingBox = boundingBox.expand(
+      BoundingBox lavaBoundingBox = boundingBox.grow(
         -0.1f,
         -0.4000000059604645D,
         -0.1f

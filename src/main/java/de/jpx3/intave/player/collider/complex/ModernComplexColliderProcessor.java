@@ -28,7 +28,7 @@ public final class ModernComplexColliderProcessor implements ComplexColliderProc
     double startMotionZ = context.motionZ;
     boolean step = false;
     BlockShape firstCollider = Collision.colliderShapeIn(
-      player, movementData.boundingBox().addCoord(context.motionX, context.motionY, context.motionZ)
+      player, movementData.boundingBox().expand(context.motionX, context.motionY, context.motionZ)
     );
     BoundingBox startBoundingBox = movementData.boundingBox();
     BoundingBox entityBoundingBox = movementData.boundingBox();
@@ -67,10 +67,10 @@ public final class ModernComplexColliderProcessor implements ComplexColliderProc
       context.motionY = STEP_HEIGHT;
       BlockShape secondCollider = Collision.colliderShapeIn(
         player,
-        entityBoundingBox.addCoord(startMotionX, context.motionY, startMotionZ)
+        entityBoundingBox.expand(startMotionX, context.motionY, startMotionZ)
       );
       BoundingBox boundingBox4 = entityBoundingBox;
-      BoundingBox boundingBox5 = boundingBox4.addCoord(startMotionX, 0.0D, startMotionZ);
+      BoundingBox boundingBox5 = boundingBox4.expand(startMotionX, 0.0D, startMotionZ);
       double d9 = context.motionY;
       d9 = secondCollider.allowedYOffset(boundingBox5, d9);
       boundingBox4 = boundingBox4.offset(0.0D, d9, 0.0D);

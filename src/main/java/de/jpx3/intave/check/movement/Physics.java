@@ -231,7 +231,7 @@ public final class Physics extends Check {
     } else {
       BoundingBox entityBoundingBox = movementData.boundingBox();
       BoundingBox checkableBoundingBox = entityBoundingBox
-        .expand(0.0D, -0.4000000059604645D, 0.0D)
+        .grow(0.0D, -0.4000000059604645D, 0.0D)
         .contract(0.001D, 0.001D, 0.001D);
       movementData.inWater = LegacyWaterflow.handleMaterialAcceleration(user, checkableBoundingBox);
     }

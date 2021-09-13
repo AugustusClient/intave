@@ -166,7 +166,7 @@ Raytracing {
         interpolatedLookVec.zCoord * blockReachDistance
       );
 
-      BoundingBox hitBox = entityBoundingBox.expand(boundingBoxExpansion, boundingBoxExpansion, boundingBoxExpansion);
+      BoundingBox hitBox = entityBoundingBox.grow(boundingBoxExpansion, boundingBoxExpansion, boundingBoxExpansion);
       if (alternativeYDifference != 0) {
         hitBox = hitBox.addJustMaxY(alternativeYDifference);
       }

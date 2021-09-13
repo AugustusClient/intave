@@ -43,7 +43,7 @@ public final class BoundingBox extends MemoryTraced implements BlockShape {
   /**
    * Adds the coordinates to the bounding box extending it if the point lies outside the current ranges. Args: x, y, z
    */
-  public BoundingBox addCoord(double x, double y, double z) {
+  public BoundingBox expand(double x, double y, double z) {
     double d0 = this.minX;
     double d1 = this.minY;
     double d2 = this.minZ;
@@ -80,7 +80,7 @@ public final class BoundingBox extends MemoryTraced implements BlockShape {
    * Returns a bounding box expanded by the specified vector (if negative numbers are given it will shrink). Args: x, y,
    * z
    */
-  public BoundingBox expand(double x, double y, double z) {
+  public BoundingBox grow(double x, double y, double z) {
     double d0 = this.minX - x;
     double d1 = this.minY - y;
     double d2 = this.minZ - z;
@@ -91,11 +91,11 @@ public final class BoundingBox extends MemoryTraced implements BlockShape {
   }
 
   public BoundingBox grow(double value) {
-    return expand(value, value, value);
+    return grow(value, value, value);
   }
 
   public BoundingBox growHorizontally(double value) {
-    return expand(value, 0, value);
+    return grow(value, 0, value);
   }
 
   public BoundingBox shrink(double value) {
