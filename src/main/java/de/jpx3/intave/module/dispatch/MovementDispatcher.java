@@ -244,8 +244,6 @@ public final class MovementDispatcher extends Module {
       return;
     }
 
-    System.out.println("move: v=" + vehicleMove + " r=" + hasRotation + " m=" + hasMovement);
-
     // garbage fix
     if (
       clientData.cavesAndCliffsUpdate() && !movementData.awaitTeleport && !movementData.awaitOutgoingTeleport
