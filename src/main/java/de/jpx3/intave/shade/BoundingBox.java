@@ -468,7 +468,7 @@ public final class BoundingBox extends MemoryTraced implements BlockShape {
   ) {
     MovementMetadata movementData = user.meta().movement();
     ProtocolMetadata clientData = user.meta().protocol();
-    double width = movementData.widthRounded;
+    double width = movementData.hasRidingEntity() ? movementData.width / 2.0f : movementData.widthRounded;
     float height = movementData.height;
 
     double newYMax;

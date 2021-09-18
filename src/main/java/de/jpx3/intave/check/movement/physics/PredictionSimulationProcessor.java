@@ -31,11 +31,13 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
   @Override
   public ComplexColliderSimulationResult simulate(User user, Simulator simulator) {
     boolean keyDependent = simulator.affectedByMovementKeys();
+    System.out.println("call simulate: " + keyDependent);
     return keyDependent ? performKeySimulation(user, simulator) : simulateWithoutKeyPress(user, simulator);
   }
 
   private ComplexColliderSimulationResult performKeySimulation(User user, Simulator simulator) {
     MovementMetadata movementData = user.meta().movement();
+    System.out.println("call performKeySimulation: " + movementData.externalKeyApply);
     return movementData.externalKeyApply ? performKeySimulationFromInput(user, simulator) : performKeyComparisonSimulation(user, simulator);
   }
 
@@ -48,6 +50,7 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
     movementData.keyStrafe = clientStrafeKey;
     movementData.physicsJumped = jump;
     KeyPressStudy.enterKeyPress(movementData.keyForward, movementData.keyStrafe);
+    System.out.println("call simulateWithKeyPress:" + clientInputKey + "/" + clientStrafeKey);
     return simulateWithKeyPress(user, simulator, clientInputKey, clientStrafeKey, jump);
   }
 

@@ -14,7 +14,7 @@ public final class LegacyComplexColliderProcessor implements ComplexColliderProc
   public ComplexColliderSimulationResult collide(User user, MotionVector context, boolean inWeb, double positionX, double positionY, double positionZ) {
     Player player = user.player();
     MetadataBundle meta = user.meta();
-    MovementMetadata movementData = meta.movement();
+    MovementMetadata movement = meta.movement();
     if (inWeb) {
       context.motionX *= 0.25D;
       context.motionY *= 0.05f;
@@ -24,8 +24,8 @@ public final class LegacyComplexColliderProcessor implements ComplexColliderProc
     double startMotionY = context.motionY;
     double startMotionZ = context.motionZ;
     boolean step = false;
-    if (movementData.onGround && movementData.sneaking) {
-      BoundingBox boundingBox = movementData.boundingBox();
+    if (movement.onGround && movement.sneaking) {
+      BoundingBox boundingBox = movement.boundingBox();
       double size;
       for (size = 0.05D; context.motionX != 0.0D && Collision.nonePresent(player, boundingBox.offset(context.motionX, -1.0D, 0.0D)); startMotionX = context.motionX) {
         if (context.motionX < size && context.motionX >= -size) {
@@ -63,12 +63,12 @@ public final class LegacyComplexColliderProcessor implements ComplexColliderProc
         }
       }
     }
-    BlockShape collisionShape = Collision.colliderShapeIn(player, movementData.boundingBox().expand(context.motionX, context.motionY, context.motionZ));
-    BoundingBox startBoundingBox = movementData.boundingBox();
-    BoundingBox entityBoundingBox = movementData.boundingBox();
+    BlockShape collisionShape = Collision.colliderShapeIn(player, movement.boundingBox().expand(context.motionX, context.motionY, context.motionZ));
+    BoundingBox startBoundingBox = movement.boundingBox();
+    BoundingBox entityBoundingBox = movement.boundingBox();
     context.motionY = collisionShape.allowedYOffset(entityBoundingBox, context.motionY);
     entityBoundingBox = (entityBoundingBox.offset(0.0D, context.motionY, 0.0D));
-    boolean flag1 = movementData.onGround || startMotionY != context.motionY && startMotionY < 0.0D;
+    boolean flag1 = movement.onGround || startMotionY != context.motionY && startMotionY < 0.0D;
     context.motionX = collisionShape.allowedXOffset(entityBoundingBox, context.motionX);
     entityBoundingBox = entityBoundingBox.offset(context.motionX, 0.0D, 0.0D);
     context.motionZ = collisionShape.allowedZOffset(entityBoundingBox, context.motionZ);
@@ -79,7 +79,7 @@ public final class LegacyComplexColliderProcessor implements ComplexColliderProc
       double copyZ = context.motionZ;
       BoundingBox axisalignedbb3 = entityBoundingBox;
       entityBoundingBox = startBoundingBox;
-      context.motionY = STEP_HEIGHT;
+      context.motionY = movement.stepHeight;
       BlockShape collider = Collision.colliderShapeIn(player, entityBoundingBox.expand(startMotionX, context.motionY, startMotionZ));
       BoundingBox axisalignedbb4 = entityBoundingBox;
       BoundingBox axisalignedbb5 = axisalignedbb4.expand(startMotionX, 0.0D, startMotionZ);

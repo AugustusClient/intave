@@ -67,10 +67,20 @@ public enum Pose {
   }
 
   public float width(User user) {
+    MovementMetadata movement = user.meta().movement();
+    Simulator simulator = movement.simulator();
+    if (simulator == Simulators.BOAT) {
+      return 1.375F;
+    }
     return size(user).width();
   }
 
   public float height(User user) {
+    MovementMetadata movement = user.meta().movement();
+    Simulator simulator = movement.simulator();
+    if (simulator == Simulators.BOAT) {
+      return 0.5625F;
+    }
     return size(user).length();
   }
 

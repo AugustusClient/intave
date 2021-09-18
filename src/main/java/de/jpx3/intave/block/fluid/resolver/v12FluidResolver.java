@@ -35,7 +35,7 @@ public final class v12FluidResolver extends FluidEngine {
     } else if (MaterialMagic.isLava(type)) {
       fluidTag = FluidTag.LAVA;
     }
-    return WrappedFluid.construct(fluidTag, height);
+    return WrappedFluid.construct(fluidTag, true, height);
   }
 
   @Override

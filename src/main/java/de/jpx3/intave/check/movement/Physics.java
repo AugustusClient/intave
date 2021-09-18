@@ -23,6 +23,7 @@ import de.jpx3.intave.diagnostic.timings.Timings;
 import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.module.Modules;
+import de.jpx3.intave.module.tracker.entity.WrappedEntity;
 import de.jpx3.intave.module.violation.Violation;
 import de.jpx3.intave.module.violation.ViolationContext;
 import de.jpx3.intave.player.Collider;
@@ -32,10 +33,7 @@ import de.jpx3.intave.shade.BoundingBox;
 import de.jpx3.intave.shade.WrappedMathHelper;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.*;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -82,7 +80,9 @@ public final class Physics extends Check {
     MovementMetadata movementData = meta.movement();
     ProtocolMetadata clientData = meta.protocol();
 
-    movementData.setSimulator(selectSimulator(user));
+    Simulator simulator = selectSimulator(user);
+    movementData.setSimulator(simulator);
+    movementData.stepHeight = simulator.stepHeight();
 
     if (clientData.waterUpdate() && movementData.sneaking && movementData.inWater) {
       handleSneakInWater(user);
@@ -123,10 +123,14 @@ public final class Physics extends Check {
     }
   }
 
+  private final static int BOAT_ID = 41;
+
   private Simulator selectSimulator(User user) {
     MovementMetadata movementData = user.meta().movement();
     if (movementData.hasRidingEntity()) {
-      return Simulators.HORSE;
+      WrappedEntity wrappedEntity = movementData.ridingEntity();
+      int typeId = wrappedEntity.typeData.identifier();
+      return typeId == BOAT_ID ? Simulators.BOAT : Simulators.HORSE;
     } else {
       boolean inLava = movementData.inLava();
       boolean inWater = movementData.inWater;
@@ -317,7 +321,7 @@ public final class Physics extends Check {
     }
 
     double violationLevelIncrease = horizontalViolationIncrease + verticalViolationIncrease;
-    if (movementData.simulator() == Simulators.HORSE && !IntaveControl.GOMME_MODE) {
+    if ((movementData.simulator() == Simulators.HORSE || movementData.simulator() == Simulators.BOAT) && !IntaveControl.GOMME_MODE) {
       violationLevelIncrease = 0;
     }
     if (distance > 1e-3) {
@@ -556,9 +560,8 @@ public final class Physics extends Check {
         violationLevelInfo = "g:" + displayPhysicsVL;
       }
       String debug = String.valueOf(chatColor);
-//      debug += poseName;
+      debug += movementData.simulator().debugName();
       debug += " ";
-      debug += movementData.pose().name();
       if (movementData.recentlyEncounteredFlyingPacket(0)) {
         debug += "f";
       }

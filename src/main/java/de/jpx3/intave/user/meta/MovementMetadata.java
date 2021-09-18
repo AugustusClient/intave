@@ -50,6 +50,7 @@ public final class MovementMetadata {
 
   public boolean disabledFlying;
   public float width = 0.6f, height = 1.8f;
+  public float stepHeight = 0.6f;
   public double widthRounded, heightRounded;
   private double resetMotion, frictionPosSubtraction;
 
@@ -140,6 +141,10 @@ public final class MovementMetadata {
   public volatile Location nearestBoatLocation = null;
   // Vehicle
   private WrappedEntity ridingEntity;
+  public float boatGlide, momentum;
+  public double waterLevel;
+  public BoatSimulator.Status boatStatus = BoatSimulator.Status.ON_LAND,
+    previousBoatStatus = BoatSimulator.Status.ON_LAND;
 
   public boolean isTeleportConfirmationPacket;
   public boolean dropPostTickMotionProcessing;
@@ -437,10 +442,9 @@ public final class MovementMetadata {
 
   @IdoNotBelongHere
   private void updateSize() {
-    Pose pose = pose();
     width = pose.width(user);
     height = pose.height(user);
-    widthRounded = Math.round(width * 50d) / 100d;
+    widthRounded = Math.round(width * 500d) / 1000d;
     heightRounded = Math.round(height * 100d) / 100d;
   }
 

@@ -31,6 +31,10 @@ public abstract class Simulator {
     return physics;
   }
 
+  public float stepHeight() {
+    return 0.6f;
+  }
+
   public boolean affectedByMovementKeys() {
     return true;
   }

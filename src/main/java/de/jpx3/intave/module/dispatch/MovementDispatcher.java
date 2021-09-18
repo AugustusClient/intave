@@ -244,6 +244,8 @@ public final class MovementDispatcher extends Module {
       return;
     }
 
+    System.out.println("move: v=" + vehicleMove + " r=" + hasRotation + " m=" + hasMovement);
+
     // garbage fix
     if (
       clientData.cavesAndCliffsUpdate() && !movementData.awaitTeleport && !movementData.awaitOutgoingTeleport
@@ -498,7 +500,7 @@ public final class MovementDispatcher extends Module {
     MovementMetadata movementData = meta.movement();
     Pose pose = movementData.pose();
     movementData.width = pose.width(user);
-    movementData.height = pose.width(user);
+    movementData.height = pose.height(user);
     ;
   }
 

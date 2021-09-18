@@ -14,24 +14,24 @@ public final class ModernComplexColliderProcessor implements ComplexColliderProc
   public ComplexColliderSimulationResult collide(User user, MotionVector context, boolean inWeb, double positionX, double positionY, double positionZ) {
     Player player = user.player();
     MetadataBundle meta = user.meta();
-    MovementMetadata movementData = meta.movement();
+    MovementMetadata movement = meta.movement();
     if (inWeb) {
       context.motionX *= 0.25D;
       context.motionY *= 0.05f;
       context.motionZ *= 0.25D;
     }
-    if (movementData.onGround && movementData.sneaking) {
-      calculateBackOffFromEdge(user, STEP_HEIGHT, context);
+    if (movement.onGround && movement.sneaking) {
+      calculateBackOffFromEdge(user, movement.stepHeight, context);
     }
     double startMotionX = context.motionX;
     double startMotionY = context.motionY;
     double startMotionZ = context.motionZ;
     boolean step = false;
     BlockShape firstCollider = Collision.colliderShapeIn(
-      player, movementData.boundingBox().expand(context.motionX, context.motionY, context.motionZ)
+      player, movement.boundingBox().expand(context.motionX, context.motionY, context.motionZ)
     );
-    BoundingBox startBoundingBox = movementData.boundingBox();
-    BoundingBox entityBoundingBox = movementData.boundingBox();
+    BoundingBox startBoundingBox = movement.boundingBox();
+    BoundingBox entityBoundingBox = movement.boundingBox();
     if (context.motionY != 0.0) {
       context.motionY = firstCollider.allowedYOffset(entityBoundingBox, context.motionY);
       if (context.motionY != 0.0) {
@@ -57,14 +57,14 @@ public final class ModernComplexColliderProcessor implements ComplexColliderProc
         entityBoundingBox = entityBoundingBox.offset(0.0, 0.0, context.motionZ);
       }
     }
-    boolean flag1 = movementData.onGround || startMotionY != context.motionY && startMotionY < 0.0D;
+    boolean flag1 = movement.onGround || startMotionY != context.motionY && startMotionY < 0.0D;
     if (flag1 && (startMotionX != context.motionX || startMotionZ != context.motionZ)) {
       double copyX = context.motionX;
       double copyY = context.motionY;
       double copyZ = context.motionZ;
       BoundingBox boundingBox3 = entityBoundingBox;
       entityBoundingBox = startBoundingBox;
-      context.motionY = STEP_HEIGHT;
+      context.motionY = movement.stepHeight;
       BlockShape secondCollider = Collision.colliderShapeIn(
         player,
         entityBoundingBox.expand(startMotionX, context.motionY, startMotionZ)

@@ -28,7 +28,7 @@ public final class v16FluidResolver extends FluidEngine {
       return WrappedFluid.empty();
     }
     float height = fluid.d();
-    return WrappedFluid.construct(fluidTag, height);
+    return WrappedFluid.construct(fluidTag, fluid.isSource(), height);
   }
 
   @PatchyAutoTranslation
