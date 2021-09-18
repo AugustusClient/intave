@@ -41,7 +41,7 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
 
   private ComplexColliderSimulationResult performKeySimulationFromInput(User user, Simulator simulator) {
     MovementMetadata movementData = user.meta().movement();
-    int clientInputKey = movementData.clientInputKey;
+    int clientInputKey = movementData.clientForwardKey;
     int clientStrafeKey = movementData.clientStrafeKey;
     boolean jump = movementData.clientPressedJump && movementData.lastOnGround;
     movementData.keyForward = clientInputKey;

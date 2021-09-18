@@ -100,7 +100,7 @@ public final class FeedbackSender extends Module {
     tracedSingleSynchronize(player, target, secondCallback, secondTracker, options);
   }
 
-  public <T> void synchronize(Player player, FeedbackCallback<Object> callback) {
+  public void synchronize(Player player, FeedbackCallback<Object> callback) {
     tracedSingleSynchronize(player, null, callback, null, 0);
   }
 
@@ -108,7 +108,7 @@ public final class FeedbackSender extends Module {
     synchronize(player, target, callback, 0);
   }
 
-  public <T> void synchronize(Player player, FeedbackCallback<Object> callback, int options) {
+  public void synchronize(Player player, FeedbackCallback<Object> callback, int options) {
     tracedSingleSynchronize(player, null, callback, null, options);
   }
 
@@ -202,7 +202,8 @@ public final class FeedbackSender extends Module {
     ConnectionMetadata synchronizeData = user.meta().connection();
     Map<Short, FeedbackRequest<?>> transactionFeedBackMap = synchronizeData.transactionShortKeyMap();
     short counter = USE_PING_PONG_PACKETS ? 13 : TRANSACTION_MIN_CODE;
-    while (transactionFeedBackMap.containsKey(counter)) counter++;
+    while (transactionFeedBackMap.containsKey(counter))
+      counter++;
     return counter;
   }
 

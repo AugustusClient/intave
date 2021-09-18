@@ -156,7 +156,7 @@ public final class MovementMetadata {
 
   // Key inputs sent by the client
   public boolean externalKeyApply = false;
-  public int clientInputKey = 0;
+  public int clientForwardKey = 0;
   public int clientStrafeKey = 0;
   public boolean clientPressedJump = false;
 
