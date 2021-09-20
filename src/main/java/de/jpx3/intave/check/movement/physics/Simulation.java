@@ -2,6 +2,7 @@ package de.jpx3.intave.check.movement.physics;
 
 import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.player.collider.complex.ComplexColliderSimulationResult;
+import de.jpx3.intave.shade.Motion;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserLocal;
 
@@ -20,11 +21,11 @@ public final class Simulation {
     this.details = "";
   }
 
-  public double accuracy(MotionVector motionVector) {
+  public double accuracy(Motion motionVector) {
     return MathHelper.distanceOf(motion(), motionVector);
   }
 
-  public MotionVector motion() {
+  public Motion motion() {
     return colliderResult.motion();
   }
 

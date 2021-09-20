@@ -21,7 +21,7 @@ import java.util.Objects;
  * @see BlockVariantRegister
  */
 public final class BlockState extends MemoryTraced {
-  private final static BlockState EMPTY = new BlockState(BlockShapes.empty(), Material.AIR, 0);
+  private final static BlockState EMPTY = new BlockState(BlockShapes.emptyShape(), Material.AIR, 0);
   private final BlockShape shape;
   private final Material type;
   private final int variant;

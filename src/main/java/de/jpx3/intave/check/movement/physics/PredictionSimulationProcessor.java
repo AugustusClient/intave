@@ -1,30 +1,20 @@
 package de.jpx3.intave.check.movement.physics;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.BlockPosition;
-import com.comphenix.protocol.wrappers.EnumWrappers;
 import de.jpx3.intave.annotate.Relocate;
+import de.jpx3.intave.annotate.refactoring.IdoNotBelongHere;
 import de.jpx3.intave.diagnostic.KeyPressStudy;
 import de.jpx3.intave.diagnostic.timings.Timings;
-import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.math.Hypot;
 import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.module.dispatch.AttackDispatcher;
-import de.jpx3.intave.player.ItemProperties;
 import de.jpx3.intave.player.collider.complex.ComplexColliderSimulationResult;
+import de.jpx3.intave.shade.Motion;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserLocal;
-import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.InventoryMetadata;
 import de.jpx3.intave.user.meta.MetadataBundle;
 import de.jpx3.intave.user.meta.MovementMetadata;
 import de.jpx3.intave.user.meta.ProtocolMetadata;
-import org.bukkit.entity.Player;
-
-import java.lang.reflect.InvocationTargetException;
 
 @Relocate
 public final class PredictionSimulationProcessor implements SimulationProcessor {
@@ -88,6 +78,7 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
     return simulation;
   }
 
+  @IdoNotBelongHere
   private void applyIterativeSimulationTo(User user, IterativeSimulationContext iterativeResult) {
     MetadataBundle meta = user.meta();
     MovementMetadata movementData = meta.movement();
@@ -100,37 +91,13 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
     if (packetsSuggestsHandIsActive && !movementSuggestsHandIsActive) {
       boolean releaseHandConditions = Hypot.fast(movementData.motionX(), movementData.motionZ()) > 0.2 || movementData.lastTeleport >= 2;
       if (releaseHandConditions) {
-        releaseHandOf(user);
+//        releaseHandOf(user);
+        user.meta().inventory().releaseItemNextTick = true;
       }
     }
     movementData.keyForward = iterativeResult.forward();
     movementData.keyStrafe = iterativeResult.strafe();
     movementData.physicsJumped = iterativeResult.jumped();
-  }
-
-  private void releaseHandOf(User user) {
-    Player player = user.player();
-    try {
-      ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
-      InventoryMetadata inventory = user.meta().inventory();
-      inventory.blockNextArrow = ItemProperties.isBow(inventory.heldItemType()) || ItemProperties.isBow(inventory.activeItem());
-      PacketContainer packet = protocolManager.createPacket(PacketType.Play.Client.BLOCK_DIG);
-      packet.getBlockPositionModifier().write(0, new BlockPosition(0,0,0));
-      packet.getDirections().write(0, EnumWrappers.Direction.DOWN);
-      packet.getPlayerDigTypes().write(0, EnumWrappers.PlayerDigType.RELEASE_USE_ITEM);
-      user.ignoreNextInboundPacket();
-      protocolManager.recieveClientPacket(player, packet);
-      updatePlayerHandItem(player);
-    } catch (InvocationTargetException | IllegalAccessException exception) {
-      exception.printStackTrace();
-    }
-    Synchronizer.synchronize(player::updateInventory);
-  }
-
-  private void updatePlayerHandItem(Player player) {
-    User user = UserRepository.userOf(player);
-    InventoryMetadata inventoryData = user.meta().inventory();
-    inventoryData.deactivateHand();
   }
 
   @Override
@@ -139,10 +106,10 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
   ) {
     MetadataBundle meta = user.meta();
     MovementMetadata movementData = meta.movement();
-    MotionVector motionVector = MotionVector.from(movementData.motionProcessorContext);
-    motionVector.resetTo(movementData);
+    Motion motion = movementData.motionProcessorContext.copy();
+    motion.resetTo(movementData);
     return simulator.performSimulation(
-      user, motionVector,
+      user, motion,
       forward, strafe, false, jumped,
       meta.inventory().handActive()
     );
@@ -155,7 +122,7 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
     Timings.CHECK_PHYSICS_PROC_PRED_BIA.start();
     MovementMetadata movementData = user.meta().movement();
     InventoryMetadata inventoryData = user.meta().inventory();
-    MotionVector motionVector = movementData.motionProcessorContext;
+    Motion motionVector = movementData.motionProcessorContext;
     double lastMotionX = movementData.physicsMotionX;
     double lastMotionZ = movementData.physicsMotionZ;
     boolean jumped = false;
@@ -257,7 +224,7 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
     Timings.CHECK_PHYSICS_PROC_LK_BIA.start();
     MovementMetadata movementData = user.meta().movement();
     InventoryMetadata inventoryData = user.meta().inventory();
-    MotionVector motionVector = movementData.motionProcessorContext;
+    Motion motion = movementData.motionProcessorContext;
 
     int keyForward = movementData.lastKeyForward;
     int keyStrafe = movementData.lastKeyStrafe;
@@ -292,10 +259,10 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
     float moveForward = keyForward * 0.98f;
     float moveStrafe = keyStrafe * 0.98f;
     movementData.physicsJumped = jumped;
-    motionVector.resetTo(movementData);
+    motion.resetTo(movementData);
     movementData.keyForward = keyForward;
     movementData.keyStrafe = keyStrafe;
-    ComplexColliderSimulationResult simulationResult = simulator.performSimulation(user, motionVector, moveForward, moveStrafe, attackReduce, jumped, handActive);
+    ComplexColliderSimulationResult simulationResult = simulator.performSimulation(user, motion, moveForward, moveStrafe, attackReduce, jumped, handActive);
     Timings.CHECK_PHYSICS_PROC_LK_BIA.stop();
     Timings.CHECK_PHYSICS_PROC_BIA.stop();
     return simulationResult;
@@ -397,7 +364,7 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
     return key;
   }
 
-  private double compareReceivedMotionWithMotion(User user, MotionVector context) {
+  private double compareReceivedMotionWithMotion(User user, Motion context) {
     MovementMetadata movementData = user.meta().movement();
     return MathHelper.distanceOf(
       context.motionX, context.motionY, context.motionZ,
@@ -418,7 +385,7 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
     boolean handActive,
     boolean forceApply
   ) {
-    MotionVector motionVector = movementData.motionProcessorContext;
+    Motion motionVector = movementData.motionProcessorContext;
     float moveForward = keyForward * 0.98f;
     float moveStrafe = keyStrafe * 0.98f;
     motionVector.resetTo(movementData);
@@ -426,7 +393,7 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
       user, motionVector, moveForward, moveStrafe,
       attackReduce, jumped, handActive
     );
-    MotionVector predictedMotion = collisionResult.motion();
+    Motion predictedMotion = collisionResult.motion();
     double distance = compareReceivedMotionWithMotion(user, predictedMotion);
     if (forceApply || inventoryData.handActive() == handActive || distance < 0.001) {
       result.tryAppendToState(collisionResult, distance, keyForward, keyStrafe, attackReduce, jumped, handActive);

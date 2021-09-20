@@ -12,6 +12,8 @@ import org.bukkit.Location;
 import java.util.Collections;
 import java.util.List;
 
+import static de.jpx3.intave.shade.Direction.Axis.*;
+
 public final class BoundingBox extends MemoryTraced implements BlockShape {
   public final double minX, minY, minZ;
   public final double maxX, maxY, maxZ;
@@ -30,14 +32,28 @@ public final class BoundingBox extends MemoryTraced implements BlockShape {
     this.maxZ = Math.max(z1, z2);
   }
 
-  @Deprecated
-  public double getMin(EnumDirection.Axis axis) {
-    return axis.getCoordinate(this.minX, this.minY, this.minZ);
+  public double min(Direction.Axis axis) {
+    switch (axis) {
+      case X_AXIS:
+        return minX;
+      case Y_AXIS:
+        return minY;
+      case Z_AXIS:
+        return minZ;
+    }
+    return axis.select(this.minX, this.minY, this.minZ);
   }
 
-  @Deprecated
-  public double getMax(EnumDirection.Axis axis) {
-    return axis.getCoordinate(this.maxX, this.maxY, this.maxZ);
+  public double max(Direction.Axis axis) {
+    switch (axis) {
+      case X_AXIS:
+        return maxX;
+      case Y_AXIS:
+        return maxY;
+      case Z_AXIS:
+        return maxZ;
+    }
+    return axis.select(this.maxX, this.maxY, this.maxZ);
   }
 
   /**
@@ -130,6 +146,29 @@ public final class BoundingBox extends MemoryTraced implements BlockShape {
    */
   public BoundingBox offset(double x, double y, double z) {
     return new BoundingBox(this.minX + x, this.minY + y, this.minZ + z, this.maxX + x, this.maxY + y, this.maxZ + z);
+  }
+
+  @Override
+  public double allowedOffset(Direction.Axis axis, BoundingBox other, double offset) {
+    // always collide if axis is selected
+    boolean collidesInXAxis = axis == X_AXIS || other.max(X_AXIS) > this.min(X_AXIS) && other.min(X_AXIS) < this.max(X_AXIS);
+    boolean collidesInYAxis = axis == Y_AXIS || (collidesInXAxis && other.max(Y_AXIS) > this.min(Y_AXIS) && other.min(Y_AXIS) < this.max(Y_AXIS));
+    boolean collidesInZAxis = axis == Z_AXIS || (collidesInYAxis && other.max(Z_AXIS) > this.min(Z_AXIS) && other.min(Z_AXIS) < this.max(Z_AXIS));
+
+    if (collidesInXAxis && collidesInYAxis && collidesInZAxis) {
+      if (offset > 0.0D && other.max(axis) <= this.min(axis)) {
+        double distance = this.min(axis) - other.max(axis);
+        if (distance < offset) {
+          offset = distance;
+        }
+      } else if (offset < 0.0D && other.min(axis) >= this.max(axis)) {
+        double distance = this.max(axis) - other.min(axis);
+        if (distance > offset) {
+          offset = distance;
+        }
+      }
+    }
+    return offset;
   }
 
   /**
@@ -325,20 +364,20 @@ public final class BoundingBox extends MemoryTraced implements BlockShape {
     if (vec36 == null) {
       return null;
     } else {
-      EnumDirection enumfacing;
+      Direction enumfacing;
 
       if (vec36 == vec3) {
-        enumfacing = EnumDirection.WEST;
+        enumfacing = Direction.WEST;
       } else if (vec36 == vec31) {
-        enumfacing = EnumDirection.EAST;
+        enumfacing = Direction.EAST;
       } else if (vec36 == vec32) {
-        enumfacing = EnumDirection.DOWN;
+        enumfacing = Direction.DOWN;
       } else if (vec36 == vec33) {
-        enumfacing = EnumDirection.UP;
+        enumfacing = Direction.UP;
       } else if (vec36 == vec34) {
-        enumfacing = EnumDirection.NORTH;
+        enumfacing = Direction.NORTH;
       } else {
-        enumfacing = EnumDirection.SOUTH;
+        enumfacing = Direction.SOUTH;
       }
 
       return new MovingObjectPosition(vec36, enumfacing);
@@ -458,6 +497,10 @@ public final class BoundingBox extends MemoryTraced implements BlockShape {
     return fromPosition(user, location.getX(), location.getY(), location.getZ());
   }
 
+  public static BoundingBox fromPosition(User user, Position position) {
+    return fromPosition(user, position.xCoordinate(), position.yCoordinate(), position.zCoordinate());
+  }
+
   public static BoundingBox fromPosition(User user, BlockPosition position) {
     return fromPosition(user, position.xCoord, position.yCoord, position.zCoord);
   }
@@ -480,7 +523,7 @@ public final class BoundingBox extends MemoryTraced implements BlockShape {
     return new BoundingBox(
       positionX - width, positionY, positionZ - width,
       positionX + width, newYMax, positionZ + width
-      );
+    );
   }
 
   public static BoundingBox fromNative(Object nativeBB) {

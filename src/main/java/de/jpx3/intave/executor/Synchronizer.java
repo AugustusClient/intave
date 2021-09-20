@@ -19,7 +19,7 @@ import java.util.concurrent.Executor;
 public final class Synchronizer {
   private final static BukkitScheduler scheduler = Bukkit.getScheduler();
 
-  private static Executor syncTaskExecutor;
+  private static Executor synchronizationExecutor;
   private static Object minecraftServer;
   private static MethodHandle postToMainThreadMethodHandle;
 
@@ -29,12 +29,12 @@ public final class Synchronizer {
       Object minecraftServer = minecraftServerClass.getMethod("getServer").invoke(null);
       //noinspection unchecked
       Queue<Runnable> cachedProcessQueue = (Queue<Runnable>) minecraftServerClass.getField("processQueue").get(minecraftServer);
-      syncTaskExecutor = cachedProcessQueue::add;
+      synchronizationExecutor = cachedProcessQueue::add;
     } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException exception) {
       throw new IllegalStateException(exception);
     } catch (NoSuchFieldException exception) {
       IntavePlugin.singletonInstance().logger().error("Your version of spigot has removed support for task-queueing. We will switch to bukkit's scheduling service");
-      syncTaskExecutor = command -> scheduler.runTask(IntavePlugin.singletonInstance(), command);
+      synchronizationExecutor = command -> scheduler.runTask(IntavePlugin.singletonInstance(), command);
     }
     try {
       minecraftServer = Lookup.serverClass("MinecraftServer").getMethod("getServer").invoke(null);
@@ -57,7 +57,7 @@ public final class Synchronizer {
 
   public static void synchronize(Runnable runnable) {
     runnable = wrapTask(runnable);
-    syncTaskExecutor.execute(runnable);
+    synchronizationExecutor.execute(runnable);
   }
 
   @Deprecated

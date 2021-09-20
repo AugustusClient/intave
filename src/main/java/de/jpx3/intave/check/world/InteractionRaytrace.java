@@ -403,7 +403,7 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
     Synchronizer.synchronize(() -> {
       player.updateInventory();
       refreshBlock(player, targetLocation);
-      for (EnumDirection direction : EnumDirection.values()) {
+      for (Direction direction : Direction.values()) {
         Location placedBlock = targetLocation.clone().add(direction.getDirectionVec().convertToBukkitVec());
         refreshBlock(player, placedBlock);
       }
@@ -598,15 +598,15 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
     }
   }
 
-  private void writeEnumDirection(PacketContainer packet, EnumDirection enumDirection) {
+  private void writeEnumDirection(PacketContainer packet, Direction direction) {
     if (BLOCK_DATA_WRAPPED_IN_MOVING_OBJECT_POSITION && !packet.getType().equals(PacketType.Play.Client.BLOCK_DIG)) {
       MovingObjectPositionBlock movingObjectPositionBlock = packet.getMovingBlockPositions().readSafely(0);
-      movingObjectPositionBlock.setDirection(enumDirection.toDirection());
+      movingObjectPositionBlock.setDirection(direction.toDirection());
     } else {
       if (packet.getDirections().size() > 0) {
-        packet.getDirections().write(0, enumDirection.toDirection());
+        packet.getDirections().write(0, direction.toDirection());
       } else {
-        packet.getIntegers().write(0, enumDirection.getIndex());
+        packet.getIntegers().write(0, direction.getIndex());
       }
     }
   }

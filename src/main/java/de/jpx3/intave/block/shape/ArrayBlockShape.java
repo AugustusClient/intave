@@ -2,6 +2,7 @@ package de.jpx3.intave.block.shape;
 
 import de.jpx3.intave.diagnostic.MemoryTraced;
 import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.shade.Direction;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,27 +16,33 @@ public final class ArrayBlockShape extends MemoryTraced implements BlockShape {
   }
 
   @Override
-  public double allowedXOffset(BoundingBox entity, double offsetX) {
+  public double allowedOffset(Direction.Axis axis, BoundingBox entity, double offset) {
     for (BlockShape shape : contents) {
-      offsetX = shape.allowedXOffset(entity, offsetX);
+      offset = shape.allowedOffset(axis, entity, offset);
     }
-    return offsetX;
+    return offset;
   }
 
   @Override
-  public double allowedYOffset(BoundingBox entity, double offsetY) {
-    for (BlockShape shape : contents) {
-      offsetY = shape.allowedYOffset(entity, offsetY);
+  public double min(Direction.Axis axis) {
+    double min = Integer.MAX_VALUE;
+    boolean hasMin = false;
+    for (BlockShape content : contents) {
+      min = Math.min(content.min(axis), min);
+      hasMin = true;
     }
-    return offsetY;
+    return hasMin ? min : 0;
   }
 
   @Override
-  public double allowedZOffset(BoundingBox entity, double offsetZ) {
-    for (BlockShape shape : contents) {
-      offsetZ = shape.allowedZOffset(entity, offsetZ);
+  public double max(Direction.Axis axis) {
+    double max = Integer.MIN_VALUE;
+    boolean hasMax = false;
+    for (BlockShape content : contents) {
+      max = Math.max(content.min(axis), max);
+      hasMax = true;
     }
-    return offsetZ;
+    return hasMax ? max : 0;
   }
 
   @Override

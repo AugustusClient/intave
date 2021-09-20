@@ -14,7 +14,7 @@ import de.jpx3.intave.module.Module;
 import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
-import de.jpx3.intave.module.tracker.entity.WrappedEntity;
+import de.jpx3.intave.module.tracker.entity.EntityShade;
 import de.jpx3.intave.player.dmc.DamageController;
 import de.jpx3.intave.player.fake.FakePlayer;
 import de.jpx3.intave.user.User;
@@ -87,7 +87,7 @@ public final class AttackDispatcher extends Module {
     ItemStack itemStack = inventoryData.heldItem();
     boolean knockbackEnchantment = itemStack != null && itemStack.containsEnchantment(Enchantment.KNOCKBACK);
 
-    WrappedEntity entity = connectionData.entityBy(entityId);
+    EntityShade entity = connectionData.entityBy(entityId);
     if (entity == null) {
       return;
     }

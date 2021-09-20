@@ -2,6 +2,7 @@ package de.jpx3.intave.block.shape;
 
 import com.google.common.collect.Lists;
 import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.shade.Direction;
 
 import java.util.List;
 
@@ -14,18 +15,18 @@ public final class MergeBlockShape implements BlockShape {
   }
 
   @Override
-  public double allowedXOffset(BoundingBox entity, double offsetX) {
-    return shapeA.allowedXOffset(entity, shapeB.allowedXOffset(entity, offsetX));
+  public double allowedOffset(Direction.Axis axis, BoundingBox entity, double offset) {
+    return shapeA.allowedOffset(axis, entity, shapeB.allowedOffset(axis, entity, offset));
   }
 
   @Override
-  public double allowedYOffset(BoundingBox entity, double offsetY) {
-    return shapeA.allowedYOffset(entity, shapeB.allowedYOffset(entity, offsetY));
+  public double min(Direction.Axis axis) {
+    return Math.min(shapeA.min(axis), shapeB.min(axis));
   }
 
   @Override
-  public double allowedZOffset(BoundingBox entity, double offsetZ) {
-    return shapeA.allowedZOffset(entity, shapeB.allowedZOffset(entity, offsetZ));
+  public double max(Direction.Axis axis) {
+    return Math.max(shapeA.max(axis), shapeB.max(axis));
   }
 
   @Override

@@ -1,6 +1,6 @@
 package de.jpx3.intave.math;
 
-import de.jpx3.intave.check.movement.physics.MotionVector;
+import de.jpx3.intave.shade.Motion;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
@@ -81,7 +81,7 @@ public final class MathHelper {
   }
 
   public static double distanceOf(
-    MotionVector motionVectorA, MotionVector motionVectorB
+    Motion motionVectorA, Motion motionVectorB
   ) {
     return distanceOf(
       motionVectorA.motionX, motionVectorA.motionY, motionVectorA.motionZ,
@@ -90,7 +90,7 @@ public final class MathHelper {
   }
 
   public static double distanceOf(
-    MotionVector motionVector,
+    Motion motionVector,
     double motionX, double motionY, double motionZ
   ) {
     return distanceOf(

@@ -14,7 +14,7 @@ import de.jpx3.intave.block.type.BlockTypeAccess;
 import de.jpx3.intave.check.EventProcessor;
 import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscription;
-import de.jpx3.intave.shade.EnumDirection;
+import de.jpx3.intave.shade.Direction;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.world.permission.WorldPermission;
@@ -117,7 +117,7 @@ public final class InteractionEmulator implements EventProcessor {
     User user = userOf(player);
     World world = interaction.world();
     Location blockAgainstLocation = interaction.targetBlock().toLocation(world);
-    Location defaultPlacementLocation = blockAgainstLocation.clone().add(EnumDirection.getFront(interaction.targetDirection()).getDirectionVec().convertToBukkitVec());
+    Location defaultPlacementLocation = blockAgainstLocation.clone().add(Direction.getFront(interaction.targetDirection()).getDirectionVec().convertToBukkitVec());
     boolean replace = BlockInteractionAccess.replacedOnPlacement(world, player, new BlockPosition(blockAgainstLocation.toVector()));
     Location blockPlacementLocation = replace ? blockAgainstLocation : defaultPlacementLocation;
     Material itemTypeInHand = interaction.itemTypeInHand();
@@ -158,7 +158,7 @@ public final class InteractionEmulator implements EventProcessor {
     Location clickedBlockLocation = interaction.targetBlock().toLocation(world);
     Block clickedBlock = VolatileBlockAccess.unsafe__BlockAccess(clickedBlockLocation);
     Material itemTypeInHand = interaction.itemTypeInHand();
-    Location placementLocation = clickedBlockLocation.clone().add(EnumDirection.getFront(interaction.targetDirection()).getDirectionVec().convertToBukkitVec());
+    Location placementLocation = clickedBlockLocation.clone().add(Direction.getFront(interaction.targetDirection()).getDirectionVec().convertToBukkitVec());
     emulateInteractWithHandItem(player, clickedBlock, placementLocation, itemTypeInHand);
     emulatePhysicalInteract(player, clickedBlock);
     return EmulationResult.SUCCEEDED;

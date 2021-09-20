@@ -11,7 +11,7 @@ public final class TrustingCopyOnWriteEnumSet<E extends Enum<E>> extends Abstrac
    * element of this array represents the  presence of universe[64*j +i]
    * in this set.
    */
-  private long[] elements;
+  private volatile long[] elements;
   private int size = 0;
 
   private final Class<E> elementType;

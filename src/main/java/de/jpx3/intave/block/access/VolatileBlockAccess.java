@@ -5,6 +5,7 @@ import de.jpx3.intave.block.variant.BlockVariant;
 import de.jpx3.intave.block.variant.BlockVariantRegister;
 import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscriber;
 import de.jpx3.intave.shade.BlockPosition;
+import de.jpx3.intave.shade.Position;
 import de.jpx3.intave.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -42,6 +43,10 @@ public final class VolatileBlockAccess implements BukkitEventSubscriber {
 
   public static Material typeAccess(User user, Location location) {
     return typeAccess(user, location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+  }
+
+  public static Material typeAccess(User user, Position position) {
+    return typeAccess(user, user.player().getWorld(), position.blockX(), position.blockY(), position.blockZ());
   }
 
   public static Material typeAccess(User user, int blockX, int blockY, int blockZ) {

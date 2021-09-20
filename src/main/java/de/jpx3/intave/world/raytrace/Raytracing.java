@@ -4,7 +4,7 @@ import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.clazz.rewrite.PatchyLoadingInjector;
 import de.jpx3.intave.diagnostic.timings.Timings;
 import de.jpx3.intave.math.SinusCache;
-import de.jpx3.intave.module.tracker.entity.WrappedEntity;
+import de.jpx3.intave.module.tracker.entity.EntityShade;
 import de.jpx3.intave.shade.BoundingBox;
 import de.jpx3.intave.shade.MovingObjectPosition;
 import de.jpx3.intave.shade.NativeVector;
@@ -61,7 +61,7 @@ Raytracing {
    * @return
    */
   public static EntityInteractionRaytrace doubleMDFBlockConstraintEntityRaytrace(
-    Player player, WrappedEntity entity, boolean alternativePositionY,
+    Player player, EntityShade entity, boolean alternativePositionY,
     double lastPositionX, double lastPositionY, double lastPositionZ,
     float lastRotationYaw,
     float rotationYaw, float rotationPitch,
@@ -95,7 +95,7 @@ Raytracing {
    * @param expandBoundingBox should be "0.1f" for a default hitbox
    */
   public static EntityInteractionRaytrace blockConstraintEntityRaytrace(
-    Player player, WrappedEntity entity,
+    Player player, EntityShade entity,
     boolean useAlternativePositionY,
     double prevPosX, double prevPosY, double prevPosZ,
     float prevYaw, float pitch,
@@ -116,7 +116,7 @@ Raytracing {
    * @param expandBoundingBox should be "0.1f" for a default hitbox
    */
   public static EntityInteractionRaytrace blockIgnoringEntityRaytrace(
-    Player player, WrappedEntity entity,
+    Player player, EntityShade entity,
     boolean useAlternativePositionY,
     double prevPosX, double prevPosY, double prevPosZ,
     float prevYaw, float pitch,

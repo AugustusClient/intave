@@ -16,7 +16,7 @@ import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.module.mitigate.AttackNerfStrategy;
-import de.jpx3.intave.module.tracker.entity.WrappedEntity;
+import de.jpx3.intave.module.tracker.entity.EntityShade;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.*;
@@ -119,7 +119,7 @@ public final class AttackInInvalidStateHeuristic extends MetaCheckPart<Heuristic
     User user = userOf(player);
     AttackMetadata attackData = user.meta().attack();
     ProtocolMetadata clientData = user.meta().protocol();
-    WrappedEntity entity = attackData.lastAttackedEntity();
+    EntityShade entity = attackData.lastAttackedEntity();
     if (entity == null || !entity.clientSynchronized || !entity.typeData.isLivingEntity()) {
       return;
     }

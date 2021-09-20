@@ -24,7 +24,7 @@ public final class ShapeCombiner {
 
   public BlockShape compile() {
     if (EMPTY == this) {
-      return BlockShapes.empty();
+      return BlockShapes.emptyShape();
     } else {
       int size = shapes.size();
       if (size == 1) {

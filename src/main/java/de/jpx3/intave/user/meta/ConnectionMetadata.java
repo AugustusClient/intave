@@ -5,7 +5,7 @@ import com.google.common.collect.Maps;
 import de.jpx3.intave.annotate.DispatchTarget;
 import de.jpx3.intave.annotate.Relocate;
 import de.jpx3.intave.module.feedback.FeedbackRequest;
-import de.jpx3.intave.module.tracker.entity.WrappedEntity;
+import de.jpx3.intave.module.tracker.entity.EntityShade;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -16,9 +16,9 @@ public final class ConnectionMetadata {
   private final Map<Short, FeedbackRequest<?>> transactionShortMap = Maps.newConcurrentMap();
   private final Map<Long, FeedbackRequest<?>> transactionGlobalKeyMap = Maps.newConcurrentMap();
   private final Map<Long, Queue<FeedbackRequest<?>>> transactionOptionalAppendixMap = Maps.newConcurrentMap();
-  private final Map<Integer, WrappedEntity> entitiesById = Maps.newConcurrentMap();
-  private final List<WrappedEntity> entities = Lists.newCopyOnWriteArrayList();
-  private final List<WrappedEntity> synchronizedEntities = Lists.newCopyOnWriteArrayList();
+  private final Map<Integer, EntityShade> entitiesById = Maps.newConcurrentMap();
+  private final List<EntityShade> entities = Lists.newCopyOnWriteArrayList();
+  private final List<EntityShade> synchronizedEntities = Lists.newCopyOnWriteArrayList();
   private final Map<Long, Long> remainingPingPacketTimestamps = Maps.newConcurrentMap();
   private final List<Long> latencyDifferenceBalance = Lists.newCopyOnWriteArrayList();
   public long lastCCCInfoMessageSent = 0;
@@ -87,33 +87,39 @@ public final class ConnectionMetadata {
   }
 
   @Deprecated
-  public Map<Integer, WrappedEntity> entitiesById() {
+  public Map<Integer, EntityShade> entitiesById() {
     return entitiesById;
   }
 
-  public Collection<WrappedEntity> entities() {
+  public Collection<EntityShade> entities() {
     return entities;
   }
 
-  public WrappedEntity entityBy(int identifier) {
+  public EntityShade entityBy(int identifier) {
     return entitiesById.get(identifier);
   }
 
   public void destroyEntity(int entityId) {
-    entitiesById.put(entityId, WrappedEntity.destroyedEntity());
-    for (int i = 0; i < entities.size(); i++) {
-      if (entities.get(i).entityId() == entityId) {
-        entities.set(i, WrappedEntity.destroyedEntity());
-      }
-    }
+    entitiesById.put(entityId, EntityShade.destroyedEntity());
+
+    // we will not override the entity collection, as it would require a lot of performance and seems quite redundant in the first place
+//    for (int i = 0, entitiesSize = entities.size(); i < entitiesSize; i++) {
+//      EntityShade entity = entities.get(i);
+//      if (entity.entityId() == entityId) {
+//        entities.set(i, EntityShade.destroyedEntity());
+//      }
+//    }
+
+    // using removeIf requires the least amount of locking and array modifications for CopyOnWriteArrayLists
+    entities.removeIf(entity -> entity.entityId() == entityId);
   }
 
-  public void enterEntity(WrappedEntity entity) {
+  public void enterEntity(EntityShade entity) {
     entitiesById.put(entity.entityId(), entity);
     entities.add(entity);
   }
 
-  public List<WrappedEntity> tracedEntities() {
+  public List<EntityShade> tracedEntities() {
     return synchronizedEntities;
   }
 

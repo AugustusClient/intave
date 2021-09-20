@@ -58,7 +58,7 @@ public final class BoundingBoxPatcher {
       return shape;
     } else {
       List<BoundingBox> normalized = normalize(patch, shape.boundingBoxes(), blockX, blockY, blockZ);
-      return BlockShapes.ofBoxes(contextualizeModifying(
+      return BlockShapes.shapeOf(contextualizeModifying(
         patch.patch(world, player, blockX, blockY, blockZ, type, blockState, normalized),
         blockX, blockY, blockZ
       ));

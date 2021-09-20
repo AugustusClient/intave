@@ -17,10 +17,11 @@ import de.jpx3.intave.check.movement.physics.*;
 import de.jpx3.intave.entity.datawatcher.DataWatcherAccess;
 import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.math.SinusCache;
-import de.jpx3.intave.module.tracker.entity.WrappedEntity;
+import de.jpx3.intave.module.tracker.entity.EntityShade;
 import de.jpx3.intave.player.Effects;
 import de.jpx3.intave.reflect.access.ReflectiveHandleAccess;
 import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.shade.Motion;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import org.bukkit.Bukkit;
@@ -66,7 +67,7 @@ public final class MovementMetadata {
   public double gravity;
   public boolean outsideBorder = true;
 
-  public MotionVector motionProcessorContext = new MotionVector();
+  public Motion motionProcessorContext = new Motion();
   public Vector lookVector = new Vector();
   public double verifiedPositionX, verifiedPositionY, verifiedPositionZ;
   public double lastPositionX, lastPositionY, lastPositionZ;
@@ -140,7 +141,7 @@ public final class MovementMetadata {
   public boolean enforceBoatStep;
   public volatile Location nearestBoatLocation = null;
   // Vehicle
-  private WrappedEntity ridingEntity;
+  private EntityShade ridingEntity;
   public float boatGlide, momentum;
   public double waterLevel;
   public BoatSimulator.Status boatStatus = BoatSimulator.Status.ON_LAND,
@@ -308,7 +309,7 @@ public final class MovementMetadata {
 
   private void updateEntityMovement() {
     ConnectionMetadata connectionMetadata = user.meta().connection();
-    for (WrappedEntity value : connectionMetadata.entities()) {
+    for (EntityShade value : connectionMetadata.entities()) {
       value.entityPlayerMoveUpdate();
     }
 //    for (Map.Entry<Integer, WrappedEntity> entry : entityMap.entrySet()) {
@@ -624,7 +625,7 @@ public final class MovementMetadata {
     return ridingEntity != null;
   }
 
-  public WrappedEntity ridingEntity() {
+  public EntityShade ridingEntity() {
     return ridingEntity;
   }
 
@@ -648,8 +649,8 @@ public final class MovementMetadata {
     return motionZ;
   }
 
-  public MotionVector motion() {
-    return new MotionVector(motionX, motionY, motionZ);
+  public Motion motion() {
+    return new Motion(motionX, motionY, motionZ);
   }
 
   public BoundingBox boundingBox() {
@@ -756,7 +757,7 @@ public final class MovementMetadata {
     this.pastFlyingPacketAccurate = pastFlyingPacketAccurate;
   }
 
-  public void setRidingEntity(WrappedEntity ridingEntity) {
+  public void setRidingEntity(EntityShade ridingEntity) {
     this.ridingEntity = ridingEntity;
   }
 }

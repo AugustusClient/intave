@@ -44,7 +44,7 @@ public final class MultiChunkKeyBlockStateAccess implements BlockStateAccess {
   @Override
   public @NotNull BlockShape resolveShape(int posX, int posY, int posZ) {
     if (posY < 0 || BUILD_LIMIT < posY) {
-      return BlockShapes.empty();
+      return BlockShapes.emptyShape();
     }
     int chunkX = posX >> 4, chunkZ = posZ >> 4;
     ShapeAccessFlowStudy.requests++;

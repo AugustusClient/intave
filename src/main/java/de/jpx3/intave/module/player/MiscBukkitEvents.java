@@ -8,7 +8,6 @@ import de.jpx3.intave.annotate.refactoring.SplitMeUp;
 import de.jpx3.intave.clazz.trace.Caller;
 import de.jpx3.intave.clazz.trace.PluginInvocation;
 import de.jpx3.intave.cleanup.GarbageCollector;
-import de.jpx3.intave.entity.datawatcher.DataWatcherAccess;
 import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.module.Module;
 import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscription;
@@ -31,8 +30,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
-
-import static de.jpx3.intave.entity.datawatcher.DataWatcherAccess.WATCHER_BLOCKING_ID;
 
 @SplitMeUp
 public final class MiscBukkitEvents extends Module {
@@ -99,10 +96,9 @@ public final class MiscBukkitEvents extends Module {
   public void on(PlayerDropItemEvent event) {
     Player player = event.getPlayer();
     User user = UserRepository.userOf(player);
-    if (/*user.meta().inventory().handActive() && */ItemProperties.isSwordItem(player.getItemOnCursor()) && !ViaVersionAdapter.ignoreBlocking(user.player())) {
+    if (ItemProperties.isSwordItem(player.getItemOnCursor()) && !ViaVersionAdapter.ignoreBlocking(user.player())) {
       Synchronizer.synchronize(() -> {
-        DataWatcherAccess.setDataWatcherFlag(player, WATCHER_BLOCKING_ID, false);
-//        player.sendMessage(ReflectiveDataWatcherAccess.getDataWatcherFlag(player, WATCHER_BLOCKING_ID) + "");
+        user.meta().inventory().releaseItemNextTick = true;
       });
     }
   }
@@ -114,7 +110,7 @@ public final class MiscBukkitEvents extends Module {
     }
     User user = UserRepository.userOf((Player) event.getEntity());
     InventoryMetadata inventory = user.meta().inventory();
-    if (inventory.blockNextArrow && !inventory.handActive()) {
+    if (inventory.blockNextArrow && !inventory.handActive() && inventory.pastHotBarSlotChange < 4) {
       event.setCancelled(true);
       inventory.blockNextArrow = false;
     }

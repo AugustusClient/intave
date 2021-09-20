@@ -4,9 +4,9 @@ import de.jpx3.intave.annotate.Nullable;
 import de.jpx3.intave.annotate.Relocate;
 import de.jpx3.intave.check.combat.heuristics.MiningStrategy;
 import de.jpx3.intave.check.combat.heuristics.mine.MiningStrategyContainer;
+import de.jpx3.intave.module.tracker.entity.EntityShade;
+import de.jpx3.intave.module.tracker.entity.EntityShade.EntityPositionContext;
 import de.jpx3.intave.module.tracker.entity.EntityTracker;
-import de.jpx3.intave.module.tracker.entity.WrappedEntity;
-import de.jpx3.intave.module.tracker.entity.WrappedEntity.EntityPositionContext;
 import de.jpx3.intave.player.fake.FakePlayer;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
@@ -23,7 +23,7 @@ public final class AttackMetadata {
 
   private long lastTimeAttackedByEntity = 0;
 
-  private WrappedEntity lastAttackedEntity;
+  private EntityShade lastAttackedEntity;
   private float perfectYaw, perfectPitch;
   private float previousPerfectYaw, previousPerfectPitch;
 
@@ -64,7 +64,7 @@ public final class AttackMetadata {
   }
 
   private static float resolveYawRotation(
-    WrappedEntity.EntityPositionContext entityPositions,
+    EntityShade.EntityPositionContext entityPositions,
     double posX, double posZ
   ) {
     final double diffX = entityPositions.posX - posX;
@@ -73,7 +73,7 @@ public final class AttackMetadata {
   }
 
   private static float resolvePitchRotation(
-    WrappedEntity.EntityPositionContext entityPositions,
+    EntityShade.EntityPositionContext entityPositions,
     double posX, double posY, double posZ
   ) {
     double diffY = entityPositions.posY + 1.62f - (posY + 1.62f);
@@ -120,7 +120,7 @@ public final class AttackMetadata {
   }
 
   @Nullable
-  public WrappedEntity lastAttackedEntity() {
+  public EntityShade lastAttackedEntity() {
     return lastAttackedEntity;
   }
 
@@ -131,8 +131,8 @@ public final class AttackMetadata {
   public void setLastAttackedEntityID(int lastAttackedEntityID) {
     this.lastAttackedEntityID = lastAttackedEntityID;
 
-    WrappedEntity lastAttackedEntity = this.lastAttackedEntity;
-    WrappedEntity attackedEntity = EntityTracker.entityByIdentifier(UserRepository.userOf(player), lastAttackedEntityID);
+    EntityShade lastAttackedEntity = this.lastAttackedEntity;
+    EntityShade attackedEntity = EntityTracker.entityByIdentifier(UserRepository.userOf(player), lastAttackedEntityID);
     if (attackedEntity != null && attackedEntity != lastAttackedEntity) {
       this.lastEntitySwitch = System.currentTimeMillis();
     }

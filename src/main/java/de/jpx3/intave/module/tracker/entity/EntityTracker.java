@@ -89,11 +89,11 @@ public final class EntityTracker extends Module {
     ConnectionMetadata synchronizeData = user.meta().connection();
     Vector location = new Vector(0, 0, 0);
     Vector playerLocation = player.getLocation().toVector();
-    List<WrappedEntity> validEntities = new ArrayList<>();
-    for (WrappedEntity entity : synchronizeData.entities()) {
+    List<EntityShade> validEntities = new ArrayList<>();
+    for (EntityShade entity : synchronizeData.entities()) {
       boolean firstSurvive = false;
       if (entity.typeData != null && entity.typeData.isLivingEntity()) {
-        WrappedEntity.EntityPositionContext positions = entity.position;
+        EntityShade.EntityPositionContext positions = entity.position;
         location.setX(positions.posX);
         location.setY(positions.posY);
         location.setZ(positions.posZ);
@@ -110,7 +110,7 @@ public final class EntityTracker extends Module {
     validEntities.sort(Comparator.comparingDouble(entity -> entity.distanceToPlayerCache));
     int count = 0;
     synchronizeData.tracedEntities().clear();
-    for (WrappedEntity entity : validEntities) {
+    for (EntityShade entity : validEntities) {
       boolean trace = count < MAX_TRACED_ENTITIES;
       if (trace) {
         synchronizeData.tracedEntities().add(entity);
@@ -158,7 +158,7 @@ public final class EntityTracker extends Module {
     MovementMetadata movementData = metadataBundle.movement();
     ConnectionMetadata connection = metadataBundle.connection();
 //    Map<Integer, WrappedEntity> entities = connection.entities();
-    WrappedEntity sittingEntity = connection.entityBy(entityID);
+    EntityShade sittingEntity = connection.entityBy(entityID);
 
     if (sittingEntity != null) {
       // Another entity
@@ -167,7 +167,7 @@ public final class EntityTracker extends Module {
         sittingEntity.unmountFromEntity();
       } else {
         // mounts on entity
-        WrappedEntity sittingOnEntity = connection.entityBy(vehicleEntityID);
+        EntityShade sittingOnEntity = connection.entityBy(vehicleEntityID);
         if (sittingOnEntity != null) {
           sittingEntity.mountToEntity(sittingOnEntity);
         } else {
@@ -180,11 +180,11 @@ public final class EntityTracker extends Module {
       // The Player
       // ID -1 => undo attachment
       tryCreateVehicleEntity(user, vehicleEntityID);
-      WrappedEntity ridingEntity = connection.entityBy(vehicleEntityID);
+      EntityShade ridingEntity = connection.entityBy(vehicleEntityID);
       if (movementData.hasRidingEntity()) {
         movementData.dismountRidingEntity();
       }
-      if (ridingEntity != null && !(ridingEntity instanceof WrappedEntity.Destroyed)) {
+      if (ridingEntity != null && !(ridingEntity instanceof EntityShade.Destroyed)) {
         movementData.setRidingEntity(ridingEntity);
       }
     }
@@ -289,9 +289,9 @@ public final class EntityTracker extends Module {
      */
     User user = UserRepository.userOf(player);
     ConnectionMetadata synchronizeData = user.meta().connection();
-    WrappedEntity wrappedEntity = synchronizeData.entityBy(entityID);
-    if (wrappedEntity instanceof WrappedEntityFirework) {
-      Modules.feedback().tracedSingleSynchronize(player, entityID, this::processEntityDestroy, wrappedEntity.feedbackTracker(), APPEND_ON_OVERFLOW);
+    EntityShade entityShade = synchronizeData.entityBy(entityID);
+    if (entityShade instanceof EntityShadeFirework) {
+      Modules.feedback().tracedSingleSynchronize(player, entityID, this::processEntityDestroy, entityShade.feedbackTracker(), APPEND_ON_OVERFLOW);
     } else {
       processEntityDestroy(player, entityID);
     }
@@ -303,7 +303,7 @@ public final class EntityTracker extends Module {
     ConnectionMetadata synchronizeData = user.meta().connection();
     MovementMetadata movementData = user.meta().movement();
 
-    WrappedEntity entity = synchronizeData.entityBy(entityId);//synchronizedEntityMap.get(entityId);
+    EntityShade entity = synchronizeData.entityBy(entityId);//synchronizedEntityMap.get(entityId);
     if (entity != null && movementData.ridingEntity() == entity) {
       movementData.dismountRidingEntity();
     }
@@ -314,10 +314,10 @@ public final class EntityTracker extends Module {
       attackData.nullifyLastAttackedEntity();
     }
     if (NEW_POSITION_PROCESSING_1_9) {
-      for (WrappedEntity wrappedEntity : synchronizeData.entities()) {
-        if (wrappedEntity.mountedEntity() != null) {
-          if (wrappedEntity.mountedEntity().entityId() == entityId) {
-            wrappedEntity.unmountFromEntity();
+      for (EntityShade entityShade : synchronizeData.entities()) {
+        if (entityShade.mountedEntity() != null) {
+          if (entityShade.mountedEntity().entityId() == entityId) {
+            entityShade.unmountFromEntity();
           }
         }
       }
@@ -339,7 +339,7 @@ public final class EntityTracker extends Module {
     if (movementData.lastTeleport == 0) {
       return;
     }
-    for (WrappedEntity value : synchronizeData.entities()) {
+    for (EntityShade value : synchronizeData.entities()) {
       value.onUpdate();
     }
 //    for (Map.Entry<Integer, WrappedEntity> entry : synchronizeData.synchronizedEntityMap().entrySet()) {
@@ -358,7 +358,7 @@ public final class EntityTracker extends Module {
   public void receiveEntityTeleport(PacketEvent event) {
     Player player = event.getPlayer();
     PacketContainer packet = event.getPacket();
-    final WrappedEntity entity = wrappedEntityByEntityTeleportPacket(event);
+    final EntityShade entity = wrappedEntityByEntityTeleportPacket(event);
 
     if(entity == null) return;
 
@@ -383,12 +383,12 @@ public final class EntityTracker extends Module {
     }
   }
 
-  private WrappedEntity wrappedEntityByEntityTeleportPacket(PacketEvent event) {
+  private EntityShade wrappedEntityByEntityTeleportPacket(PacketEvent event) {
     Player player = event.getPlayer();
     User user = UserRepository.userOf(player);
     PacketContainer packet = event.getPacket();
     int entityId = packet.getIntegers().read(0);
-    WrappedEntity entity = entityByIdentifier(user, entityId);
+    EntityShade entity = entityByIdentifier(user, entityId);
 
     if (entity == null) {
       Entity bukkitEntity = serverEntityByIdentifier(player, entityId);
@@ -416,7 +416,7 @@ public final class EntityTracker extends Module {
     int entityId = packet.getIntegers().read(0);
     /* NOTE: An entity can't be created by the entityID when the entity doesn't
      gets teleported afterwards because the Bukkit location isn't specific enough */
-    WrappedEntity entity = entityByIdentifier(user, entityId);
+    EntityShade entity = entityByIdentifier(user, entityId);
 
     if(entity == null) return;
 
@@ -438,7 +438,7 @@ public final class EntityTracker extends Module {
     }
   }
 
-  private WrappedEntity spawnMobByBukkitEntity(User user, Entity bukkitEntity) {
+  private EntityShade spawnMobByBukkitEntity(User user, Entity bukkitEntity) {
     Location location = bukkitEntity.getLocation();
     int entityID = bukkitEntity.getEntityId();
 
@@ -458,7 +458,7 @@ public final class EntityTracker extends Module {
 
     EntityTypeData entityTypeData = entityTypeResolver.entityTypeDataOfBukkitEntity(bukkitEntity);
 
-    WrappedEntity entity = processEntitySpawn(
+    EntityShade entity = processEntitySpawn(
       user,
       entityID, entityTypeData,
       serverPosX, serverPosY, serverPosZ,
@@ -526,7 +526,7 @@ public final class EntityTracker extends Module {
   ) {
     ConnectionMetadata synchronizeData = user.meta().connection();
 //    Map<Integer, WrappedEntity> entities = synchronizeData.entities();
-    WrappedEntity entity = createEntityOf(user, entityId, entityTypeData, player);
+    EntityShade entity = createEntityOf(user, entityId, entityTypeData, player);
     entity.serverPosX = ClientMathHelper.positionLong(posX);
     entity.serverPosY = ClientMathHelper.positionLong(posY);
     entity.serverPosZ = ClientMathHelper.positionLong(posZ);
@@ -535,7 +535,7 @@ public final class EntityTracker extends Module {
     synchronizeData.enterEntity(entity);
   }
 
-  private WrappedEntity processEntitySpawn(
+  private EntityShade processEntitySpawn(
     User user, int entityId, EntityTypeData entityTypeData,
     long serverPosX, long serverPosY, long serverPosZ,
     boolean player
@@ -545,7 +545,7 @@ public final class EntityTracker extends Module {
     double posX = serverPosX / 32d;
     double posY = serverPosY / 32d;
     double posZ = serverPosZ / 32d;
-    WrappedEntity entity = createEntityOf(user, entityId, entityTypeData, player);
+    EntityShade entity = createEntityOf(user, entityId, entityTypeData, player);
     entity.serverPosX = serverPosX;
     entity.serverPosY = serverPosY;
     entity.serverPosZ = serverPosZ;
@@ -556,17 +556,17 @@ public final class EntityTracker extends Module {
     return entity;
   }
 
-  private WrappedEntity createEntityOf(
+  private EntityShade createEntityOf(
     User user,
     int entityId,
     EntityTypeData entityTypeData,
     boolean player
   ) {
-    WrappedEntity entity;
+    EntityShade entity;
     if (entityTypeData.name() != null && entityTypeData.name().contains("Firework")) {
-      entity = new WrappedEntityFirework(user, entityId, entityTypeData);
+      entity = new EntityShadeFirework(user, entityId, entityTypeData);
     } else {
-      entity = new WrappedEntity(entityId, entityTypeData, player);
+      entity = new EntityShade(entityId, entityTypeData, player);
     }
     return entity;
   }
@@ -587,20 +587,20 @@ public final class EntityTracker extends Module {
     PacketContainer packet = event.getPacket();
     Integer entityID = packet.getIntegers().read(0);
     Byte type = packet.getBytes().read(0);
-    WrappedEntity entity = entityByIdentifier(user, entityID);
+    EntityShade entity = entityByIdentifier(user, entityID);
     if (entity == null || type != 3) {
       return;
     }
     boolean synchronize = entity.clientSynchronized && entity.tracingEnabled();
     if (synchronize) {
-      FeedbackCallback<WrappedEntity> task = (p, e) -> updateDeadState(e);
+      FeedbackCallback<EntityShade> task = (p, e) -> updateDeadState(e);
       Modules.feedback().tracedSingleSynchronize(player, entity, task, entity.feedbackTracker());
     } else {
       updateDeadState(entity);
     }
   }
 
-  private void updateDeadState(WrappedEntity entity) {
+  private void updateDeadState(EntityShade entity) {
     entity.fakeDead = true;
     entity.health = 0f;
   }
@@ -621,7 +621,7 @@ public final class EntityTracker extends Module {
       synchronizePlayerHealth(player, packet);
       return;
     }
-    WrappedEntity entity = entityByIdentifier(user, entityId);
+    EntityShade entity = entityByIdentifier(user, entityId);
     if (entity == null) {
       return;
     }
@@ -688,7 +688,7 @@ public final class EntityTracker extends Module {
     return null;
   }
 
-  private void updateHealthState(WrappedEntity entity, float health) {
+  private void updateHealthState(EntityShade entity, float health) {
     entity.health = health;
   }
 
@@ -705,7 +705,7 @@ public final class EntityTracker extends Module {
   }
 
   @Nullable
-  public static WrappedEntity entityByIdentifier(User user, int entityID) {
+  public static EntityShade entityByIdentifier(User user, int entityID) {
     ConnectionMetadata synchronizeData = user.meta().connection();
     return synchronizeData.entityBy(entityID);
   }

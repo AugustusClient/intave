@@ -96,7 +96,7 @@ public final class BlockPosition extends NativeVector {
    * Offset this BlockPos n blocks up
    */
   public BlockPosition up(int n) {
-    return this.offset(EnumDirection.UP, n);
+    return this.offset(Direction.UP, n);
   }
 
   /**
@@ -110,7 +110,7 @@ public final class BlockPosition extends NativeVector {
    * Offset this BlockPos n blocks down
    */
   public BlockPosition down(int n) {
-    return this.offset(EnumDirection.DOWN, n);
+    return this.offset(Direction.DOWN, n);
   }
 
   /**
@@ -124,7 +124,7 @@ public final class BlockPosition extends NativeVector {
    * Offset this BlockPos n blocks in northern direction
    */
   public BlockPosition north(int n) {
-    return this.offset(EnumDirection.NORTH, n);
+    return this.offset(Direction.NORTH, n);
   }
 
   /**
@@ -138,7 +138,7 @@ public final class BlockPosition extends NativeVector {
    * Offset this BlockPos n blocks in southern direction
    */
   public BlockPosition south(int n) {
-    return this.offset(EnumDirection.SOUTH, n);
+    return this.offset(Direction.SOUTH, n);
   }
 
   /**
@@ -152,7 +152,7 @@ public final class BlockPosition extends NativeVector {
    * Offset this BlockPos n blocks in western direction
    */
   public BlockPosition west(int n) {
-    return this.offset(EnumDirection.WEST, n);
+    return this.offset(Direction.WEST, n);
   }
 
   /**
@@ -166,28 +166,28 @@ public final class BlockPosition extends NativeVector {
    * Offset this BlockPos n blocks in eastern direction
    */
   public BlockPosition east(int n) {
-    return this.offset(EnumDirection.EAST, n);
+    return this.offset(Direction.EAST, n);
   }
 
   /**
    * Offset this BlockPos 1 block in the given direction
    */
-  public BlockPosition offset(EnumDirection facing) {
+  public BlockPosition offset(Direction facing) {
     return this.offset(facing, 1);
   }
 
-  public BlockPosition move(EnumDirection facing) {
+  public BlockPosition move(Direction facing) {
     return move(facing, 1);
   }
 
-  public BlockPosition move(EnumDirection facing, int n) {
+  public BlockPosition move(Direction facing, int n) {
     return new BlockPosition(this.xCoord + facing.getXOffset() * n, this.yCoord + facing.getYOffset() * n, this.zCoord + facing.getZOffset() * n);
   }
 
   /**
    * Offsets this BlockPos n blocks in the given direction
    */
-  public BlockPosition offset(EnumDirection facing, int n) {
+  public BlockPosition offset(Direction facing, int n) {
     return n == 0 ? this : new BlockPosition(
       this.xCoord + facing.getFrontOffsetX() * n,
       this.yCoord + facing.getFrontOffsetY() * n,

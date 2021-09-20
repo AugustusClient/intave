@@ -7,10 +7,10 @@ import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.MovementMetadata;
 import org.bukkit.util.Vector;
 
-public final class WrappedEntityFirework extends WrappedEntity {
+public final class EntityShadeFirework extends EntityShade {
   private final User attachedUser;
 
-  public WrappedEntityFirework(
+  public EntityShadeFirework(
     User attachedUser,
     int entityId,
     EntityTypeData entityTypeData

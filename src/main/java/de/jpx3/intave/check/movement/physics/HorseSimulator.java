@@ -1,6 +1,7 @@
 package de.jpx3.intave.check.movement.physics;
 
 import de.jpx3.intave.player.collider.complex.ComplexColliderSimulationResult;
+import de.jpx3.intave.shade.Motion;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.MovementMetadata;
 
@@ -9,7 +10,7 @@ public final class HorseSimulator extends DefaultSimulator {
 
   @Override
   public ComplexColliderSimulationResult performSimulation(
-    User user, MotionVector context,
+    User user, Motion motion,
     float forward, float strafe,
     boolean attackReduce, boolean jumped, boolean handActive
   ) {
@@ -33,7 +34,7 @@ public final class HorseSimulator extends DefaultSimulator {
     movementData.setJumpMovementFactor(0.02f);
     movementData.setAiMoveSpeed(0.2f);
 
-    return super.performSimulation(user, context, horseForward, horseStrafe, attackReduce, jumped, handActive);
+    return super.performSimulation(user, motion, horseForward, horseStrafe, attackReduce, jumped, handActive);
   }
 
   @Override

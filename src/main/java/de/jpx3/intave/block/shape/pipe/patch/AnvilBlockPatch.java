@@ -4,7 +4,7 @@ import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.block.access.BlockVariantAccess;
 import de.jpx3.intave.block.type.BlockTypeAccess;
 import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.EnumDirection;
+import de.jpx3.intave.shade.Direction;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.ProtocolMetadata;
@@ -29,13 +29,13 @@ final class AnvilBlockPatch extends BoundingBoxPatch {
   public List<BoundingBox> patch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, List<BoundingBox> bbs) {
     User user = UserRepository.userOf(player);
     boolean legacy = user.meta().protocol().protocolVersion() < ProtocolMetadata.VER_1_13;
-    EnumDirection.Axis axis = axisOf(blockState);
+    Direction.Axis axis = axisOf(blockState);
     return legacy ? legacyPatch(axis) : modernPatch(axis);
   }
 
-  private List<BoundingBox> legacyPatch(EnumDirection.Axis axis) {
+  private List<BoundingBox> legacyPatch(Direction.Axis axis) {
     BoundingBoxBuilder boundingBoxBuilder = BoundingBoxBuilder.create();
-    if (axis == EnumDirection.Axis.X) {
+    if (axis == Direction.Axis.X_AXIS) {
       boundingBoxBuilder.shape(0.0F, 0.0F, 0.125F, 1.0F, 1.0F, 0.875F);
     } else {
       boundingBoxBuilder.shape(0.125F, 0.0F, 0.0F, 0.875F, 1.0F, 1.0F);
@@ -43,9 +43,9 @@ final class AnvilBlockPatch extends BoundingBoxPatch {
     return boundingBoxBuilder.applyAndResolve();
   }
 
-  private List<BoundingBox> modernPatch(EnumDirection.Axis axis) {
+  private List<BoundingBox> modernPatch(Direction.Axis axis) {
     ApplyOnShapeBoundingBoxBuilder boundingBoxBuilder = ApplyOnShapeBoundingBoxBuilder.create();
-    if (axis == EnumDirection.Axis.X) {
+    if (axis == Direction.Axis.X_AXIS) {
       boundingBoxBuilder.shapeX16AndApply(2.0D, 0.0D, 2.0D, 14.0D, 4.0D, 14.0D);
       boundingBoxBuilder.shapeX16AndApply(3.0D, 4.0D, 4.0D, 13.0D, 5.0D, 12.0D);
       boundingBoxBuilder.shapeX16AndApply(4.0D, 5.0D, 6.0D, 12.0D, 10.0D, 10.0D);
@@ -61,15 +61,15 @@ final class AnvilBlockPatch extends BoundingBoxPatch {
 
   private final static boolean CORRUPTED = MinecraftVersions.VER1_14_0.atOrAbove();
 
-  private EnumDirection.Axis axisOf(int state) {
+  private Direction.Axis axisOf(int state) {
     if (CORRUPTED) {
       switch (state) {
         case 1:
-          return EnumDirection.Axis.Z;
+          return Direction.Axis.Z_AXIS;
         case 2:
-          return EnumDirection.Axis.X;
+          return Direction.Axis.X_AXIS;
       }
     }
-    return EnumDirection.getHorizontal(state & 3).getAxis();
+    return Direction.getHorizontal(state & 3).getAxis();
   }
 }

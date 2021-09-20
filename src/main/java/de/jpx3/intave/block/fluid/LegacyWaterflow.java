@@ -58,8 +58,8 @@ public final class LegacyWaterflow {
   private static NativeVector flowVector(User user, BlockPosition pos) {
     NativeVector vec3 = new NativeVector(0.0D, 0.0D, 0.0D);
     int i = resolveEffectiveFlowDecay(user, pos);
-    for (EnumDirection enumDirection : EnumDirection.Plane.HORIZONTAL) {
-      BlockPosition position = pos.offset(enumDirection);
+    for (Direction direction : Direction.Plane.HORIZONTAL) {
+      BlockPosition position = pos.offset(direction);
       int j = resolveEffectiveFlowDecay(user, position);
       if (j < 0) {
         if (!blocksMovement(user, pos)) {
@@ -75,7 +75,7 @@ public final class LegacyWaterflow {
       }
     }
     if (resolveLevel(user, pos) >= 8) {
-      for (EnumDirection enumfacing1 : EnumDirection.Plane.HORIZONTAL) {
+      for (Direction enumfacing1 : Direction.Plane.HORIZONTAL) {
         BlockPosition blockpos1 = pos.offset(enumfacing1);
         if (isBlockSolid(user, blockpos1, enumfacing1) || isBlockSolid(user, blockpos1.up(), enumfacing1)) {
           vec3 = vec3.normalize().addVector(0.0D, -6.0D, 0.0D);
@@ -102,10 +102,10 @@ public final class LegacyWaterflow {
     return MaterialMagic.blocksMovement(type);
   }
 
-  private static boolean isBlockSolid(User user, BlockPosition pos, EnumDirection side) {
+  private static boolean isBlockSolid(User user, BlockPosition pos, Direction side) {
     World world = user.player().getWorld();
     Material type = VolatileBlockAccess.typeAccess(user, world, pos.xCoord, pos.yCoord, pos.zCoord);
-    return !MaterialMagic.isLiquid(type) && (side == EnumDirection.UP || (type != Material.ICE && MaterialMagic.blockSolid(type)));
+    return !MaterialMagic.isLiquid(type) && (side == Direction.UP || (type != Material.ICE && MaterialMagic.blockSolid(type)));
   }
 
   public static float resolveLiquidHeightPercentage(int level) {

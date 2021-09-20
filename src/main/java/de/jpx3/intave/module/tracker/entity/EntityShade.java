@@ -17,13 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class WrappedEntity {
+public class EntityShade {
   /*
   Dead entities are used to identify recently removed entities.
   Some packets are synchronized and some are processed immediately so
   this type of entity ensures that the synchrosized packets are handled correctly.
   */
-  private static WrappedEntity DESTROYED_ENTITY;
+  private static EntityShade DESTROYED_ENTITY;
   private final static boolean NEW_POSITION_PROCESSING_1_9 = ProtocolLibraryAdapter.serverVersion().isAtLeast(MinecraftVersions.VER1_9_0);
   private final static boolean NEW_POSITION_PROCESSING_1_14 = ProtocolLibraryAdapter.serverVersion().isAtLeast(MinecraftVersions.VER1_14_0);
   public EntityTypeData typeData;
@@ -55,7 +55,7 @@ public class WrappedEntity {
   public int ticksAlive;
   public final boolean player;
   private int deathTime;
-  private WrappedEntity mountedOnEntity;
+  private EntityShade mountedOnEntity;
   private BoundingBox boundingBox;
   private boolean enabledResponseTracing;
 
@@ -67,7 +67,7 @@ public class WrappedEntity {
 
   private final PendingCountingFeedbackTracker feedbackTracker;
 
-  public WrappedEntity(
+  public EntityShade(
     int entityId,
     EntityTypeData typeData,
     boolean player
@@ -320,7 +320,7 @@ public class WrappedEntity {
     return !this.dead && this.health > 0.0f;
   }
 
-  public void mountToEntity(WrappedEntity mountedOnEntity) {
+  public void mountToEntity(EntityShade mountedOnEntity) {
     this.mountedOnEntity = mountedOnEntity;
   }
 
@@ -328,7 +328,7 @@ public class WrappedEntity {
     mountedOnEntity = null;
   }
 
-  public WrappedEntity mountedEntity() {
+  public EntityShade mountedEntity() {
     return mountedOnEntity;
   }
 
@@ -372,8 +372,8 @@ public class WrappedEntity {
     return boundingBox;
   }
 
-  public WrappedEntity temporaryCopy()  {
-    WrappedEntity clone = new WrappedEntity(entityId, typeData, player);
+  public EntityShade temporaryCopy()  {
+    EntityShade clone = new EntityShade(entityId, typeData, player);
     clone.temporaryCopy = true;
     clone.position = position.clone();
     clone.alternativePosition = alternativePosition.clone();
@@ -381,7 +381,7 @@ public class WrappedEntity {
     return clone;
   }
 
-  public static BoundingBox entityBoundingBoxFrom(EntityPositionContext position, WrappedEntity entity) {
+  public static BoundingBox entityBoundingBoxFrom(EntityPositionContext position, EntityShade entity) {
     double x = position.posX;
     double y = position.posY;
     double z = position.posZ;
@@ -407,11 +407,11 @@ public class WrappedEntity {
   Some packets are synchronized and some are processed immediately so
   this type of entity ensures that the synchrosized packets are handled correctly.
    */
-  public static WrappedEntity destroyedEntity() {
+  public static EntityShade destroyedEntity() {
     return DESTROYED_ENTITY;
   }
 
-  public static final class Destroyed extends WrappedEntity {
+  public static final class Destroyed extends EntityShade {
     public Destroyed() {
       super(0, new EntityTypeData("destroyed", HitboxSize.zero(),-1, false, 8), false);
     }

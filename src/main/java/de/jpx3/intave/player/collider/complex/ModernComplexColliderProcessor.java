@@ -2,137 +2,139 @@ package de.jpx3.intave.player.collider.complex;
 
 import de.jpx3.intave.block.collision.Collision;
 import de.jpx3.intave.block.shape.BlockShape;
-import de.jpx3.intave.check.movement.physics.MotionVector;
 import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.shade.Motion;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.MetadataBundle;
 import de.jpx3.intave.user.meta.MovementMetadata;
 import org.bukkit.entity.Player;
 
+import static de.jpx3.intave.shade.Direction.Axis.*;
+
 public final class ModernComplexColliderProcessor implements ComplexColliderProcessor {
   @Override
-  public ComplexColliderSimulationResult collide(User user, MotionVector context, boolean inWeb, double positionX, double positionY, double positionZ) {
+  public ComplexColliderSimulationResult collide(User user, Motion motion, boolean inWeb, double positionX, double positionY, double positionZ) {
     Player player = user.player();
     MetadataBundle meta = user.meta();
     MovementMetadata movement = meta.movement();
     if (inWeb) {
-      context.motionX *= 0.25D;
-      context.motionY *= 0.05f;
-      context.motionZ *= 0.25D;
+      motion.motionX *= 0.25D;
+      motion.motionY *= 0.05f;
+      motion.motionZ *= 0.25D;
     }
     if (movement.onGround && movement.sneaking) {
-      calculateBackOffFromEdge(user, movement.stepHeight, context);
+      calculateBackOffFromEdge(user, movement.stepHeight, motion);
     }
-    double startMotionX = context.motionX;
-    double startMotionY = context.motionY;
-    double startMotionZ = context.motionZ;
+    double startMotionX = motion.motionX;
+    double startMotionY = motion.motionY;
+    double startMotionZ = motion.motionZ;
     boolean step = false;
-    BlockShape firstCollider = Collision.colliderShapeIn(
-      player, movement.boundingBox().expand(context.motionX, context.motionY, context.motionZ)
+    BlockShape firstCollider = Collision.colliderShapeFor(
+      player, movement.boundingBox().expand(motion.motionX, motion.motionY, motion.motionZ)
     );
     BoundingBox startBoundingBox = movement.boundingBox();
-    BoundingBox entityBoundingBox = movement.boundingBox();
-    if (context.motionY != 0.0) {
-      context.motionY = firstCollider.allowedYOffset(entityBoundingBox, context.motionY);
-      if (context.motionY != 0.0) {
-        entityBoundingBox = entityBoundingBox.offset(0.0D, context.motionY, 0.0D);
+    BoundingBox shiftedBoundingBox = movement.boundingBox();
+    if (motion.motionY != 0.0) {
+      motion.motionY = firstCollider.allowedOffset(Y_AXIS, shiftedBoundingBox, motion.motionY);
+      if (motion.motionY != 0.0) {
+        shiftedBoundingBox = shiftedBoundingBox.offset(0.0D, motion.motionY, 0.0D);
       }
     }
-    boolean flag = Math.abs(context.motionX) < Math.abs(context.motionZ);
-    if (flag && context.motionZ != 0.0) {
-      context.motionZ = firstCollider.allowedZOffset(entityBoundingBox, context.motionZ);
-      if (context.motionZ != 0.0) {
-        entityBoundingBox = entityBoundingBox.offset(0.0, 0.0, context.motionZ);
+    boolean flag = Math.abs(motion.motionX) < Math.abs(motion.motionZ);
+    if (flag && motion.motionZ != 0.0) {
+      motion.motionZ = firstCollider.allowedOffset(Z_AXIS, shiftedBoundingBox, motion.motionZ);
+      if (motion.motionZ != 0.0) {
+        shiftedBoundingBox = shiftedBoundingBox.offset(0.0, 0.0, motion.motionZ);
       }
     }
-    if (context.motionX != 0.0) {
-      context.motionX = firstCollider.allowedXOffset(entityBoundingBox, context.motionX);
-      if (context.motionX != 0.0) {
-        entityBoundingBox = entityBoundingBox.offset(context.motionX, 0.0D, 0.0D);
+    if (motion.motionX != 0.0) {
+      motion.motionX = firstCollider.allowedOffset(X_AXIS, shiftedBoundingBox, motion.motionX);
+      if (motion.motionX != 0.0) {
+        shiftedBoundingBox = shiftedBoundingBox.offset(motion.motionX, 0.0D, 0.0D);
       }
     }
-    if (!flag && context.motionZ != 0.0) {
-      context.motionZ = firstCollider.allowedZOffset(entityBoundingBox, context.motionZ);
-      if (context.motionZ != 0.0) {
-        entityBoundingBox = entityBoundingBox.offset(0.0, 0.0, context.motionZ);
+    if (!flag && motion.motionZ != 0.0) {
+      motion.motionZ = firstCollider.allowedOffset(Z_AXIS, shiftedBoundingBox, motion.motionZ);
+      if (motion.motionZ != 0.0) {
+        shiftedBoundingBox = shiftedBoundingBox.offset(0.0, 0.0, motion.motionZ);
       }
     }
-    boolean flag1 = movement.onGround || startMotionY != context.motionY && startMotionY < 0.0D;
-    if (flag1 && (startMotionX != context.motionX || startMotionZ != context.motionZ)) {
-      double copyX = context.motionX;
-      double copyY = context.motionY;
-      double copyZ = context.motionZ;
-      BoundingBox boundingBox3 = entityBoundingBox;
-      entityBoundingBox = startBoundingBox;
-      context.motionY = movement.stepHeight;
-      BlockShape secondCollider = Collision.colliderShapeIn(
+    boolean flag1 = movement.onGround || startMotionY != motion.motionY && startMotionY < 0.0D;
+    if (flag1 && (startMotionX != motion.motionX || startMotionZ != motion.motionZ)) {
+      double copyX = motion.motionX;
+      double copyY = motion.motionY;
+      double copyZ = motion.motionZ;
+      BoundingBox boundingBox3 = shiftedBoundingBox;
+      shiftedBoundingBox = startBoundingBox;
+      motion.motionY = movement.stepHeight;
+      BlockShape secondCollider = Collision.colliderShapeFor(
         player,
-        entityBoundingBox.expand(startMotionX, context.motionY, startMotionZ)
+        shiftedBoundingBox.expand(startMotionX, motion.motionY, startMotionZ)
       );
-      BoundingBox boundingBox4 = entityBoundingBox;
+      BoundingBox boundingBox4 = shiftedBoundingBox;
       BoundingBox boundingBox5 = boundingBox4.expand(startMotionX, 0.0D, startMotionZ);
-      double d9 = context.motionY;
-      d9 = secondCollider.allowedYOffset(boundingBox5, d9);
+      double d9 = motion.motionY;
+      d9 = secondCollider.allowedOffset(Y_AXIS, boundingBox5, d9);
       boundingBox4 = boundingBox4.offset(0.0D, d9, 0.0D);
       double d16 = startMotionZ;
-      d16 = secondCollider.allowedZOffset(boundingBox4, d16);
+      d16 = secondCollider.allowedOffset(Z_AXIS, boundingBox4, d16);
       boundingBox4 = boundingBox4.offset(0.0D, 0.0D, d16);
       double d15 = startMotionX;
-      d15 = secondCollider.allowedXOffset(boundingBox4, d15);
+      d15 = secondCollider.allowedOffset(X_AXIS, boundingBox4, d15);
       boundingBox4 = boundingBox4.offset(d15, 0.0D, 0.0D);
-      BoundingBox boundingBox14 = entityBoundingBox;
-      double d17 = context.motionY;
-      d17 = secondCollider.allowedYOffset(boundingBox14, d17);
+      BoundingBox boundingBox14 = shiftedBoundingBox;
+      double d17 = motion.motionY;
+      d17 = secondCollider.allowedOffset(Y_AXIS, boundingBox14, d17);
       boundingBox14 = boundingBox14.offset(0.0D, d17, 0.0D);
       double d18 = startMotionX;
-      d18 = secondCollider.allowedXOffset(boundingBox14, d18);
+      d18 = secondCollider.allowedOffset(X_AXIS, boundingBox14, d18);
       boundingBox14 = boundingBox14.offset(d18, 0.0D, 0.0D);
       double d19 = startMotionZ;
-      d19 = secondCollider.allowedZOffset(boundingBox14, d19);
+      d19 = secondCollider.allowedOffset(Z_AXIS, boundingBox14, d19);
       boundingBox14 = boundingBox14.offset(0.0D, 0.0D, d19);
       double d20 = d15 * d15 + d16 * d16;
       double d10 = d18 * d18 + d19 * d19;
       if (d20 > d10) {
-        context.motionX = d15;
-        context.motionZ = d16;
-        context.motionY = -d9;
-        entityBoundingBox = boundingBox4;
+        motion.motionX = d15;
+        motion.motionZ = d16;
+        motion.motionY = -d9;
+        shiftedBoundingBox = boundingBox4;
       } else {
-        context.motionX = d18;
-        context.motionZ = d19;
-        context.motionY = -d17;
-        entityBoundingBox = boundingBox14;
+        motion.motionX = d18;
+        motion.motionZ = d19;
+        motion.motionY = -d17;
+        shiftedBoundingBox = boundingBox14;
       }
-      context.motionY = secondCollider.allowedYOffset(entityBoundingBox, context.motionY);
-      entityBoundingBox = entityBoundingBox.offset(0.0, context.motionY, 0.0);
-      if (copyX * copyX + copyZ * copyZ >= context.motionX * context.motionX + context.motionZ * context.motionZ) {
-        context.motionX = copyX;
-        context.motionY = copyY;
-        context.motionZ = copyZ;
-        entityBoundingBox = boundingBox3;
+      motion.motionY = secondCollider.allowedOffset(Y_AXIS, shiftedBoundingBox, motion.motionY);
+      shiftedBoundingBox = shiftedBoundingBox.offset(0.0, motion.motionY, 0.0);
+      if (copyX * copyX + copyZ * copyZ >= motion.motionX * motion.motionX + motion.motionZ * motion.motionZ) {
+        motion.motionX = copyX;
+        motion.motionY = copyY;
+        motion.motionZ = copyZ;
+        shiftedBoundingBox = boundingBox3;
       } else {
         step = true;
       }
     }
-    boolean collidedVertically = startMotionY != context.motionY;
-    boolean collidedHorizontally = startMotionX != context.motionX || startMotionZ != context.motionZ;
-    boolean onGround = startMotionY != context.motionY && startMotionY < 0.0;
-    boolean moveResetX = startMotionX != context.motionX;
-    boolean moveResetZ = startMotionZ != context.motionZ;
-    double newPositionX = (entityBoundingBox.minX + entityBoundingBox.maxX) / 2.0D;
-    double newPositionY = entityBoundingBox.minY;
-    double newPositionZ = (entityBoundingBox.minZ + entityBoundingBox.maxZ) / 2.0D;
-    context.motionX = newPositionX - positionX;
-    context.motionY = newPositionY - positionY;
-    context.motionZ = newPositionZ - positionZ;
+    boolean collidedVertically = startMotionY != motion.motionY;
+    boolean collidedHorizontally = startMotionX != motion.motionX || startMotionZ != motion.motionZ;
+    boolean onGround = startMotionY != motion.motionY && startMotionY < 0.0;
+    boolean moveResetX = startMotionX != motion.motionX;
+    boolean moveResetZ = startMotionZ != motion.motionZ;
+    double newPositionX = (shiftedBoundingBox.minX + shiftedBoundingBox.maxX) / 2.0D;
+    double newPositionY = shiftedBoundingBox.minY;
+    double newPositionZ = (shiftedBoundingBox.minZ + shiftedBoundingBox.maxZ) / 2.0D;
+    motion.motionX = newPositionX - positionX;
+    motion.motionY = newPositionY - positionY;
+    motion.motionZ = newPositionZ - positionZ;
     return new ComplexColliderSimulationResult(
-      MotionVector.from(context), onGround,
+      Motion.copyFrom(motion), onGround,
       collidedHorizontally, collidedVertically,
       moveResetX, moveResetZ, step
     );
   }
 
-  private void calculateBackOffFromEdge(User user, double length, MotionVector context) {
+  private void calculateBackOffFromEdge(User user, double length, Motion context) {
     Player player = user.player();
     MovementMetadata movementData = user.meta().movement();
     BoundingBox boundingBox = movementData.boundingBox();

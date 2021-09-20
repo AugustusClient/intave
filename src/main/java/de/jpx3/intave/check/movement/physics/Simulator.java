@@ -2,6 +2,7 @@ package de.jpx3.intave.check.movement.physics;
 
 import de.jpx3.intave.check.movement.Physics;
 import de.jpx3.intave.player.collider.complex.ComplexColliderSimulationResult;
+import de.jpx3.intave.shade.Motion;
 import de.jpx3.intave.user.User;
 
 public abstract class Simulator {
@@ -12,7 +13,7 @@ public abstract class Simulator {
   }
 
   public abstract ComplexColliderSimulationResult performSimulation(
-    User user, MotionVector context,
+    User user, Motion motion,
     float keyForward, float keyStrafe,
     boolean attackReduce, boolean jumped, boolean handActive
   );

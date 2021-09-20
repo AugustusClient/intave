@@ -1,26 +1,12 @@
 package de.jpx3.intave.block.shape;
 
 import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.shade.Direction;
 
 import java.util.Collections;
 import java.util.List;
 
 final class EmptyBlockShape implements BlockShape {
-  @Override
-  public double allowedXOffset(BoundingBox entity, double offsetX) {
-    return offsetX;
-  }
-
-  @Override
-  public double allowedYOffset(BoundingBox entity, double offsetY) {
-    return offsetY;
-  }
-
-  @Override
-  public double allowedZOffset(BoundingBox entity, double offsetZ) {
-    return offsetZ;
-  }
-
   @Override
   public BlockShape contextualized(int posX, int posY, int posZ) {
     return this;
@@ -39,6 +25,21 @@ final class EmptyBlockShape implements BlockShape {
   @Override
   public boolean isEmpty() {
     return true;
+  }
+
+  @Override
+  public double allowedOffset(Direction.Axis axis, BoundingBox entity, double offset) {
+    return offset;
+  }
+
+  @Override
+  public double min(Direction.Axis axis) {
+    return 0;
+  }
+
+  @Override
+  public double max(Direction.Axis axis) {
+    return 0;
   }
 
   @Override

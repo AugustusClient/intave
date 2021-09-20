@@ -42,7 +42,7 @@ import de.jpx3.intave.module.BootSegment;
 import de.jpx3.intave.module.Modules;
 import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscriptionLinker;
 import de.jpx3.intave.module.linker.packet.PacketSubscriptionLinker;
-import de.jpx3.intave.module.tracker.entity.WrappedEntity;
+import de.jpx3.intave.module.tracker.entity.EntityShade;
 import de.jpx3.intave.packet.reader.PacketReaders;
 import de.jpx3.intave.player.ItemProperties;
 import de.jpx3.intave.player.fake.event.FakePlayerEventService;
@@ -481,7 +481,7 @@ public final class IntavePlugin extends JavaPlugin {
       // stage 7
       Modules.proceedBoot(BootSegment.STAGE_7);
 
-      WrappedEntity.setup();
+      EntityShade.setup();
       HitboxSizeAccess.setup();
       UserRepository.setup();
       WrapperLinkage.setup();

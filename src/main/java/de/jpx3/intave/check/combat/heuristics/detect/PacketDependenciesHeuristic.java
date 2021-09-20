@@ -2,7 +2,6 @@ package de.jpx3.intave.check.combat.heuristics.detect;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketEvent;
-import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.check.MetaCheckPart;
 import de.jpx3.intave.check.combat.Heuristics;
 import de.jpx3.intave.math.MathHelper;
@@ -19,15 +18,11 @@ import java.util.Map;
 
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
 
-public final class PacketDependenciesHeuristic extends MetaCheckPart<Heuristics, PacketDependenciesHeuristic.PacketDependentHeuristicMeta> {
-  private final IntavePlugin plugin;
-
-  /*
+/*
   What the check does:
 
-  The check should measure the time diffrences between multiple packets which are send by the client (measured in ticks / movement packets)
-  The time diffrences betweeen theses packets then should be put into a standard deviation method which should give dependencies between theses packets
-  when the returned value is pretty low.
+  The check should measure the time difference between multiple packets which are sent by the client (measured in ticks / movement packets)
+  The standard deviation of the time difference between these packets should identify packet-patterns as well as irregular dependencies of packets (when std is pretty low)
 
   Some packets could false flagg which should then can be blacklisted manually.
 
@@ -43,14 +38,14 @@ public final class PacketDependenciesHeuristic extends MetaCheckPart<Heuristics,
   8                                      |-> tick diffrence is 2
   9                   BLOCK_PLACE -------|
 
-  calculateStandardDeviation(2, 2, 2) which should be near 0
-  */
+  calculateStandardDeviation(2, 2, 2) should be consequently 0
+*/
+public final class PacketDependenciesHeuristic extends MetaCheckPart<Heuristics, PacketDependenciesHeuristic.PacketDependentHeuristicMeta> {
+  private static final int TICKS_TO_SAVE = 200;
+
   public PacketDependenciesHeuristic(Heuristics parentCheck) {
     super(parentCheck, PacketDependenciesHeuristic.PacketDependentHeuristicMeta.class);
-    this.plugin = IntavePlugin.singletonInstance();
   }
-
-  private static int ticksToSave = 200;
 
   @PacketSubscription(
     priority = ListenerPriority.HIGH,
@@ -63,16 +58,16 @@ public final class PacketDependenciesHeuristic extends MetaCheckPart<Heuristics,
     User user = userOf(player);
     PacketDependentHeuristicMeta meta = metaOf(user);
 
-    HashMap<Integer, SaveMultipleTicks> multipleDependencies = new HashMap<>();
-    for (int firstTick = meta.currentTick; firstTick > meta.currentTick - ticksToSave; firstTick--) {
-      ArrayList<PacketType> firstPacketTypes = meta.packetTypeList.get(firstTick);
+    Map<Integer, SaveMultipleTicks> multipleDependencies = new HashMap<>();
+    for (int firstTick = meta.currentTick; firstTick > meta.currentTick - TICKS_TO_SAVE; firstTick--) {
+      List<PacketType> firstPacketTypes = meta.packetTypeList.get(firstTick);
       if(firstPacketTypes != null) {
-        HashMap<Integer, SaveOneTick> dependencies = new HashMap<>();
+        Map<Integer, SaveOneTick> dependencies = new HashMap<>();
         /*
         Speicher pro PacketType ein anderes packetType was davor gesendet wurde in der abhängigkeit mit dem ersten packetType ab.
          */
-        for (int secondTick = firstTick - 1; secondTick > meta.currentTick - ticksToSave; secondTick--) {
-          ArrayList<PacketType> secondPacketTypes = meta.packetTypeList.get(secondTick);
+        for (int secondTick = firstTick - 1; secondTick > meta.currentTick - TICKS_TO_SAVE; secondTick--) {
+          List<PacketType> secondPacketTypes = meta.packetTypeList.get(secondTick);
           if(secondPacketTypes != null) {
 
             for (PacketType firstPacketType : firstPacketTypes) {
@@ -134,7 +129,7 @@ public final class PacketDependenciesHeuristic extends MetaCheckPart<Heuristics,
   }
 
   private void addTickToPacketTypeList(PacketDependentHeuristicMeta meta, PacketType packetType) {
-    ArrayList<PacketType> packetTypeArrayList = meta.packetTypeList.get(meta.currentTick);
+    List<PacketType> packetTypeArrayList = meta.packetTypeList.get(meta.currentTick);
     if(packetTypeArrayList == null) {
       packetTypeArrayList = new ArrayList<>();
       meta.packetTypeList.put(meta.currentTick, packetTypeArrayList);
@@ -145,8 +140,8 @@ public final class PacketDependenciesHeuristic extends MetaCheckPart<Heuristics,
   private void prepareNextTick(PacketDependentHeuristicMeta meta) {
     meta.currentTick++;
 
-    if(meta.currentTick > ticksToSave) {
-      meta.packetTypeList.remove(meta.currentTick - ticksToSave);
+    if(meta.currentTick > TICKS_TO_SAVE) {
+      meta.packetTypeList.remove(meta.currentTick - TICKS_TO_SAVE);
     }
   }
 
@@ -167,9 +162,8 @@ public final class PacketDependenciesHeuristic extends MetaCheckPart<Heuristics,
   }
 
   public final static class PacketDependentHeuristicMeta extends CheckCustomMetadata {
-
     int currentTick;
-    HashMap<Integer, ArrayList<PacketType>> packetTypeList = new HashMap<>();
+    Map<Integer, List<PacketType>> packetTypeList = new HashMap<>();
   }
 }
 

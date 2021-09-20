@@ -1,6 +1,5 @@
-package de.jpx3.intave.player;
+package de.jpx3.intave.player.collider;
 
-import de.jpx3.intave.check.movement.physics.MotionVector;
 import de.jpx3.intave.player.collider.complex.ComplexColliderProcessor;
 import de.jpx3.intave.player.collider.complex.ComplexColliderSimulationResult;
 import de.jpx3.intave.player.collider.complex.LegacyComplexColliderProcessor;
@@ -9,6 +8,8 @@ import de.jpx3.intave.player.collider.simple.SimpleColliderProcessor;
 import de.jpx3.intave.player.collider.simple.SimpleColliderSimulationResult;
 import de.jpx3.intave.player.collider.simple.UniversalSimpleColliderProcessor;
 import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.shade.Motion;
+import de.jpx3.intave.shade.Position;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.ProtocolMetadata;
@@ -38,10 +39,20 @@ public final class Collider {
   }
 
   public static ComplexColliderSimulationResult simulateComplexCollision(
-    User user, MotionVector context, boolean inWeb,
+    User user, Motion motion, boolean inWeb,
     double positionX, double positionY, double positionZ
   ) {
-    return user.complexColliderProcessor().collide(user, context, inWeb, positionX, positionY, positionZ);
+    return user.complexColliderProcessor().collide(user, motion, inWeb, positionX, positionY, positionZ);
+  }
+
+  public static SimpleColliderSimulationResult simulateSimpleCollision(
+    Player player,
+    Position position,
+    Motion motion
+  ) {
+    User user = UserRepository.userOf(player);
+    BoundingBox boundingBox = BoundingBox.fromPosition(user, position);
+    return user.simpleColliderProcessor().collide(user, boundingBox, motion);
   }
 
   public static SimpleColliderSimulationResult simulateSimpleCollision(
@@ -50,7 +61,7 @@ public final class Collider {
     double motionX, double motionY, double motionZ
   ) {
     User user = UserRepository.userOf(player);
-    BoundingBox boundingBox = BoundingBox.fromPosition(positionX, positionY, positionZ);
+    BoundingBox boundingBox = BoundingBox.fromPosition(user, positionX, positionY, positionZ);
     SimpleColliderProcessor simpleColliderProcessor = user.simpleColliderProcessor();
     return simpleColliderProcessor.collide(user, boundingBox, motionX, motionY, motionZ);
   }

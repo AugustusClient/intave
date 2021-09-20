@@ -1,9 +1,13 @@
 package de.jpx3.intave.module.dispatch;
 
 import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
+import com.comphenix.protocol.wrappers.BlockPosition;
+import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.annotate.Relocate;
@@ -23,10 +27,11 @@ import de.jpx3.intave.module.linker.packet.Engine;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.module.linker.packet.PrioritySlot;
-import de.jpx3.intave.module.tracker.entity.WrappedEntity;
+import de.jpx3.intave.module.tracker.entity.EntityShade;
 import de.jpx3.intave.module.violation.Violation;
 import de.jpx3.intave.packet.converter.PlayerAction;
 import de.jpx3.intave.packet.converter.PlayerActionResolver;
+import de.jpx3.intave.player.ItemProperties;
 import de.jpx3.intave.player.fake.FakePlayer;
 import de.jpx3.intave.shade.BoundingBox;
 import de.jpx3.intave.user.User;
@@ -42,6 +47,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import static de.jpx3.intave.module.feedback.TransactionOptions.SELF_SYNCHRONIZATION;
@@ -288,9 +294,14 @@ public final class MovementDispatcher extends Module {
       return;
     }
 
-    WrappedEntity attachedEntity = movementData.ridingEntity();
+    EntityShade attachedEntity = movementData.ridingEntity();
     if (attachedEntity != null && !attachedEntity.isEntityAlive() && !attachedEntity.entityName().equals("Boat")) {
       movementData.dismountRidingEntity();
+    }
+
+    if (inventoryData.releaseItemNextTick) {
+      releaseItem(user);
+      inventoryData.releaseItemNextTick = false;
     }
 
     if (violationLevelData.isInActiveTeleportBundle) {
@@ -381,6 +392,34 @@ public final class MovementDispatcher extends Module {
         potionData.potionEffectJumpAmplifier(0);
       }
     }
+  }
+
+  private void releaseItem(User user) {
+    Player player = user.player();
+
+    try {
+      ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+      InventoryMetadata inventory = user.meta().inventory();
+      inventory.blockNextArrow = inventory.pastHotBarSlotChange > 4 && ItemProperties.isBow(inventory.heldItemType()) || ItemProperties.isBow(inventory.activeItem());
+
+      PacketContainer packet = protocolManager.createPacket(PacketType.Play.Client.BLOCK_DIG);
+      packet.getBlockPositionModifier().write(0, new BlockPosition(0,0,0));
+      packet.getDirections().write(0, EnumWrappers.Direction.DOWN);
+      packet.getPlayerDigTypes().write(0, EnumWrappers.PlayerDigType.RELEASE_USE_ITEM);
+      user.ignoreNextInboundPacket();
+      protocolManager.recieveClientPacket(player, packet);
+      updatePlayerHandItem(player);
+
+    } catch (InvocationTargetException | IllegalAccessException exception) {
+      exception.printStackTrace();
+    }
+    Synchronizer.synchronize(player::updateInventory);
+  }
+
+  private void updatePlayerHandItem(Player player) {
+    User user = UserRepository.userOf(player);
+    InventoryMetadata inventoryData = user.meta().inventory();
+    inventoryData.deactivateHand();
   }
 
   @PacketSubscription(

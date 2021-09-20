@@ -26,6 +26,7 @@ public final class InventoryMetadata {
   public boolean forceInventoryOnClickOpen = true;
   public volatile int pastSlotSwitch = 100;
   public boolean blockNextArrow = false;
+  public boolean releaseItemNextTick = false;
 
   public InventoryMetadata(Player player) {
     this.player = player;

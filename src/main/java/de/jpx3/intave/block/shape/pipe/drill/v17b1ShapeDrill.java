@@ -10,6 +10,7 @@ import net.minecraft.world.level.IBlockAccess;
 import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.phys.AxisAlignedBB;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.VoxelShapes;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
@@ -26,13 +27,16 @@ public final class v17b1ShapeDrill extends AbstractShapeDrill {
     BlockPosition blockPosition = new BlockPosition(posX, posY, posZ);
     IBlockData blockData = (IBlockData) BlockVariantRegister.rawBlockDataOf(type, blockState);
     if (blockData == null) {
-      return BlockShapes.empty();
+      return BlockShapes.emptyShape();
     }
     IBlockAccess blockAccess = handle.getChunkProvider().c(posX >> 4, posZ >> 4);
     if (blockAccess == null) {
-      return BlockShapes.empty();
+      return BlockShapes.emptyShape();
     }
     VoxelShape collisionShape = blockData.getCollisionShape(blockAccess, blockPosition);
+    if (VoxelShapes.b() == collisionShape) {
+      return BlockShapes.cubicShape();
+    }
     List<AxisAlignedBB> nativeBoxes = collisionShape.toList();
     return translateWithOffset(nativeBoxes, posX, posY, posZ);
   }

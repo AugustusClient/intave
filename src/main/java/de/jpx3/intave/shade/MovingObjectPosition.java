@@ -17,7 +17,7 @@ public class MovingObjectPosition {
 
   /** What type of ray trace hit was this? 0 = block, 1 = entity */
   public MovingObjectPosition.MovingObjectType typeOfHit;
-  public EnumDirection sideHit;
+  public Direction sideHit;
 
   /** The vector position of the hit */
   public NativeVector hitVec;
@@ -25,11 +25,11 @@ public class MovingObjectPosition {
   /** The hit entity */
   public Entity entityHit;
 
-  public MovingObjectPosition(NativeVector hitVecIn, EnumDirection facing, BlockPosition blockPosIn) {
+  public MovingObjectPosition(NativeVector hitVecIn, Direction facing, BlockPosition blockPosIn) {
     this(MovingObjectPosition.MovingObjectType.BLOCK, hitVecIn, facing, blockPosIn);
   }
 
-  public MovingObjectPosition(NativeVector p_i45552_1_, EnumDirection facing) {
+  public MovingObjectPosition(NativeVector p_i45552_1_, Direction facing) {
     this(MovingObjectPosition.MovingObjectType.BLOCK, p_i45552_1_, facing, BlockPosition.ORIGIN);
   }
 
@@ -43,7 +43,7 @@ public class MovingObjectPosition {
 
   public MovingObjectPosition(
     MovingObjectPosition.MovingObjectType typeOfHitIn,
-    NativeVector hitVecIn, EnumDirection sideHitIn, BlockPosition blockPosIn
+    NativeVector hitVecIn, Direction sideHitIn, BlockPosition blockPosIn
   ) {
     this.typeOfHit = typeOfHitIn;
     this.blockPos = blockPosIn;
@@ -103,13 +103,13 @@ public class MovingObjectPosition {
           bField.setAccessible(true);
         Object direction = bField.get(movingObjectPosition);
         String directionName = (String) Enum.class.getMethod("name").invoke(direction);
-        EnumDirection wrappedEnumDirection = EnumDirection.valueOf(directionName);
+        Direction wrappedDirection = Direction.valueOf(directionName);
         Field cField = movingObjectPositionBlock.getDeclaredField("c");
         if (!cField.isAccessible())
           cField.setAccessible(true);
         Object blockPosition = cField.get(movingObjectPosition);
         BlockPosition wrappedBlockPosition = WrapperLinkage.blockPositionOf(blockPosition);
-        return new MovingObjectPosition(movingObjectType, wrappedPos, wrappedEnumDirection, wrappedBlockPosition);
+        return new MovingObjectPosition(movingObjectType, wrappedPos, wrappedDirection, wrappedBlockPosition);
       }
     } catch (Exception exception) {
       throw new IllegalStateException(exception);
@@ -132,8 +132,8 @@ public class MovingObjectPosition {
         String typeName = (String) Enum.class.getMethod("name").invoke(type);
         MovingObjectType movingObjectType = MovingObjectType.valueOf(typeName);
         String directionName = (String) Enum.class.getMethod("name").invoke(direction);
-        EnumDirection wrappedEnumDirection = EnumDirection.valueOf(directionName);
-        return new MovingObjectPosition(movingObjectType, wrappedPos, wrappedEnumDirection, wrappedBlockPosition);
+        Direction wrappedDirection = Direction.valueOf(directionName);
+        return new MovingObjectPosition(movingObjectType, wrappedPos, wrappedDirection, wrappedBlockPosition);
       } else {
         Entity bukkitEntity = serverEntityByIdentifier((int) entity.getClass().getMethod("getId").invoke(entity));
         return new MovingObjectPosition(bukkitEntity, wrappedPos);

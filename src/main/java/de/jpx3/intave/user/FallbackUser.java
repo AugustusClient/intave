@@ -12,7 +12,7 @@ import de.jpx3.intave.entity.size.HitboxSize;
 import de.jpx3.intave.module.mitigate.AttackNerfStrategy;
 import de.jpx3.intave.module.violation.placeholder.PlayerContext;
 import de.jpx3.intave.module.violation.placeholder.UserContext;
-import de.jpx3.intave.player.Collider;
+import de.jpx3.intave.player.collider.Collider;
 import de.jpx3.intave.player.collider.complex.ComplexColliderProcessor;
 import de.jpx3.intave.player.collider.simple.SimpleColliderProcessor;
 import de.jpx3.intave.player.fake.FakePlayer;

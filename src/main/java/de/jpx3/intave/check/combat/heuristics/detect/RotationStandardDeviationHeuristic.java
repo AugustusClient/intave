@@ -11,7 +11,7 @@ import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.module.mitigate.AttackNerfStrategy;
-import de.jpx3.intave.module.tracker.entity.WrappedEntity;
+import de.jpx3.intave.module.tracker.entity.EntityShade;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.AttackMetadata;
 import de.jpx3.intave.user.meta.CheckCustomMetadata;
@@ -47,7 +47,7 @@ public final class RotationStandardDeviationHeuristic extends MetaCheckPart<Heur
     MovementMetadata movementData = meta.movement();
     AttackMetadata attackData = meta.attack();
     RotationStandardDeviationMeta heuristicMeta = metaOf(player);
-    WrappedEntity entity = attackData.lastAttackedEntity();
+    EntityShade entity = attackData.lastAttackedEntity();
 
     if (entity != null && attackData.recentlyAttacked(500) && entity.moving(0.05)) {
       /*

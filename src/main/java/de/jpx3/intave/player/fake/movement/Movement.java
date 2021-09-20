@@ -9,6 +9,8 @@ import org.bukkit.entity.Player;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static de.jpx3.intave.shade.Direction.Axis.*;
+
 public abstract class Movement extends HeadRotationMovement {
   private final static double BOT_DISTANCE_ADJUSTMENT = 0.15;
 
@@ -93,16 +95,16 @@ public abstract class Movement extends HeadRotationMovement {
     List<BoundingBox> collisionBoxes = Collision.resolveBoxes(location.getWorld(), boundingBox.expand(motionX, motionY, motionZ));
     double startMotionY = motionY;
     for (BoundingBox collisionBox : collisionBoxes) {
-      motionY = collisionBox.allowedYOffset(boundingBox, motionY);
+      motionY = collisionBox.allowedOffset(Y_AXIS, boundingBox, motionY);
     }
     boundingBox = (boundingBox.offset(0.0D, motionY, 0.0D));
     boolean onGround = startMotionY != motionY && startMotionY < 0.0D;
     for (BoundingBox collisionBox : collisionBoxes) {
-      motionX = collisionBox.allowedXOffset(boundingBox, motionX);
+      motionX = collisionBox.allowedOffset(X_AXIS, boundingBox, motionX);
     }
     boundingBox = boundingBox.offset(motionX, 0.0D, 0.0D);
     for (BoundingBox collisionBox : collisionBoxes) {
-      motionZ = collisionBox.allowedZOffset(boundingBox, motionZ);
+      motionZ = collisionBox.allowedOffset(Z_AXIS, boundingBox, motionZ);
     }
     return new SimpleColliderSimulationResult(motionX, motionY, motionZ, onGround, startMotionY != motionY);
   }

@@ -23,14 +23,15 @@ import de.jpx3.intave.diagnostic.timings.Timings;
 import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.module.Modules;
-import de.jpx3.intave.module.tracker.entity.WrappedEntity;
+import de.jpx3.intave.module.tracker.entity.EntityShade;
 import de.jpx3.intave.module.violation.Violation;
 import de.jpx3.intave.module.violation.ViolationContext;
-import de.jpx3.intave.player.Collider;
+import de.jpx3.intave.player.collider.Collider;
 import de.jpx3.intave.player.collider.complex.ComplexColliderSimulationResult;
 import de.jpx3.intave.player.collider.simple.SimpleColliderSimulationResult;
 import de.jpx3.intave.shade.BoundingBox;
 import de.jpx3.intave.shade.ClientMathHelper;
+import de.jpx3.intave.shade.Motion;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.*;
 import org.bukkit.ChatColor;
@@ -131,8 +132,8 @@ public final class Physics extends Check {
   private Simulator selectSimulator(User user) {
     MovementMetadata movementData = user.meta().movement();
     if (movementData.hasRidingEntity()) {
-      WrappedEntity wrappedEntity = movementData.ridingEntity();
-      int typeId = wrappedEntity.typeData.identifier();
+      EntityShade entityShade = movementData.ridingEntity();
+      int typeId = entityShade.typeData.identifier();
       return typeId == BOAT_ID ? Simulators.BOAT : Simulators.HORSE;
     } else {
       boolean inLava = movementData.inLava();
@@ -261,7 +262,7 @@ public final class Physics extends Check {
     ViolationMetadata violationLevelData = meta.violationLevel();
     AbilityMetadata abilityData = meta.abilities();
     BlockStateAccess blockStateAccess = user.blockShapeAccess();
-    MotionVector context = expectedMovement.motion();
+    Motion context = expectedMovement.motion();
 
     int keyForward = movementData.keyForward;
     int keyStrafe = movementData.keyStrafe;
@@ -330,7 +331,7 @@ public final class Physics extends Check {
     if (distance > 1e-3) {
       movementData.suspiciousMovement = true;
       ComplexColliderSimulationResult simulation = simulationProcessor.simulateWithoutKeyPress(user, selectSimulator(user));
-      MotionVector setbackMotion = simulation.motion();
+      Motion setbackMotion = simulation.motion();
       predictedX = setbackMotion.motionX;
       predictedY = setbackMotion.motionY;
       predictedZ = setbackMotion.motionZ;

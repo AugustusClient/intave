@@ -21,7 +21,7 @@ public final class v13ShapeDrill extends AbstractShapeDrill {
     BlockPosition blockPosition = new BlockPosition(posX, posY, posZ);
     IBlockData blockData = CraftMagicNumbers.getBlock(type, (byte) blockState);
     if (blockData == null) {
-      return BlockShapes.empty();
+      return BlockShapes.emptyShape();
     }
     VoxelShape collisionShape = blockData.getCollisionShape(handle, blockPosition);
     List<AxisAlignedBB> nativeBoxes = collisionShape.d();

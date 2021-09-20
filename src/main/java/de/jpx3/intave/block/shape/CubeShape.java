@@ -2,11 +2,14 @@ package de.jpx3.intave.block.shape;
 
 import de.jpx3.intave.diagnostic.MemoryTraced;
 import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.shade.Direction;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.List;
+
+import static de.jpx3.intave.shade.Direction.Axis.*;
 
 public final class CubeShape extends MemoryTraced implements BlockShape {
   private final int x, y, z;
@@ -17,55 +20,34 @@ public final class CubeShape extends MemoryTraced implements BlockShape {
     this.z = z;
   }
 
-  public double allowedXOffset(BoundingBox other, double offsetX) {
-    if (other.maxY > y && other.minY < y + 1 && other.maxZ > z && other.minZ < z + 1) {
-      if (offsetX > 0.0D && other.maxX <= x) {
-        double d1 = x - other.maxX;
-        if (d1 < offsetX) {
-          offsetX = d1;
+  public double allowedOffset(Direction.Axis axis, BoundingBox other, double offset) {
+    // always collide if axis is selected
+    boolean collidesInXAxis = axis == X_AXIS || other.max(X_AXIS) > this.min(X_AXIS) && other.min(X_AXIS) < this.max(X_AXIS);
+    boolean collidesInYAxis = axis == Y_AXIS || (collidesInXAxis && other.max(Y_AXIS) > this.min(Y_AXIS) && other.min(Y_AXIS) < this.max(Y_AXIS));
+    boolean collidesInZAxis = axis == Z_AXIS || (collidesInYAxis && other.max(Z_AXIS) > this.min(Z_AXIS) && other.min(Z_AXIS) < this.max(Z_AXIS));
+
+    if (collidesInXAxis && collidesInYAxis && collidesInZAxis) {
+      if (offset > 0.0D && other.max(axis) <= this.min(axis)) {
+        double distance = this.min(axis) - other.max(axis);
+        if (distance < offset) {
+          offset = distance;
         }
-      } else if (offsetX < 0.0D && other.minX >= x + 1) {
-        double d0 = x + 1 - other.minX;
-        if (d0 > offsetX) {
-          offsetX = d0;
+      } else if (offset < 0.0D && other.min(axis) >= this.max(axis)) {
+        double distance = this.max(axis) - other.min(axis);
+        if (distance > offset) {
+          offset = distance;
         }
       }
     }
-    return offsetX;
+    return offset;
   }
 
-  public double allowedYOffset(BoundingBox other, double offsetY) {
-    if (other.maxX > x && other.minX < x + 1 && other.maxZ > z && other.minZ < z + 1) {
-      if (offsetY > 0.0D && other.maxY <= y) {
-        double d1 = y - other.maxY;
-        if (d1 < offsetY) {
-          offsetY = d1;
-        }
-      } else if (offsetY < 0.0D && other.minY >= y + 1) {
-        double d0 = y + 1 - other.minY;
-        if (d0 > offsetY) {
-          offsetY = d0;
-        }
-      }
-    }
-    return offsetY;
+  public double min(Direction.Axis axis) {
+    return axis.select(x, y, z);
   }
 
-  public double allowedZOffset(BoundingBox other, double offsetZ) {
-    if (other.maxX > x && other.minX < x + 1 && other.maxY > y && other.minY < y + 1) {
-      if (offsetZ > 0.0D && other.maxZ <= z) {
-        double d1 = z - other.maxZ;
-        if (d1 < offsetZ) {
-          offsetZ = d1;
-        }
-      } else if (offsetZ < 0.0D && other.minZ >= z + 1) {
-        double d0 = z + 1 - other.minZ;
-        if (d0 > offsetZ) {
-          offsetZ = d0;
-        }
-      }
-    }
-    return offsetZ;
+  public double max(Direction.Axis axis) {
+    return axis.select(x, y, z) + 1;
   }
 
   @Override

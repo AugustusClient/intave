@@ -4,7 +4,7 @@ import de.jpx3.intave.block.access.BlockVariantAccess;
 import de.jpx3.intave.block.access.VolatileBlockAccess;
 import de.jpx3.intave.block.type.BlockTypeAccess;
 import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.EnumDirection;
+import de.jpx3.intave.shade.Direction;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import org.bukkit.Material;
@@ -42,7 +42,7 @@ final class DoorBlockPatch extends BoundingBoxPatch {
       }
     }
 
-    EnumDirection enumDirection = EnumDirection.getFront(lowerData & 3);
+    Direction direction = Direction.getFront(lowerData & 3);
     boolean open = (lowerData & 4) != 0;
     boolean hinge = (upperData & 1) != 0;
 
@@ -50,7 +50,7 @@ final class DoorBlockPatch extends BoundingBoxPatch {
 
     BoundingBoxBuilder builder = BoundingBoxBuilder.create();
     if (open) {
-      switch (enumDirection) {
+      switch (direction) {
         case EAST:
           if (hinge) {
             builder.shape(0.0F, 0.0F, 1.0F - f, 1.0F, 1.0F, 1.0F);
@@ -81,7 +81,7 @@ final class DoorBlockPatch extends BoundingBoxPatch {
           break;
       }
     } else {
-      switch (enumDirection) {
+      switch (direction) {
         case EAST:
           builder.shape(0.0F, 0.0F, 0.0F, f, 1.0F, 1.0F);
           break;

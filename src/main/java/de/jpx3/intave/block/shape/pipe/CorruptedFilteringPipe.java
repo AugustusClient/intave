@@ -22,7 +22,7 @@ public final class CorruptedFilteringPipe implements ShapeResolverPipeline {
   @Override
   public BlockShape resolve(World world, Player player, Material type, int blockState, int posX, int posY, int posZ) {
     List<BoundingBox> corrupted = resolveCorrupted(type, blockState);
-    return corrupted != null ? BlockShapes.ofBoxes(corrupted) : forward.resolve(world, player, type, blockState, posX, posY, posZ);
+    return corrupted != null ? BlockShapes.shapeOf(corrupted) : forward.resolve(world, player, type, blockState, posX, posY, posZ);
   }
 
   @Override

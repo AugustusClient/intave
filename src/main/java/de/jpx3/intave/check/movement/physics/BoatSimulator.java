@@ -6,9 +6,10 @@ import de.jpx3.intave.block.fluid.FluidTag;
 import de.jpx3.intave.block.fluid.Fluids;
 import de.jpx3.intave.block.physics.BlockProperties;
 import de.jpx3.intave.math.SinusCache;
-import de.jpx3.intave.player.Collider;
+import de.jpx3.intave.player.collider.Collider;
 import de.jpx3.intave.player.collider.complex.ComplexColliderSimulationResult;
 import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.shade.Motion;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.MetadataBundle;
 import de.jpx3.intave.user.meta.MovementMetadata;
@@ -24,7 +25,7 @@ public final class BoatSimulator extends DefaultSimulator {
   @Override
   public ComplexColliderSimulationResult performSimulation(
     User user,
-    MotionVector context,
+    Motion motion,
     float keyForward, float keyStrafe,
     boolean attackReduce, boolean jumped,
     boolean handActive
@@ -34,11 +35,11 @@ public final class BoatSimulator extends DefaultSimulator {
     movement.previousBoatStatus = movement.boatStatus;
     movement.boatStatus = getBoatStatus(user);
     movement.boatGlide = getBoatGlide(user);
-    updateMotion(user, context);
-    controlBoat(user, context);
+    updateMotion(user, motion);
+    controlBoat(user, motion);
 
     return Collider.simulateComplexCollision(
-      user, context, movement.inWeb,
+      user, motion, movement.inWeb,
       movement.verifiedPositionX, movement.verifiedPositionY, movement.verifiedPositionZ
     );
   }
@@ -116,7 +117,7 @@ public final class BoatSimulator extends DefaultSimulator {
     return flag ? Status.UNDER_WATER : null;
   }
 
-  private void updateMotion(User user, MotionVector context) {
+  private void updateMotion(User user, Motion context) {
     MetadataBundle meta = user.meta();
     MovementMetadata movement = meta.movement();
 
@@ -163,7 +164,7 @@ public final class BoatSimulator extends DefaultSimulator {
     }
   }
 
-  private void controlBoat(User user, MotionVector context) {
+  private void controlBoat(User user, Motion context) {
     MovementMetadata movement = user.meta().movement();
     int forwardInput = movement.clientForwardKey;
     int strafeInput = movement.clientStrafeKey;
@@ -238,7 +239,7 @@ public final class BoatSimulator extends DefaultSimulator {
   @Override
   public void prepareNextTick(User user, double positionX, double positionY, double positionZ, double motionX, double motionY, double motionZ) {
     MovementMetadata movement = user.meta().movement();
-    MotionVector motionVector = movement.motion();
+    Motion motionVector = movement.motion();
     ViolationMetadata violationMetadata = user.meta().violationLevel();
 
     BoundingBox boundingBox = BoundingBox.fromPosition(user, positionX, positionY, positionZ);

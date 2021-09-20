@@ -20,7 +20,7 @@ import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.module.violation.Violation;
 import de.jpx3.intave.packet.reader.BlockInteractionReader;
 import de.jpx3.intave.packet.reader.PacketReaders;
-import de.jpx3.intave.shade.EnumDirection;
+import de.jpx3.intave.shade.Direction;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.AbilityMetadata;
 import de.jpx3.intave.user.meta.CheckCustomMetadata;
@@ -116,7 +116,7 @@ public final class BlockRotationAnalyzer extends MetaCheckPart<PlacementAnalysis
     Synchronizer.synchronize(() -> {
       player.updateInventory();
       refreshBlock(player, targetLocation);
-      for (EnumDirection direction : EnumDirection.values()) {
+      for (Direction direction : Direction.values()) {
         Location placedBlock = targetLocation.clone().add(direction.getDirectionVec().convertToBukkitVec());
         refreshBlock(player, placedBlock);
       }

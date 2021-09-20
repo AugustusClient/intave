@@ -4,7 +4,7 @@ import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.block.access.BlockVariantAccess;
 import de.jpx3.intave.block.type.BlockTypeAccess;
 import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.EnumDirection;
+import de.jpx3.intave.shade.Direction;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import org.bukkit.Material;
@@ -29,7 +29,7 @@ final class LadderBlockPatch extends BoundingBoxPatch {
   @Override
   public List<BoundingBox> patch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, List<BoundingBox> bbs) {
     User user = UserRepository.userOf(player);
-    EnumDirection direction = EnumDirection.getFront(blockState);
+    Direction direction = Direction.getFront(blockState);
     boolean modern = user.meta().protocol().combatUpdate();
     if (modern) {
       return MODERN_PATCH_REDUNDANT ? bbs : modernPath(direction);
@@ -38,7 +38,7 @@ final class LadderBlockPatch extends BoundingBoxPatch {
     }
   }
 
-  private List<BoundingBox> modernPath(EnumDirection direction) {
+  private List<BoundingBox> modernPath(Direction direction) {
     BoundingBoxBuilder builder = BoundingBoxBuilder.create();
     switch (direction) {
       case NORTH:
@@ -57,7 +57,7 @@ final class LadderBlockPatch extends BoundingBoxPatch {
     return builder.applyAndResolve();
   }
 
-  private List<BoundingBox> legacyPatch(EnumDirection direction) {
+  private List<BoundingBox> legacyPatch(Direction direction) {
     BoundingBoxBuilder builder = BoundingBoxBuilder.create();
     switch (direction) {
       case NORTH:

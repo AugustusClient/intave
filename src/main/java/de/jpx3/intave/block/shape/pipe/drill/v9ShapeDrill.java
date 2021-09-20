@@ -22,7 +22,7 @@ public final class v9ShapeDrill extends AbstractShapeDrill {
     BlockPosition blockposition = new BlockPosition(posX, posY, posZ);
     IBlockData blockData = Block.getByCombinedId(type.getId() | (blockState & 0xF) << 12);
     if (blockData == null) {
-      return BlockShapes.empty();
+      return BlockShapes.emptyShape();
     }
     List<AxisAlignedBB> bbs = new ArrayList<>();
     WorldServer worldServer = ((CraftWorld) world).getHandle();

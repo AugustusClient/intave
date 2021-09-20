@@ -13,7 +13,7 @@ import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.module.mitigate.AttackNerfStrategy;
-import de.jpx3.intave.module.tracker.entity.WrappedEntity;
+import de.jpx3.intave.module.tracker.entity.EntityShade;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.AttackMetadata;
 import de.jpx3.intave.user.meta.CheckCustomMetadata;
@@ -42,7 +42,7 @@ public final class PerfectAttackHeuristic extends MetaCheckPart<Heuristics, Perf
     PerfectAttackMeta heuristicMeta = metaOf(user);
     PacketType packetType = event.getPacketType();
     PacketContainer packet = event.getPacket();
-    WrappedEntity attackedEntity = attackData.lastAttackedEntity();
+    EntityShade attackedEntity = attackData.lastAttackedEntity();
 
     if (attackedEntity != null && !attackedEntity.moving(0.05)) {
       return;

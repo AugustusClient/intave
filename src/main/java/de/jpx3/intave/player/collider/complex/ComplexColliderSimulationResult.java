@@ -1,20 +1,20 @@
 package de.jpx3.intave.player.collider.complex;
 
-import de.jpx3.intave.check.movement.physics.MotionVector;
 import de.jpx3.intave.math.MathHelper;
+import de.jpx3.intave.shade.Motion;
 
 public final class ComplexColliderSimulationResult {
   private final static ComplexColliderSimulationResult INVALID_SIMULATION = new ComplexColliderSimulationResult(
-    new MotionVector(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE), false, false, false, false, false, false
+    new Motion(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE), false, false, false, false, false, false
   );
 
-  private final MotionVector context;
+  private final Motion context;
   private final boolean onGround, collidedHorizontally, collidedVertically;
   private final boolean resetMotionX, resetMotionZ;
   private final boolean step;
 
   public ComplexColliderSimulationResult(
-    MotionVector context, boolean onGround,
+    Motion context, boolean onGround,
     boolean collidedHorizontally, boolean collidedVertically,
     boolean resetMotionX, boolean resetMotionZ, boolean step
   ) {
@@ -30,11 +30,11 @@ public final class ComplexColliderSimulationResult {
     this.step = step;
   }
 
-  public double accuracy(MotionVector motionVector) {
+  public double accuracy(Motion motionVector) {
     return MathHelper.distanceOf(context, motionVector);
   }
 
-  public MotionVector motion() {
+  public Motion motion() {
     return context;
   }
 

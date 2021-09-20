@@ -10,7 +10,7 @@ import de.jpx3.intave.check.combat.heuristics.Anomaly;
 import de.jpx3.intave.check.combat.heuristics.Confidence;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
-import de.jpx3.intave.module.tracker.entity.WrappedEntity;
+import de.jpx3.intave.module.tracker.entity.EntityShade;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.*;
 import de.jpx3.intave.world.raytrace.Raytracing;
@@ -91,7 +91,7 @@ public final class PreAttackHeuristic extends MetaCheckPart<Heuristics, PreAttac
     ProtocolMetadata clientData = user.meta().protocol();
     AttackMetadata attackData = user.meta().attack();
     MovementMetadata movementData = user.meta().movement();
-    WrappedEntity entity = attackData.lastAttackedEntity();
+    EntityShade entity = attackData.lastAttackedEntity();
     if (entity == null || !entity.clientSynchronized || movementData.lastTeleport < 5) {
       return;
     }
@@ -145,7 +145,7 @@ public final class PreAttackHeuristic extends MetaCheckPart<Heuristics, PreAttac
   private boolean cursorUponEntity(
     Player player,
     User user,
-    WrappedEntity entity
+    EntityShade entity
   ) {
     MetadataBundle meta = user.meta();
     MovementMetadata movementData = meta.movement();

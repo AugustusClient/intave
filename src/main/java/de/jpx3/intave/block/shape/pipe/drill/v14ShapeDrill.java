@@ -22,11 +22,11 @@ public final class v14ShapeDrill extends AbstractShapeDrill {
     // do not attempt to merge this class with v13BoundingBoxDrill
     IBlockData blockData = (IBlockData) BlockVariantRegister.rawBlockDataOf(type, blockState);
     if (blockData == null) {
-      return BlockShapes.empty();
+      return BlockShapes.emptyShape();
     }
     IBlockAccess blockAccess = handle.getChunkProvider().c(posX >> 4, posZ >> 4);
     if (blockAccess == null) {
-      return BlockShapes.empty();
+      return BlockShapes.emptyShape();
     }
     VoxelShape collisionShape = blockData.getCollisionShape(blockAccess, blockPosition);
     List<AxisAlignedBB> nativeBoxes = collisionShape.d();

@@ -8,13 +8,17 @@ import java.util.List;
 public final class BlockShapes {
   private final static BlockShape EMPTY = new EmptyBlockShape();
 
-  public static BlockShape empty() {
+  public static BlockShape emptyShape() {
     return EMPTY;
   }
 
-  public static BlockShape ofBoxes(List<BoundingBox> boundingBoxes) {
+  public static BlockShape cubicShape() {
+    return new CubeShape(0, 0, 0);
+  }
+
+  public static BlockShape shapeOf(List<BoundingBox> boundingBoxes) {
     if (boundingBoxes.isEmpty()) {
-      return empty();
+      return emptyShape();
     } else if (boundingBoxes.size() == 1) {
       return boundingBoxes.get(0);
     } else if (boundingBoxes.size() == 2) {
