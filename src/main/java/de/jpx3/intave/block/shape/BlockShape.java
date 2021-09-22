@@ -6,7 +6,6 @@ import de.jpx3.intave.shade.Direction;
 import java.util.List;
 
 public interface BlockShape {
-//  double[] pointsOn(Direction.Axis axis);
   double allowedOffset(Direction.Axis axis, BoundingBox entity, double offset);
   double min(Direction.Axis axis);
   double max(Direction.Axis axis);

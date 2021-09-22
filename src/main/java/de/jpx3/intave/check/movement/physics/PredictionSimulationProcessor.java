@@ -2,6 +2,7 @@ package de.jpx3.intave.check.movement.physics;
 
 import de.jpx3.intave.annotate.Relocate;
 import de.jpx3.intave.annotate.refactoring.IdoNotBelongHere;
+import de.jpx3.intave.diagnostic.IterativeStudy;
 import de.jpx3.intave.diagnostic.KeyPressStudy;
 import de.jpx3.intave.diagnostic.timings.Timings;
 import de.jpx3.intave.math.Hypot;
@@ -10,7 +11,6 @@ import de.jpx3.intave.module.dispatch.AttackDispatcher;
 import de.jpx3.intave.player.collider.complex.ComplexColliderSimulationResult;
 import de.jpx3.intave.shade.Motion;
 import de.jpx3.intave.user.User;
-import de.jpx3.intave.user.UserLocal;
 import de.jpx3.intave.user.meta.InventoryMetadata;
 import de.jpx3.intave.user.meta.MetadataBundle;
 import de.jpx3.intave.user.meta.MovementMetadata;
@@ -42,6 +42,7 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
   }
 
   private final static double REQUIRED_ACCURACY_FOR_QUICK_PROC_EXIT = 0.001;
+  private final static double REQUIRED_ACCURACY_FOR_FLYING_PROC_EXIT = 0.02;
 
   private ComplexColliderSimulationResult performKeyComparisonSimulation(User user, Simulator simulator) {
     MovementMetadata movementData = user.meta().movement();
@@ -70,7 +71,7 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
     //
     boolean iterativeAllowed = !user.meta().inventory().inventoryOpen();
     if (biasedSimulationFailed && iterativeAllowed) {
-      IterativeSimulationContext iterative = simulateMovementIterative(user, simulator);
+      SimulationStack iterative = simulateMovementIterative(user, simulator);
       simulation = iterative.bestSimulation();
       applyIterativeSimulationTo(user, iterative);
     }
@@ -79,7 +80,7 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
   }
 
   @IdoNotBelongHere
-  private void applyIterativeSimulationTo(User user, IterativeSimulationContext iterativeResult) {
+  private void applyIterativeSimulationTo(User user, SimulationStack iterativeResult) {
     MetadataBundle meta = user.meta();
     MovementMetadata movementData = meta.movement();
     InventoryMetadata inventoryData = meta.inventory();
@@ -89,10 +90,9 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
     boolean movementSuggestsHandIsActive = iterativeResult.handActive();
     boolean packetsSuggestsHandIsActive = inventoryData.handActive();
     if (packetsSuggestsHandIsActive && !movementSuggestsHandIsActive) {
-      boolean releaseHandConditions = Hypot.fast(movementData.motionX(), movementData.motionZ()) > 0.2 || movementData.lastTeleport >= 2;
+      boolean releaseHandConditions = Hypot.fast(movementData.motionX(), movementData.motionZ()) > 0.3 || movementData.lastTeleport >= 2;
       if (releaseHandConditions) {
-//        releaseHandOf(user);
-        user.meta().inventory().releaseItemNextTick = true;
+        user.meta().inventory().releaseItemNextTick();
       }
     }
     movementData.keyForward = iterativeResult.forward();
@@ -271,30 +271,34 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
   private final static boolean[] OPTIMISTIC_BOOLEAN_ORDER = new boolean[]{true, false};
   private final static boolean[] PESSIMISTIC_BOOLEAN_ORDER = new boolean[]{false, true};
 
-  private final static int[][] KEYS_USAGE_ORDERED = {{1, 0}, {1, -1}, {1, 1}, {0, 0}, {0, -1}, {0, 1}, {-1, -1}, {-1, 0}, {-1, 1}};
+  private final static int[][] KEYS_USAGE_ORDERED = {{1, 0}, {0, 0}, {1, -1}, {1, 1}, {0, -1}, {0, 1}, {-1, -1}, {-1, 0}, {-1, 1}};
 
-  private IterativeSimulationContext simulateMovementIterative(User user, Simulator simulator) {
+  private SimulationStack simulateMovementIterative(User user, Simulator simulator) {
     Timings.CHECK_PHYSICS_PROC_ITR.start();
     MetadataBundle meta = user.meta();
     InventoryMetadata inventoryData = meta.inventory();
     MovementMetadata movementData = meta.movement();
     ProtocolMetadata clientData = meta.protocol();
-    IterativeSimulationContext iterativeSimulation = IterativeSimulationContext.construct(user);
+    SimulationStack simulationStack = SimulationStack.of(user);
     boolean inLava = movementData.inLava();
     boolean inWater = movementData.inWater;
     boolean lastOnGround = movementData.lastOnGround;
     boolean estimatedJump = Math.abs(movementData.motionY() - 0.2) < 1e-5 || movementData.motionY() == movementData.jumpMotion();
     boolean skipUseItem = !clientData.sprintWhenHandActive() && movementData.sprinting;
 
+    int iterativeRuns = 0;
+
     SIMULATION:
     for (boolean useItemState : inventoryData.handActive() ? OPTIMISTIC_BOOLEAN_ORDER : PESSIMISTIC_BOOLEAN_ORDER) {
       if (skipUseItem && useItemState) {
         continue;
       }
+      IterativeStudy.USE_ITEM_ITERATOR.run();
       for (boolean attackReduce : PESSIMISTIC_BOOLEAN_ORDER) {
         if (attackReduce && (movementData.pastPlayerAttackPhysics >= 1 || AttackDispatcher.REDUCING_DISABLED)) {
           continue;
         }
+        IterativeStudy.ATTACK_REDUCE_ITERATOR.run();
         for (boolean jumped : estimatedJump ? OPTIMISTIC_BOOLEAN_ORDER : PESSIMISTIC_BOOLEAN_ORDER) {
           // Jumps are only allowed on the ground :(
           if (jumped && !lastOnGround && !inLava && !inWater) {
@@ -303,6 +307,7 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
           if (jumped && movementData.denyJump()) {
             continue;
           }
+          IterativeStudy.JUMP_ITERATOR.run();
           for (int i = 0; i < 9; i++) {
             int[] keyPair = KEYS_USAGE_ORDERED[i];
             int keyForward = keyPair[0];
@@ -310,12 +315,13 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
             if (movementData.sprinting && keyForward != 1) {
               continue;
             }
+            iterativeRuns++;
             simulateIterativeState(
               simulator,
               user,
               movementData,
               inventoryData,
-              iterativeSimulation,
+              simulationStack,
               keyForward,
               keyStrafe,
               attackReduce,
@@ -323,20 +329,20 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
               useItemState,
               false
             );
-            if (iterativeSimulation.smallestDistance() <= REQUIRED_ACCURACY_FOR_QUICK_PROC_EXIT) {
+            if (simulationStack.smallestDistance() <= (movementData.recentlyEncounteredFlyingPacket(2) ? REQUIRED_ACCURACY_FOR_FLYING_PROC_EXIT : REQUIRED_ACCURACY_FOR_QUICK_PROC_EXIT)) {
               break SIMULATION;
             }
           }
         }
       }
     }
-    if (iterativeSimulation.noMatch() || iterativeSimulation.collisionResult == null) {
+    if (simulationStack.noMatch()) {
       simulateIterativeState(
         simulator,
         user,
         movementData,
         inventoryData,
-        iterativeSimulation,
+        simulationStack,
         0,
         0,
         false,
@@ -345,8 +351,12 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
         true
       );
     }
+    IterativeStudy.USE_ITEM_ITERATOR.pass();
+    IterativeStudy.ATTACK_REDUCE_ITERATOR.pass();
+    IterativeStudy.JUMP_ITERATOR.pass();
+    IterativeStudy.enterTrials(iterativeRuns);
     Timings.CHECK_PHYSICS_PROC_ITR.stop();
-    return iterativeSimulation;
+    return simulationStack;
   }
 
   private static String resolveKeysFromInput(int forward, int strafe) {
@@ -377,7 +387,7 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
     User user,
     MovementMetadata movementData,
     InventoryMetadata inventoryData,
-    IterativeSimulationContext result,
+    SimulationStack result,
     int keyForward,
     int keyStrafe,
     boolean attackReduce,
@@ -400,100 +410,4 @@ public final class PredictionSimulationProcessor implements SimulationProcessor 
     }
   }
 
-  public static final class IterativeSimulationContext {
-    private final static UserLocal<IterativeSimulationContext> iterativeUserLocal = UserLocal.withInitial(IterativeSimulationContext::new);
-
-    private final static int DEFAULT_DISTANCE = Integer.MAX_VALUE;
-
-    private ComplexColliderSimulationResult collisionResult;
-    private int forward, strafe;
-    private boolean jumped;
-    private boolean reduced;
-    private double smallestDistance;
-    private boolean handActive;
-
-    public IterativeSimulationContext() {
-      this.smallestDistance = DEFAULT_DISTANCE;
-    }
-
-    public void restore() {
-      collisionResult = null;
-      forward = 0;
-      strafe = 0;
-      jumped = false;
-      reduced = false;
-      smallestDistance = DEFAULT_DISTANCE;
-      handActive = false;
-    }
-
-    public void tryAppendToState(
-      ComplexColliderSimulationResult collisionResult,
-      double newDistance,
-      int forward,
-      int strafe,
-      boolean attackReduce,
-      boolean jumped,
-      boolean handActive
-    ) {
-      if (newDistance < this.smallestDistance) {
-        appendToState(collisionResult, newDistance, forward, strafe, attackReduce, jumped, handActive);
-      }
-    }
-
-    private void appendToState(
-      ComplexColliderSimulationResult collisionResult,
-      double newDistance,
-      int forward,
-      int strafe,
-      boolean attackReduce,
-      boolean jumped,
-      boolean handActive
-    ) {
-      this.collisionResult = collisionResult;
-      this.smallestDistance = newDistance;
-      this.forward = forward;
-      this.strafe = strafe;
-      this.reduced = attackReduce;
-      this.jumped = jumped;
-      this.handActive = handActive;
-    }
-
-    public boolean noMatch() {
-      return this.smallestDistance == DEFAULT_DISTANCE;
-    }
-
-    public ComplexColliderSimulationResult bestSimulation() {
-      return collisionResult;
-    }
-
-    public int forward() {
-      return forward;
-    }
-
-    public int strafe() {
-      return strafe;
-    }
-
-    public boolean jumped() {
-      return jumped;
-    }
-
-    public boolean reduced() {
-      return reduced;
-    }
-
-    public double smallestDistance() {
-      return smallestDistance;
-    }
-
-    public boolean handActive() {
-      return handActive;
-    }
-
-    public static IterativeSimulationContext construct(User user) {
-      IterativeSimulationContext simulationContext = iterativeUserLocal.get(user);
-      simulationContext.restore();
-      return simulationContext;
-    }
-  }
 }

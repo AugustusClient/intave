@@ -27,6 +27,7 @@ public final class InventoryMetadata {
   public volatile int pastSlotSwitch = 100;
   public boolean blockNextArrow = false;
   public boolean releaseItemNextTick = false;
+  public Material releaseItemType = Material.AIR;
 
   public InventoryMetadata(Player player) {
     this.player = player;
@@ -117,6 +118,11 @@ public final class InventoryMetadata {
 //    }
 //    return ItemProperties.canItemBeUsed(player, item);
 //  }
+
+  public void releaseItemNextTick() {
+    releaseItemNextTick = true;
+    releaseItemType = heldItemType();
+  }
 
   public void setHeldItemSlot(int slot) {
     this.handSlot = slot;

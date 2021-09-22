@@ -38,6 +38,7 @@ import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.*;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -302,6 +303,7 @@ public final class MovementDispatcher extends Module {
     if (inventoryData.releaseItemNextTick) {
       releaseItem(user);
       inventoryData.releaseItemNextTick = false;
+      inventoryData.releaseItemType = Material.AIR;
     }
 
     if (violationLevelData.isInActiveTeleportBundle) {
@@ -396,12 +398,10 @@ public final class MovementDispatcher extends Module {
 
   private void releaseItem(User user) {
     Player player = user.player();
-
     try {
       ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
       InventoryMetadata inventory = user.meta().inventory();
-      inventory.blockNextArrow = inventory.pastHotBarSlotChange > 4 && ItemProperties.isBow(inventory.heldItemType()) || ItemProperties.isBow(inventory.activeItem());
-
+      inventory.blockNextArrow = inventory.pastHotBarSlotChange < 4 && ItemProperties.isBow(inventory.releaseItemType) || ItemProperties.isBow(inventory.activeItem());
       PacketContainer packet = protocolManager.createPacket(PacketType.Play.Client.BLOCK_DIG);
       packet.getBlockPositionModifier().write(0, new BlockPosition(0,0,0));
       packet.getDirections().write(0, EnumWrappers.Direction.DOWN);

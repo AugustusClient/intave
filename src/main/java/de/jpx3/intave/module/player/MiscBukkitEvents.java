@@ -18,10 +18,7 @@ import de.jpx3.intave.user.meta.InventoryMetadata;
 import de.jpx3.intave.user.permission.BukkitPermissionCheck;
 import de.jpx3.intave.version.DurationTranslator;
 import de.jpx3.intave.version.IntaveVersion;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityShootBowEvent;
@@ -30,6 +27,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+import org.bukkit.inventory.ItemStack;
 
 @SplitMeUp
 public final class MiscBukkitEvents extends Module {
@@ -96,10 +94,11 @@ public final class MiscBukkitEvents extends Module {
   public void on(PlayerDropItemEvent event) {
     Player player = event.getPlayer();
     User user = UserRepository.userOf(player);
-    if (ItemProperties.isSwordItem(player.getItemOnCursor()) && !ViaVersionAdapter.ignoreBlocking(user.player())) {
-      Synchronizer.synchronize(() -> {
-        user.meta().inventory().releaseItemNextTick = true;
-      });
+    ItemStack item = player.getItemOnCursor();
+    if (ItemProperties.isSwordItem(item) && !ViaVersionAdapter.ignoreBlocking(user.player())) {
+      Material material = item.getType();
+      user.meta().inventory().releaseItemNextTick = true;
+      user.meta().inventory().releaseItemType = material;
     }
   }
 
@@ -110,8 +109,11 @@ public final class MiscBukkitEvents extends Module {
     }
     User user = UserRepository.userOf((Player) event.getEntity());
     InventoryMetadata inventory = user.meta().inventory();
-    if (inventory.blockNextArrow && !inventory.handActive() && inventory.pastHotBarSlotChange < 4) {
-      event.setCancelled(true);
+    if (inventory.blockNextArrow) {
+      boolean applyArrowBlock = inventory.pastHotBarSlotChange < 4;
+      if (applyArrowBlock) {
+        event.setCancelled(true);
+      }
       inventory.blockNextArrow = false;
     }
   }

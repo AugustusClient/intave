@@ -39,10 +39,8 @@ public final class BlockVariantRegister {
   }
 
   public static BlockVariant variantOf(Material type, int variantIndex) {
-    return blockVariants.computeIfAbsent(type, material -> {
-      Map<Integer, Object> variantIndexRegister = blockDataRegister.get(material);
-      return BlockVariantConverter.translate(material, variantIndexRegister);
-    }).get(variantIndex);
+    return blockVariants.computeIfAbsent(type, material ->
+      BlockVariantConverter.translate(material, blockDataRegister.get(material))).get(variantIndex);
   }
 
   public static int variantIndexOf(Material type, Object rawBlockData) {

@@ -43,6 +43,13 @@ public final class AttackInInvalidStateHeuristic extends MetaCheckPart<Heuristic
     PacketContainer packet = event.getPacket();
     User user = userOf(player);
     ProtocolMetadata clientData = user.meta().protocol();
+    EnumWrappers.EntityUseAction action = packet.getEntityUseActions().readSafely(0);
+    if (action == null) {
+      action = packet.getEnumEntityUseActions().read(0).getAction();
+    }
+    if (action != EnumWrappers.EntityUseAction.ATTACK) {
+      return;
+    }
     if (clientData.protocolVersion() <= VER_1_8) {
       checkGUIScreen(player);
     }

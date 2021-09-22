@@ -17,10 +17,7 @@ import de.jpx3.intave.check.combat.heuristics.MiningStrategy;
 import de.jpx3.intave.command.CommandStage;
 import de.jpx3.intave.command.Optional;
 import de.jpx3.intave.command.SubCommand;
-import de.jpx3.intave.diagnostic.KeyPressStudy;
-import de.jpx3.intave.diagnostic.LatencyStudy;
-import de.jpx3.intave.diagnostic.MemoryTraced;
-import de.jpx3.intave.diagnostic.MemoryWatchdog;
+import de.jpx3.intave.diagnostic.*;
 import de.jpx3.intave.diagnostic.timings.Timing;
 import de.jpx3.intave.diagnostic.timings.Timings;
 import de.jpx3.intave.shade.BoundingBox;
@@ -263,6 +260,25 @@ public final class RootStage extends CommandStage {
     Player player = user.player();
     player.sendMessage("The average attack latency is " + formatDouble(LatencyStudy.average(), 2) + " ticks");
   }
+
+  @SubCommand(
+    selectors = "iter",
+    usage = "",
+    description = "",
+    permission = "sibyl"
+  )
+  @Native
+  public void outputIterative(User user) {
+    Player player = user.player();
+    player.sendMessage("");
+    player.sendMessage("Iterative Study");
+    player.sendMessage("Average runs: " + formatDouble(IterativeStudy.average(), 2));
+    IterativeStudy.ITERATORS.forEach((s, iterator) -> {
+      player.sendMessage(s + " -> " + iterator.totalRuns() + " with " + (iterator.successRate() * 100d) + "% sucess");
+    });
+    player.sendMessage("");
+  }
+
 
   @SubCommand(
     selectors = "bbaf",
