@@ -21,6 +21,9 @@ public final class LegacyComplexColliderProcessor implements ComplexColliderProc
       context.motionX *= 0.25D;
       context.motionY *= 0.05f;
       context.motionZ *= 0.25D;
+      movement.physicsMotionX = 0;
+      movement.physicsMotionY = 0;
+      movement.physicsMotionZ = 0;
     }
     double startMotionX = context.motionX;
     double startMotionY = context.motionY;
