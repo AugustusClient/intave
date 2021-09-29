@@ -345,7 +345,7 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
     Player player = interaction.player();
     User user = userOf(player);
     ResponseType response = interaction.type().response();
-    BlockStateAccess blockStateAccess = user.blockShapeAccess();
+    BlockStateAccess blockStateAccess = user.blockStateAccess();
     if (enforceCancel) {
       response = ResponseType.CANCEL;
     }

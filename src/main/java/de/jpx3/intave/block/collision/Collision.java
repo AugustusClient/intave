@@ -41,7 +41,7 @@ public final class Collision {
     World world = player.getWorld();
     MovementMetadata movementData = user.meta().movement();
     ShapeCombiner shapeCombiner = ShapeCombiner.create();
-    BlockStateAccess stateAccess = user.blockShapeAccess();
+    BlockStateAccess stateAccess = user.blockStateAccess();
     boolean outsideBorderLast = movementData.outsideBorder;
     boolean outsideBorderCurrent = playerOutsideBorder(user);
     if (outsideBorderLast && outsideBorderCurrent) {
@@ -88,7 +88,7 @@ public final class Collision {
     int ystart = Math.max(minY - 1, 0);
     User user = UserRepository.userOf(player);
     World world = player.getWorld();
-    BlockStateAccess blockStateAccess = user.blockShapeAccess();
+    BlockStateAccess blockStateAccess = user.blockStateAccess();
     MovementMetadata movementData = user.meta().movement();
     boolean outsideBorderLast = movementData.outsideBorder;
     boolean outsideBorderCurrent = playerOutsideBorder(user);
@@ -147,7 +147,7 @@ public final class Collision {
     } else if (!outsideBorderLast && !outsideBorderCurrent) {
       movementData.outsideBorder = true;
     }
-    BlockStateAccess stateAccess = user.blockShapeAccess();
+    BlockStateAccess stateAccess = user.blockStateAccess();
     World world = player.getWorld();
     // this looks 1000x slower than it actually is
     for (int chunkx = minX >> 4; chunkx <= maxX - 1 >> 4; ++chunkx) {

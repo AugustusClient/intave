@@ -152,7 +152,7 @@ public final class FallbackUser implements User {
   }
 
   @Override
-  public BlockStateAccess blockShapeAccess() {
+  public BlockStateAccess blockStateAccess() {
     return blockStateAccess;
   }
 

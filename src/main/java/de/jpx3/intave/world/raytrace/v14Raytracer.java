@@ -134,7 +134,7 @@ public final class v14Raytracer implements Raytracer {
   @PatchyAutoTranslation
   @PatchyTranslateParameters
   private MovingObjectPositionBlock dualRaytrace(User user, RayTrace var0x, BlockPosition var1) {
-    BlockStateAccess blockStateAccess = user.blockShapeAccess();
+    BlockStateAccess blockStateAccess = user.blockStateAccess();
     WorldServer worldServer = ((CraftWorld) user.player().getWorld()).getHandle();
     IBlockAccess blockAccess = worldServer.getChunkProvider().c(var1.getX() >> 4, var1.getZ() >> 4);
     if (blockAccess == null) {
@@ -157,7 +157,7 @@ public final class v14Raytracer implements Raytracer {
   @PatchyTranslateParameters
   private VoxelShape voxelShapeAt(User user, BlockPosition position) {
     // resolve native boxes
-    List<AxisAlignedBB> boxes = translateBoxes(user.blockShapeAccess().resolveShape(
+    List<AxisAlignedBB> boxes = translateBoxes(user.blockStateAccess().resolveShape(
       position.getX(), position.getY(), position.getZ()
     ).boundingBoxes());
     return voxelShapeOf(boxes);

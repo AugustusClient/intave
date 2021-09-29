@@ -165,7 +165,7 @@ public interface User {
    * @see BlockStateCache
    * @see BlockStateOverrides
    */
-  BlockStateAccess blockShapeAccess();
+  BlockStateAccess blockStateAccess();
 
   /**
    * Retrieve the {@link User}-associated {@link ComplexColliderProcessor}

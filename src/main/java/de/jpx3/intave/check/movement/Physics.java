@@ -261,7 +261,7 @@ public final class Physics extends Check {
     MovementMetadata movementData = meta.movement();
     ViolationMetadata violationLevelData = meta.violationLevel();
     AbilityMetadata abilityData = meta.abilities();
-    BlockStateAccess blockStateAccess = user.blockShapeAccess();
+    BlockStateAccess blockStateAccess = user.blockStateAccess();
 
     ComplexColliderSimulationResult expectedMovement = simulation.collider();
     Motion context = expectedMovement.motion();

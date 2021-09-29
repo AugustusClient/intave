@@ -237,7 +237,7 @@ final class PlayerUser implements User {
   }
 
   @Override
-  public BlockStateAccess blockShapeAccess() {
+  public BlockStateAccess blockStateAccess() {
     return blockStateAccess;
   }
 

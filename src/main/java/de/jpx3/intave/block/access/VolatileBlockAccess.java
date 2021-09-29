@@ -56,7 +56,7 @@ public final class VolatileBlockAccess implements BukkitEventSubscriber {
 
   public static Material typeAccess(User user, World blockAccess, int blockX, int blockY, int blockZ) {
     if (isInLoadedChunk(blockAccess, blockX, blockZ) || Bukkit.isPrimaryThread()) {
-      return user.blockShapeAccess().resolveType(blockX >> 4, blockZ >> 4, blockX, blockY, blockZ);
+      return user.blockStateAccess().resolveType(blockX >> 4, blockZ >> 4, blockX, blockY, blockZ);
     }
     return Material.AIR;
   }
@@ -66,7 +66,7 @@ public final class VolatileBlockAccess implements BukkitEventSubscriber {
     int blockY = floor(y);
     int blockZ = floor(z);
     if (isInLoadedChunk(blockAccess, blockX, blockZ) || Bukkit.isPrimaryThread()) {
-      return user.blockShapeAccess().resolveType(blockX >> 4, blockZ >> 4,blockX, blockY, blockZ);
+      return user.blockStateAccess().resolveType(blockX >> 4, blockZ >> 4,blockX, blockY, blockZ);
     }
     return Material.AIR;
   }
@@ -87,7 +87,7 @@ public final class VolatileBlockAccess implements BukkitEventSubscriber {
 
   public static int variantIndexAccess(User user, World blockAccess, int blockX, int blockY, int blockZ) {
     if (isInLoadedChunk(blockAccess, blockX, blockZ) || Bukkit.isPrimaryThread()) {
-      return user.blockShapeAccess().resolveVariantIndex(blockX >> 4, blockZ >> 4, blockX, blockY, blockZ);
+      return user.blockStateAccess().resolveVariantIndex(blockX >> 4, blockZ >> 4, blockX, blockY, blockZ);
     }
     return 0;
   }
@@ -97,7 +97,7 @@ public final class VolatileBlockAccess implements BukkitEventSubscriber {
     int blockY = floor(y);
     int blockZ = floor(z);
     if (isInLoadedChunk(blockAccess, blockX, blockZ) || Bukkit.isPrimaryThread()) {
-      return user.blockShapeAccess().resolveVariantIndex(blockX >> 4, blockZ >> 4, blockX, blockY, blockZ);
+      return user.blockStateAccess().resolveVariantIndex(blockX >> 4, blockZ >> 4, blockX, blockY, blockZ);
     }
     return 0;
   }
