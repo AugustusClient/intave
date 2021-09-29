@@ -39,7 +39,7 @@ public final class PunishmentMetadata {
   public long timeLastBlockCancel;
   public long timeLastSneakToggleCancel;
 
-  private Map<Integer, Long> lastTimeValidHurttimeAttack = new ConcurrentHashMap<>();
+  private final Map<Integer, Long> lastTimeValidHurttimeAttack = new ConcurrentHashMap<>();
   private long delay = 600;
 
   public PunishmentMetadata(Player player) {

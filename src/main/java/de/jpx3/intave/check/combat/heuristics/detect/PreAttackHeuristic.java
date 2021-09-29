@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 
 import static de.jpx3.intave.check.combat.heuristics.Anomaly.AnomalyOption.LIMIT_4;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
+import static de.jpx3.intave.module.mitigate.AttackNerfStrategy.DMG_MEDIUM;
 import static de.jpx3.intave.user.meta.ProtocolMetadata.VER_1_8;
 
 public final class PreAttackHeuristic extends MetaCheckPart<Heuristics, PreAttackHeuristic.PreAttackMeta> {
@@ -131,6 +132,7 @@ public final class PreAttackHeuristic extends MetaCheckPart<Heuristics, PreAttac
           }
           Anomaly anomaly = Anomaly.anomalyOf("231", confidence, Anomaly.Type.KILLAURA, description, LIMIT_4);
           parentCheck().saveAnomaly(player, anomaly);
+          user.applyAttackNerfer(DMG_MEDIUM, "231");
         }
         meta.attacks = 0;
         meta.preAttacks = 0;

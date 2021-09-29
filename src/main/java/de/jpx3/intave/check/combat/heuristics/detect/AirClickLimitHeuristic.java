@@ -217,6 +217,7 @@ public final class AirClickLimitHeuristic extends MetaCheckPart<Heuristics, AirC
         if (meta.flaggCounter > 20) {
           //dmc27
           user.applyAttackNerfer(AttackNerfStrategy.GARBAGE_HITS, "27");
+          user.applyAttackNerfer(AttackNerfStrategy.DMG_LIGHT, "27");
           user.applyAttackNerfer(AttackNerfStrategy.BLOCKING, "27");
         }
 
