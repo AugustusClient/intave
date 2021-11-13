@@ -47,7 +47,7 @@ public final class BlockTypeAccess {
 
   public static void setupTranslationsFor(User user) {
     MinecraftVersion serverVersion = MinecraftVersion.getCurrentVersion();
-    MinecraftVersion clientVersion = new MinecraftVersion(user.meta().protocol().versionString());
+    MinecraftVersion clientVersion = user.meta().protocol().minecraftVersion();
     user.clearTypeTranslations();
     typeTranslations.specifiedTo(serverVersion, clientVersion).asMap().forEach(user::applyTypeTranslation);
   }

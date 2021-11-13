@@ -1,6 +1,7 @@
 package de.jpx3.intave.user.meta;
 
 import com.comphenix.protocol.utility.MinecraftVersion;
+import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.adapter.ViaVersionAdapter;
 import de.jpx3.intave.annotate.Relocate;
 import de.jpx3.intave.user.User;
@@ -25,6 +26,7 @@ public final class ProtocolMetadata {
 
   public static int VER_INVALID = 1000;
 
+  private MinecraftVersion minecraftVersion;
   private String versionString;
   private String clientBrand = "Unknown";
   private int protocolVersion;
@@ -43,6 +45,9 @@ public final class ProtocolMetadata {
 
     if (protocolVersion == -1 || protocolVersion == 0) {
       protocolVersion = VER_INVALID;
+      minecraftVersion = MinecraftVersions.VER1_17_1;
+    } else {
+      minecraftVersion = new MinecraftVersion(versionString);
     }
   }
 
@@ -228,5 +233,9 @@ public final class ProtocolMetadata {
 
   public String versionString() {
     return versionString;
+  }
+
+  public MinecraftVersion minecraftVersion() {
+    return minecraftVersion;
   }
 }
