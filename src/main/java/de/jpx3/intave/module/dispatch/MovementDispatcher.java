@@ -37,8 +37,10 @@ import de.jpx3.intave.shade.BoundingBox;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -115,7 +117,12 @@ public final class MovementDispatcher extends Module {
   public void postShift(PlayerRespawnEvent respawn) {
     Player player = respawn.getPlayer();
     User user = UserRepository.userOf(player);
+
     Location respawnLocation = respawn.getRespawnLocation().clone();
+    if (respawnLocation.getWorld() != player.getWorld()) {
+      return;
+    }
+
     BoundingBox bb = BoundingBox.fromPosition(user, respawnLocation);
     while (respawnLocation.getY() < 256 && Collision.present(player, bb)) {
       respawnLocation.add(0, 1, 0);
