@@ -1,8 +1,11 @@
 package de.jpx3.intave.check;
 
+import de.jpx3.intave.access.player.trust.TrustFactor;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import org.bukkit.entity.Player;
+
+import java.util.function.Consumer;
 
 /**
  * A {@link CheckPart} is a single detection algorithm in a detection cluster
@@ -44,6 +47,33 @@ public abstract class CheckPart<P extends Check> implements EventProcessor {
    */
   public final P parentCheck() {
     return parentCheck;
+  }
+
+  /**
+   * Apply a change to the base statistics and all other statistics of abstract categories.
+   * @param user the affected user
+   * @param applier the player statistic applier
+   */
+  public void statisticApply(User user, Consumer<CheckStatistics> applier) {
+    parentCheck.statisticApply(user, applier);
+  }
+
+  /**
+   * Retrieves a {@link TrustFactor} setting for a given key using the trustfactor of the given {@link Player}.
+   * @param key the trustfactor setting key
+   * @param player the affected player
+   * @return trustfactor setting
+   */
+  protected int trustFactorSetting(String key, Player player) {
+    return parentCheck.trustFactorSetting(key, player);
+  }
+
+  /**
+   * Retrieve the checks name.
+   * @return the checks name
+   */
+  public String name() {
+    return parentCheck.name();
   }
 
   /**
