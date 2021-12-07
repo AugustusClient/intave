@@ -37,6 +37,7 @@ import de.jpx3.intave.packet.reader.PacketReaders;
 import de.jpx3.intave.player.ItemProperties;
 import de.jpx3.intave.shade.BlockPosition;
 import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.shade.ClientMathHelper;
 import de.jpx3.intave.shade.Direction;
 import de.jpx3.intave.shade.MovingObjectPosition;
 import de.jpx3.intave.shade.NativeVector;
@@ -539,9 +540,19 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
 
     int targetDirection = interaction.targetDirection();
     boolean suppressDetection = protocol.oppositeBlockVectorBehavior()
+      && interactionInHead(user, interaction)
       && targetDirection == rayTraceResult.sideHit.getOpposite().getIndex();
 
     return !suppressDetection && rayTraceResult.sideHit.getIndex() != targetDirection;
+  }
+
+  private boolean interactionInHead(User user, Interaction interaction) {
+    com.comphenix.protocol.wrappers.BlockPosition blockPosition = interaction.targetBlock();
+    MovementMetadata movement = user.meta().movement();
+    double xDiff = blockPosition.getX() - ClientMathHelper.floor(movement.positionX);
+    double yDiff = blockPosition.getY() - ClientMathHelper.floor(movement.positionY + movement.eyeHeight());
+    double zDiff = blockPosition.getZ() - ClientMathHelper.floor(movement.positionZ);
+    return xDiff == 0 && yDiff == 0 && zDiff == 0;
   }
 
   private boolean atLeastLookingAtBlock(User user, Location location, Location targetBlockLocation, MovingObjectPosition movingObjectPosition) {
