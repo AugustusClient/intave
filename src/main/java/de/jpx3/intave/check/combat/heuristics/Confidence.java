@@ -27,6 +27,10 @@ public enum Confidence implements Comparable<Confidence> {
     return level;
   }
 
+  public String confidenceName() {
+    return name;
+  }
+
   public String output() {
     return output;
   }

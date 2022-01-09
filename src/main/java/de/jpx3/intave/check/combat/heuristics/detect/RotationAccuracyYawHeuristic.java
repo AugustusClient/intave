@@ -117,7 +117,7 @@ public final class RotationAccuracyYawHeuristic extends MetaCheckPart<Heuristics
         if (distanceToPerfectYaw > 4.0) {
           heuristicMeta.balanceYawAccuracyOther = 0;
         } else if (heuristicMeta.balanceYawAccuracyOther++ > 50) {
-          String description = "keeps high yaw accuracy in " + heuristicMeta.balanceYawAccuracyOther + " rotations";
+          String description = "keeps high yaw accuracy in " + (int)heuristicMeta.balanceYawAccuracyOther + " rotations";
           int options = LIMIT_2 | DELAY_32s | SUGGEST_MINING;
           Anomaly anomaly = Anomaly.anomalyOf("84", Confidence.MAYBE, Anomaly.Type.KILLAURA, description, options);
           parentCheck().saveAnomaly(player, anomaly);

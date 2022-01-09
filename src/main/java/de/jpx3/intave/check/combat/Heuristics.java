@@ -197,7 +197,7 @@ public final class Heuristics extends MetaCheck<Heuristics.HeuristicMeta> {
       String threshold = "confidence-thresholds." + overallConfidence.output();
       String message = "is fighting suspiciously";
       String confidence = define(overallConfidence);
-      String confidenceName = overallConfidence.name();
+      String confidenceName = overallConfidence.confidenceName();
       String confidenceSymbol = overallConfidence.output();
       String typeName = type.typeName();
       String details = typeName + ": " + confidence + " / " + identifier;
@@ -229,7 +229,7 @@ public final class Heuristics extends MetaCheck<Heuristics.HeuristicMeta> {
 //      default:
 //        return "none";
 //    }
-    return confidence.name() + " (" + confidence.output() + ")";
+    return confidence.confidenceName() + " (" + confidence.output() + ")";
   }
 
   @SuppressWarnings("UnusedAssignment")
