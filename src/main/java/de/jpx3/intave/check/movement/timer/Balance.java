@@ -15,6 +15,7 @@ import de.jpx3.intave.module.violation.Violation;
 import de.jpx3.intave.module.violation.ViolationContext;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.CheckCustomMetadata;
+import de.jpx3.intave.user.meta.MetadataBundle;
 import de.jpx3.intave.user.meta.MovementMetadata;
 import de.jpx3.intave.user.meta.ViolationMetadata;
 import org.bukkit.entity.Entity;
@@ -71,6 +72,7 @@ public final class Balance extends MetaCheckPart<Timer, Balance.BalanceMeta> {
       return;
     }
     User user = userOf(player);
+    MetadataBundle meta = user.meta();
     BalanceMeta timerData = metaOf(user);
     long time = System.currentTimeMillis();
     long delta = time - timerData.lastFlyingPacket;
@@ -78,7 +80,7 @@ public final class Balance extends MetaCheckPart<Timer, Balance.BalanceMeta> {
     timerData.timerBalance -= delta / 5.0;
     timerData.timerBalance += 10;
     int allowedLagInMilliseconds = trustFactorSetting("buffer-size", player);
-    if (highToleranceMode) {
+    if (highToleranceMode || meta.abilities().probablyFlying()) {
       allowedLagInMilliseconds *= 1.5;
     }
     if (System.currentTimeMillis() - timerData.lastRespawn < 6000) {
