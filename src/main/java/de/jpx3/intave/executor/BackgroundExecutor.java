@@ -19,11 +19,11 @@ public final class BackgroundExecutor {
     if (executorService == null) {
       return;
     }
-    List<Runnable> runnables = executorService.shutdownNow();
-    if (!runnables.isEmpty()) {
+    List<Runnable> tasks = executorService.shutdownNow();
+    if (!tasks.isEmpty()) {
       IntavePlugin.singletonInstance().logger().info("Waiting for background tasks to finish");
     }
-    for (Runnable runnable : runnables) {
+    for (Runnable runnable : tasks) {
       runnable.run();
     }
   }
