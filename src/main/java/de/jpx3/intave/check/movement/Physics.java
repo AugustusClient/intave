@@ -144,7 +144,7 @@ public final class Physics extends Check {
 
     if (movementData.isInVehicle() && clientVehicleMovement) {
       EntityShade entityShade = movementData.ridingEntity();
-      int typeId = entityShade.typeData.identifier();
+      int typeId = entityShade.typeData().identifier();
       return typeId == BOAT_ID ? Simulators.BOAT : Simulators.HORSE;
     } else {
       boolean inLava = movementData.inLava();

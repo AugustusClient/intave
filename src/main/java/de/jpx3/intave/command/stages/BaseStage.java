@@ -17,6 +17,7 @@ import de.jpx3.intave.user.meta.ProtocolMetadata;
 import de.jpx3.intave.user.permission.BukkitPermissionCheck;
 import de.jpx3.intave.user.storage.ViolationStorage;
 import de.jpx3.intave.user.storage.ViolationStorage.ViolationEvent;
+import de.jpx3.intave.user.storage.ViolationStorage.ViolationEvents;
 import de.jpx3.intave.version.DurationTranslator;
 import de.jpx3.intave.version.IntaveVersion;
 import org.bukkit.Bukkit;
@@ -27,10 +28,12 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import static java.util.concurrent.TimeUnit.*;
 
 public final class BaseStage extends CommandStage {
   private static BaseStage singletonInstance;
@@ -152,14 +155,74 @@ public final class BaseStage extends CommandStage {
   }
 
   private void outputHistory(CommandSender sender, UUID id, ViolationStorage violationStorage) {
-    List<ViolationEvent> violations = violationStorage.violations();
+    ViolationEvents violations = violationStorage.violations();
     sender.sendMessage(String.format("%s History of %s%s", IntavePlugin.prefix(), ChatColor.RED, id));
+
+    if (violations.isEmpty()) {
+      sender.sendMessage(IntavePlugin.prefix() + ChatColor.GREEN + "No violations found");
+      return;
+    }
+
     // first naive approach
-    violations.stream()
-      .sorted(Comparator.comparing(ViolationEvent::timestamp).reversed())
-      .map(violation -> violation.checkName() + " " + violation.violationLevel() + " " + violation.timestamp())
-      .map(s -> IntavePlugin.defaultColor() + s)
-      .forEach(sender::sendMessage);
+    processCombatViolations(sender, violations);
+  }
+
+  private void processCombatViolations(CommandSender sender, ViolationEvents allViolations) {
+    printHistory(sender, "Reach", filterByCheck("attackraytrace", allViolations));
+    printHistory(sender, "KillAura", filterByCheck("heuristics", allViolations));
+    printHistory(sender, "Fly/Speed", filterByCheck("physics", allViolations));
+    printHistory(sender, "Scaffold", filterByCheck("placementAnalysis", allViolations));
+    printHistory(sender, "ChestStealer", filterByCheck("inventoryAnalysis", allViolations));
+
+  }
+
+  private void printHistory(CommandSender sender, String message, ViolationEvents violations) {
+    if (violations.isEmpty()) {
+      return;
+    }
+    if (violations.size() == 1) {
+      sender.sendMessage(IntavePlugin.defaultColor() + " - One detection for " + ChatColor.RED + message + IntavePlugin.defaultColor() + " " + durationToString(violations.first().timePassedSince()));
+      return;
+    }
+    Predicate<ViolationEvent> violationOld = event -> event.timePassedSince() > DAYS.toDays(3);
+    Predicate<ViolationEvent> violationRecent = event -> event.timePassedSince() < HOURS.toDays(6);
+    double percentageLongAgo = violations.matchFactor(violationOld);
+    double percentageVeryRecently = violations.matchFactor(violationRecent);
+
+    sender.sendMessage(IntavePlugin.defaultColor() + " - Multiple detections for " + ChatColor.RED + ", ");
+  }
+
+  private String durationToString(long duration) {
+    if (duration < MINUTES.toMillis(30)) {
+      return "half an hour ago";
+    } else if (duration < HOURS.toMillis(1)) {
+      return "an hour ago";
+    } else if (duration < HOURS.toMillis(6)) {
+      return "a few hours ago";
+    } else if (duration < HOURS.toMillis(12)) {
+      return "hours ago";
+    } else if (duration < DAYS.toMillis(1)) {
+      return "yesterday";
+    } else if (duration < DAYS.toMillis(2)) {
+      return "two days ago";
+    } else if (duration < DAYS.toMillis(3)) {
+      return "three days ago";
+    } else if (duration < DAYS.toMillis(4)) {
+      return "four days ago";
+    } else if (duration < DAYS.toMillis(4)) {
+      return "almost a week ago";
+    } else if (duration < DAYS.toMillis(7)) {
+      return "a week ago";
+    } else if (duration < DAYS.toMillis(14)) {
+      return "two weeks ago";
+    } else if (duration < DAYS.toMillis(21)) {
+      return "weeks ago";
+    }
+    return "long ago";
+  }
+
+  private ViolationEvents filterByCheck(String check, ViolationEvents allViolations) {
+    return allViolations.filter(event -> event.checkName().equalsIgnoreCase(check));
   }
 
   private boolean isOnline(OfflinePlayer player) {

@@ -3,33 +3,33 @@ package de.jpx3.intave.user.storage;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import de.jpx3.intave.IntavePlugin;
-import de.jpx3.intave.access.check.Check;
 import de.jpx3.intave.module.violation.Violation;
 import de.jpx3.intave.module.violation.ViolationContext;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class ViolationStorage implements Storage {
-  private final static long VIOLATION_CHECK_UPDATE_TIMEOUT = TimeUnit.MINUTES.toMillis(3);
+  private final static long VIOLATION_UPDATE_CHECK_TIMEOUT = TimeUnit.MINUTES.toMillis(3);
   private final static long VIOLATION_INSERT_CHECK_COOLDOWN = TimeUnit.MINUTES.toMillis(30);
   private final static long VIOLATION_ALLOWED_LIFETIME = TimeUnit.DAYS.toMillis(7);
   private final static long VIOLATION_OVERALL_LIMIT = 256;
 
-  private final List<ViolationEvent> interestingViolations = new CopyOnWriteArrayList<>();
+  private ViolationEvents interestingViolations = new ViolationEvents();
 
   public void noteViolation(ViolationContext violationContext) {
     Violation violation = violationContext.violation();
     String checkName = violation.check().name();
     String details = violation.details();
     int violationLevelAfter = (int) violationContext.violationLevelAfter();
-    if (susVL(violation.check().type(), details, violationLevelAfter)) {
-      Optional<ViolationEvent> violationEventOptional = lastViolationOfCheck(checkName);
-      long lastViolationOfCheck = violationEventOptional.map(event -> System.currentTimeMillis() - event.timestamp()).orElseGet(System::currentTimeMillis);
+    if (interestingViolation(checkName, details, violationLevelAfter)) {
+      Optional<ViolationEvent> lastViolationEvent = lastViolationOfCheck(checkName);
+      long lastViolationOfCheck = lastViolationEvent.map(ViolationEvent::timePassedSince).orElseGet(System::currentTimeMillis);
       if (lastViolationOfCheck > VIOLATION_INSERT_CHECK_COOLDOWN) {
         if (interestingViolations.size() < VIOLATION_OVERALL_LIMIT) {
           ViolationEvent event = new ViolationEvent(
@@ -41,8 +41,8 @@ public final class ViolationStorage implements Storage {
           );
           addViolationEvent(event);
         }
-      } else if (lastViolationOfCheck < VIOLATION_CHECK_UPDATE_TIMEOUT && violationEventOptional.isPresent()) {
-        ViolationEvent violationEvent = violationEventOptional.get();
+      } else if (lastViolationOfCheck < VIOLATION_UPDATE_CHECK_TIMEOUT && lastViolationEvent.isPresent()) {
+        ViolationEvent violationEvent = lastViolationEvent.get();
         if (violationLevelAfter > violationEvent.violationLevel()) {
           violationEvent.setViolationLevel(violationLevelAfter);
           violationEvent.setTimestamp(System.currentTimeMillis());
@@ -51,14 +51,14 @@ public final class ViolationStorage implements Storage {
     }
   }
 
-  public boolean susVL(Check check, String description, int vl) {
-    switch (check) {
-      case ATTACK_RAYTRACE:
+  public boolean interestingViolation(String checkName, String description, int vl) {
+    switch (checkName.toLowerCase(Locale.ROOT)) {
+      case "attackraytrace":
         return vl > 100;
-      case HEURISTICS:
+      case "heuristics":
         return description.contains("!");
-      case PHYSICS:
-      case PLACEMENT_ANALYSIS:
+      case "physics":
+      case "placementanalysis":
         return vl > 500;
       default:
         return false;
@@ -79,29 +79,119 @@ public final class ViolationStorage implements Storage {
   @Override
   public void writeTo(ByteArrayDataOutput output) {
     clearOldViolations();
-    output.writeInt(interestingViolations.size());
-    for (ViolationEvent violation : interestingViolations) {
-      violation.writeTo(output);
-    }
+    interestingViolations.writeTo(output);
   }
 
   @Override
   public void readFrom(ByteArrayDataInput input) {
-    int violations = input.readInt();
-    for (int i = 0; i < violations; i++) {
-      ViolationEvent violation = new ViolationEvent();
-      violation.readFrom(input);
-      interestingViolations.add(violation);
-    }
+    interestingViolations.readFrom(input);
     clearOldViolations();
   }
 
   private void clearOldViolations() {
-    interestingViolations.removeIf(event -> System.currentTimeMillis() - event.timestamp > VIOLATION_ALLOWED_LIFETIME);
+    interestingViolations = interestingViolations.withoutViolationsOlderThan(
+      VIOLATION_ALLOWED_LIFETIME, TimeUnit.MILLISECONDS
+    );
   }
 
-  public List<ViolationEvent> violations() {
+  public ViolationEvents violations() {
     return interestingViolations;
+  }
+
+  public static class ViolationEvents implements Storage, Iterable<ViolationEvent> {
+    private final Collection<ViolationEvent> parent;
+
+    public ViolationEvents() {
+      this(new ArrayList<>());
+    }
+
+    public ViolationEvents(Collection<ViolationEvent> parent) {
+      this.parent = parent;
+    }
+
+    public int size() {
+      return parent.size();
+    }
+
+    public boolean isEmpty() {
+      return size() == 0;
+    }
+
+    public ViolationEvent first() {
+      Iterator<ViolationEvent> iterator = parent.iterator();
+      return iterator.hasNext() ? iterator.next() : null;
+    }
+
+    public ViolationEvents withoutViolationsOlderThan(
+      long value, TimeUnit unit
+    ) {
+      return filter(
+        event -> System.currentTimeMillis() - event.timestamp > unit.toMillis(value)
+      );
+    }
+
+    public double matchFactor(
+      Predicate<ViolationEvent> predicate
+    ) {
+      return (double) numMatching(predicate) / size();
+    }
+
+    public long numMatching(
+      Predicate<ViolationEvent> predicate
+    ) {
+      return stream().filter(predicate).count();
+    }
+
+    public ViolationEvents filter(
+      Predicate<ViolationEvent> predicate
+    ) {
+      List<ViolationEvent> filtered = stream()
+        .filter(predicate)
+        .collect(Collectors.toList());
+      return new ViolationEvents(filtered);
+    }
+
+    public Stream<ViolationEvent> stream() {
+      return parent.stream();
+    }
+
+    @NotNull
+    @Override
+    public Iterator<ViolationEvent> iterator() {
+      return parent.iterator();
+    }
+
+    @Override
+    public void forEach(Consumer<? super ViolationEvent> action) {
+      parent.forEach(action);
+    }
+
+    @Override
+    public Spliterator<ViolationEvent> spliterator() {
+      return parent.spliterator();
+    }
+
+    @Override
+    public void writeTo(ByteArrayDataOutput output) {
+      output.writeInt(size());
+      for (ViolationEvent violation : this) {
+        violation.writeTo(output);
+      }
+    }
+
+    @Override
+    public void readFrom(ByteArrayDataInput input) {
+      int violations = input.readInt();
+      for (int i = 0; i < violations; i++) {
+        ViolationEvent violation = new ViolationEvent();
+        violation.readFrom(input);
+        add(violation);
+      }
+    }
+
+    public void add(ViolationEvent event) {
+      parent.add(event);
+    }
   }
 
   public static class ViolationEvent implements Storage {
@@ -168,6 +258,10 @@ public final class ViolationStorage implements Storage {
 
     public void setTimestamp(long timestamp) {
       this.timestamp = timestamp;
+    }
+
+    public long timePassedSince() {
+      return System.currentTimeMillis() - timestamp;
     }
 
     public long timestamp() {

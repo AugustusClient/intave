@@ -17,7 +17,7 @@ import org.bukkit.entity.Player;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.ARM_ANIMATION;
 
 public final class ClickPatterns extends Check {
-  private final static double MAX_VL_DEDUCTION_PER_MINUTE = 10;
+  private final static double MAX_VL_DEDUCTION_PER_MINUTE = 16;
   private final CheckViolationLevelDecrementer decrementer;
 
   public ClickPatterns() {
@@ -41,7 +41,7 @@ public final class ClickPatterns extends Check {
   public void receiveSwing(PacketEvent event) {
     Player player = event.getPlayer();
     User user = userOf(player);
-    decrementer.decrement(user, (MAX_VL_DEDUCTION_PER_MINUTE / 4) / 60d);
+    decrementer.decrement(user, (MAX_VL_DEDUCTION_PER_MINUTE / 32) / 60d);
   }
 
   public void makeDetection(Player player, String details, String specifics, double vl) {

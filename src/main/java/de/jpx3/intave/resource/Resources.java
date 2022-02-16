@@ -19,7 +19,7 @@ public final class Resources {
   }
 
   public static Resource resourceFromFileWithLock(File file) {
-    return new FileResource(file).locked(file);
+    return resourceFromFile(file).locked(file);
   }
 
   public static Resource resourceFromWeb(URL url) {

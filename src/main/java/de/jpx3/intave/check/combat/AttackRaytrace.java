@@ -116,7 +116,7 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
               "[DEB] false, "
                 + (entity instanceof EntityShade.Destroyed) + ", "
                 + (unsynchronizedHealth <= 0) + " - " + unsynchronizedHealth + ", "
-                + entity.typeData.isLivingEntity() + ", "
+                + entity.typeData().isLivingEntity() + ", "
                 + (entity.mountedEntity() == null)
             );
           }
@@ -175,7 +175,7 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
 //        player.sendMessage(remainingAttack + " " + entity.typeData.name());
 
         if (entityIsAlive && entityHasNotTimedOut) {
-          if (entity.mountedEntity() == null && !player.isInsideVehicle() && entity.typeData.isLivingEntity() && !abilityData.ignoringMovementPackets()) {
+          if (entity.mountedEntity() == null && !player.isInsideVehicle() && entity.typeData().isLivingEntity() && !abilityData.ignoringMovementPackets()) {
             if (clientData.protocolVersion() >= VER_1_9) {
               // >= 1.9.x
               if (entity.clientSynchronized
@@ -401,7 +401,7 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
     int vl = 0;
     switch (attackRaytraceResult) {
       case MISS: {
-        if (!entity.typeData.isLivingEntity()) {
+        if (!entity.typeData().isLivingEntity()) {
           vl = 0;
         } else {
           vl = 4;
@@ -492,7 +492,7 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
     int maximumPendingFeedbackPackets = trustFactorSetting("pending-allowance", player) + (int) MathHelper.minmax(0, LatencyStudy.cachedAverage(), 20);
     double minReach = 10;
     EntityShade clonedEntity = entity.temporaryCopy();
-    boolean livingEntity = entity.typeData.isLivingEntity();
+    boolean livingEntity = entity.typeData().isLivingEntity();
     List<EntityShade.EntityPositionContext> positionHistory = clonedEntity.positionHistory;
     int from = positionHistory.size() - 1;
     for (int i = from; i >= 0; i--) {

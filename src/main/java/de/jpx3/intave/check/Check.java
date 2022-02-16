@@ -45,7 +45,6 @@ import java.util.function.Consumer;
  public abstract class Check implements EventProcessor {
   private final IntavePlugin plugin;
   private final String checkName;
-  private final de.jpx3.intave.access.check.Check type;
   private final String configurationKey;
   private final CheckStatistics statistics = new CheckStatistics();
   private final Map<TrustFactor, CheckStatistics> perTrustFactorStatistics = new EnumMap<>(TrustFactor.class);
@@ -58,7 +57,6 @@ import java.util.function.Consumer;
   public Check(String checkName, String configurationKey) {
     this.plugin = IntavePlugin.singletonInstance();
     this.checkName = checkName;
-    this.type = de.jpx3.intave.access.check.Check.fromString(checkName);
     this.configurationKey = configurationKey;
     this.enterConfiguration();
     this.enabled = checkConfiguration.settings().checkEnabled();
@@ -152,14 +150,6 @@ import java.util.function.Consumer;
    */
   public String name() {
     return checkName;
-  }
-
-  /**
-   * Retrieve the check's type.
-   * @return the check's type
-   */
-  public de.jpx3.intave.access.check.Check type() {
-    return type;
   }
 
   /**

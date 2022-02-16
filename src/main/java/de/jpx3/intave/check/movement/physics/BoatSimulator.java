@@ -201,8 +201,8 @@ public final class BoatSimulator extends Simulator {
     int maxY = ClientMathHelper.ceil(axisalignedbb1.maxY) + 1;
     int minZ = ClientMathHelper.floor(axisalignedbb1.minZ) - 1;
     int maxZ = ClientMathHelper.ceil(axisalignedbb1.maxZ) + 1;
-    float f = 0.0F;
-    int k1 = 0;
+    float slipperiness = 0.0F;
+    int collisions = 0;
 
     for (int x = minX; x < maxX; ++x) {
       for (int z = minZ; z < maxZ; ++z) {
@@ -212,10 +212,10 @@ public final class BoatSimulator extends Simulator {
           for (int y = minY; y < maxY; ++y) {
             if (j2 <= 0 || y != minY && y != maxY - 1) {
               BoundingBox boundingBox = new BoundingBox(x, y, z, x + 1, y + 1, z + 1);
-              if (!Collision.collisionShape(player, boundingBox).isEmpty()) {
+              if (Collision.present(player, boundingBox)) {
                 Material material = VolatileBlockAccess.typeAccess(user, x, y, z);
-                f += BlockProperties.of(material).slipperiness();
-                ++k1;
+                slipperiness += BlockProperties.of(material).slipperiness();
+                ++collisions;
               }
             }
           }
@@ -223,8 +223,7 @@ public final class BoatSimulator extends Simulator {
       }
     }
 
-
-    return f / (float) k1;
+    return slipperiness / (float) collisions;
   }
 
   public enum Status {

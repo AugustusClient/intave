@@ -12,6 +12,7 @@ import de.jpx3.intave.module.feedback.PendingCountingFeedbackTracker;
 import de.jpx3.intave.shade.BoundingBox;
 import de.jpx3.intave.shade.ClientMathHelper;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ public class EntityShade {
   private static EntityShade DESTROYED_ENTITY;
   private final static boolean NEW_POSITION_PROCESSING_1_9 = MinecraftVersions.VER1_9_0.atOrAbove();
   private final static boolean NEW_POSITION_PROCESSING_1_14 = MinecraftVersions.VER1_14_0.atOrAbove();
-  public EntityTypeData typeData;
+  private EntityTypeData typeData;
 
   private final int entityId;
 
@@ -69,7 +70,7 @@ public class EntityShade {
 
   public EntityShade(
     int entityId,
-    EntityTypeData typeData,
+    @NotNull EntityTypeData typeData,
     boolean player
   ) {
     this.player = player;
@@ -80,6 +81,18 @@ public class EntityShade {
     this.lastPosition = new EntityPositionContext();
     this.alternativePosition = new EntityPositionContext();
     this.feedbackTracker = new PendingCountingFeedbackTracker();
+  }
+
+  public boolean hasTypeData() {
+    return typeData != null;
+  }
+
+  public EntityTypeData typeData() {
+    return typeData;
+  }
+
+  public void setTypeData(EntityTypeData typeData) {
+    this.typeData = typeData;
   }
 
   public static class EntityPositionContext implements Cloneable {
@@ -125,7 +138,7 @@ public class EntityShade {
    * FLYING, LOOK, POSITION, POSITION_LOOK
    */
   void onLivingUpdate() {
-    if (typeData.isLivingEntity() && position.newPosRotationIncrements > 0) {
+    if (typeData().isLivingEntity() && position.newPosRotationIncrements > 0) {
       double newPosX = position.posX + (position.newPosX - position.posX) / (double) position.newPosRotationIncrements;
       double newPosY = position.posY + (position.newPosY - position.posY) / (double) position.newPosRotationIncrements;
       double shiftedNewY = alternativePosition.posY + (alternativePosition.newPosY - alternativePosition.posY) / (double) position.newPosRotationIncrements;
@@ -304,7 +317,7 @@ public class EntityShade {
    * @param newPosRotationIncrements the value which is used to interpolate the movement of the entity in new ticks
    */
   public void setPositionAndRotationEntityLiving(double x, double y, double z, int newPosRotationIncrements) {
-    if (!typeData.isLivingEntity()) {
+    if (!typeData().isLivingEntity()) {
       setPosition(x, y, z);
       return;
     }
@@ -316,7 +329,7 @@ public class EntityShade {
   }
 
   public void setPositionAndRotationEntityLiving(double alternativeY) {
-    if (!typeData.isLivingEntity()) {
+    if (!typeData().isLivingEntity()) {
       setShiftedPositionY(alternativeY);
       return;
     }
@@ -364,7 +377,7 @@ public class EntityShade {
    * Returns the type name of this entity.
    */
   public String entityName() {
-    return typeData.name();
+    return typeData().name();
   }
 
   public int entityId() {
@@ -385,7 +398,7 @@ public class EntityShade {
   }
 
   public EntityShade temporaryCopy() {
-    EntityShade clone = new EntityShade(entityId, typeData, player);
+    EntityShade clone = new EntityShade(entityId, typeData(), player);
     clone.temporaryCopy = true;
     clone.position = position.clone();
     clone.alternativePosition = alternativePosition.clone();
@@ -398,8 +411,8 @@ public class EntityShade {
     double y = position.posY;
     double z = position.posZ;
 
-    double halfWidth = entity.typeData.size().width() / 2.0;
-    double length = entity.typeData.size().height();
+    double halfWidth = entity.typeData().size().width() / 2.0;
+    double length = entity.typeData().size().height();
     return new BoundingBox(
       x - halfWidth, y, z - halfWidth,
       x + halfWidth, y + length, z + halfWidth
