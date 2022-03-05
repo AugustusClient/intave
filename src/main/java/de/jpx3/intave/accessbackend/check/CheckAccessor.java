@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static de.jpx3.intave.access.check.Check.fromString;
+import static de.jpx3.intave.access.check.Check.fromName;
 
 public final class CheckAccessor {
   private final Map<String, CheckAccess> checkAccessCache = ReferenceMap.soft(Maps.newConcurrentMap());
@@ -53,7 +53,7 @@ public final class CheckAccessor {
 
       @Override
       public de.jpx3.intave.access.check.Check enumCheck() {
-        return fromString(name());
+        return fromName(name());
       }
 
       @Override

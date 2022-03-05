@@ -156,6 +156,11 @@ final class PlayerUser implements User {
   }
 
   @Override
+  public long joined() {
+    return birthTimestamp;
+  }
+
+  @Override
   public boolean hasPlayer() {
     Player player = this.player.get();
     return isOnline(player);

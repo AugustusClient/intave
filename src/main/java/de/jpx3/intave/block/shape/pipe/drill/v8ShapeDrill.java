@@ -4,6 +4,7 @@ import de.jpx3.intave.block.shape.BlockShape;
 import de.jpx3.intave.block.shape.BlockShapes;
 import de.jpx3.intave.block.shape.pipe.drill.acbbs.v8AlwaysCollidingBoundingBox;
 import de.jpx3.intave.klass.rewrite.PatchyAutoTranslation;
+import de.jpx3.intave.shade.BoundingBox;
 import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
@@ -31,7 +32,10 @@ public final class v8ShapeDrill extends AbstractShapeDrill {
       return translate(bbs);
     } catch (IllegalArgumentException exception) {
       // ¯\_(ツ)_/¯
-      return BlockShapes.cubicShapeAt(posX, posY, posZ);
+      return BoundingBox
+        // anything but a box
+        .fromBounds(0,0,0,0.5,0.5,0.5)
+        .contextualized(posX, posY, posZ);
     }
   }
 }

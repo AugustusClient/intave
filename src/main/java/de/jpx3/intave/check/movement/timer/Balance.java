@@ -106,7 +106,7 @@ public final class Balance extends MetaCheckPart<Timer, Balance.BalanceMeta> {
     }
     statisticApply(user, CheckStatistics::increaseTotal);
     int overflowLimit = highToleranceMode ? 150 : 20;
-    if (timerData.timerBalance > overflowLimit) {
+    if (timerData.timerBalance > overflowLimit && !user.meta().movement().isInVehicle()) {
       String balanceAsString = MathHelper.formatDouble(timerData.timerBalance / 10, 2);
       statisticApply(user, CheckStatistics::increaseFails);
       Violation violation = Violation.builderFor(Timer.class).forPlayer(player)

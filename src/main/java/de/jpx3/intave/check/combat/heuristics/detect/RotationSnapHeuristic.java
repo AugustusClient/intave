@@ -33,6 +33,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.Map;
 
+import static de.jpx3.intave.check.combat.heuristics.Anomaly.AnomalyOption.*;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
 
 public final class RotationSnapHeuristic extends MetaCheckPart<Heuristics, RotationSnapHeuristic.RotationSnapHeuristicMeta> {
@@ -190,10 +191,7 @@ public final class RotationSnapHeuristic extends MetaCheckPart<Heuristics, Rotat
     }
 
     boolean isSuspicious = (meta.yawMotions[1] == 0 && meta.yawMotions[0] > 25 && meta.yawMotions[0] > 9);
-    boolean liteFlag = false;
-    if (isSuspicious && meta.silentMovements[1] == KeyStates.SILENTMOVE && meta.rotationPacketCounter > 10 && movementData.lastTeleport > 7) {
-      liteFlag = true;
-    }
+    boolean liteFlag = isSuspicious && meta.silentMovements[1] == KeyStates.SILENTMOVE && meta.rotationPacketCounter > 10 && movementData.lastTeleport > 7;
 
     isSuspicious = meta.yawMotions[1] < 9 && meta.yawMotions[0] > 40 && yawMotion < 9;
 
@@ -307,18 +305,18 @@ public final class RotationSnapHeuristic extends MetaCheckPart<Heuristics, Rotat
   private int anomalyOptions(boolean isPartner) {
     int options;
     if (IntaveControl.GOMME_MODE) {
-      options = Anomaly.AnomalyOption.DELAY_32s;
+      options = DELAY_32s;
     } else if (isPartner) {
-      options = Anomaly.AnomalyOption.DELAY_64s;
+      options = DELAY_64s;
     } else {
-      options = Anomaly.AnomalyOption.DELAY_128s;
+      options = DELAY_128s;
     }
+    options |= LIMIT_4 | LIMIT_2 | LIMIT_1;
     return options;
   }
 
   private double calculateViolation(double valueOfSnap, boolean changedLookToEntity, User user, boolean liteFlag) {
     RotationSnapHeuristicMeta meta = metaOf(user);
-
     double vl = 7;
     if (valueOfSnap > 360) {
       vl = 120;
@@ -329,32 +327,25 @@ public final class RotationSnapHeuristic extends MetaCheckPart<Heuristics, Rotat
     } else if (valueOfSnap > 50) {
       vl = 10;
     }
-
     if (meta.lastBlockPlace < 3) {
       vl *= 1.5;
     }
-
     if (changedLookToEntity) {
       vl *= 2;
     }
-
     if (meta.silentMovements[1] == KeyStates.SILENTMOVE) {
       vl *= 3;
     } else if (meta.silentMovements[1] == KeyStates.CHANGED) {
       vl *= 1.7;
     }
-
     if (liteFlag) {
       vl += 10;
     }
-
     if (!IntaveControl.GOMME_MODE) {
       vl /= 2;
     }
-
     // added the division because there are false flaggs when a player has less than 20 fps
     vl /= 3;
-
     if(vl > 160 && valueOfSnap < 360) {
       vl = 160;
     }

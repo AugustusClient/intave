@@ -24,6 +24,7 @@ public final class BoundingBoxPatcher {
     add(FarmlandBlockPatch.class);
     add(BambooBlockPatch.class);
     add(ThinBlockPatch.class);
+    add(EnderPortalFramePatch.class);
 //    add(BlockDoorPatch.class);
   }
 

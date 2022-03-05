@@ -71,7 +71,7 @@ public final class EntityTypeResolver {
     }
   }
 
-  private final static int ENTITY_DEAD_TYPE_FIELD = MinecraftVersions.VER1_12_0.atOrAbove() ? 6 : 9;
+  private final static int ENTITY_DEAD_TYPE_FIELD = MinecraftVersions.VER1_9_0.atOrAbove() ? 6 : 9;
 
   public EntityTypeData entityTypeDataOfDeadEntity(PacketEvent event) {
     PacketContainer packet = event.getPacket();
@@ -89,19 +89,19 @@ public final class EntityTypeResolver {
           int deadEntityType = packet.getIntegers().read(ENTITY_DEAD_TYPE_FIELD);
           String name = nameByDeadEntityType(deadEntityType);
           HitboxSize boundaries = hitboxBoundariesByDeadEntityType(deadEntityType);
-          return new EntityTypeData(name, boundaries, -1, false, 2);
+          return new EntityTypeData(name, boundaries, deadEntityType == 1 ? 41 : -1, false, 2);
         } catch (FieldAccessException exception) {
-         // IntaveLogger.logger().info("Can't access type data of " + entityId);
-         // exception.printStackTrace();
+          IntaveLogger.logger().info("Can't access type data of " + entityId);
+          exception.printStackTrace();
         }
-        return new EntityTypeData("could not be created", HitboxSize.zero(), -2, false, 3);
+        return new EntityTypeData("Invalid", HitboxSize.zero(), -2, false, 3);
       } else {
         EntityType entityType = packet.getEntityTypeModifier().read(0);
         Class<? extends Entity> entityClass = entityType.getEntityClass();
         String entityClassName = entityClass.getSimpleName();
         if (IntaveControl.DISABLE_LICENSE_CHECK) {
           // still necessary?
-          IntaveLogger.logger().info("Zero BoundingBox 2 (Entity " + entityClassName + ")");
+          IntaveLogger.logger().info("Unable to lookup hitbox for entity " + entityClassName);
         }
         return new EntityTypeData(entityClassName, HitboxSize.zero(), -2, false, 4);
       }

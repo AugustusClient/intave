@@ -1,5 +1,9 @@
 package de.jpx3.intave.access.check;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 /**
  * An alphabetically-sorted enumerator of all check-names in Intave
  */
@@ -12,11 +16,19 @@ public enum Check {
   INTERACTION_RAYTRACE("InteractionRaytrace"),
   INVENTORY_CLICK_ANALYSIS("InventoryClickAnalysis"),
   PHYSICS("Physics"),
-  PROTOCOL_SCANNER("ProtocolScanner"),
   PLACEMENT_ANALYSIS("PlacementAnalysis"),
+  PROTOCOL_SCANNER("ProtocolScanner"),
   TIMER("Timer"),
 
   ;
+
+  private final static Map<String, Check> LOOKUP_MAP = new HashMap<>();
+
+  static {
+    for (Check value : values()) {
+      LOOKUP_MAP.put(value.typeName.toLowerCase(Locale.ROOT), value);
+    }
+  }
 
   private final String typeName;
 
@@ -24,13 +36,8 @@ public enum Check {
     this.typeName = name;
   }
 
-  public static Check fromString(String name) {
-    for (Check value : values()) {
-      if (value.typeName.equalsIgnoreCase(name)) {
-        return value;
-      }
-    }
-    return null;
+  public static Check fromName(String name) {
+    return LOOKUP_MAP.get(name.toLowerCase(Locale.ROOT));
   }
 
   public String typeName() {

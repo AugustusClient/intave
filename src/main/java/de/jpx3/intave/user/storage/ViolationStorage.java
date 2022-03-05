@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 
 public final class ViolationStorage implements Storage {
   private final static long VIOLATION_UPDATE_CHECK_TIMEOUT = TimeUnit.MINUTES.toMillis(3);
-  private final static long VIOLATION_INSERT_CHECK_COOLDOWN = TimeUnit.MINUTES.toMillis(30);
+  private final static long VIOLATION_INSERT_CHECK_COOLDOWN = TimeUnit.MINUTES.toMillis(10);
   private final static long VIOLATION_ALLOWED_LIFETIME = TimeUnit.DAYS.toMillis(7);
   private final static long VIOLATION_OVERALL_LIMIT = 256;
 
@@ -66,9 +66,8 @@ public final class ViolationStorage implements Storage {
   }
 
   private Optional<ViolationEvent> lastViolationOfCheck(String check) {
-    String finalCheck = check.toLowerCase(Locale.ROOT);
     return interestingViolations.stream()
-      .filter(event -> event.checkName().equals(finalCheck))
+      .filter(event -> event.checkName().equalsIgnoreCase(check))
       .max(Comparator.comparingLong(ViolationEvent::timestamp));
   }
 
@@ -106,7 +105,7 @@ public final class ViolationStorage implements Storage {
     }
 
     public ViolationEvents(Collection<ViolationEvent> parent) {
-      this.parent = parent;
+      this.parent = new ArrayList<>(parent);
     }
 
     public int size() {
@@ -122,11 +121,25 @@ public final class ViolationStorage implements Storage {
       return iterator.hasNext() ? iterator.next() : null;
     }
 
+    public ViolationEvent newest() {
+      return stream()
+        .max(Comparator.comparing(ViolationEvent::timestamp))
+        .orElse(null);
+    }
+
+    public ViolationEvents sortedByAge() {
+      return new ViolationEvents(
+        stream()
+        .sorted(Comparator.comparing(ViolationEvent::timePassedSince))
+        .collect(Collectors.toList())
+      );
+    }
+
     public ViolationEvents withoutViolationsOlderThan(
       long value, TimeUnit unit
     ) {
       return filter(
-        event -> System.currentTimeMillis() - event.timestamp > unit.toMillis(value)
+        event -> event.timePassedSince() < unit.toMillis(value)
       );
     }
 

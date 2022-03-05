@@ -79,6 +79,13 @@ public interface User {
   boolean justJoined();
 
   /**
+   * Retrieve the join-timestamp of the associated player
+   * When no player is present, return System.currentTimeMillies()
+   * @return  the join-timestamp of the associated player
+   */
+  long joined();
+
+  /**
    * Retrieve if this {@link User} is {@link Player}-associated or a fallback
    * @return if a player is present
    */

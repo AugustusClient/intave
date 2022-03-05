@@ -86,6 +86,11 @@ public final class FallbackUser implements User {
   }
 
   @Override
+  public long joined() {
+    return System.currentTimeMillis();
+  }
+
+  @Override
   public boolean hasPlayer() {
     return false;
   }

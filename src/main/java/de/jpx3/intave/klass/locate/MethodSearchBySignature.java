@@ -7,9 +7,11 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public final class MethodSearchBySignature {
   private final MethodHandle[] methodsMatching;
@@ -18,11 +20,14 @@ public final class MethodSearchBySignature {
     this.methodsMatching = methodsMatching;
   }
 
-  public MethodSearchBySignature peek(Consumer<MethodHandle> applier) {
+  public void forEach(Consumer<MethodHandle> applier) {
     for (MethodHandle method : methodsMatching) {
       applier.accept(method);
     }
-    return this;
+  }
+
+  public Stream<MethodHandle> stream() {
+    return Arrays.stream(methodsMatching);
   }
 
   public MethodHandle[] all() {
@@ -37,6 +42,13 @@ public final class MethodSearchBySignature {
     return methodsMatching.length > 0 ?
       Optional.ofNullable(methodsMatching[0]) :
       Optional.empty();
+  }
+
+  public MethodSearchBySignature peek(Consumer<MethodHandle> applier) {
+    for (MethodHandle method : methodsMatching) {
+      applier.accept(method);
+    }
+    return this;
   }
 
   public static MethodSearchBySignature search(Class<?> target, Class<?>[] params, Class<?> returnVal) {

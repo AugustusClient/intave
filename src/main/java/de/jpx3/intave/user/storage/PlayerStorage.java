@@ -3,6 +3,8 @@ package de.jpx3.intave.user.storage;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,6 +13,7 @@ public final class PlayerStorage implements Storage {
   private final static int STORAGE_VERSION = 1;
 
   private final Map<Class<? extends Storage>, Storage> subStorages = new ConcurrentHashMap<>();
+  private final List<Storage> storageList = new ArrayList<>();
   private final UUID id;
   private long creation;
 
@@ -25,7 +28,7 @@ public final class PlayerStorage implements Storage {
     output.writeLong(id.getMostSignificantBits());
     output.writeLong(id.getLeastSignificantBits());
     output.writeLong(creation);
-    subStorages.values().forEach(child -> child.writeTo(output));
+    storageList.forEach(child -> child.writeTo(output));
   }
 
   private final static String INVALID_ID_ERROR = "Invalid entry fetched, expected %s but received id %s";
@@ -44,11 +47,13 @@ public final class PlayerStorage implements Storage {
       throw new IllegalStateException(errorMessage);
     }
     creation = input.readLong();
-    subStorages.values().forEach(child -> child.readFrom(input));
+    storageList.forEach(child -> child.readFrom(input));
   }
 
   <T extends Storage> void append(Class<T> storageClass) {
-    subStorages.put(storageClass, instanceOf(storageClass));
+    T value = instanceOf(storageClass);
+    subStorages.put(storageClass, value);
+    storageList.add(value);
   }
 
   public <T extends Storage> T storageOf(Class<T> storageClass) {

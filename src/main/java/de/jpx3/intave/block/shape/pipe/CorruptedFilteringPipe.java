@@ -3,6 +3,7 @@ package de.jpx3.intave.block.shape.pipe;
 import de.jpx3.intave.block.shape.BlockShape;
 import de.jpx3.intave.block.shape.BlockShapes;
 import de.jpx3.intave.block.shape.ShapeResolverPipeline;
+import de.jpx3.intave.block.shape.pipe.patch.ApplyOnShapeBoundingBoxBuilder;
 import de.jpx3.intave.block.shape.pipe.patch.BoundingBoxBuilder;
 import de.jpx3.intave.block.type.BlockTypeAccess;
 import de.jpx3.intave.shade.BoundingBox;
@@ -22,7 +23,7 @@ public final class CorruptedFilteringPipe implements ShapeResolverPipeline {
   @Override
   public BlockShape resolve(World world, Player player, Material type, int blockState, int posX, int posY, int posZ) {
     List<BoundingBox> corrupted = resolveCorrupted(type, blockState);
-    return corrupted != null ? BlockShapes.shapeOf(corrupted) : forward.resolve(world, player, type, blockState, posX, posY, posZ);
+    return corrupted != null ? BlockShapes.shapeOf(corrupted).contextualized(posX, posY, posZ) : forward.resolve(world, player, type, blockState, posX, posY, posZ);
   }
 
   @Override
@@ -31,7 +32,16 @@ public final class CorruptedFilteringPipe implements ShapeResolverPipeline {
   }
 
   public List<BoundingBox> resolveCorrupted(Material type, int data) {
-    if (type == BlockTypeAccess.SKULL) {
+    if (type == Material.ENDER_PORTAL_FRAME) {
+      ApplyOnShapeBoundingBoxBuilder builder = ApplyOnShapeBoundingBoxBuilder.create();
+      builder.shapeX16AndApply(0.0D, 0.0D, 0.0D, 16.0D, 13.0D, 16.0D);
+      boolean hasEye = (data & 4) != 0;
+      if (hasEye) {
+        builder.shapeX16AndApply(4.0D, 13.0D, 4.0D, 12.0D, 16.0D, 12.0D);
+        // 0.3125F, 0.8125F, 0.3125F, 0.6875F, 1.0F, 0.6875F
+      }
+      return builder.resolve();
+    } else if (type == BlockTypeAccess.SKULL) {
       BoundingBoxBuilder builder = BoundingBoxBuilder.create();
       switch (data & 7) {
         case 1:

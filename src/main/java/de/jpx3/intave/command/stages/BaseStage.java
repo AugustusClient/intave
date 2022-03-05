@@ -20,6 +20,9 @@ import de.jpx3.intave.user.storage.ViolationStorage.ViolationEvent;
 import de.jpx3.intave.user.storage.ViolationStorage.ViolationEvents;
 import de.jpx3.intave.version.DurationTranslator;
 import de.jpx3.intave.version.IntaveVersion;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -27,10 +30,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import java.text.DateFormat;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.util.concurrent.TimeUnit.*;
@@ -83,7 +89,7 @@ public final class BaseStage extends CommandStage {
   private static String describePlayerList(List<String> elements) {
     int size = elements.size();
     String defaultColor = IntavePlugin.defaultColor();
-    if(size == 0) {
+    if (size == 0) {
       return defaultColor + "nobody";
     } else if (size == 1) {
       return elements.get(0);
@@ -125,7 +131,7 @@ public final class BaseStage extends CommandStage {
   }
 
   @SubCommand(
-    selectors = {"history", "info", "logs"},
+    selectors = {"history", "logs"},
     usage = "<name>",
     permission = "intave.command.history"
   )
@@ -133,9 +139,10 @@ public final class BaseStage extends CommandStage {
     Player player = Bukkit.getPlayer(playerName);
     if (isOnline(player)) {
       User targetUser = UserRepository.userOf(player);
+      String name = player.getName();
       UUID id = player.getUniqueId();
       ViolationStorage violationStorage = (ViolationStorage) targetUser.storageOf(ViolationStorage.class);
-      outputHistory(sender, id, violationStorage);
+      outputHistory(sender, name, id, violationStorage);
     } else {
       sender.sendMessage(IntavePlugin.prefix() + ChatColor.YELLOW + "Loading history..");
       ProfileLookup.lookupIdFromName(playerName, uuid -> {
@@ -146,7 +153,7 @@ public final class BaseStage extends CommandStage {
             if (playerStorage == null) {
               sender.sendMessage(IntavePlugin.prefix() + ChatColor.RED + "Player has never played before");
             } else {
-              outputHistory(sender, uuid, playerStorage.storageOf(ViolationStorage.class));
+              outputHistory(sender, playerName, uuid, playerStorage.storageOf(ViolationStorage.class));
             }
           });
         }
@@ -154,46 +161,88 @@ public final class BaseStage extends CommandStage {
     }
   }
 
-  private void outputHistory(CommandSender sender, UUID id, ViolationStorage violationStorage) {
+  private void outputHistory(CommandSender sender, String name, UUID id, ViolationStorage violationStorage) {
     ViolationEvents violations = violationStorage.violations();
-    sender.sendMessage(String.format("%s History of %s%s", IntavePlugin.prefix(), ChatColor.RED, id));
-
+    sender.sendMessage(String.format("%sHistory of "+ChatColor.RED+"%s%s:", IntavePlugin.prefix(), name, IntavePlugin.defaultColor()));
     if (violations.isEmpty()) {
       sender.sendMessage(IntavePlugin.prefix() + ChatColor.GREEN + "No violations found");
       return;
     }
-
     // first naive approach
-    processCombatViolations(sender, violations);
+    printHistory(sender, "Reach", filterByCheck("attackraytrace", violations));
+    printHistory(sender, "KillAura", filterByCheck("heuristics", violations));
+    printHistory(sender, "Fly/Speed", filterByCheck("physics", violations));
+    printHistory(sender, "Scaffold", filterByCheck("placementanalysis", violations));
+    printHistory(sender, "ChestStealer", filterByCheck("inventoryAnalysis", violations));
   }
 
-  private void processCombatViolations(CommandSender sender, ViolationEvents allViolations) {
-    printHistory(sender, "Reach", filterByCheck("attackraytrace", allViolations));
-    printHistory(sender, "KillAura", filterByCheck("heuristics", allViolations));
-    printHistory(sender, "Fly/Speed", filterByCheck("physics", allViolations));
-    printHistory(sender, "Scaffold", filterByCheck("placementAnalysis", allViolations));
-    printHistory(sender, "ChestStealer", filterByCheck("inventoryAnalysis", allViolations));
-
-  }
-
-  private void printHistory(CommandSender sender, String message, ViolationEvents violations) {
+  private void printHistory(CommandSender sender, String cheat, ViolationEvents violations) {
     if (violations.isEmpty()) {
       return;
     }
     if (violations.size() == 1) {
-      sender.sendMessage(IntavePlugin.defaultColor() + " - One detection for " + ChatColor.RED + message + IntavePlugin.defaultColor() + " " + durationToString(violations.first().timePassedSince()));
+      ViolationEvent firstViolation = violations.first();
+      String baseMessage = MessageFormat.format("{0}- detected for using {1}{2}{0} {3}", IntavePlugin.defaultColor(), ChatColor.RED, cheat, durationToString(firstViolation.timePassedSince()));
+      String defaultColor = IntavePlugin.defaultColor();
+      TextComponent textComponent = new TextComponent(baseMessage);
+      textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{
+        new TextComponent(defaultColor + "Check " + ChatColor.RED + correctlyFormattedCheckName(firstViolation.checkName())),
+        new TextComponent(defaultColor + " reached " + ChatColor.RED + firstViolation.violationLevel() + defaultColor + "VL"),
+        new TextComponent(defaultColor + " on " + ChatColor.RED + dateFormat(firstViolation.timestamp())),
+      }));
+      if (sender instanceof Player) {
+        ((Player) sender).spigot().sendMessage(textComponent);
+      } else {
+        sender.sendMessage(baseMessage);
+      }
       return;
     }
-    Predicate<ViolationEvent> violationOld = event -> event.timePassedSince() > DAYS.toDays(3);
-    Predicate<ViolationEvent> violationRecent = event -> event.timePassedSince() < HOURS.toDays(6);
-    double percentageLongAgo = violations.matchFactor(violationOld);
-    double percentageVeryRecently = violations.matchFactor(violationRecent);
 
-    sender.sendMessage(IntavePlugin.defaultColor() + " - Multiple detections for " + ChatColor.RED + ", ");
+    String baseMessage = IntavePlugin.defaultColor() + "- detected multiple times for using " + ChatColor.RED + cheat + IntavePlugin.defaultColor() + ", last was " + durationToString(violations.newest().timePassedSince());
+    String defaultColor = IntavePlugin.defaultColor();
+    TextComponent newLine = new TextComponent(ComponentSerializer.parse("{text: \"\n\"}"));
+    TextComponent[] textComponents = new TextComponent[violations.size()];
+    int i = 0;
+    for (ViolationEvent violation : violations) {
+      TextComponent textComponent = new TextComponent(
+        new TextComponent(defaultColor + "Check " + ChatColor.RED + correctlyFormattedCheckName(violation.checkName())),
+        new TextComponent(defaultColor + " reached " + ChatColor.RED + violation.violationLevel() + defaultColor + "VL"),
+        new TextComponent(defaultColor + " on " + ChatColor.RED + dateFormat(violation.timestamp()))
+      );
+      if (i != violations.size() - 1) {
+        textComponent.addExtra(newLine);
+      }
+      textComponents[i++] = textComponent;
+    }
+
+    TextComponent textComponent = new TextComponent(baseMessage);
+    textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, textComponents));
+    if (sender instanceof Player) {
+      ((Player) sender).spigot().sendMessage(textComponent);
+    } else {
+      sender.sendMessage(baseMessage);
+    }
+  }
+
+  private String correctlyFormattedCheckName(String checkNameLowercase) {
+    IntavePlugin plugin = IntavePlugin.singletonInstance();
+    return plugin.checks().searchCheck(checkNameLowercase).name();
+  }
+
+  private final DateFormat dateFormat = new SimpleDateFormat("HH:mm dd/MM/yy");
+
+  private String dateFormat(long input) {
+    return dateFormat.format(new Date(input));
   }
 
   private String durationToString(long duration) {
-    if (duration < MINUTES.toMillis(30)) {
+    if (duration < MINUTES.toMillis(2)) {
+      return "just now";
+    } else if (duration < MINUTES.toMillis(10)) {
+      return "a few minutes ago";
+    } else if (duration < MINUTES.toMillis(20)) {
+      return "ten minutes ago";
+    } else if (duration < MINUTES.toMillis(30)) {
       return "half an hour ago";
     } else if (duration < HOURS.toMillis(1)) {
       return "an hour ago";
@@ -209,7 +258,7 @@ public final class BaseStage extends CommandStage {
       return "three days ago";
     } else if (duration < DAYS.toMillis(4)) {
       return "four days ago";
-    } else if (duration < DAYS.toMillis(4)) {
+    } else if (duration < DAYS.toMillis(5)) {
       return "almost a week ago";
     } else if (duration < DAYS.toMillis(7)) {
       return "a week ago";
