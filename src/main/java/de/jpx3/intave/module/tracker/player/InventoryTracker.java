@@ -6,7 +6,6 @@ import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
-import com.mojang.authlib.GameProfile;
 import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.adapter.ProtocolLibraryAdapter;
 import de.jpx3.intave.block.collision.Collision;
@@ -28,19 +27,18 @@ import de.jpx3.intave.user.meta.MetadataBundle;
 import de.jpx3.intave.user.meta.MovementMetadata;
 import de.jpx3.intave.user.meta.PunishmentMetadata;
 import org.bukkit.World;
-import org.bukkit.block.Skull;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.lang.reflect.Field;
 import java.util.List;
-import java.util.UUID;
 
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.HELD_ITEM_SLOT;
+import static de.jpx3.intave.module.linker.packet.PacketId.Client.UPDATE_SIGN;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
 import static de.jpx3.intave.module.linker.packet.PacketId.Server.*;
 
@@ -115,35 +113,58 @@ public final class InventoryTracker extends Module {
 
   private void putOnWhitelist(User user, ItemStack stack) {
     InventoryMetadata inventory = user.meta().inventory();
-    UUID id = idFromSkull(stack);
-    if (id != null) {
-      inventory.registerIdRequest(id);
+    String name = ownerFromSkull(stack);
+    if (name != null) {
+      inventory.registerSkullRequest(name);
     }
   }
+//
+//  private Field profileField;
+//  {
+//    try {
+//      profileField = Lookup.craftBukkitClass("inventory.CraftMetaSkull").getDeclaredField("profile");
+//      profileField.setAccessible(true);
+//    } catch (NoSuchFieldException exception) {
+//      exception.printStackTrace();
+//    }
+//  }
 
-  private Field profileField;
-  {
-    try {
-      profileField = Lookup.craftBukkitClass("block.CraftSkull").getDeclaredField("profile");
-      profileField.setAccessible(true);
-    } catch (NoSuchFieldException exception) {
-      exception.printStackTrace();
-    }
-  }
-
-  private UUID idFromSkull(ItemStack skull) {
-    if (skull instanceof Skull) {
-      SkullMeta itemMeta = (SkullMeta) skull.getItemMeta();
-      if (itemMeta != null) {
-        try {
-          GameProfile profile = (GameProfile) profileField.get(itemMeta);
-          return profile.getId();
-        } catch (Exception exception) {
-          exception.printStackTrace();
-        }
-      }
+  private String ownerFromSkull(ItemStack skull) {
+    ItemMeta meta = skull.getItemMeta();
+    if (meta instanceof SkullMeta) {
+      return ownerFromSkullMeta((SkullMeta) meta);
     }
     return null;
+  }
+
+  private String ownerFromSkullMeta(SkullMeta meta) {
+//    try {
+//      GameProfile profile = (GameProfile) profileField.get(meta);
+//      System.out.println(profile);
+//      return profile.getName();
+      return meta.getOwner();
+//    } catch (Exception exception) {
+//      exception.printStackTrace();
+//    }
+//    return null;
+  }
+
+  @PacketSubscription(
+    packetsIn = UPDATE_SIGN
+  )
+  public void checkSign(PacketEvent event) {
+    Player player = event.getPlayer();
+    User user = UserRepository.userOf(player);
+    PacketContainer packet = event.getPacket();
+    WrappedChatComponent[] wrappedChatComponents = packet.getChatComponentArrays().readSafely(0);
+
+    for (WrappedChatComponent chatComponent : wrappedChatComponents) {
+      if (chatComponent.getJson().length() > 500) {
+        event.setCancelled(true);
+        user.synchronizedDisconnect("Too many characters in sign update packet");
+        return;
+      }
+    }
   }
 
   @PacketSubscription(
@@ -162,11 +183,12 @@ public final class InventoryTracker extends Module {
 
     PacketContainer packet = event.getPacket();
     ItemStack itemStack = packet.getItemModifier().readSafely(0);
-    UUID probableId = idFromSkull(itemStack);
-
-    if (probableId != null) {
-      if (!inventoryData.idWhitelisted(probableId)) {
-        user.synchronizedDisconnect("Forbidden skin request");
+    String probableName = ownerFromSkull(itemStack);
+    if (probableName != null) {
+      if (/*probableName.length() < 3 || */probableName.length() > 128 || !inventoryData.skullWhitelisted(probableName)) {
+        // cancel all following
+        inventoryData.windowClickCounter = 1000;
+        user.synchronizedDisconnect("Forbidden skull request");
         event.setCancelled(true);
       }
     }

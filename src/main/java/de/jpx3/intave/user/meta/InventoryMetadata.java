@@ -14,7 +14,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Relocate
 public final class InventoryMetadata {
@@ -38,7 +37,7 @@ public final class InventoryMetadata {
   public boolean releaseItemNextTick = false;
   public Material releaseItemType = Material.AIR;
 
-  private List<UUID> whitelistedItemIdRequests = new ArrayList<>();
+  private List<String> whitelistedItemIdRequests = new ArrayList<>();
 
   public InventoryMetadata(Player player) {
     this.player = player;
@@ -56,13 +55,13 @@ public final class InventoryMetadata {
     return handActive;
   }
 
-  public void registerIdRequest(UUID id) {
-    if (!whitelistedItemIdRequests.contains(id)) {
-      whitelistedItemIdRequests.add(id);
+  public void registerSkullRequest(String name) {
+    if (!whitelistedItemIdRequests.contains(name)) {
+      whitelistedItemIdRequests.add(name);
     }
   }
 
-  public boolean idWhitelisted(UUID id) {
+  public boolean skullWhitelisted(String id) {
     return whitelistedItemIdRequests.contains(id);
   }
 

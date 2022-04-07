@@ -25,8 +25,10 @@ public final class ConnectionMetadata {
   public boolean sendAsyncMessage = false;
   public boolean eligibleForTransactionTimeout = false;
 
-  private final Deque<Object> enqueuedPackets = new LinkedList<>();
+  private final Deque<Object> bufferEnqueue = new LinkedList<>();
   public long lastEnqueue = 0;
+  public boolean ignorePacket;
+  public long packets = 0;
 
   // Client Synchronization
   public int latency;
@@ -178,6 +180,6 @@ public final class ConnectionMetadata {
   }
 
   public Deque<Object> enqueuedPackets() {
-    return enqueuedPackets;
+    return bufferEnqueue;
   }
 }

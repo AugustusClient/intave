@@ -8,6 +8,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public final class LatencyStudy {
   private final static Map<Short, AtomicLong> hitDelays = new ConcurrentHashMap<>();
 
+  private static long transPingCount;
+  private static long transPingNum;
+
   public static void enterHit(short tickLatency) {
     hitDelays.computeIfAbsent(tickLatency, x -> new AtomicLong(0L)).incrementAndGet();
   }
@@ -20,6 +23,20 @@ public final class LatencyStudy {
       count.addAndGet(atomicLong.get());
     });
     return (double) score.get() / Math.max((double) count.get(), 1);
+  }
+
+  public static void receivedTransactionAfter(long milliseconds) {
+    transPingNum += Math.min(milliseconds, 1000);
+    transPingCount++;
+
+    if (transPingNum > Integer.MAX_VALUE / 2) {
+      transPingNum /= 2;
+      transPingCount /= 2;
+    }
+  }
+
+  public static long transactionPingAverage() {
+    return transPingNum == 0 ? 0 : transPingNum / transPingCount;
   }
 
   private static double cachedAverage;

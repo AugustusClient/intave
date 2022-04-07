@@ -8,6 +8,7 @@ import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntaveLogger;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.adapter.MinecraftVersions;
+import de.jpx3.intave.diagnostic.LatencyStudy;
 import de.jpx3.intave.executor.TaskTracker;
 import de.jpx3.intave.module.Module;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
@@ -15,6 +16,7 @@ import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.ConnectionMetadata;
+import de.jpx3.intave.user.meta.MovementMetadata;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -130,7 +132,9 @@ public final class FeedbackReceiver extends Module {
       transactionShortKeyMap.remove(transactionIdentifier);
       transactionGlobalKeyMap.remove(transactionResponse.num());
       receiveRequest(user, transactionResponse);
-      user.meta().connection().receivedTransactionAfter(transactionResponse.passedTime());
+      long passedTime = transactionResponse.passedTime();
+      user.meta().connection().receivedTransactionAfter(passedTime);
+      LatencyStudy.receivedTransactionAfter(passedTime);
       event.setCancelled(true);
     }
   }
@@ -214,22 +218,38 @@ public final class FeedbackReceiver extends Module {
   public void enqueueOutgoingPackets(PacketEvent event) {
     Player player = event.getPlayer();
     User user = UserRepository.userOf(player);
+    ConnectionMetadata connection = user.meta().connection();
+    MovementMetadata movement = user.meta().movement();
+
     PacketContainer packetContainer = event.getPacket();
     PacketType packetType = event.getPacketType();
-
-    ConnectionMetadata connection = user.meta().connection();
     Deque<Object> enqueuedPackets = connection.enqueuedPackets();
 
     if (user.justJoined()) {
       return;
     }
 
-    boolean transactionTimeout = oldestPendingTransaction(user) > connection.transactionPingAverage() + 300;
+    if (connection.ignorePacket) {
+      connection.ignorePacket = false;
+      return;
+    }
 
-    long positionTimeoutTolerance = user.meta().protocol().flyingPacketStream() ? 0 : 1000;
-    boolean riding = user.meta().movement().isInVehicle();
-    boolean positionTimeout = !riding
-      && System.currentTimeMillis() - user.meta().connection().lastMovementPacket() > connection.transactionPingAverage() + 300 + positionTimeoutTolerance;
+//    if (connection.packets++ % 100 == 0) {
+//      Synchronizer.synchronize(() -> {
+//        player.setLevel((int) connection.transactionPingAverage());
+//      });
+//    }
+
+    long playerLatencyGain = connection.transactionPingAverage() - LatencyStudy.transactionPingAverage();
+    boolean significantGain = playerLatencyGain > 150; // trustfactor?
+
+    long lastMovementPacket = System.currentTimeMillis() - connection.lastMovementPacket();
+    long oldestTransactionPacket = oldestPendingTransaction(user);
+    long positionTimeoutTolerance = user.meta().protocol().flyingPacketStream() ? 0 : 1050;
+
+    boolean transactionTimeout = oldestTransactionPacket > connection.transactionPingAverage() + LatencyStudy.transactionPingAverage() / 2 + 100;
+    boolean riding = movement.isInVehicle();
+    boolean positionTimeout = !riding && lastMovementPacket > connection.transactionPingAverage() + LatencyStudy.transactionPingAverage() / 2 + 300 + positionTimeoutTolerance;
 
     boolean idAddressed =
       packetType == PacketType.Play.Server.ENTITY_STATUS ||
@@ -244,9 +264,10 @@ public final class FeedbackReceiver extends Module {
       }
     }
 
-    if (transactionTimeout || positionTimeout) {
+    boolean tooManyPackets = enqueuedPackets.size() > 4000;
+    if (!tooManyPackets && (transactionTimeout || positionTimeout)) {
       enqueuedPackets.offerLast(packetContainer.getHandle());
-      user.meta().connection().lastEnqueue = System.currentTimeMillis();
+      connection.lastEnqueue = System.currentTimeMillis();
       event.setCancelled(true);
     } else if (!enqueuedPackets.isEmpty()) {
       if (enqueuedPackets.size() > 100) {
@@ -254,23 +275,26 @@ public final class FeedbackReceiver extends Module {
         for (int i = 0; i < 10; i++) {
           Object packet = enqueuedPackets.pollFirst();
           if (packet == null) break;
+          connection.ignorePacket = true;
           sendPacket(player, packet);
         }
         enqueuedPackets.offerLast(packetContainer.getHandle());
+        event.setCancelled(true);
       } else {
         // send all packets in the queue by poll
         while (!enqueuedPackets.isEmpty()) {
           Object packet = enqueuedPackets.pollFirst();
+          connection.ignorePacket = true;
           sendPacket(player, packet);
         }
       }
-      user.meta().connection().lastEnqueue = System.currentTimeMillis();
+      connection.lastEnqueue = System.currentTimeMillis();
     }
   }
 
   private void sendPacket(Player player, Object packet) {
     try {
-      ProtocolLibrary.getProtocolManager().sendServerPacket(player, PacketContainer.fromPacket(packet), false);
+      ProtocolLibrary.getProtocolManager().sendServerPacket(player, PacketContainer.fromPacket(packet), true);
     } catch (InvocationTargetException exception) {
       exception.printStackTrace();
     }
