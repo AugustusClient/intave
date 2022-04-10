@@ -1,6 +1,8 @@
 package de.jpx3.intave.check.combat.heuristics.detect.clickpatterns;
 
 import de.jpx3.intave.check.combat.Heuristics;
+import de.jpx3.intave.check.combat.heuristics.Anomaly;
+import de.jpx3.intave.check.combat.heuristics.Confidence;
 import de.jpx3.intave.user.User;
 import org.bukkit.Bukkit;
 
@@ -18,7 +20,9 @@ public final class AirClickLimitHeuristics extends SwingBlueprint<AirClickLimitB
     AirClickLimitBlueprintMeta exampleMeta = metaOf(userOf(user.player()));
     double cps = clickPerSecond(delays);
     if (cps > 15 && exampleMeta.doubleClicks == 0) {
-      Bukkit.broadcastMessage("§cBye:! " + cps + " " + exampleMeta.doubleClicks);
+      String description = String.format("clicking too fast without double clicks %.2f", cps);
+      Anomaly anomaly = Anomaly.anomalyOf("300", Confidence.NONE, Anomaly.Type.AUTOCLICKER, description);
+      parentCheck().saveAnomaly(user.player(), anomaly);
     }
   }
 
