@@ -8,16 +8,13 @@ import de.jpx3.intave.check.combat.Heuristics;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.user.User;
-import de.jpx3.intave.user.meta.CheckCustomMetadata;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static de.jpx3.intave.check.combat.heuristics.detect.clickpatterns.SwingBlueprint.SwingMeta;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
 
-public abstract class SwingBlueprint<M extends SwingMeta>
-  extends CheckPartBlueprintLayout<Heuristics, SwingMeta, M> {
+public abstract class SwingBlueprint<M extends SwingBlueprintMeta>
+  extends CheckPartBlueprintLayout<Heuristics, SwingBlueprintMeta, M> {
   private final int sampleSize;
   // Could use bit-shift operations for these options in constructor? they're always true & false for now
   private boolean ignoreDoubleClicks = true;
@@ -28,13 +25,6 @@ public abstract class SwingBlueprint<M extends SwingMeta>
   public SwingBlueprint(Heuristics parentCheck, Class<M> metaClass, int sampleSize) {
     super(parentCheck, metaClass);
     this.sampleSize = sampleSize;
-  }
-
-  public abstract static class SwingMeta extends CheckCustomMetadata {
-    private final List<Integer> delays = new ArrayList<>();
-    private int delay;
-    private int lastAttack; // In client ticks
-    private boolean placedBlock;
   }
 
   // This isn't going to work because when we will extend it we won't know our user?
@@ -49,7 +39,7 @@ public abstract class SwingBlueprint<M extends SwingMeta>
   )
   public void clientSwing(PacketEvent event) {
     User user = userOf(event.getPlayer());
-    SwingMeta meta = metaOf(user);
+    SwingBlueprintMeta meta = metaOf(user);
     // Completely ignore this swing, like it never existed!
     if (user.meta().attack().inBreakProcess || meta.placedBlock) {
       return;
@@ -76,7 +66,7 @@ public abstract class SwingBlueprint<M extends SwingMeta>
   // BLOCK_PLACE is replaced by USE_ITEM in 1.9+ but it doesn't matter to us since those detections are for 1.8-
   public void clientBlockPlace(PacketEvent event) {
     User user = userOf(event.getPlayer());
-    SwingMeta meta = metaOf(user);
+    SwingBlueprintMeta meta = metaOf(user);
 
     int blockPlaceDirection = event.getPacket().getIntegers().read(0);
     if (blockPlaceDirection != 255) {
@@ -92,7 +82,7 @@ public abstract class SwingBlueprint<M extends SwingMeta>
   )
   public void clientUseEntity(PacketEvent event) {
     User user = userOf(event.getPlayer());
-    SwingMeta meta = metaOf(user);
+    SwingBlueprintMeta meta = metaOf(user);
     PacketContainer packet = event.getPacket();
     EnumWrappers.EntityUseAction action = packet.getEntityUseActions().readSafely(0);
     if (action == null) {
@@ -111,7 +101,7 @@ public abstract class SwingBlueprint<M extends SwingMeta>
   )
   public void clientTickUpdate(PacketEvent event) {
     User user = userOf(event.getPlayer());
-    SwingMeta meta = metaOf(user);
+    SwingBlueprintMeta meta = metaOf(user);
     meta.delay++;
     meta.lastAttack++;
     meta.placedBlock = false;
