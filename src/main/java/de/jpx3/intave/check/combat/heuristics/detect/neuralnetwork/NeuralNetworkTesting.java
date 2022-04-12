@@ -1,12 +1,16 @@
 package de.jpx3.intave.check.combat.heuristics.detect.neuralnetwork;
 
+import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import de.jpx3.intave.check.MetaCheckPart;
 import de.jpx3.intave.check.combat.Heuristics;
+import de.jpx3.intave.check.combat.heuristics.detect.combatpatterns.RotationPrevisionHeuristic;
 import de.jpx3.intave.executor.IntaveThreadFactory;
+import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
+import de.jpx3.intave.module.tracker.entity.EntityShade;
 import de.jpx3.intave.shade.ClientMathHelper;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.AttackMetadata;
@@ -31,13 +35,15 @@ import static de.jpx3.intave.check.combat.heuristics.detect.neuralnetwork.activa
 
 public class NeuralNetworkTesting extends MetaCheckPart<Heuristics, NeuralNetworkTesting.NeuralNetworkTestingMeta> {
   private final ExecutorService executorService = Executors.newSingleThreadExecutor(IntaveThreadFactory.ofLowestPriority());
-  
+
+  private final String testUsername = "iTz_Lucky";
+
   public NeuralNetworkTesting(Heuristics parentCheck) {
     super(parentCheck, NeuralNetworkTesting.NeuralNetworkTestingMeta.class);
   }
   
   public static class NeuralNetworkTestingMeta extends CheckCustomMetadata {
-    public int lastAttackCounter;
+    public int lastAttack;
   }
   
   private static final NeuralNetwork NEURAL_NETWORK = new NeuralNetwork(
@@ -58,9 +64,16 @@ public class NeuralNetworkTesting extends MetaCheckPart<Heuristics, NeuralNetwor
     }
   )
   public void playerAttack(PacketEvent event) {
-    Player player = event.getPlayer();
-    NeuralNetworkTestingMeta neuralNetworkTestingMeta = metaOf(player);
-    neuralNetworkTestingMeta.lastAttackCounter = 0;
+    User user = userOf(event.getPlayer());
+    NeuralNetworkTestingMeta meta = metaOf(user);
+    PacketContainer packet = event.getPacket();
+    EnumWrappers.EntityUseAction action = packet.getEntityUseActions().readSafely(0);
+    if (action == null) {
+      action = packet.getEnumEntityUseActions().read(0).getAction();
+    }
+    if (action == EnumWrappers.EntityUseAction.ATTACK) {
+      meta.lastAttack = 0;
+    }
   }
   
   @PacketSubscription(
@@ -75,7 +88,7 @@ public class NeuralNetworkTesting extends MetaCheckPart<Heuristics, NeuralNetwor
   public void playerMove(PacketEvent event) {
     Player player = event.getPlayer();
     User user = userOf(player);
-    NeuralNetworkTestingMeta neuralNetworkTestingMeta = metaOf(player);
+    NeuralNetworkTestingMeta meta = metaOf(player);
     
     AttackMetadata attack = user.meta().attack();
     MovementMetadata movement = user.meta().movement();
@@ -92,15 +105,41 @@ public class NeuralNetworkTesting extends MetaCheckPart<Heuristics, NeuralNetwor
 //        + " yawDelta " + MathHelper.formatDouble(yawDelta, 4)
 //    );
     
-    if (attack.perfectYaw() != 0 && a != 0 && attack.recentlyAttacked(500)) {
+    /*if (attack.perfectYaw() != 0 && a != 0 && attack.recentlyAttacked(500)) {
       double x = mapData(a, -45, 45, -1, 1);
       double y = mapData(b, -45, 45, -1, 1);
       
       Point point = new Point(x, y);
       addPoint(player, point);
+    }*/
+    EntityShade target = user.meta().attack().lastAttackedEntity();
+    if (target == null) {
+      return;
+    }
+    MovementMetadata movementData = user.meta().movement();
+    //user.player().sendMessage(String.format("x=%.3f y=%.3f z=%.3f",
+    //  target.position.posX, target.position.posY, target.position.posZ));
+    float lastPlayerYaw = ClientMathHelper.wrapAngleTo180_float(movementData.lastRotationYaw);
+    float playerYaw = ClientMathHelper.wrapAngleTo180_float(movementData.rotationYaw);
+    float serverYaw = resolveYawRotation(target.position, movementData.lastPositionX, movementData.lastPositionZ);
+
+    float expectedYawDelta = (serverYaw - lastPlayerYaw) % 360f;
+    float yawDelta = (playerYaw -lastPlayerYaw) % 360f;
+    //player.sendMessage(String.format("%.4f %.4f", expectedYawDelta, yawDelta));
+    if (meta.lastAttack <= 0) {
+      double x = mapData(expectedYawDelta, -45, 45, -1, 1);
+      double y = mapData(yawDelta, -45, 45, -1, 1);
+      Point point = new Point(x, y);
+      addPoint(player, point);
     }
   }
-  
+
+  private float resolveYawRotation(EntityShade.EntityPositionContext entityPositions, double posX, double posZ) {
+    final double diffX = entityPositions.posX - posX;
+    final double diffZ = entityPositions.posZ - posZ;
+    return (float) Math.toDegrees(Math.atan2(diffZ, diffX)) - 90.0f;
+  }
+
   @PacketSubscription(
     priority = ListenerPriority.HIGHEST,
     packetsIn = {
@@ -113,11 +152,11 @@ public class NeuralNetworkTesting extends MetaCheckPart<Heuristics, NeuralNetwor
   public void playerMoveEnd(PacketEvent event) {
     Player player = event.getPlayer();
     NeuralNetworkTestingMeta neuralNetworkTestingMeta = metaOf(player);
-    neuralNetworkTestingMeta.lastAttackCounter++;
+    neuralNetworkTestingMeta.lastAttack++;
   }
   
   void addPoint(Player player, Point point) {
-    if (player.getName().contains("TheDarkBlue")) {
+    if (player.getName().contains(testUsername)) {
       greenPoints.add(point);
     } else {
       redPoints.add(point);
@@ -141,7 +180,7 @@ public class NeuralNetworkTesting extends MetaCheckPart<Heuristics, NeuralNetwor
     MovementMetadata movement = user.meta().movement();
     
     if (playerActions != null && player.isOp()) {
-      if (playerActions == EnumWrappers.PlayerAction.START_SNEAKING && player.getName().contains("Dark")) {
+      if (playerActions == EnumWrappers.PlayerAction.START_SNEAKING && player.getName().contains(testUsername)) {
         double motion = Math.hypot(movement.motionX(), movement.motionZ());
         if (motion < 0.005) {
           openWindow();

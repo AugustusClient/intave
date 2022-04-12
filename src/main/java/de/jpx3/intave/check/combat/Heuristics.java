@@ -21,6 +21,7 @@ import de.jpx3.intave.check.combat.heuristics.detect.combatpatterns.*;
 import de.jpx3.intave.check.combat.heuristics.detect.inventory.PacketInventoryHeuristic;
 import de.jpx3.intave.check.combat.heuristics.detect.mods.LabyModsHeuristic;
 import de.jpx3.intave.check.combat.heuristics.detect.clickpatterns.OldAirClickLimitHeuristic;
+import de.jpx3.intave.check.combat.heuristics.detect.neuralnetwork.NeuralNetworkTesting;
 import de.jpx3.intave.check.combat.heuristics.detect.other.*;
 import de.jpx3.intave.check.combat.heuristics.mine.MiningStrategyContainer;
 import de.jpx3.intave.check.combat.heuristics.mine.MiningStrategyExecutor;
@@ -96,8 +97,14 @@ public final class Heuristics extends MetaCheck<Heuristics.HeuristicMeta> {
       appendCheckPart(new LabyModsHeuristic(this));
     }
 
+    // Lucky experimental heuristics
     appendCheckPart(new SwingLimitHeuristics(this));
     appendCheckPart(new SwingDeviationHeuristics(this));
+    appendCheckPart(new RotationPrevisionHeuristic(this));
+
+
+    appendCheckPart(new NeuralNetworkTesting(this));
+
     appendCheckPart(new PreAttackHeuristic(this));
 //    appendCheckPart(new RotationAngleHeuristic(this));
 
