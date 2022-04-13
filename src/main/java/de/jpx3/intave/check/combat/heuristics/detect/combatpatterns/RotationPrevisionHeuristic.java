@@ -50,7 +50,8 @@ public final class RotationPrevisionHeuristic extends MetaCheckPart<Heuristics, 
 
     float expectedYawDelta = MathHelper.distanceInDegrees(serverYaw, lastPlayerYaw);
     float yawDelta = MathHelper.distanceInDegrees(playerYaw, lastPlayerYaw);
-    //player.sendMessage(String.format("%.4f %.4f rotExpected: %.4f rot: %.4f", expectedYawDelta, yawDelta, playerYaw, serverYaw));
+    double diff = Math.abs(expectedYawDelta - yawDelta);
+    //player.sendMessage(String.format("%.4f %.4f §bdiff: %.3f", expectedYawDelta, yawDelta, diff));
     if (meta.lastAttack <= 0) {
       RotationData rotationData = new RotationData(yawDelta, expectedYawDelta, 0, 0);
       meta.rotationDataList.add(rotationData);
