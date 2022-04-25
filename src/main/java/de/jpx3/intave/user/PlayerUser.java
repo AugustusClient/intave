@@ -63,12 +63,12 @@ final class PlayerUser implements User {
   private final WeakReference<Object> playerConnection;
   private final MetadataBundle metadata;
   private final PermissionCache permissionCache;
-  private final ColliderProcessor colliderProcessor;
-  private final SimpleColliderProcessor simpleColliderProcessor;
+  private ColliderProcessor colliderProcessor;
+  private SimpleColliderProcessor simpleColliderProcessor;
   private final List<MessageChannel> receivingUserChannels = new ArrayList<>();
   private final Map<MessageChannel, Predicate<Player>> channelConstraints = Maps.newEnumMap(MessageChannel.class);
   private final Map<Material, Material> typeTranslations = Maps.newHashMap();
-  private final Map<Pose, HitboxSize> poseSizes;
+  private Map<Pose, HitboxSize> poseSizes;
   private final BlockStateAccess blockStateAccess;
   private boolean ignoreNextInboundPacket;
   private boolean ignoreNextOutboundPacket;
@@ -112,8 +112,16 @@ final class PlayerUser implements User {
     Player player = player();
     ProtocolMetadata clientData = meta().protocol();
     clientData.refresh(player);
+    applyNewProtocolVersion();
     outputVersionJoinInfo();
     BlockTypeAccess.setupTranslationsFor(this);
+  }
+
+  @Override
+  public void applyNewProtocolVersion() {
+    this.colliderProcessor = Collider.suitableComplexColliderProcessorFor(this);
+    this.simpleColliderProcessor = Collider.suitableSimpleColliderProcessorFor(this);
+    this.poseSizes = Pose.poseSizesByVersion(metadata.protocol().protocolVersion());
   }
 
   private void outputVersionJoinInfo() {

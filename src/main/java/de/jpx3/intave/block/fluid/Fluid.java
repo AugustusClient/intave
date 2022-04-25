@@ -23,6 +23,14 @@ public final class Fluid {
     return !empty && this.fluidTag == fluidTag;
   }
 
+  public boolean isOfWater() {
+    return !empty && this.fluidTag == FluidTag.WATER;
+  }
+
+  public boolean isOfLava() {
+    return !empty && this.fluidTag == FluidTag.LAVA;
+  }
+
   public boolean isEmpty() {
     return empty;
   }

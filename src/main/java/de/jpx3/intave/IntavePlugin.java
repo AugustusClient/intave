@@ -352,6 +352,9 @@ public final class IntavePlugin extends JavaPlugin {
         } else if ("hwidr".equals(response)) {
           message = "Unable to boot: Hardware identification required (see website)";
           bad = true;
+        } else if ("rate".equals(response)) {
+          message = "Unable to boot: Too many pending requests, please contact support";
+          bad = true;
         } else if ("expired".equals(response)) {
           message = "Unable to boot: Buy Intave for continued use";
           bad = true;

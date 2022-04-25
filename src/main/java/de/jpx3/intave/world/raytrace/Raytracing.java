@@ -16,10 +16,9 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-public final class
-Raytracing {
+public final class Raytracing {
   private static Raytracer raytracer;
-  private static final boolean[] PESSIMISTIC_BOOLEAN_ORDER = new boolean[] { false, true };
+  private static final boolean[] PESSIMISTIC_BOOLEAN_ORDER = new boolean[]{false, true};
 
   public static void setup() {
     String className;
@@ -34,12 +33,14 @@ Raytracing {
     }
     PatchyLoadingInjector.loadUnloadedClassPatched(Raytracing.class.getClassLoader(), className);
     raytracer = instanceOf(className);
+//    raytracer = new CustomRaytracer();
   }
 
   private static <T> T instanceOf(String className) {
     try {
+      //noinspection unchecked
       return (T) Class.forName(className).newInstance();
-    } catch (InstantiationException | IllegalAccessException | ClassNotFoundException exception) {
+    } catch (Exception exception) {
       throw new IllegalStateException(exception);
     }
   }
@@ -158,14 +159,12 @@ Raytracing {
     for (boolean fastMath : PESSIMISTIC_BOOLEAN_ORDER) {
       if (lastReach < attackReachDistance)
         break;
-
       NativeVector interpolatedLookVec = wrappedVectorForRotation(pitch, prevYaw, fastMath);
       NativeVector lookVector = eyeVector.addVector(
         interpolatedLookVec.xCoord * blockReachDistance,
         interpolatedLookVec.yCoord * blockReachDistance,
         interpolatedLookVec.zCoord * blockReachDistance
       );
-
       BoundingBox hitBox = entityBoundingBox.grow(boundingBoxExpansion, boundingBoxExpansion, boundingBoxExpansion);
       if (alternativeYDifference != 0) {
         hitBox = hitBox.addJustMaxY(alternativeYDifference);
@@ -184,8 +183,6 @@ Raytracing {
         } else {
           reach = distanceToEntity;
         }
-//        if (fastMath)
-//          Bukkit.broadcastMessage("" + (lastReach - reach));
         if (reach < lastReach) {
           lastReach = reach;
           lastHitVec = movingObjectPosition.hitVec;
@@ -207,6 +204,28 @@ Raytracing {
 
   private static NativeVector positionEyes(Player player, double prevPosX, double prevPosY, double prevPosZ) {
     return new NativeVector(prevPosX, prevPosY + resolvePlayerEyeHeight(player), prevPosZ);
+  }
+
+  public static MovingObjectPosition blockShrinkRayTrace(Player player, Location playerLocation, double shrik) {
+    double blockReachDistance = resolveBlockReachDistance(player.getGameMode());
+    double eyeHeight = resolvePlayerEyeHeight(player);
+    return blockRayTrace(player, playerLocation, playerLocation, blockReachDistance, eyeHeight, 1.0f);
+  }
+
+  public static MovingObjectPosition blockShrinkRayTrace(Player player, Location location, Location prevLocation, double blockReachDistance, double eyeHeight, float partialTicks) {
+    NativeVector eyeVector = resolvePositionEyes(location, prevLocation, eyeHeight, partialTicks);
+    NativeVector lookVector = resolveLookVector(location, prevLocation, partialTicks);
+    NativeVector targetVector = eyeVector.addVector(lookVector.xCoord * blockReachDistance, lookVector.yCoord * blockReachDistance, lookVector.zCoord * blockReachDistance);
+    return blockShrinkRayTrace(location.getWorld(), player, eyeVector, targetVector);
+  }
+
+  public static MovingObjectPosition blockShrinkRayTrace(World world, Player player, NativeVector eyeVector, NativeVector targetVector) {
+    try {
+      Timings.SERVICE_RAYTRACER_BLOCK.start();
+      return raytracer.raytrace(world, player, eyeVector, targetVector);
+    } finally {
+      Timings.SERVICE_RAYTRACER_BLOCK.stop();
+    }
   }
 
   public static MovingObjectPosition blockRayTrace(Player player, Location playerLocation) {
@@ -276,5 +295,4 @@ Raytracing {
   private static double resolveBlockReachDistance(GameMode gameMode) {
     return (gameMode == GameMode.CREATIVE) ? 5.0 : 4.5;
   }
-
 }

@@ -2,7 +2,7 @@ package de.jpx3.intave.block.variant;
 
 final class EmptyBlockVariant implements BlockVariant {
   @Override
-  public Comparable<?> propertyOf(String name) {
+  public <T> T propertyOf(String name) {
     return null;
   }
 

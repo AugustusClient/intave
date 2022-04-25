@@ -3,9 +3,13 @@ package de.jpx3.intave.block.shape.pipe.drill;
 import de.jpx3.intave.block.shape.BlockShape;
 import de.jpx3.intave.block.shape.BlockShapes;
 import de.jpx3.intave.block.shape.pipe.drill.acbbs.v8AlwaysCollidingBoundingBox;
+import de.jpx3.intave.block.variant.BlockVariantRegister;
 import de.jpx3.intave.klass.rewrite.PatchyAutoTranslation;
 import de.jpx3.intave.shade.BoundingBox;
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_8_R3.AxisAlignedBB;
+import net.minecraft.server.v1_8_R3.BlockPosition;
+import net.minecraft.server.v1_8_R3.IBlockData;
+import net.minecraft.server.v1_8_R3.WorldServer;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.entity.Player;
@@ -21,7 +25,7 @@ public final class v8ShapeDrill extends AbstractShapeDrill {
   @PatchyAutoTranslation
   public BlockShape resolve(World world, Player player, org.bukkit.Material type, int blockState, int posX, int posY, int posZ) {
     BlockPosition blockposition = new BlockPosition(posX, posY, posZ);
-    IBlockData blockData = Block.getByCombinedId(type.getId() | (blockState & 0xF) << 12);
+    IBlockData blockData = (IBlockData) BlockVariantRegister.rawVariantOf(type, blockState);//Block.getByCombinedId(type.getId() | (blockState & 0xF) << 12);
     if (blockData == null) {
       return BlockShapes.emptyShape();
     }
@@ -33,7 +37,7 @@ public final class v8ShapeDrill extends AbstractShapeDrill {
     } catch (IllegalArgumentException exception) {
       // we catch irregularities here elsewhere
       return BoundingBox
-        // anything but a cubic or empty box
+        // anything but a full or empty box
         .originFromBounds(0.25,0.25,0.25,0.75,0.75,0.75)
         .contextualized(posX, posY, posZ);
     }

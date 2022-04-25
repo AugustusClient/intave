@@ -4,6 +4,7 @@ import de.jpx3.intave.block.shape.BlockShape;
 import de.jpx3.intave.block.shape.BlockShapes;
 import de.jpx3.intave.block.shape.pipe.drill.acbbs.v9AlwaysCollidingBoundingBox;
 import de.jpx3.intave.klass.rewrite.PatchyAutoTranslation;
+import de.jpx3.intave.shade.BoundingBox;
 import net.minecraft.server.v1_9_R2.*;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_9_R2.CraftWorld;
@@ -26,7 +27,15 @@ public final class v9ShapeDrill extends AbstractShapeDrill {
     }
     List<AxisAlignedBB> bbs = new ArrayList<>();
     WorldServer worldServer = ((CraftWorld) world).getHandle();
-    blockData.getBlock().a(blockData, worldServer, blockposition, ALWAYS_COLLIDING_BOX, bbs, null);
-    return translate(bbs);
+    try {
+      blockData.getBlock().a(blockData, worldServer, blockposition, ALWAYS_COLLIDING_BOX, bbs, null);
+      return translate(bbs);
+    } catch (IllegalArgumentException exception) {
+      // we catch irregularities here elsewhere
+      return BoundingBox
+        // anything but a full or empty box
+        .originFromBounds(0.25,0.25,0.25,0.75,0.75,0.75)
+        .contextualized(posX, posY, posZ);
+    }
   }
 }

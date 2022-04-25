@@ -192,7 +192,6 @@ class TestNeuralNetwork {
           for (double[][] data : trainingData) {
             double[] inputs = data[0];
             double[] targets = data[1];
-            
             neuralNetwork.train(inputs, targets);
           }
         }

@@ -82,9 +82,7 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
     InteractionMeta interactionMeta = metaOf(user);
     MovementMetadata movementData = user.meta().movement();
     AbilityMetadata abilityMetadata = user.meta().abilities();
-
     PacketContainer packet = event.getPacket();
-
     BlockInteractionReader reader = PacketReaders.readerOf(packet);
     try {
       com.comphenix.protocol.wrappers.BlockPosition blockPosition = reader.blockPosition();
@@ -122,7 +120,10 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
 
       boolean mustPostValidate = interactionMeta.remainingBlockStart > 0;
       if (!mustPostValidate && preprocessInteraction(interaction)) {
-        interactionEmulator.emulate(interaction);
+        if (interactionEmulator.emulate(interaction) == FAILED) {
+          refreshBlocksAround(player, blockPosition.toLocation(player.getWorld()));
+          event.setCancelled(true);
+        }
       } else {
         interactionMeta.interactionList.add(interaction);
         event.setCancelled(true);
@@ -212,18 +213,15 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
     User user = userOf(player);
     MovementMetadata movementData = user.meta().movement();
     InteractionMeta interactionMeta = metaOf(user);
-
     List<Interaction> interactionList = interactionMeta.interactionList;
     if (interactionList.isEmpty()) {
       return;
     }
-
     Location playerLocation = new Location(world, movementData.lastPositionX, movementData.lastPositionY, movementData.lastPositionZ);
     playerLocation.setYaw(movementData.rotationYaw);
     playerLocation.setPitch(movementData.rotationPitch);
     Location playerLocationmdf = playerLocation.clone();
     playerLocationmdf.setYaw(movementData.lastRotationYaw);
-
     for (Interaction interaction : interactionList) {
       processInteraction(interaction, playerLocation, playerLocationmdf);
     }
@@ -335,24 +333,23 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
       interactionMeta.estimateMouseDelayFix = raytraceFailed == interactionMeta.estimateMouseDelayFix;
     }
 
-    boolean flag, flagEnforce;
+    boolean flag, mustCancelPacket;
 
     if (!raytraceFailed) {
+      // everything is fine
       decrementer.decrement(user, 0.25);
-      InteractionEmulator.EmulationResult emulationResult = interactionEmulator.emulate(interaction);
-      boolean emulationFailed = emulationResult == FAILED;
-      flag = emulationFailed;
-      flagEnforce = emulationFailed;
+      boolean emulationFailed = interactionEmulator.emulate(interaction) == FAILED;
+      flag = mustCancelPacket = emulationFailed;
+//      mustCancelPacket = emulationFailed;
     } else {
       MovingObjectPosition movingObjectPosition = estimateMouseDelayFix ? raycastResultmdf : raycastResult;
       Location location = estimateMouseDelayFix ? playerLocationmdf : playerLocation;
       boolean atLeastLookingAtBlock = movingObjectPosition != null && atLeastLookingAtBlock(user, location, targetLocation, movingObjectPosition);
       boolean isAbortDestroyBlock = interaction.digType() == ABORT_DESTROY_BLOCK;
       flag = enabled() && !isAbortDestroyBlock && performFlag(interaction, raycastResult, targetLocation, raycastLocation, hitMiss, atLeastLookingAtBlock);
-      flagEnforce = false;
+      mustCancelPacket = false;
     }
-
-    dequeueInteraction(interaction, raycastResult, targetLocation, raycastLocation, hitMiss, flag, flagEnforce);
+    dequeueInteraction(interaction, raycastResult, targetLocation, raycastLocation, hitMiss, flag, mustCancelPacket);
   }
 
   private void dequeueInteraction(

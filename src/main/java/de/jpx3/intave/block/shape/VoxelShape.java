@@ -3,6 +3,7 @@ package de.jpx3.intave.block.shape;
 import de.jpx3.intave.shade.AxisRotation;
 import de.jpx3.intave.shade.BoundingBox;
 import de.jpx3.intave.shade.Direction;
+import de.jpx3.intave.shade.Position;
 
 import java.util.BitSet;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
 import static de.jpx3.intave.shade.ClientMathHelper.binarySearch;
 import static de.jpx3.intave.shade.Direction.Axis.*;
 
+@Deprecated
 public final class VoxelShape implements BlockShape {
   private final BitSet storage;
   private final int sizeX, sizeY, sizeZ;
@@ -143,6 +145,11 @@ public final class VoxelShape implements BlockShape {
   @Override
   public BlockShape normalized(int posX, int posY, int posZ) {
     return null;
+  }
+
+  @Override
+  public BlockRaytrace raytrace(Position origin, Position target) {
+    return BlockRaytrace.none();
   }
 
   @Override

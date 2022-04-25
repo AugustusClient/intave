@@ -18,13 +18,13 @@ public final class FileSpreadLayer implements Resource {
     this.fileToResource = fileToResource;
     this.spread = new Resource[spreadAmount];
     if (targetResource.available()) {
-      prepare();
+      setupSpreadFiles();
     }
   }
 
   private boolean prepared = false;
 
-  public synchronized void prepare() {
+  public synchronized void setupSpreadFiles() {
     if (prepared) {
       return;
     }
@@ -57,7 +57,7 @@ public final class FileSpreadLayer implements Resource {
   @Override
   public void write(InputStream inputStream) {
     targetResource.write(inputStream);
-    prepare();
+    setupSpreadFiles();
     copyMainToSpread();
   }
 
@@ -69,9 +69,9 @@ public final class FileSpreadLayer implements Resource {
 
   @Override
   public InputStream read() {
-    prepare();
-    int tries = 1000;
-    while (available() && tries-- > 0) {
+    setupSpreadFiles();
+    int attemptsRemaining = 1000;
+    while (available() && attemptsRemaining-- > 0) {
       int random = ThreadLocalRandom.current().nextInt(0, spread.length);
       Resource spreadResource = spread[random];
       if (spreadResource.available()) {

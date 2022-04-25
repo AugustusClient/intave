@@ -3,6 +3,7 @@ package de.jpx3.intave.block.shape;
 import de.jpx3.intave.diagnostic.MemoryTraced;
 import de.jpx3.intave.shade.BoundingBox;
 import de.jpx3.intave.shade.Direction;
+import de.jpx3.intave.shade.Position;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,6 +63,22 @@ public final class ArrayBlockShape extends MemoryTraced implements BlockShape {
       list.add(blockShape.normalized(posX, posY, posZ));
     }
     return new ArrayBlockShape(list);
+  }
+
+  @Override
+  public BlockRaytrace raytrace(Position origin, Position target) {
+    BlockRaytrace raytrace = null;
+    for (BlockShape content : contents) {
+      BlockRaytrace added = content.raytrace(origin, target);
+      if (added != BlockRaytrace.none()) {
+        if (raytrace == null) {
+          raytrace = added;
+        } else {
+          raytrace = raytrace.minSelect(added);
+        }
+      }
+    }
+    return raytrace;
   }
 
   @Override

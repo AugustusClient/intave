@@ -73,6 +73,11 @@ public interface User {
   void delayedSetup();
 
   /**
+   * Let the user know that his protocol version has changed
+   */
+  void applyNewProtocolVersion();
+
+  /**
    * Retrieve whether the associated player joined in the last 5 seconds
    * @return whether the player joined recently
    */

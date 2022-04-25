@@ -85,7 +85,6 @@ public final class EncryptionLayer implements Resource {
       }
       String quarterHash = stringBuilder.toString();
       String password = "adXUOhsZW7H5m4dlOyrNV7ZvHBBB071Sy2jCiuUZ91QMAcYyexjxwDQmXL1LR1nV";
-
       // xor the password with the quarterHash
       byte[] passwordBytes = password.getBytes(UTF_8);
       for (int j = 0; j < passwordBytes.length; j++) {

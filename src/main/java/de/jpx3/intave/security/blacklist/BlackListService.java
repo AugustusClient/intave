@@ -26,7 +26,7 @@ public final class BlackListService implements BukkitEventSubscriber {
   }
 
   public void setup() {
-    if(!enabled()) {
+    if (!enabled()) {
       return;
     }
     try {
@@ -57,7 +57,7 @@ public final class BlackListService implements BukkitEventSubscriber {
   @BukkitEventSubscription
   public void on(PlayerJoinEvent join) {
     Player player = join.getPlayer();
-    if(blacklisted(player)) {
+    if (blacklisted(player)) {
       disconnect(player);
     }
   }
@@ -75,6 +75,6 @@ public final class BlackListService implements BukkitEventSubscriber {
   }
 
   public boolean enabled() {
-    return plugin.settings().getBoolean("blacklist.enable");
+    return plugin.settings().getBoolean("blacklist.apply");
   }
 }

@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class VariantCachePipe implements ShapeResolverPipeline {
   private final ShapeResolverPipeline forward;
-  private final Map<Material, /*SoftReference*/Map<Integer, BlockShape>> cache = MemoryWatchdog.watch("variant-cache", new ConcurrentHashMap<>());
+  private final Map<Material, /*(SoftReference)*/Map<Integer, BlockShape>> cache = MemoryWatchdog.watch("variant-cache", new ConcurrentHashMap<>());
 
   public VariantCachePipe(ShapeResolverPipeline forward) {
     this.forward = forward;

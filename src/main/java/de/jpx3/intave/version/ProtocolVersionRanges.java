@@ -29,7 +29,7 @@ public final class ProtocolVersionRanges implements Iterable<ProtocolVersionRang
   public String byProtocolVersion(int version) {
     ProtocolVersionRange protocolVersionRange =
       versionRanges.stream()
-      .filter(range -> range.has(version))
+      .filter(range -> range.includes(version))
       .findFirst()
       .orElseGet(this::newest);
     return protocolVersionRange.version();

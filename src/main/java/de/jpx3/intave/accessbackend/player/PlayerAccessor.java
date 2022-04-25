@@ -53,6 +53,14 @@ public final class PlayerAccessor {
       }
 
       @Override
+      public void setProtocolVersion(int paramInt) {
+        String message = "Changed protocol-version of " + player.getName() + " to " + paramInt+ " (unknown origin)";
+        IntaveLogger.logger().info(message);
+        user.meta().protocol().setProtocolVersion(paramInt);
+        user.applyNewProtocolVersion();
+      }
+
+      @Override
       public double violationLevel(String check, String threshold) {
         check = check.toLowerCase(Locale.ROOT);
         if (!plugin.checks().hasCheck(check)) {

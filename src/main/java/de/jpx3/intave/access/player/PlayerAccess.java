@@ -5,6 +5,7 @@ import de.jpx3.intave.access.player.trust.TrustFactor;
 
 public interface PlayerAccess {
   int protocolVersion();
+  void setProtocolVersion(int paramInt);
 
   default double violationLevel(Check check) {
     return violationLevel(check, "thresholds");

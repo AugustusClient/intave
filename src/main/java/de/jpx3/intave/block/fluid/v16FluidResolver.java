@@ -13,6 +13,7 @@ import net.minecraft.server.v1_16_R3.World;
 
 @PatchyAutoTranslation
 public final class v16FluidResolver extends FluidResolver {
+
   @Override
   @PatchyAutoTranslation
   protected Fluid fluidAt(User user, int x, int y, int z) {

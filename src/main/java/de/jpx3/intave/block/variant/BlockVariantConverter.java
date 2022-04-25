@@ -6,6 +6,7 @@ import de.jpx3.intave.klass.locate.Locate;
 import de.jpx3.intave.klass.rewrite.PatchyAutoTranslation;
 import de.jpx3.intave.klass.rewrite.PatchyLoadingInjector;
 import net.minecraft.server.v1_14_R1.*;
+import net.minecraft.server.v1_8_R3.BlockStateList;
 import org.bukkit.Material;
 
 import java.lang.reflect.Method;
@@ -170,8 +171,7 @@ public final class BlockVariantConverter {
           getStateListMethod = Locate.classByKey("Block").getDeclaredMethod("getStateList");
           getStateListMethod.setAccessible(true);
         }
-        net.minecraft.server.v1_8_R3.BlockStateList blockStateList = (net.minecraft.server.v1_8_R3.BlockStateList) getStateListMethod.invoke(block);
-        Collection<net.minecraft.server.v1_8_R3.IBlockState> states = blockStateList.d();
+        Collection<net.minecraft.server.v1_8_R3.IBlockState> states = ((BlockStateList) getStateListMethod.invoke(block)).d();
         if (states.isEmpty()) {
           return Collections.emptyMap();
         }

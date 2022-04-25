@@ -2,6 +2,7 @@ package de.jpx3.intave.block.shape;
 
 import de.jpx3.intave.shade.BoundingBox;
 import de.jpx3.intave.shade.Direction;
+import de.jpx3.intave.shade.Position;
 
 import java.util.Collections;
 import java.util.List;
@@ -15,6 +16,11 @@ final class EmptyBlockShape implements BlockShape {
   @Override
   public BlockShape normalized(int posX, int posY, int posZ) {
     return this;
+  }
+
+  @Override
+  public BlockRaytrace raytrace(Position origin, Position target) {
+    return BlockRaytrace.none();
   }
 
   @Override

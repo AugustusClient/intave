@@ -316,6 +316,9 @@ public final class FeedbackReceiver extends Module {
       if (connection.lastBufferNotification + 30000 < System.currentTimeMillis()) {
         connection.lastBufferNotification = System.currentTimeMillis();
         SibylBroadcast.broadcast("[AYCN] " + player.getName() + " had himself " + enqueuedPacketAmount + " packets buffered.");
+        if (IntaveControl.GOMME_MODE) {
+          System.out.println("[AYCN] " + player.getName() + " got " + enqueuedPacketAmount + " packets buffered.");
+        }
 //        player.sendMessage(ChatColor.RED + "You have " + enqueuedPacketAmount + " packets buffered.");
       }
       connection.lastBufferEnqueue = System.currentTimeMillis();
@@ -338,6 +341,9 @@ public final class FeedbackReceiver extends Module {
       if (connection.lastDelayNotification + 30000 < System.currentTimeMillis()) {
         connection.lastDelayNotification = System.currentTimeMillis();
         SibylBroadcast.broadcast("[AYCN] " + player.getName() + " is being delayed by " + requestedDelay + "ms.");
+        if (IntaveControl.GOMME_MODE) {
+          System.out.println("[AYCN] " + player.getName() + " is being delayed by " + requestedDelay + "ms.");
+        }
 //        player.sendMessage(ChatColor.RED + "You are being delayed by " + requestedDelay + "ms.");
       }
     } else {

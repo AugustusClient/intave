@@ -19,8 +19,9 @@ final class IndexedBlockVariant implements BlockVariant {
     nativeConfig.forEach((setting, comparable) -> namedConfig.put(setting.name().toLowerCase(Locale.ROOT), comparable));
   }
 
-  public Comparable<?> propertyOf(String name) {
-    return namedConfig.get(name);
+  public <T> T propertyOf(String name) {
+    //noinspection unchecked
+    return (T) namedConfig.get(name);
   }
 
   @Override

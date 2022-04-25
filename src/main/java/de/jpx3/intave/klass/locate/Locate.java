@@ -21,6 +21,10 @@ public final class Locate {
   private final static Map<String, FieldLocation> fieldLocationCache = new ConcurrentHashMap<>();
   private final static Map<String, MethodLocation> methodLocationCache = new ConcurrentHashMap<>();
 
+//  static {
+//    classLocations.forEach(System.out::println);
+//  }
+
   public static String patchyConvert(String input) {
     input = input.replace("/", ".");
     String output;

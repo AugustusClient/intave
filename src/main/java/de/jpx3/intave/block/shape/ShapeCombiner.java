@@ -15,6 +15,9 @@ public final class ShapeCombiner {
   }
 
   public ShapeCombiner append(BlockShape blockShape) {
+    if (blockShape.isEmpty()) {
+      return this;
+    }
     if (EMPTY == this) {
       return new ShapeCombiner(blockShape);
     }

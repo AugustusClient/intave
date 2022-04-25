@@ -1,5 +1,6 @@
 package de.jpx3.intave.shade;
 
+import de.jpx3.intave.block.shape.BlockRaytrace;
 import de.jpx3.intave.block.shape.BlockShape;
 import de.jpx3.intave.diagnostic.MemoryTraced;
 import de.jpx3.intave.math.MathHelper;
@@ -9,6 +10,7 @@ import de.jpx3.intave.user.meta.MovementMetadata;
 import de.jpx3.intave.user.meta.ProtocolMetadata;
 import org.bukkit.Location;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
@@ -158,76 +160,6 @@ public final class BoundingBox extends MemoryTraced implements BlockShape {
     return offset;
   }
 
-  /**
-   * if instance and the argument bounding boxes overlap in the Y and Z dimensions, calculate the offset between them in
-   * the X dimension.  return var2 if the bounding boxes do not overlap or if var2 is closer to 0 then the calculated
-   * offset.  Otherwise return the calculated offset.
-   */
-  public double allowedXOffset(BoundingBox other, double offsetX) {
-    if (other.maxY > this.minY && other.minY < this.maxY && other.maxZ > this.minZ && other.minZ < this.maxZ) {
-      if (offsetX > 0.0D && other.maxX <= this.minX) {
-        double d1 = this.minX - other.maxX;
-
-        if (d1 < offsetX) {
-          offsetX = d1;
-        }
-      } else if (offsetX < 0.0D && other.minX >= this.maxX) {
-        double d0 = this.maxX - other.minX;
-
-        if (d0 > offsetX) {
-          offsetX = d0;
-        }
-      }
-
-    }
-    return offsetX;
-  }
-
-  /**
-   * if instance and the argument bounding boxes overlap in the X and Z dimensions, calculate the offset between them in
-   * the Y dimension.  return var2 if the bounding boxes do not overlap or if var2 is closer to 0 then the calculated
-   * offset.  Otherwise return the calculated offset.
-   */
-  public double allowedYOffset(BoundingBox other, double offsetY) {
-    if (other.maxX > this.minX && other.minX < this.maxX && other.maxZ > this.minZ && other.minZ < this.maxZ) {
-      if (offsetY > 0.0D && other.maxY <= this.minY) {
-        double d1 = this.minY - other.maxY;
-        if (d1 < offsetY) {
-          offsetY = d1;
-        }
-      } else if (offsetY < 0.0D && other.minY >= this.maxY) {
-        double d0 = this.maxY - other.minY;
-        if (d0 > offsetY) {
-          offsetY = d0;
-        }
-      }
-    }
-    return offsetY;
-  }
-
-  /**
-   * if instance and the argument bounding boxes overlap in the Y and X dimensions, calculate the offset between them in
-   * the Z dimension.  return var2 if the bounding boxes do not overlap or if var2 is closer to 0 then the calculated
-   * offset.  Otherwise return the calculated offset.
-   */
-  public double allowedZOffset(BoundingBox other, double offsetZ) {
-    if (other.maxX > this.minX && other.minX < this.maxX && other.maxY > this.minY && other.minY < this.maxY) {
-      if (offsetZ > 0.0D && other.maxZ <= this.minZ) {
-        double d1 = this.minZ - other.maxZ;
-        if (d1 < offsetZ) {
-          offsetZ = d1;
-        }
-      } else if (offsetZ < 0.0D && other.minZ >= this.maxZ) {
-        double d0 = this.maxZ - other.minZ;
-        if (d0 > offsetZ) {
-          offsetZ = d0;
-        }
-      }
-
-    }
-    return offsetZ;
-  }
-
   @Override
   public BlockShape contextualized(int posX, int posY, int posZ) {
     if (isOriginBox()) {
@@ -243,9 +175,15 @@ public final class BoundingBox extends MemoryTraced implements BlockShape {
     return normalized;
   }
 
+  private List<BoundingBox> selfListReference;
+
   @Override
+  @Deprecated
   public List<BoundingBox> boundingBoxes() {
-    return Collections.singletonList(this);
+    if (selfListReference == null) {
+      selfListReference = Collections.singletonList(this);
+    }
+    return selfListReference;
   }
 
   @Override
@@ -290,6 +228,75 @@ public final class BoundingBox extends MemoryTraced implements BlockShape {
     return new BoundingBox(d0, d1, d2, d3, d4, d5);
   }
 
+  @Override
+  public BlockRaytrace raytrace(Position origin, Position target) {
+    double[] distanceStorage = {1.0};
+    double differenceX = origin.getX() - target.getX();
+    double differenceY = origin.getY() - target.getY();
+    double differenceZ = origin.getZ() - target.getZ();
+    Direction direction = xyzDirectionRaytrace(target, distanceStorage, differenceX, differenceY, differenceZ);
+    return direction == null ? null : BlockRaytrace.from(direction, distanceStorage[0]);
+  }
+
+  private final static double TOLERANCE = 0.0000001;
+
+  @SuppressWarnings({"SuspiciousNameCombination", "ConstantConditions"})
+  @Nullable
+  private Direction xyzDirectionRaytrace(Position targetPosition, double[] distanceStorage, double differenceX, double differenceY, double differenceZ) {
+    double minX = this.minX;
+    double maxX = this.maxX;
+    double minY = this.minY;
+    double maxY = this.maxY;
+    double minZ = this.minZ;
+    double maxZ = this.maxZ;
+    double targetPositionX = targetPosition.getX();
+    double targetPositionY = targetPosition.getY();
+    double targetPositionZ = targetPosition.getZ();
+    Direction direction = null;
+    if (differenceX > TOLERANCE) {
+      direction = directionRaytrace(distanceStorage, direction, differenceX, differenceY, differenceZ, minX, minY, maxY, minZ, maxZ, Direction.WEST, targetPositionX, targetPositionY, targetPositionZ);
+    } else if (differenceX < -TOLERANCE) {
+      direction = directionRaytrace(distanceStorage, direction, differenceX, differenceY, differenceZ, maxX, minY, maxY, minZ, maxZ, Direction.EAST, targetPositionX, targetPositionY, targetPositionZ);
+    }
+    if (differenceY > TOLERANCE) {
+      direction = directionRaytrace(distanceStorage, direction, differenceY, differenceZ, differenceX, minY, minZ, maxZ, minX, maxX, Direction.DOWN, targetPositionY, targetPositionZ, targetPositionX);
+    } else if (differenceY < -TOLERANCE) {
+      direction = directionRaytrace(distanceStorage, direction, differenceY, differenceZ, differenceX, maxY, minZ, maxZ, minX, maxX, Direction.UP, targetPositionY, targetPositionZ, targetPositionX);
+    }
+    if (differenceZ > TOLERANCE) {
+      direction = directionRaytrace(distanceStorage, direction, differenceZ, differenceX, differenceY, minZ, minX, maxX, minY, maxY, Direction.NORTH, targetPositionZ, targetPositionX, targetPositionY);
+    } else if (differenceZ < -TOLERANCE) {
+      direction = directionRaytrace(distanceStorage, direction, differenceZ, differenceX, differenceY, maxZ, minX, maxX, minY, maxY, Direction.SOUTH, targetPositionZ, targetPositionX, targetPositionY);
+    }
+    return direction;
+  }
+
+  @Nullable
+  private static Direction directionRaytrace(
+    double[] distanceStorage,
+    @Nullable Direction inheritDirection,
+    double differenceMain, double differenceUp, double differenceRight,
+    double minMain,
+    double minUp, double maxUp,
+    double minRight, double maxRight,
+    Direction selectedDirection,
+    double targetMain, double targetUp, double targetRight
+  ) {
+    double normalizedStepMain = (minMain - targetMain) / differenceMain;
+    if (0.0 < normalizedStepMain && normalizedStepMain < distanceStorage[0]) {
+      double normalizedStepUp = targetUp + normalizedStepMain * differenceUp;
+      double normalizedStepRight = targetRight + normalizedStepMain * differenceRight;
+      if (
+        minUp - TOLERANCE < normalizedStepUp && normalizedStepUp < maxUp + TOLERANCE &&
+          minRight - TOLERANCE < normalizedStepRight && normalizedStepRight < maxRight + TOLERANCE
+      ) {
+        distanceStorage[0] = normalizedStepMain;
+        return selectedDirection;
+      }
+    }
+    return inheritDirection;
+  }
+
   public MovingObjectPosition calculateIntercept(NativeVector vecA, NativeVector vecB) {
     NativeVector vec3 = vecA.getIntermediateWithXValue(vecB, this.minX);
     NativeVector vec31 = vecA.getIntermediateWithXValue(vecB, this.maxX);
@@ -297,62 +304,47 @@ public final class BoundingBox extends MemoryTraced implements BlockShape {
     NativeVector vec33 = vecA.getIntermediateWithYValue(vecB, this.maxY);
     NativeVector vec34 = vecA.getIntermediateWithZValue(vecB, this.minZ);
     NativeVector vec35 = vecA.getIntermediateWithZValue(vecB, this.maxZ);
-
     if (!this.isVecInYZ(vec3)) {
       vec3 = null;
     }
-
     if (!this.isVecInYZ(vec31)) {
       vec31 = null;
     }
-
     if (!this.isVecInXZ(vec32)) {
       vec32 = null;
     }
-
     if (!this.isVecInXZ(vec33)) {
       vec33 = null;
     }
-
     if (!this.isVecInXY(vec34)) {
       vec34 = null;
     }
-
     if (!this.isVecInXY(vec35)) {
       vec35 = null;
     }
-
     NativeVector vec36 = null;
-
     if (vec3 != null) {
       vec36 = vec3;
     }
-
     if (vec31 != null && (vec36 == null || vecA.squareDistanceTo(vec31) < vecA.squareDistanceTo(vec36))) {
       vec36 = vec31;
     }
-
     if (vec32 != null && (vec36 == null || vecA.squareDistanceTo(vec32) < vecA.squareDistanceTo(vec36))) {
       vec36 = vec32;
     }
-
     if (vec33 != null && (vec36 == null || vecA.squareDistanceTo(vec33) < vecA.squareDistanceTo(vec36))) {
       vec36 = vec33;
     }
-
     if (vec34 != null && (vec36 == null || vecA.squareDistanceTo(vec34) < vecA.squareDistanceTo(vec36))) {
       vec36 = vec34;
     }
-
     if (vec35 != null && (vec36 == null || vecA.squareDistanceTo(vec35) < vecA.squareDistanceTo(vec36))) {
       vec36 = vec35;
     }
-
     if (vec36 == null) {
       return null;
     } else {
       Direction enumfacing;
-
       if (vec36 == vec3) {
         enumfacing = Direction.WEST;
       } else if (vec36 == vec31) {
@@ -366,7 +358,6 @@ public final class BoundingBox extends MemoryTraced implements BlockShape {
       } else {
         enumfacing = Direction.SOUTH;
       }
-
       return new MovingObjectPosition(vec36, enumfacing);
     }
   }

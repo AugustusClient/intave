@@ -37,8 +37,8 @@ public final class ScaffoldingCollisionModifier extends CollisionModifier {
       return false;
     }
     BlockVariant blockVariant = VolatileBlockAccess.variantAccess(user, world, posX, posY, posZ);
-    int distance = (Integer) blockVariant.propertyOf("distance");
-    boolean bottom = (Boolean) blockVariant.propertyOf("bottom");
+    int distance = blockVariant.propertyOf("distance");
+    boolean bottom = blockVariant.propertyOf("bottom");
     return bottom && distance != 0;
   }
 

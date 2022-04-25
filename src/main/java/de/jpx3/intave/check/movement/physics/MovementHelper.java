@@ -217,7 +217,7 @@ public final class MovementHelper {
   @WhyMustIExist
   private static boolean modernCanGoThroughTrapDoorOnLadder(User user, double positionX, double positionY, double positionZ) {
     BlockVariant variant = VolatileBlockAccess.variantAccess(user, user.player().getWorld(), positionX, positionY, positionZ);
-    boolean isOpen = (Boolean) variant.propertyOf("open");
+    boolean isOpen = variant.propertyOf("open");
     if (isOpen) {
       Direction direction = variant.enumProperty(Direction.class, "facing");
       if (VolatileBlockAccess.typeAccess(user, user.player().getWorld(), positionX, positionY - 1, positionZ) != Material.LADDER) {

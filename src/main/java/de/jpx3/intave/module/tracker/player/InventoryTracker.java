@@ -158,11 +158,13 @@ public final class InventoryTracker extends Module {
     PacketContainer packet = event.getPacket();
     WrappedChatComponent[] wrappedChatComponents = packet.getChatComponentArrays().readSafely(0);
 
-    for (WrappedChatComponent chatComponent : wrappedChatComponents) {
-      if (chatComponent.getJson().length() > 500) {
-        event.setCancelled(true);
-        user.synchronizedDisconnect("Too many characters in sign update packet");
-        return;
+    if (wrappedChatComponents != null) {
+      for (WrappedChatComponent chatComponent : wrappedChatComponents) {
+        if (chatComponent.getJson().length() > 500) {
+          event.setCancelled(true);
+          user.synchronizedDisconnect("Too many characters in sign update packet");
+          return;
+        }
       }
     }
   }

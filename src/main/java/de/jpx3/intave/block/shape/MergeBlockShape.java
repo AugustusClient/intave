@@ -3,6 +3,7 @@ package de.jpx3.intave.block.shape;
 import com.google.common.collect.Lists;
 import de.jpx3.intave.shade.BoundingBox;
 import de.jpx3.intave.shade.Direction;
+import de.jpx3.intave.shade.Position;
 
 import java.util.List;
 
@@ -43,6 +44,19 @@ public final class MergeBlockShape implements BlockShape {
       shapeA.normalized(posX, posY, posZ),
       shapeB.normalized(posX, posY, posZ)
     );
+  }
+
+  @Override
+  public BlockRaytrace raytrace(Position origin, Position target) {
+    BlockRaytrace raytraceA = shapeA.raytrace(origin, target);
+    BlockRaytrace raytraceB = shapeB.raytrace(origin, target);
+    if (raytraceA == null) {
+      return raytraceB;
+    }
+    if (raytraceB == null) {
+      return raytraceA;
+    }
+    return raytraceA.minSelect(raytraceB);
   }
 
   @Override

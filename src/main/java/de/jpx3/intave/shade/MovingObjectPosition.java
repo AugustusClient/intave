@@ -71,7 +71,6 @@ public class MovingObjectPosition {
       // just to make IntelliJ happy..
       return null;
     }
-
     if (NEW_RESOLVER) {
       return modernResolve(movingObjectPosition);
     } else {
@@ -161,6 +160,10 @@ public class MovingObjectPosition {
         }
       }
     }
+    return null;
+  }
+
+  public static MovingObjectPosition none() {
     return null;
   }
 

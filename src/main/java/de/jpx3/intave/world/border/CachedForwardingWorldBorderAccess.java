@@ -27,7 +27,7 @@ public final class CachedForwardingWorldBorderAccess implements WorldBorderAcces
       sizeCache = new WorldBorderAccessCache<>(forward.sizeOf(world));
       this.sizeCache.put(world, sizeCache);
     } else if (sizeCache.expired()) {
-      sizeCache.typeFlush(forward.sizeOf(world));
+      sizeCache.flush(forward.sizeOf(world));
     }
     return sizeCache.target();
   }
@@ -39,7 +39,7 @@ public final class CachedForwardingWorldBorderAccess implements WorldBorderAcces
       locationCache = new WorldBorderAccessCache<>(forward.centerOf(world));
       this.locationCache.put(world, locationCache);
     } else if (locationCache.expired()) {
-      locationCache.typeFlush(forward.centerOf(world));
+      locationCache.flush(forward.centerOf(world));
     }
     return locationCache.target();
   }
@@ -53,7 +53,7 @@ public final class CachedForwardingWorldBorderAccess implements WorldBorderAcces
       this.time = System.currentTimeMillis();
     }
 
-    public void typeFlush(T newValue) {
+    public void flush(T newValue) {
       target = newValue;
       time = System.currentTimeMillis();
     }

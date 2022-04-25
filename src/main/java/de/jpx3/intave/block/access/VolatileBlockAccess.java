@@ -9,6 +9,8 @@ import de.jpx3.intave.user.User;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 
+import java.util.ConcurrentModificationException;
+
 import static de.jpx3.intave.world.WorldHeight.LOWER_WORLD_LIMIT;
 
 @Relocate
@@ -44,10 +46,18 @@ public final class VolatileBlockAccess {
   private static Block fallbackBlock(World world) {
     Location spawnLocation = world.getSpawnLocation();
     if (!world.isChunkLoaded(spawnLocation.getBlockX(), spawnLocation.getBlockZ())) {
-      Chunk[] loadedChunks = world.getLoadedChunks();
-      if (loadedChunks.length > 0) {
-        Chunk anyChunk = loadedChunks[0];
-        return world.getBlockAt(anyChunk.getX() << 4, LOWER_WORLD_LIMIT - 1, anyChunk.getZ() << 4);
+      try {
+        Chunk[] loadedChunks = world.getLoadedChunks();
+        if (loadedChunks.length > 0) {
+          Chunk anyChunk = loadedChunks[0];
+          return world.getBlockAt(anyChunk.getX() << 4, LOWER_WORLD_LIMIT - 1, anyChunk.getZ() << 4);
+        }
+      } catch (ConcurrentModificationException exception) {
+        Chunk[] loadedChunks = world.getLoadedChunks();
+        if (loadedChunks.length > 0) {
+          Chunk anyChunk = loadedChunks[0];
+          return world.getBlockAt(anyChunk.getX() << 4, LOWER_WORLD_LIMIT - 1, anyChunk.getZ() << 4);
+        }
       }
       // well.. xd
     }

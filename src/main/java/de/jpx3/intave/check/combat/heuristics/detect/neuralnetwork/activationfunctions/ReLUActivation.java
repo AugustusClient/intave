@@ -7,8 +7,6 @@ public class ReLUActivation extends ActivationFunction {
       return input;
     else
       return 0;
-    
-//    return Math.max(0, input);
   }
   
   @Override

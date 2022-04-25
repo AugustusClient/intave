@@ -6,6 +6,7 @@ import java.util.*;
 
 public final class UnknownEnumSetting extends NamedSetting<Integer> {
   private final ImmutableSet<Integer> values;
+  private final Class<?> owner;
   private final Map<String, Integer> enumNameToIndex = new HashMap<>();
   private final Map<Integer, String> enumIndexToName = new HashMap<>();
 
@@ -14,6 +15,7 @@ public final class UnknownEnumSetting extends NamedSetting<Integer> {
     if (!owner.isEnum()) {
       throw new IllegalStateException("Not an enum");
     }
+    this.owner = owner;
     for (Object value : values) {
       String key = value.toString().toLowerCase(Locale.ROOT);
       int ordinal = ((Enum<?>) value).ordinal();
@@ -26,7 +28,13 @@ public final class UnknownEnumSetting extends NamedSetting<Integer> {
   }
 
   public <K extends Enum<K>> K enumType(Class<K> enumClass, int index) {
-    return Enum.valueOf(enumClass, enumIndexToName.get(index).toUpperCase(Locale.ROOT));
+    String enumName = enumIndexToName.get(index);
+    if (enumName == null) {
+      System.out.println("Unknown enum index " + index + " in " + enumIndexToName + " for " + enumClass + ", owned by " + owner);
+      Thread.dumpStack();
+      return enumClass.getEnumConstants()[0];
+    }
+    return Enum.valueOf(enumClass, enumName.toUpperCase(Locale.ROOT));
   }
 
   @Override

@@ -60,6 +60,10 @@ public final class ProtocolMetadata {
     return protocolVersion;
   }
 
+  public void setProtocolVersion(int protocolVersion) {
+    this.protocolVersion = protocolVersion;
+  }
+
   public boolean legacyTeleportAccept() {
     return protocolVersion <= VER_1_8;
   }

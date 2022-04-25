@@ -19,7 +19,7 @@ public class ProtocolVersionRange implements Comparable<ProtocolVersionRange> {
     return to;
   }
 
-  public boolean has(int version) {
+  public boolean includes(int version) {
     return from <= version && version <= to;
   }
 

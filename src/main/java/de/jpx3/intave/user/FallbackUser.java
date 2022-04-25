@@ -61,6 +61,11 @@ public final class FallbackUser implements User {
   }
 
   @Override
+  public void applyNewProtocolVersion() {
+
+  }
+
+  @Override
   public MetadataBundle meta() {
     return this.metadata;
   }
