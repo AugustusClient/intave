@@ -5,6 +5,7 @@ import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.check.MitigationStrategy;
 import de.jpx3.intave.access.player.trust.TrustFactor;
 import de.jpx3.intave.adapter.MinecraftVersions;
+import de.jpx3.intave.analytics.GlobalStatisticsRecorder;
 import de.jpx3.intave.annotate.DispatchTarget;
 import de.jpx3.intave.annotate.Relocate;
 import de.jpx3.intave.annotate.refactoring.IdoNotBelongHere;
@@ -21,6 +22,7 @@ import de.jpx3.intave.check.CheckViolationLevelDecrementer;
 import de.jpx3.intave.check.movement.physics.*;
 import de.jpx3.intave.diagnostic.timings.Timings;
 import de.jpx3.intave.executor.Synchronizer;
+import de.jpx3.intave.math.Hypot;
 import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.module.Modules;
 import de.jpx3.intave.module.tracker.entity.EntityShade;
@@ -553,6 +555,10 @@ public final class Physics extends Check {
     if (movementData.inLava()) {
       movementData.artificialFallDistance *= 0.5;
     }
+
+    GlobalStatisticsRecorder recorder = plugin.analytics().recorderOf(GlobalStatisticsRecorder.class);
+//    recorder.recordMovement();
+    recorder.recordBlockMoved(Hypot.fast(movementData.motionX(), movementData.motionZ()));
 
     if (IntaveControl.DEBUG_MOVEMENT) {
       ChatColor chatColor = violationLevelIncrease == 0 ? ChatColor.GRAY : ChatColor.YELLOW;

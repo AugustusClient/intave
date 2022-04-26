@@ -19,7 +19,7 @@ public final class PlaytimeRecorder extends Recorder {
   @Override
   public JsonObject asJson() {
     JsonObject json = new JsonObject();
-    json.addProperty("lifetime", System.currentTimeMillis() - startup / 1000 / 60);
+    json.addProperty("lifetime", (System.currentTimeMillis() - startup) / 1000 / 60);
     json.addProperty("total-active-playtime", activePlaytime);
     json.addProperty("total-afk-playtime", afkPlaytime);
     return json;

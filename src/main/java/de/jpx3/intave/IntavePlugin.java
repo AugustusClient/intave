@@ -596,6 +596,7 @@ public final class IntavePlugin extends JavaPlugin {
       shadowIntegration.setup();
       accessService = new IntaveAccessService(this);
       accessService.setup();
+      analytics = new Analytics(this);
       customClientSupportService = new CustomClientSupportService(this);
       customClientSupportService.setup();
       checkService = new CheckService(this);
@@ -621,6 +622,7 @@ public final class IntavePlugin extends JavaPlugin {
       checkService.setup();
       fakePlayerEventService.setup();
       blackListService.setup();
+      analytics.setup();
     } catch (Exception exception) {
       logger.error("Unable to boot: " + exception.getMessage());
       exception.printStackTrace();

@@ -3,6 +3,7 @@ package de.jpx3.intave.adapter.viaversion;
 import de.jpx3.intave.IntaveLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Method;
 import java.util.UUID;
@@ -52,5 +53,10 @@ public final class ViaVersion2Access implements ViaVersionAccess {
   @Override
   public boolean available(String version) {
     return version.startsWith("2");
+  }
+
+  @Override
+  public String version() {
+    return ((JavaPlugin) viaVersionInstance).getDescription().getVersion();
   }
 }

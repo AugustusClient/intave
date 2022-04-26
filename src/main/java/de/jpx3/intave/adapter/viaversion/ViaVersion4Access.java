@@ -57,4 +57,9 @@ public final class ViaVersion4Access implements ViaVersionAccess {
   public boolean available(String version) {
     return version.startsWith("4");
   }
+
+  @Override
+  public String version() {
+    return Bukkit.getPluginManager().getPlugin("ViaVersion").getDescription().getVersion();
+  }
 }

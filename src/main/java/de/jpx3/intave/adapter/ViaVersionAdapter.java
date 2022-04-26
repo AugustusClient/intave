@@ -66,4 +66,8 @@ public class ViaVersionAdapter {
   public static boolean foundLinkage() {
     return access != null;
   }
+
+  public static String version() {
+    return access != null ? access.version() : "unknown";
+  }
 }

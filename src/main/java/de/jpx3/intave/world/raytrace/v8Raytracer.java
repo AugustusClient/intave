@@ -30,7 +30,7 @@ public final class v8Raytracer implements Raytracer {
     Player player, WorldServer world,
     Vec3D nativeLookVector, Vec3D nativePosition
   ) {
-    System.out.println("Raytrace " + nativeLookVector + " " + nativePosition);
+//    System.out.println("Raytrace " + nativeLookVector + " " + nativePosition);
 
     NativeVector lookVector = NativeVector.fromNative(nativeLookVector);
     NativeVector targetVector = NativeVector.fromNative(nativePosition);

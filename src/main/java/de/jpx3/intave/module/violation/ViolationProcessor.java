@@ -4,6 +4,7 @@ import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.access.check.event.IntaveCommandExecutionEvent;
 import de.jpx3.intave.access.check.event.IntaveViolationEvent;
 import de.jpx3.intave.access.player.trust.TrustFactor;
+import de.jpx3.intave.analytics.GlobalStatisticsRecorder;
 import de.jpx3.intave.check.Check;
 import de.jpx3.intave.check.CheckStatistics;
 import de.jpx3.intave.connect.proxy.protocol.packets.IntavePacketOutKicked;
@@ -60,7 +61,7 @@ public final class ViolationProcessor extends Module {
     processViolationSpam(violationContext);
     processViolationStatistics(violationContext);
     processViolationVerbose(violationContext);
-    noteViolationToStorage(violationContext);
+    forwardViolationToAnalytics(violationContext);
     processViolationLevelIncrease(violationContext);
     lookupThresholdCommands(violationContext);
     processThresholdsEvents(violationContext);
@@ -188,11 +189,13 @@ public final class ViolationProcessor extends Module {
     plugin.logger().violation(consoleMessage);
   }
 
-  private void noteViolationToStorage(ViolationContext violationContext) {
+  private void forwardViolationToAnalytics(ViolationContext violationContext) {
     if (violationContext.completed()) {
       return;
     }
+    GlobalStatisticsRecorder recorder = plugin.analytics().recorderOf(GlobalStatisticsRecorder.class);
     Violation violation = violationContext.violation();
+    recorder.recordViolation(violation.check().name());
     Player player = violation.findPlayer().orElseThrow(IllegalStateException::new);
     User user = UserRepository.userOf(player);
     ViolationStorage violationStorage = (ViolationStorage) user.storageOf(ViolationStorage.class);

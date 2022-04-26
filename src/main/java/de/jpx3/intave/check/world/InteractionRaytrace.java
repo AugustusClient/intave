@@ -342,6 +342,8 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
       flag = mustCancelPacket = emulationFailed;
 //      mustCancelPacket = emulationFailed;
     } else {
+//      System.out.println(raycastLocation + " " + targetLocation);
+//      System.out.println(raycastLocation.distance(targetLocation) + " blocks difference");
       MovingObjectPosition movingObjectPosition = estimateMouseDelayFix ? raycastResultmdf : raycastResult;
       Location location = estimateMouseDelayFix ? playerLocationmdf : playerLocation;
       boolean atLeastLookingAtBlock = movingObjectPosition != null && atLeastLookingAtBlock(user, location, targetLocation, movingObjectPosition);

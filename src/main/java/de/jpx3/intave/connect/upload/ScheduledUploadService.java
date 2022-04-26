@@ -1,22 +1,31 @@
 package de.jpx3.intave.connect.upload;
 
+import de.jpx3.intave.IntaveLogger;
 import de.jpx3.intave.IntavePlugin;
+import de.jpx3.intave.annotate.Native;
 import de.jpx3.intave.cleanup.ShutdownTasks;
 import de.jpx3.intave.executor.BackgroundExecutor;
 import de.jpx3.intave.security.ContextSecrets;
 import de.jpx3.intave.security.HWIDVerification;
 import de.jpx3.intave.security.LicenseAccess;
+import org.apache.commons.io.output.CountingOutputStream;
 import org.bukkit.Bukkit;
 
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.*;
+import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -31,15 +40,12 @@ public final class ScheduledUploadService {
 
   public void enable() {
     mergeFiles();
-    ShutdownTasks.addBeforeAll(this::disable);
+    ShutdownTasks.add(this::disable);
   }
 
   private void mergeFiles() {
-    BackgroundExecutor.execute(() -> {
-      mergeSessionFilesToDayFile();
-      uploadDayFilesWeekly();
-    });
-    // start timer for next day
+    BackgroundExecutor.execute(this::uploadSessionFiles);
+    // start timer for edge of next day
     Bukkit.getScheduler().scheduleSyncDelayedTask(IntavePlugin.singletonInstance(), this::mergeFiles, millisUntilNextDay() / 50);
   }
 
@@ -51,8 +57,9 @@ public final class ScheduledUploadService {
     scheduledUpload(name, new ByteArrayInputStream(data));
   }
 
+  @Native
   public void scheduledUpload(String name, InputStream data) throws IOException {
-    System.out.println("Scheduled upload: " + name + " (" + data.available() + " bytes)");
+    // encrypt data with public key
     if (storageSize + data.available() > STORAGE_BYTE_LIMIT) {
       if (!temporaryFolderPresent()) {
         newTemporaryFolder();
@@ -66,6 +73,17 @@ public final class ScheduledUploadService {
         }
       });
       storage.clear();
+      ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+      byte[] copy = new byte[2048];
+      int read;
+      while ((read = data.read(copy)) != -1) {
+        buffer.write(copy, 0, read);
+      }
+      byte[] array = compressAndEncrypt(buffer.toByteArray());
+      if (array == null) {
+        return;
+      }
+      copyToSession(name, array);
       storageSize = 0;
       return;
     }
@@ -76,7 +94,10 @@ public final class ScheduledUploadService {
       while ((read = data.read(copy)) != -1) {
         buffer.write(copy, 0, read);
       }
-      byte[] array = buffer.toByteArray();
+      byte[] array = compressAndEncrypt(buffer.toByteArray());
+      if (array == null) {
+        return;
+      }
       storage.put(name, array);
       storageSize += array.length;
     } catch (Exception exception) {
@@ -84,15 +105,64 @@ public final class ScheduledUploadService {
     }
   }
 
+  private byte[] compressAndEncrypt(byte[] data) {
+    try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
+      try (GZIPOutputStream gzip = new GZIPOutputStream(buffer)) {
+        gzip.write(data);
+      }
+      data = buffer.toByteArray();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    try {
+      KeyFactory rsaKeyFactory = KeyFactory.getInstance("RSA");
+      PublicKey publicKey = rsaKeyFactory.generatePublic(new X509EncodedKeySpec(publicKey(new byte[4096])));
+      Cipher cipher = Cipher.getInstance("RSA");
+      cipher.init(Cipher.PUBLIC_KEY, publicKey);
+      KeyGenerator aesKeyGenerator = KeyGenerator.getInstance("AES");
+      aesKeyGenerator.init(128);
+      SecretKey aesKey = aesKeyGenerator.generateKey();
+      Cipher encryptCipher = Cipher.getInstance("AES/GCM/NoPadding");
+      encryptCipher.init(Cipher.ENCRYPT_MODE, aesKey);
+      byte[] encryptedData = encryptCipher.doFinal(data);
+      byte[] encryptedAesKey = cipher.doFinal(aesKey.getEncoded());
+      ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+      buffer.write(encryptedData);
+      buffer.write(encryptedAesKey);
+      return buffer.toByteArray();
+    } catch (Exception exception) {
+      exception.printStackTrace();
+    }
+    return null;
+  }
+
+  private byte[] publicKey(byte[] garbage) {
+    String fileName = "/id_rsa.pub";
+    try(InputStream resourceAsStream = getClass().getResourceAsStream(fileName)) {
+      if (resourceAsStream == null) {
+        throw new RuntimeException("Failed to load public key: " + fileName);
+      } else {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        byte[] copy = new byte[2048];
+        int read;
+        while ((read = resourceAsStream.read(copy)) != -1) {
+          buffer.write(copy, 0, read);
+        }
+        return buffer.toByteArray();
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   public void disable() {
     mergeFilesToSessionFile();
-    mergeSessionFilesToDayFile();
-    uploadDayFilesWeekly();
+    uploadSessionFiles();
   }
 
   private void mergeFilesToSessionFile() {
     File workingFolder = dataFolder();
-    File sessionFile = new File(workingFolder, "X3-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 8) + ".zip");
+    File sessionFile = new File(workingFolder, "X3-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 8));
     sessionFile.getParentFile().mkdirs();
     boolean added = false;
     try {
@@ -140,49 +210,24 @@ public final class ScheduledUploadService {
     }
   }
 
-  private void mergeSessionFilesToDayFile() {
+  private void uploadSessionFiles() {
+    lock("X3-2-S");
     File workingFolder = dataFolder();
-    File dayFile = new File(workingFolder, "X4-" + (currentDay() - 1) + ".zip");
-    if (dayFile.exists()) {
+    File oldFile = new File(workingFolder, "X4-" + (currentDay() - 4));
+    if (oldFile.exists()) {
+      oldFile.delete();
+    }
+    File finalFile = new File(workingFolder, "X4-" + (currentDay() - 1));
+    if (finalFile.exists()) {
+      unlock("X3-2-S");
       return;
-    }
-    dayFile.getParentFile().mkdirs();
-    try {
-      dayFile.createNewFile();
-    } catch (IOException exception) {
-      exception.printStackTrace();
-    }
-    // create a zip file
-    try (ZipOutputStream zipOut = new ZipOutputStream(Files.newOutputStream(dayFile.toPath()))) {
-      File[] files = workingFolder.listFiles();
-      if (files != null) {
-        for (File file : files) {
-          // copy files from session folder to zip
-          if (file.getName().startsWith("X3-") && file.getName().endsWith(".zip")) {
-            zipOut.putNextEntry(new ZipEntry(file.getName()));
-            try (FileInputStream in = new FileInputStream(file)) {
-              int len;
-              byte[] buffer = new byte[2048];
-              while ((len = in.read(buffer)) != -1) {
-                zipOut.write(buffer, 0, len);
-              }
-            }
-            zipOut.closeEntry();
-            file.delete();
-          }
-        }
+    } else {
+      try {
+        finalFile.createNewFile();
+      } catch (IOException e) {
+        throw new RuntimeException(e);
       }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
     }
-  }
-
-  private void uploadDayFilesWeekly() {
-    // check if week has passed
-    if (currentDay() % 7 != 6) {
-      return;
-    }
-    // open connection
     try {
       URL url = new URL("https://service.intave.de/analytics/upload");
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -190,28 +235,108 @@ public final class ScheduledUploadService {
       connection.setRequestMethod("POST");
       connection.setRequestProperty("Content-Type", "application/zip");
       connection.setRequestProperty("Identifier", LicenseAccess.rawLicense());
-      connection.setRequestProperty("Machine", HWIDVerification.publicHardwareIdentifier());
+      connection.setRequestProperty("Hardware", HWIDVerification.publicHardwareIdentifier());
       OutputStream outputStream = connection.getOutputStream();
-      outputStream = new ZipOutputStream(outputStream);
-      File workingFolder = dataFolder();
-      File[] files = workingFolder.listFiles();
-      if (files != null) {
-        for (File file : files) {
-          if (file.getName().startsWith("X4-") && file.getName().endsWith(".zip")) {
-            try (FileInputStream in = new FileInputStream(file)) {
-              int len;
-              byte[] buffer = new byte[2048];
-              while ((len = in.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, len);
+      CountingOutputStream filterOutputStream = new CountingOutputStream(outputStream);
+      try (ZipOutputStream zipOut = new ZipOutputStream(filterOutputStream)) {
+        File[] files = workingFolder.listFiles();
+        if (files != null) {
+          for (File file : files) {
+            if (file.getName().startsWith("X3-")) {
+              zipOut.putNextEntry(new ZipEntry(file.getName()));
+              try (FileInputStream in = new FileInputStream(file)) {
+                int len;
+                byte[] buffer = new byte[2048];
+                while ((len = in.read(buffer)) != -1) {
+                  zipOut.write(buffer, 0, len);
+                }
               }
+              zipOut.closeEntry();
             }
           }
+        }
+      }
+      long bytes = filterOutputStream.getByteCount();
+      IntaveLogger.logger().info("Uploaded " + bytes + " bytes of analytics & usage data");
+      InputStream inputStream = connection.getInputStream();
+      StringBuilder response = new StringBuilder();
+      Scanner scanner = new Scanner(inputStream);
+      while (scanner.hasNextLine()) {
+        response.append(scanner.nextLine());
+      }
+      scanner.close();
+      if (!response.toString().equals("SUCCESS")) {
+        throw new RuntimeException("Server error: " + response);
+      }
+    } catch (Exception e) {
+      finalFile.delete();
+      unlock("X3-2-S");
+      throw new RuntimeException("Upload failed: " + e.getMessage());
+    }
+    File[] files = workingFolder.listFiles();
+    if (files != null) {
+      for (File file : files) {
+        if (file.getName().startsWith("X3-")) {
           file.delete();
         }
       }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
     }
+    unlock("X3-2-S");
+  }
+
+  private final Map<String, File> lockFiles = new HashMap<>();
+  private final Map<String, FileLock> locks = new HashMap<>();
+  private final Map<String, FileChannel> lockChannels = new HashMap<>();
+
+  public void lock(String key) {
+    FileLock lock = null;
+    FileChannel channel = null;
+    try {
+      File lockFile = new File(dataFolder(), "X0-" + key + ".lock");
+      if (lockFile.exists() && System.currentTimeMillis() - lockFile.lastModified() > 5 * 60 * 1000) {
+        try {
+          lockFile.delete();
+        } catch (Exception ignored) {}
+      }
+      int attemptsRemaining = 30 * 1000 / 50;
+      while (lockFile.exists() && attemptsRemaining-- > 0) {
+        try {
+          Thread.sleep(50);
+        } catch (InterruptedException exception) {
+          exception.printStackTrace();
+        }
+      }
+      lockFile.delete();
+      lockFile.createNewFile();
+      lockFiles.put(key, lockFile);
+      channel = new FileOutputStream(lockFile).getChannel();
+      lock = channel.lock();
+    } catch (IOException exception) {
+      exception.printStackTrace();
+    }
+    locks.put(key, lock);
+    lockChannels.put(key, channel);
+  }
+
+  public void unlock(String key) {
+    File lockFile = lockFiles.remove(key);
+    FileLock lock = locks.remove(key);
+    if (lock != null) {
+      try {
+        lock.release();
+      } catch (IOException exception) {
+        exception.printStackTrace();
+      }
+    }
+    FileChannel channel = lockChannels.remove(key);
+    if (channel != null) {
+      try {
+        channel.close();
+      } catch (IOException exception) {
+        exception.printStackTrace();
+      }
+    }
+    lockFile.delete();
   }
 
   private boolean temporaryFolderPresent() {

@@ -4,6 +4,7 @@ import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.player.event.BucketAction;
+import de.jpx3.intave.analytics.GlobalStatisticsRecorder;
 import de.jpx3.intave.block.access.BlockInteractionAccess;
 import de.jpx3.intave.block.access.VolatileBlockAccess;
 import de.jpx3.intave.block.collision.Collision;
@@ -107,6 +108,7 @@ public final class InteractionEmulator implements EventProcessor {
   private EmulationResult emulateBreak(Player player, Interaction interaction) {
     User user = userOf(player);
     World world = interaction.world();
+    plugin.analytics().recorderOf(GlobalStatisticsRecorder.class).recordBlockDestroyed();
     BlockPosition blockPosition = interaction.targetBlock();
     Location blockBreakLocation = blockPosition.toLocation(world);
     boolean access = WorldPermission.blockBreakPermission(
@@ -150,6 +152,7 @@ public final class InteractionEmulator implements EventProcessor {
   private EmulationResult emulatePlacement(Player player, Interaction interaction) {
     User user = userOf(player);
     World world = interaction.world();
+    plugin.analytics().recorderOf(GlobalStatisticsRecorder.class).recordBlockPlaced();
     Location blockAgainstLocation = interaction.targetBlock().toLocation(world);
     Location defaultPlacementLocation = blockAgainstLocation.clone().add(Direction.getFront(interaction.targetDirection()).getDirectionVec().convertToBukkitVec());
     boolean replace = BlockInteractionAccess.replacedOnPlacement(world, player, new BlockPosition(blockAgainstLocation.toVector()));

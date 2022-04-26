@@ -44,7 +44,7 @@ public final class ProtocolMetadata {
     this.refreshes++;
   }
 
-  private String versionAsString() {
+  private String versionAsString(int protocolVersion) {
     return ProtocolVersionConverter.versionByProtocolVersion(protocolVersion);
   }
 
@@ -53,7 +53,7 @@ public final class ProtocolMetadata {
   }
 
   public void setProtocolVersion(int protocolVersion) {
-    String versionString = versionAsString();
+    String versionString = versionAsString(protocolVersion);
     if (protocolVersion <= 0) {
       protocolVersion = VER_INVALID;
       minecraftVersion = MinecraftVersions.VER1_18_2;
@@ -171,7 +171,7 @@ public final class ProtocolMetadata {
   public boolean clientVersionOlderThanServerVersion() {
     if (behind == null || refreshes < 2) {
       MinecraftVersion server = MinecraftVersion.getCurrentVersion();
-      MinecraftVersion client = new MinecraftVersion(versionAsString());
+      MinecraftVersion client = new MinecraftVersion(versionAsString(protocolVersion));
       behind = !client.isAtLeast(server);
     }
     return behind;

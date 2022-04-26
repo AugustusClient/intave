@@ -57,4 +57,9 @@ public final class ViaVersion3Access implements ViaVersionAccess {
   public boolean available(String version) {
     return version.startsWith("3");
   }
+
+  @Override
+  public String version() {
+    return Bukkit.getPluginManager().getPlugin("ViaVersion").getDescription().getVersion();
+  }
 }
