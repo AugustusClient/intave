@@ -1,6 +1,10 @@
 package de.jpx3.intave.module.nayoro;
 
 import de.jpx3.intave.module.Modules;
+import de.jpx3.intave.module.nayoro.event.EntityMoveEvent;
+import de.jpx3.intave.module.nayoro.event.Event;
+import de.jpx3.intave.module.nayoro.event.EventRegistry;
+import de.jpx3.intave.module.nayoro.event.PropertiesEvent;
 import de.jpx3.intave.shade.Position;
 
 import java.io.DataInputStream;

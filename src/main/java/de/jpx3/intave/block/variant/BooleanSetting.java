@@ -5,10 +5,10 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
 import java.util.Optional;
 
-public final class BooleanSetting extends NamedSetting<Boolean> {
+final class BooleanSetting extends NamedSetting<Boolean> {
   private final ImmutableSet<Boolean> values = ImmutableSet.of(true, false);
 
-  public BooleanSetting(String name) {
+  BooleanSetting(String name) {
     super(name, Boolean.class);
   }
 

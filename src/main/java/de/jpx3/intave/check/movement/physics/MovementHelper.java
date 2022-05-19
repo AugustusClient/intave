@@ -2,7 +2,6 @@ package de.jpx3.intave.check.movement.physics;
 
 import de.jpx3.intave.annotate.refactoring.IdoNotBelongHere;
 import de.jpx3.intave.annotate.refactoring.WhyMustIExist;
-import de.jpx3.intave.block.access.BlockWrapper;
 import de.jpx3.intave.block.access.VolatileBlockAccess;
 import de.jpx3.intave.block.collision.Collision;
 import de.jpx3.intave.block.physics.BlockProperties;
@@ -19,13 +18,7 @@ import de.jpx3.intave.user.meta.ProtocolMetadata;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
-import org.bukkit.material.Attachable;
-import org.bukkit.material.Directional;
-import org.bukkit.material.MaterialData;
-import org.bukkit.material.Openable;
 
 import static de.jpx3.intave.shade.ClientMathHelper.floor;
 

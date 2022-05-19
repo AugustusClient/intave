@@ -1,8 +1,6 @@
 package de.jpx3.intave.block.physics;
 
 import com.comphenix.protocol.utility.MinecraftVersion;
-import de.jpx3.intave.IntaveControl;
-import de.jpx3.intave.IntaveLogger;
 import de.jpx3.intave.annotate.Nullable;
 import de.jpx3.intave.shade.Motion;
 import de.jpx3.intave.user.User;
@@ -10,7 +8,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public final class BlockPhysics {
@@ -29,13 +26,13 @@ public final class BlockPhysics {
     setup(BubbleColumnPhysics.class);
   }
 
-  private static void setup(Class<? extends BlockPhysic> blockClass) {
+  private static void setup(Class<? extends BlockPhysic> blockPhysicClass) {
     try {
-      BlockPhysic block = blockClass.newInstance();
-      block.setup(MINECRAFT_VERSION);
-      if (block.supportedOnServerVersion()) {
-        for (Material material : block.applicableMaterials()) {
-          materialLookup.put(material, block);
+      BlockPhysic blockPhysic = blockPhysicClass.newInstance();
+      blockPhysic.setupFor(MINECRAFT_VERSION);
+      if (blockPhysic.supportedOnServerVersion()) {
+        for (Material material : blockPhysic.applicableMaterials()) {
+          materialLookup.put(material, blockPhysic);
         }
       }
     } catch (InstantiationException | IllegalAccessException exception) {

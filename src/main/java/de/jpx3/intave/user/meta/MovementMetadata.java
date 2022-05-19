@@ -43,7 +43,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.comphenix.protocol.wrappers.WrappedAttributeModifier.Operation.ADD_PERCENTAGE;
-import static de.jpx3.intave.block.fluid.FluidTag.WATER;
 import static de.jpx3.intave.check.movement.physics.MovementHelper.resolveFriction;
 import static de.jpx3.intave.reflect.access.ReflectiveHandleAccess.handleOf;
 import static de.jpx3.intave.shade.ClientMathHelper.*;
@@ -395,11 +394,11 @@ public final class MovementMetadata implements SimulationEnvironment {
 
   public void updateEyesInWater() {
     double yPos = positionY + eyeHeight() - (double) 0.11111f;
-    this.eyesInWater = interactingFluid != null && interactingFluid.isOf(WATER);
+    this.eyesInWater = interactingFluid != null && interactingFluid.isOfWater();
     this.interactingFluid = null;
 
     Fluid fluid = Fluids.fluidAt(user, positionX, yPos, positionZ);
-    if (fluid.isOf(WATER)) {
+    if (fluid.isOfWater()) {
       double d1 = (float) floor(yPos) + 1.0f;
       if (d1 > yPos) {
         this.interactingFluid = fluid;

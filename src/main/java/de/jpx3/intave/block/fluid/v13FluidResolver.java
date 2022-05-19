@@ -9,7 +9,7 @@ import de.jpx3.intave.user.meta.MovementMetadata;
 import net.minecraft.server.v1_13_R2.*;
 
 @PatchyAutoTranslation
-public final class v13FluidResolver extends FluidResolver {
+final class v13FluidResolver extends FluidResolver {
   @Override
   @PatchyAutoTranslation
   protected Fluid fluidAt(User user, int x, int y, int z) {

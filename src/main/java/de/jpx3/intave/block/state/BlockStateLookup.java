@@ -1,7 +1,7 @@
 package de.jpx3.intave.block.state;
 
 import de.jpx3.intave.block.shape.BlockShape;
-import de.jpx3.intave.block.shape.ShapeResolver;
+import de.jpx3.intave.block.shape.resolve.ShapeResolver;
 import de.jpx3.intave.user.User;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;

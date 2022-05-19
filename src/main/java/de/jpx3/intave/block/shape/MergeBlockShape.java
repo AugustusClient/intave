@@ -7,7 +7,7 @@ import de.jpx3.intave.shade.Position;
 
 import java.util.List;
 
-public final class MergeBlockShape implements BlockShape {
+final class MergeBlockShape implements BlockShape {
   private final BlockShape shapeA, shapeB;
 
   public MergeBlockShape(BlockShape shapeA, BlockShape shapeB) {
@@ -75,6 +75,12 @@ public final class MergeBlockShape implements BlockShape {
   @Override
   public boolean isEmpty() {
     return shapeA.isEmpty() && shapeB.isEmpty();
+  }
+
+  @Override
+  public boolean isCubic() {
+    return (shapeA.isCubic() && shapeB.isEmpty())
+      || (shapeB.isCubic() && shapeA.isEmpty());
   }
 
   @Override

@@ -5,9 +5,8 @@ import de.jpx3.intave.check.MetaCheckPart;
 import de.jpx3.intave.check.combat.Heuristics;
 import de.jpx3.intave.module.linker.nayoro.NayoroRelay;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
-import de.jpx3.intave.module.nayoro.ClickEvent;
-import de.jpx3.intave.module.nayoro.EntityMoveEvent;
 import de.jpx3.intave.module.nayoro.PlayerContainer;
+import de.jpx3.intave.module.nayoro.event.ClickEvent;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.CheckCustomMetadata;
 import org.bukkit.entity.Player;
@@ -28,10 +27,10 @@ public final class TestingHeuristic extends MetaCheckPart<Heuristics, TestingHeu
     player.debug("This is a test, " + meta.uniqueId);
   }
 
-  @NayoroRelay
-  public void on(PlayerContainer player, EntityMoveEvent event) {
-    player.debug("Entity " + event.entityId() + " moved to " + event.x() + "," + event.y() + "," + event.z());
-  }
+//  @NayoroRelay
+//  public void on(PlayerContainer player, EntityMoveEvent event) {
+//    player.debug("Entity " + event.entityId() + " moved to " + event.x() + "," + event.y() + "," + event.z());
+//  }
 
   @PacketSubscription(
     packetsIn = {

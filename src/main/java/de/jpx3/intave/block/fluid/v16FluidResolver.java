@@ -12,7 +12,7 @@ import net.minecraft.server.v1_16_R3.TagsFluid;
 import net.minecraft.server.v1_16_R3.World;
 
 @PatchyAutoTranslation
-public final class v16FluidResolver extends FluidResolver {
+final class v16FluidResolver extends FluidResolver {
 
   @Override
   @PatchyAutoTranslation

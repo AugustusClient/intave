@@ -13,7 +13,7 @@ import java.util.List;
 
 import static de.jpx3.intave.shade.Direction.Axis.*;
 
-public final class CubeShape extends MemoryTraced implements BlockShape {
+final class CubeShape extends MemoryTraced implements BlockShape {
   private final int x, y, z;
 
   public CubeShape(int x, int y, int z) {
@@ -147,6 +147,11 @@ public final class CubeShape extends MemoryTraced implements BlockShape {
   @Override
   public boolean isEmpty() {
     return false;
+  }
+
+  @Override
+  public boolean isCubic() {
+    return true;
   }
 
   public boolean intersectsWith(BoundingBox boundingBox) {

@@ -134,6 +134,10 @@ public final class ProtocolMetadata {
     return protocolVersion >= VER_1_9;
   }
 
+  public boolean deadOldVersion() {
+    return protocolVersion < VER_1_8;
+  }
+
   public boolean delayedSneak() {
     return protocolVersion >= VER_1_15;
   }

@@ -1,5 +1,8 @@
 package de.jpx3.intave.module.nayoro;
 
+import de.jpx3.intave.module.nayoro.event.AttackEvent;
+import de.jpx3.intave.module.nayoro.event.PlayerInitEvent;
+import de.jpx3.intave.module.nayoro.event.PlayerMoveEvent;
 import de.jpx3.intave.shade.Position;
 import de.jpx3.intave.shade.Rotation;
 import de.jpx3.intave.user.meta.CheckCustomMetadata;

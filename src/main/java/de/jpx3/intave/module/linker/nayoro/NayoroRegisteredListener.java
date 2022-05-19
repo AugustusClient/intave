@@ -1,7 +1,7 @@
 package de.jpx3.intave.module.linker.nayoro;
 
-import de.jpx3.intave.module.nayoro.Event;
 import de.jpx3.intave.module.nayoro.PlayerContainer;
+import de.jpx3.intave.module.nayoro.event.Event;
 
 public final class NayoroRegisteredListener {
   private final NayoroEventSubscriber subscriber;

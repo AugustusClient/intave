@@ -31,6 +31,10 @@ public final class UserLocal<T> {
     return map.computeIfAbsent(id, uuid -> initializer.apply(user));
   }
 
+  public static <T> UserLocal<T> withInitial(T value) {
+    return new UserLocal<>(u -> value);
+  }
+
   public static <T> UserLocal<T> withInitial(Supplier<T> initializer) {
     return new UserLocal<>(initializer);
   }

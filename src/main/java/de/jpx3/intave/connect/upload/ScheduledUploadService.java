@@ -1,6 +1,5 @@
 package de.jpx3.intave.connect.upload;
 
-import de.jpx3.intave.IntaveLogger;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.annotate.Native;
 import de.jpx3.intave.cleanup.ShutdownTasks;
@@ -241,7 +240,6 @@ public final class ScheduledUploadService {
         }
       }
       long bytes = filterOutputStream.getByteCount();
-      IntaveLogger.logger().info("Uploaded " + bytes + " bytes of analytics & usage data");
       InputStream inputStream = connection.getInputStream();
       StringBuilder response = new StringBuilder();
       Scanner scanner = new Scanner(inputStream);

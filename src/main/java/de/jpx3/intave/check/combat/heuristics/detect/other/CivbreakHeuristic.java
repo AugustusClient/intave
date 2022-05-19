@@ -11,7 +11,7 @@ import de.jpx3.intave.user.meta.CheckCustomMetadata;
 import de.jpx3.intave.user.meta.ProtocolMetadata;
 import org.bukkit.entity.Player;
 
-import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
+import static de.jpx3.intave.module.linker.packet.PacketId.Client.BLOCK_DIG;
 
 public final class CivbreakHeuristic extends MetaCheckPart<Heuristics, CivbreakHeuristic.CivbreakMeta> {
   
@@ -41,7 +41,6 @@ public final class CivbreakHeuristic extends MetaCheckPart<Heuristics, CivbreakH
     // Note: isMining should set to false on every PlayerDigType except START_DESTROY_BLOCK
   
 //    player.sendMessage("" + playerDigType);
-    
     if (playerDigType == EnumWrappers.PlayerDigType.START_DESTROY_BLOCK) {
       meta.isMining = true;
     }
@@ -55,11 +54,9 @@ public final class CivbreakHeuristic extends MetaCheckPart<Heuristics, CivbreakH
         // TODO: fix civbreak on 1.14+
         // players don't send a start break packet when destroying a block multiple times on 1.14+
       }
-      
       meta.isMining = false;
     }
   }
-  
   public final static class CivbreakMeta extends CheckCustomMetadata {
     private boolean isMining;
   }

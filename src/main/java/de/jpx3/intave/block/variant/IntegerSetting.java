@@ -8,10 +8,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class IntegerSetting extends NamedSetting<Integer> {
+final class IntegerSetting extends NamedSetting<Integer> {
   private final Set<Integer> values;
 
-  public IntegerSetting(String name, int min, int max) {
+  IntegerSetting(String name, int min, int max) {
     super(name, Integer.TYPE);
     this.values = ImmutableSet.copyOf(
       IntStream.rangeClosed(min, max).boxed().collect(Collectors.toSet())

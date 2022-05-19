@@ -2,7 +2,7 @@ package de.jpx3.intave.block.variant;
 
 import java.util.Objects;
 
-public abstract class NamedSetting<T extends Comparable<T>> implements Setting<T> {
+abstract class NamedSetting<T extends Comparable<T>> implements Setting<T> {
   private final Class<T> clazz;
   private final String name;
   private Integer hashCode;

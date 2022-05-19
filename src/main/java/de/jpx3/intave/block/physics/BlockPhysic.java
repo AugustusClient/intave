@@ -10,7 +10,7 @@ import org.bukkit.Material;
 import java.util.List;
 
 public interface BlockPhysic {
-  void setup(MinecraftVersion serverVersion);
+  void setupFor(MinecraftVersion serverVersion);
 
   // Called from #doBlockCollisions
   @Nullable

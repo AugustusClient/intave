@@ -20,8 +20,9 @@ import de.jpx3.intave.module.feedback.FeedbackCallback;
 import de.jpx3.intave.module.feedback.FeedbackTracker;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
-import de.jpx3.intave.module.nayoro.EntityMoveEvent;
-import de.jpx3.intave.module.nayoro.EventSink;
+import de.jpx3.intave.module.nayoro.Nayoro;
+import de.jpx3.intave.module.nayoro.event.EntityMoveEvent;
+import de.jpx3.intave.module.nayoro.event.sink.EventSink;
 import de.jpx3.intave.packet.reader.EntityDestroyReader;
 import de.jpx3.intave.packet.reader.PacketReaders;
 import de.jpx3.intave.player.fake.FakePlayer;
@@ -432,6 +433,10 @@ public final class EntityTracker extends Module {
   private void nayoroEntityPositionUpdate(Player player, EntityShade entity)  {
     EntityShade.EntityPositionContext position = entity.position;
     EntityShade.EntityPositionContext lastPosition = entity.lastPosition;
+    Nayoro nayoro = Modules.nayoro();
+    if (!nayoro.recordingActiveFor(UserRepository.userOf(player))) {
+      return;
+    }
     EntityMoveEvent event = new EntityMoveEvent(
       entity.entityId(),
       position.posX,

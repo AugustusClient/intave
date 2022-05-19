@@ -1,5 +1,11 @@
 package de.jpx3.intave.module.nayoro;
 
+import de.jpx3.intave.module.nayoro.event.Event;
+import de.jpx3.intave.module.nayoro.event.EventRegistry;
+import de.jpx3.intave.module.nayoro.event.PlayerInitEvent;
+import de.jpx3.intave.module.nayoro.event.PropertiesEvent;
+import de.jpx3.intave.module.nayoro.event.sink.EventSink;
+
 import java.io.Closeable;
 import java.io.DataOutput;
 import java.io.IOException;

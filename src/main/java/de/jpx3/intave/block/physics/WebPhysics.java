@@ -18,7 +18,7 @@ final class WebPhysics implements BlockPhysic {
   private List<Material> material;
 
   @Override
-  public void setup(MinecraftVersion serverVersion) {
+  public void setupFor(MinecraftVersion serverVersion) {
     material = Collections.singletonList(BlockTypeAccess.WEB);
   }
 

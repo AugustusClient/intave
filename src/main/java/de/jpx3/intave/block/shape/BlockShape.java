@@ -22,4 +22,5 @@ public interface BlockShape {
   @Deprecated
   List<BoundingBox> boundingBoxes();
   boolean isEmpty();
+  boolean isCubic();
 }

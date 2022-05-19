@@ -21,7 +21,6 @@ import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
 
-import static de.jpx3.intave.block.fluid.FluidTag.WATER;
 import static de.jpx3.intave.shade.ClientMathHelper.ceil;
 import static de.jpx3.intave.shade.ClientMathHelper.floor;
 
@@ -79,7 +78,7 @@ public final class BoatSimulator extends Simulator {
       for (int y = minY; y < maxY; ++y) {
         for (int z = minZ; z < maxZ; ++z) {
           Fluid fluid = Fluids.fluidAt(user, x, y, z);
-          if (fluid.isOf(WATER)) {
+          if (fluid.isOfWater()) {
             float f = y + fluid.height();
             movement.waterLevel = Math.max(f, movement.waterLevel);
             flag |= boundingBox.minY < f;
@@ -106,7 +105,7 @@ public final class BoatSimulator extends Simulator {
       for (int y = minY; y < maxY; ++y) {
         for (int z = minZ; z < maxZ; ++z) {
           Fluid fluid = Fluids.fluidAt(user, x, y, z);
-          if (fluid.isOf(WATER) && d0 < (double) ((float) y + fluid.height())) {
+          if (fluid.isOfWater() && d0 < (double) ((float) y + fluid.height())) {
             if (!fluid.source()) {
               return Status.UNDER_FLOWING_WATER;
             }

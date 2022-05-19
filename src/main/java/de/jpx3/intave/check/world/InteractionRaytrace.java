@@ -148,8 +148,10 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
     AttackMetadata attack = meta.attack();
     AbilityMetadata abilityData = meta.abilities();
     InventoryMetadata inventoryData = meta.inventory();
+    ProtocolMetadata protocol = meta.protocol();
 
     PacketContainer packet = event.getPacket();
+
 //    com.comphenix.protocol.wrappers.BlockPosition blockPosition = packet.getBlockPositionModifier().readSafely(0);
     com.comphenix.protocol.wrappers.BlockPosition blockPosition = event.getPacket().getModifier()
       .withType(Lookup.serverClass("BlockPosition"), BlockPositionConverter.threadConverter())
@@ -176,8 +178,15 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
 
     EnumWrappers.Direction direction = packet.getDirections().readSafely(0);
     int enumDirection = direction == null ? 0 : direction.ordinal();
-    boolean blocking = blockPosition.getX() == 0 && blockPosition.getY() == 0 && blockPosition.getZ() == 0 && enumDirection == 0;
-    if (enumDirection == 255 || blocking) {
+    boolean nullBlock = blockPosition.getX() == 0 && blockPosition.getY() == 0 && blockPosition.getZ() == 0;
+    if (nullBlock && enumDirection == 0) {
+      return;
+    }
+    if (protocol.deadOldVersion() &&
+      nullBlock &&
+      direction == EnumWrappers.Direction.SOUTH &&
+      playerDigType == RELEASE_USE_ITEM
+    ) {
       return;
     }
 
@@ -303,7 +312,7 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
     } catch (Exception exception) {
       exception.printStackTrace();
       if (interaction.targetBlock().toLocation(world).distance(player.getLocation()) < 6) {
-        dequeueInteraction(interaction, null, interaction.targetBlock().toLocation(world), interaction.targetBlock().toLocation(world), false, false, false);
+        forwardInteractionToServer(interaction, null, interaction.targetBlock().toLocation(world), interaction.targetBlock().toLocation(world), false, false, false);
       }
       return;
     }
@@ -351,10 +360,10 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
       flag = enabled() && !isAbortDestroyBlock && performFlag(interaction, raycastResult, targetLocation, raycastLocation, hitMiss, atLeastLookingAtBlock);
       mustCancelPacket = false;
     }
-    dequeueInteraction(interaction, raycastResult, targetLocation, raycastLocation, hitMiss, flag, mustCancelPacket);
+    forwardInteractionToServer(interaction, raycastResult, targetLocation, raycastLocation, hitMiss, flag, mustCancelPacket);
   }
 
-  private void dequeueInteraction(
+  private void forwardInteractionToServer(
     Interaction interaction,
     MovingObjectPosition raycastResult,
     Location targetLocation,
@@ -402,8 +411,13 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
             }
           }
           writeEnumDirection(packet, raycastResult.sideHit);
-          com.comphenix.protocol.wrappers.BlockPosition value = new com.comphenix.protocol.wrappers.BlockPosition(raycastLocation.getBlockX(), raycastLocation.getBlockY(), raycastLocation.getBlockZ());
-          writeBlockPosition(packet, value);
+          com.comphenix.protocol.wrappers.BlockPosition bp =
+            new com.comphenix.protocol.wrappers.BlockPosition(
+              raycastLocation.getBlockX(),
+              raycastLocation.getBlockY(),
+              raycastLocation.getBlockZ()
+            );
+          writeBlockPosition(packet, bp);
         }
         receiveExcludedPacket(player, packet);
         if (refreshBlocks && rewritePacket) {

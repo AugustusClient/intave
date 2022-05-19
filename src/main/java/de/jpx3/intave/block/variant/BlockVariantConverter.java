@@ -13,14 +13,14 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class BlockVariantConverter {
+final class BlockVariantConverter {
   static {
     ClassLoader classLoader = IntavePlugin.class.getClassLoader();
     String className = "de.jpx3.intave.block.variant.BlockVariantConverter$Bridge";
     PatchyLoadingInjector.loadUnloadedClassPatched(classLoader, className);
   }
 
-  public static Map<Integer, BlockVariant> translate(Material type, Map<Integer, Object> indexToNative) {
+  static Map<Integer, BlockVariant> translate(Material type, Map<Integer, Object> indexToNative) {
     if (indexToNative.isEmpty()) {
       return Collections.emptyMap();
     }
@@ -34,7 +34,7 @@ public final class BlockVariantConverter {
     return indexToVariant;
   }
 
-  public final static BlockVariant EMPTY = new EmptyBlockVariant();
+  final static BlockVariant EMPTY = new EmptyBlockVariant();
 
   private static BlockVariant translate(Material type, Object blockData) {
     Map<Setting<?>, Comparable<?>> settings = Bridge.settingsOf(blockData);
@@ -83,14 +83,15 @@ public final class BlockVariantConverter {
       net.minecraft.server.v1_16_R1.IBlockState<?> state = (net.minecraft.server.v1_16_R1.IBlockState<?>) blockState;
       String name = state.getName();
       if (state instanceof net.minecraft.server.v1_16_R1.BlockStateInteger) {
-        net.minecraft.server.v1_16_R1.BlockStateInteger blockStateInteger = (net.minecraft.server.v1_16_R1.BlockStateInteger) state;
+        net.minecraft.server.v1_16_R1.BlockStateInteger blockStateInteger =
+          (net.minecraft.server.v1_16_R1.BlockStateInteger) state;
         Collection<Integer> values = blockStateInteger.getValues();
         IntSummaryStatistics statistics = values.stream().mapToInt(value -> value).summaryStatistics();
         return new IntegerSetting(name, statistics.getMin(), statistics.getMax());
       } else if (state instanceof net.minecraft.server.v1_16_R1.BlockStateBoolean) {
         return new BooleanSetting(name);
       } else if (state instanceof net.minecraft.server.v1_16_R1.BlockStateEnum) {
-        return new UnknownEnumSetting(name, state.getType(), state.getValues());
+        return new EnumSetting(name, state.getType(), state.getValues());
       }
       throw new IllegalStateException("Unknown block state " + state + " (" + name +")");
     }
@@ -122,7 +123,7 @@ public final class BlockVariantConverter {
       } else if (state instanceof BlockStateBoolean) {
         return new BooleanSetting(name);
       } else if (state instanceof BlockStateEnum) {
-        return new UnknownEnumSetting(name, state.b(), state.getValues());
+        return new EnumSetting(name, state.b(), state.getValues());
       }
       throw new IllegalStateException("Unknown block state " + state + " (" + name +")");
     }
@@ -154,7 +155,7 @@ public final class BlockVariantConverter {
       } else if (state instanceof BlockStateBoolean) {
         return new BooleanSetting(name);
       } else if (state instanceof BlockStateEnum) {
-        return new UnknownEnumSetting(name, state.b(), state.c());
+        return new EnumSetting(name, state.b(), state.c());
       }
       throw new IllegalStateException("Unknown block state " + state + " (" + name +")");
     }
@@ -197,7 +198,7 @@ public final class BlockVariantConverter {
       } else if (state instanceof BlockStateBoolean) {
         return new BooleanSetting(name);
       } else if (state instanceof BlockStateEnum) {
-        return new UnknownEnumSetting(name, state.b(), state.c());
+        return new EnumSetting(name, state.b(), state.c());
       }
       throw new IllegalStateException("Unknown block state " + state + " (" + name +")");
     }

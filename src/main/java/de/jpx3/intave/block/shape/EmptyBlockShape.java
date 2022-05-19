@@ -34,6 +34,11 @@ final class EmptyBlockShape implements BlockShape {
   }
 
   @Override
+  public boolean isCubic() {
+    return false;
+  }
+
+  @Override
   public double allowedOffset(Direction.Axis axis, BoundingBox entity, double offset) {
     return offset;
   }

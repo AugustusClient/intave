@@ -14,13 +14,11 @@ import org.bukkit.Material;
 import java.util.Collections;
 import java.util.List;
 
-import static de.jpx3.intave.block.fluid.FluidTag.WATER;
-
 final class BubbleColumnPhysics implements BlockPhysic {
   private Material bubbleColumnBlock;
 
   @Override
-  public void setup(MinecraftVersion serverVersion) {
+  public void setupFor(MinecraftVersion serverVersion) {
     bubbleColumnBlock = Material.getMaterial("BUBBLE_COLUMN");
   }
 
@@ -33,7 +31,7 @@ final class BubbleColumnPhysics implements BlockPhysic {
   public Motion entityCollidedWithBlock(User user, Location location, Location from, double motionX, double motionY, double motionZ) {
     ProtocolMetadata protocol = user.meta().protocol();
     if (protocol.waterUpdate()) {
-      boolean water = Fluids.fluidAt(user, location.clone().add(0,1,0)).isOf(WATER);
+      boolean water = Fluids.fluidAt(user, location.clone().add(0,1,0)).isOfWater();
       BlockVariant variant = VolatileBlockAccess.variantAccess(user, location);
       boolean downwards = variant.propertyOf("drag");
       if (water) {

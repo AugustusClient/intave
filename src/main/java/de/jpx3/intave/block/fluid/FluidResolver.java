@@ -9,7 +9,6 @@ import de.jpx3.intave.user.meta.MovementMetadata;
 import org.bukkit.Material;
 import org.bukkit.World;
 
-import static de.jpx3.intave.block.fluid.FluidTag.WATER;
 import static de.jpx3.intave.shade.ClientMathHelper.ceil;
 import static de.jpx3.intave.shade.ClientMathHelper.floor;
 
@@ -42,7 +41,7 @@ public abstract class FluidResolver {
         for (int z = minZ; z < maxZ; ++z) {
           Material blockClientSide = VolatileBlockAccess.typeAccess(user, world, x, y, z);
           Fluid fluid = fluidAt(user, x, y, z);
-          if (fluid.isOf(WATER)) {
+          if (fluid.isOfWater()) {
             double d1 = (float) y + fluid.height();
             if (d1 >= wrappedBoundingBox.minY) {
               inWater = true;

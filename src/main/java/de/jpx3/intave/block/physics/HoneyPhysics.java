@@ -14,7 +14,7 @@ final class HoneyPhysics implements BlockPhysic {
   private Material honeyBlock;
 
   @Override
-  public void setup(MinecraftVersion serverVersion) {
+  public void setupFor(MinecraftVersion serverVersion) {
     honeyBlock = Material.getMaterial("HONEY_BLOCK");
   }
 

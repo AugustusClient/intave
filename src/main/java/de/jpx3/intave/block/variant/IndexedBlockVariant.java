@@ -32,9 +32,9 @@ final class IndexedBlockVariant implements BlockVariant {
     if (setting == null || enumIndex == null) {
       return null;
     }
-    if (!(setting instanceof UnknownEnumSetting)) {
+    if (!(setting instanceof EnumSetting)) {
       throw new IllegalStateException(type + "/" + name + " is not a enum property");
     }
-    return ((UnknownEnumSetting) setting).enumType(klass, enumIndex);
+    return ((EnumSetting) setting).enumType(klass, enumIndex);
   }
 }

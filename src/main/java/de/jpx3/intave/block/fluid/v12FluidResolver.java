@@ -16,7 +16,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-public final class v12FluidResolver extends FluidResolver {
+final class v12FluidResolver extends FluidResolver {
   @Override
   protected Fluid fluidAt(User user, int x, int y, int z) {
     Player player = user.player();

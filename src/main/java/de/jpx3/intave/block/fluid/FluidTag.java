@@ -5,7 +5,7 @@ import de.jpx3.intave.annotate.KeepEnumInternalNames;
 import de.jpx3.intave.klass.Lookup;
 
 @KeepEnumInternalNames
-public enum FluidTag {
+enum FluidTag {
   WATER(true),
   LAVA(true),
   EMPTY(false);

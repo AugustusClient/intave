@@ -16,7 +16,7 @@ final class BerryBushPhysics implements BlockPhysic {
   private boolean supported;
 
   @Override
-  public void setup(MinecraftVersion serverVersion) {
+  public void setupFor(MinecraftVersion serverVersion) {
     Material sweetBerryBush = Material.getMaterial("SWEET_BERRY_BUSH");
     material = Collections.singletonList(sweetBerryBush);
     supported = sweetBerryBush != null;

@@ -1,5 +1,7 @@
 package de.jpx3.intave.module.nayoro;
 
+import de.jpx3.intave.module.nayoro.event.Event;
+
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.util.concurrent.Executor;

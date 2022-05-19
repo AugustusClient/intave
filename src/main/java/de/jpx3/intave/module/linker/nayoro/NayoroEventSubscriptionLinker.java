@@ -8,8 +8,8 @@ import de.jpx3.intave.klass.create.IRXClassFactory;
 import de.jpx3.intave.lib.asm.Type;
 import de.jpx3.intave.module.Module;
 import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscriptionLinker;
-import de.jpx3.intave.module.nayoro.Event;
 import de.jpx3.intave.module.nayoro.PlayerContainer;
+import de.jpx3.intave.module.nayoro.event.Event;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

@@ -12,7 +12,7 @@ import static de.jpx3.intave.shade.ClientMathHelper.binarySearch;
 import static de.jpx3.intave.shade.Direction.Axis.*;
 
 @Deprecated
-public final class VoxelShape implements BlockShape {
+final class VoxelShape implements BlockShape {
   private final BitSet storage;
   private final int sizeX, sizeY, sizeZ;
   private final int startX, startY, startZ;
@@ -159,6 +159,11 @@ public final class VoxelShape implements BlockShape {
 
   public boolean isEmpty() {
     return this.storage.isEmpty();
+  }
+
+  @Override
+  public boolean isCubic() {
+    return false;
   }
 
   @Override

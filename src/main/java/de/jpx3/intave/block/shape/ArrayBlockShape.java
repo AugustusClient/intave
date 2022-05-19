@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public final class ArrayBlockShape extends MemoryTraced implements BlockShape {
+final class ArrayBlockShape extends MemoryTraced implements BlockShape {
   private final BlockShape[] contents;
 
   public ArrayBlockShape(List<BlockShape> contents) {
@@ -117,6 +117,14 @@ public final class ArrayBlockShape extends MemoryTraced implements BlockShape {
       }
     }
     return true;
+  }
+
+  @Override
+  public boolean isCubic() {
+    if (contents.length == 1) {
+      return contents[0].isCubic();
+    }
+    return false;
   }
 
   @Override

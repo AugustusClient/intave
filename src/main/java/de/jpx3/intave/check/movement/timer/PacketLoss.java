@@ -14,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
-import static de.jpx3.intave.module.linker.packet.PacketId.Client.LOOK;
 
 public final class PacketLoss extends MetaCheckPart<Timer, PacketLoss.PacketLossMeta> {
   private static final double AVERAGE = 50;

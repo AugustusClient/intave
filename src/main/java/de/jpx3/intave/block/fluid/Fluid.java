@@ -15,20 +15,16 @@ public final class Fluid {
     this.empty = fluidTag == FluidTag.EMPTY;
   }
 
-  public FluidTag fluidTag() {
-    return fluidTag;
-  }
-
-  public boolean isOf(FluidTag fluidTag) {
-    return !empty && this.fluidTag == fluidTag;
-  }
-
   public boolean isOfWater() {
-    return !empty && this.fluidTag == FluidTag.WATER;
+    return isOf(FluidTag.WATER);
   }
 
   public boolean isOfLava() {
-    return !empty && this.fluidTag == FluidTag.LAVA;
+    return isOf(FluidTag.LAVA);
+  }
+
+  private boolean isOf(FluidTag fluidTag) {
+    return !empty && this.fluidTag == fluidTag;
   }
 
   public boolean isEmpty() {

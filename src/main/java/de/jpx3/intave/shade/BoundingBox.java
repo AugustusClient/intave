@@ -191,6 +191,20 @@ public final class BoundingBox extends MemoryTraced implements BlockShape {
     return false;
   }
 
+  private final static double EPSILON = 0.00001;
+
+  @Override
+  public boolean isCubic() {
+    if (isOriginBox()) {
+      return minX == 0 && minY == 0 && minZ == 0 &&
+        maxX == 1 && maxY == 1 && maxZ == 1;
+    } else {
+      return Math.abs(maxX - minX - 1) < EPSILON &&
+        Math.abs(maxY - minY - 1) < EPSILON &&
+        Math.abs(maxZ - minZ - 1) < EPSILON;
+    }
+  }
+
   /**
    * Returns whether the given bounding box intersects with this one. Args: axisAlignedBB
    */

@@ -4,26 +4,46 @@ import com.google.common.collect.ImmutableSet;
 
 import java.util.*;
 
-public class EnumSetting<T extends Enum<T>> extends NamedSetting<T> {
-  private final ImmutableSet<T> values;
-  private final Map<String, T> enumMap = new HashMap<>();
+final class EnumSetting extends NamedSetting<Integer> {
+  private final ImmutableSet<Integer> values;
+  private final Class<?> owner;
+  private final Map<String, Integer> enumNameToIndex = new HashMap<>();
+  private final Map<Integer, String> enumIndexToName = new HashMap<>();
 
-  public EnumSetting(String name, Class<T> clazz, Collection<T> values) {
-    super(name, clazz);
-    this.values = ImmutableSet.copyOf(values);
-    for (T value : values) {
-      String valueName = value.name().toLowerCase(Locale.ROOT);
-      enumMap.put(valueName, value);
+  public EnumSetting(String name, Class<?> owner, Collection<?> values) {
+    super(name, Integer.TYPE);
+    if (!owner.isEnum()) {
+      throw new IllegalStateException("Not an enum");
     }
+    this.owner = owner;
+    for (Object value : values) {
+      String key = value.toString().toLowerCase(Locale.ROOT);
+      int ordinal = ((Enum<?>) value).ordinal();
+      enumNameToIndex.put(key, ordinal);
+      enumIndexToName.put(ordinal, key);
+    }
+    ImmutableSet.Builder<Integer> builder = ImmutableSet.builder();
+    values.stream().mapToInt(value -> ((Enum<?>) value).ordinal()).forEach(builder::add);
+    this.values = builder.build();
+  }
+
+  public <K extends Enum<K>> K enumType(Class<K> enumClass, int index) {
+    String enumName = enumIndexToName.get(index);
+    if (enumName == null) {
+      System.out.println("Unknown enum index " + index + " in " + enumIndexToName + " for " + enumClass + ", owned by " + owner);
+      Thread.dumpStack();
+      return enumClass.getEnumConstants()[0];
+    }
+    return Enum.valueOf(enumClass, enumName.toUpperCase(Locale.ROOT));
   }
 
   @Override
-  public Collection<T> values() {
+  public Collection<Integer> values() {
     return values;
   }
 
   @Override
-  public Optional<T> findByName(String name) {
-    return Optional.ofNullable(this.enumMap.get(name));
+  public Optional<Integer> findByName(String name) {
+    return Optional.ofNullable(enumNameToIndex.get(name.toLowerCase(Locale.ROOT)));
   }
 }

@@ -7,8 +7,6 @@ import org.bukkit.potion.PotionEffect;
 import java.util.Collection;
 
 import static de.jpx3.intave.module.tracker.player.EffectTracker.*;
-import static org.bukkit.potion.PotionEffectType.SLOW;
-import static org.bukkit.potion.PotionEffectType.SPEED;
 
 @Relocate
 public final class EffectMetadata {

@@ -20,7 +20,7 @@ final class BedPhysics implements BlockPhysic {
   private List<Material> materials;
 
   @Override
-  public void setup(MinecraftVersion serverVersion) {
+  public void setupFor(MinecraftVersion serverVersion) {
     if (serverVersion.isAtLeast(MinecraftVersions.VER1_12_0)) {
       materials = resolveBedMaterials();
     } else {
