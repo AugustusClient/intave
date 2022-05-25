@@ -25,7 +25,7 @@ public final class PatchyLoadingInjector {
         de.jpx3.classloader.ClassLoader.classLoad(classBytes);
       }
       return classByName(className);
-    } catch (Error | Exception e) {
+    } catch (Error | Exception exception) {
       if (classBytes.length > 0) {
         File dumpFile = null;
         try {
@@ -34,11 +34,11 @@ public final class PatchyLoadingInjector {
           fileOutputStream.write(classBytes);
           fileOutputStream.close();
           System.out.println("Dumped class bytes to " + dumpFile.getAbsolutePath());
-        } catch (IOException ex) {
-          ex.printStackTrace();
+        } catch (IOException exception2) {
+          exception2.printStackTrace();
         }
       }
-      throw new IllegalStateException("Failed to load class " + className, e);
+      throw new IllegalStateException("Failed to load class " + className, exception);
     }
   }
 
@@ -66,8 +66,8 @@ public final class PatchyLoadingInjector {
       String path;
       try {
         path = PatchyLoadingInjector.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
-      } catch (URISyntaxException e) {
-        throw new IllegalStateException(e);
+      } catch (URISyntaxException exception) {
+        throw new IllegalStateException(exception);
       }
       return resourceFromJar(new File(path), className);
     }
@@ -89,8 +89,8 @@ public final class PatchyLoadingInjector {
         }
       }
       zipFile.close();
-    } catch (IOException e) {
-      throw new IllegalStateException(e);
+    } catch (IOException exception) {
+      throw new IllegalStateException(exception);
     }
     throw new IllegalStateException("Unable to locate " + fileName);
   }

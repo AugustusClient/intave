@@ -6,65 +6,65 @@ import org.bukkit.entity.Player;
 
 @Relocate
 public final class MetadataBundle {
-  private final ViolationMetadata violationLevelData;
-  private final MovementMetadata movementData;
-  private final AbilityMetadata abilityData;
-  private final EffectMetadata potionData;
-  private final ProtocolMetadata clientData;
-  private final ConnectionMetadata connectionData;
-  private final InventoryMetadata inventoryData;
-  private final AttackMetadata attackData;
-  private final PunishmentMetadata punishmentData;
+  private final ViolationMetadata violation;
+  private final MovementMetadata movement;
+  private final AbilityMetadata ability;
+  private final EffectMetadata potion;
+  private final ProtocolMetadata protocol;
+  private final ConnectionMetadata connection;
+  private final InventoryMetadata inventory;
+  private final AttackMetadata attack;
+  private final PunishmentMetadata punishment;
 
   public MetadataBundle(Player player, User user) {
-    this.violationLevelData = new ViolationMetadata();
-    this.clientData = new ProtocolMetadata(player, user);
-    this.abilityData = new AbilityMetadata(player);
-    this.potionData = new EffectMetadata(player);
-    this.inventoryData = new InventoryMetadata(player);
-    this.connectionData = new ConnectionMetadata(player);
-    this.movementData = new MovementMetadata(player, user);
-    this.attackData = new AttackMetadata(player);
-    this.punishmentData = new PunishmentMetadata(player);
+    this.violation = new ViolationMetadata();
+    this.protocol = new ProtocolMetadata(player, user);
+    this.ability = new AbilityMetadata(player);
+    this.potion = new EffectMetadata(player);
+    this.inventory = new InventoryMetadata(player);
+    this.connection = new ConnectionMetadata(player);
+    this.movement = new MovementMetadata(player, user);
+    this.attack = new AttackMetadata(player);
+    this.punishment = new PunishmentMetadata(player);
   }
 
   public ViolationMetadata violationLevel() {
-    return violationLevelData;
+    return violation;
   }
 
   public MovementMetadata movement() {
-    return movementData;
+    return movement;
   }
 
   public InventoryMetadata inventory() {
-    return inventoryData;
+    return inventory;
   }
 
   public AbilityMetadata abilities() {
-    return abilityData;
+    return ability;
   }
 
   public EffectMetadata potions() {
-    return potionData;
+    return potion;
   }
 
   public ConnectionMetadata connection() {
-    return connectionData;
+    return connection;
   }
 
   public ProtocolMetadata protocol() {
-    return clientData;
+    return protocol;
   }
 
   public AttackMetadata attack() {
-    return attackData;
+    return attack;
   }
 
   public PunishmentMetadata punishment() {
-    return punishmentData;
+    return punishment;
   }
 
   public void setup() {
-    movementData.setup();
+    movement.setup();
   }
 }

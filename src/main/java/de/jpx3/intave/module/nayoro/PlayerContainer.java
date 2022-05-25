@@ -32,6 +32,9 @@ public interface PlayerContainer {
   float lastPitch();
 
   Position position();
+  double x();
+  double y();
+  double z();
 
   boolean cursorUponEntity(int id, float expansion);
   boolean notTeleportedIn(int ticks);

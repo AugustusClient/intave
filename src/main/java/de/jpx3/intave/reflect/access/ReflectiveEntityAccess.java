@@ -44,16 +44,16 @@ public final class ReflectiveEntityAccess {
   private static void fieldSetOnGround(Object entity, boolean onGround) {
     try {
       ENTITY_GROUND_FIELD.set(entity, onGround);
-    } catch (IllegalAccessException e) {
-      throw new IntaveInternalException(e);
+    } catch (IllegalAccessException exception) {
+      throw new IntaveInternalException(exception);
     }
   }
 
   private static boolean fieldGetOnGround(Object entity) {
     try {
       return (boolean) ENTITY_GROUND_FIELD.get(entity);
-    } catch (IllegalAccessException e) {
-      throw new IntaveInternalException(e);
+    } catch (IllegalAccessException exception) {
+      throw new IntaveInternalException(exception);
     }
   }
 

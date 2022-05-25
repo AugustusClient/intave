@@ -578,9 +578,9 @@ public class CheckClassAdapter extends ClassVisitor {
         startIndex = dotIndex + 1;
       }
       CheckMethodAdapter.checkIdentifier(version, name, startIndex, name.length(), null);
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException exception) {
       throw new IllegalArgumentException(
-        "Invalid " + source + " (must be a fully qualified name): " + name, e);
+        "Invalid " + source + " (must be a fully qualified name): " + name, exception);
     }
   }
 
@@ -1066,8 +1066,8 @@ public class CheckClassAdapter extends ClassVisitor {
       }
       try {
         analyzer.analyze(classNode.name, method);
-      } catch (AnalyzerException e) {
-        e.printStackTrace(printWriter);
+      } catch (AnalyzerException exception) {
+        exception.printStackTrace(printWriter);
       }
       if (printResults) {
         printAnalyzerResult(method, analyzer, printWriter);

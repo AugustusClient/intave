@@ -33,7 +33,7 @@ class RecordEventSink extends EventSink {
   public void visitAny(Event event) {
     setupIfNeeded();
     try {
-      dataOutput.writeInt((int) (System.currentTimeMillis() - last));
+      dataOutput.writeShort((int) Math.max(Short.MAX_VALUE, System.currentTimeMillis() - last));
       dataOutput.writeByte(EventRegistry.idOf(event));
       event.serialize(environment, dataOutput);
     } catch (IOException exception) {

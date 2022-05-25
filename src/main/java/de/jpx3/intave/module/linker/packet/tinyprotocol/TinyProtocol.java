@@ -79,7 +79,7 @@ public class TinyProtocol {
     try {
       registerChannelHandler();
       registerPlayers(plugin);
-    } catch (IllegalArgumentException ex) {
+    } catch (IllegalArgumentException exception) {
       Synchronizer.synchronize(() -> {
         registerChannelHandler();
         registerPlayers(plugin);
@@ -202,7 +202,7 @@ public class TinyProtocol {
       serverChannel.eventLoop().execute(() -> {
         try {
           pipeline.remove(serverChannelHandler);
-        } catch (NoSuchElementException e) {
+        } catch (NoSuchElementException exception) {
           // That's fine
         }
       });
@@ -345,7 +345,7 @@ public class TinyProtocol {
         uninjectedChannels.remove(channel);
       }
       return interceptor;
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException exception) {
       // Try again
       return (PacketInterceptor) channel.pipeline().get(handlerName);
     }
@@ -446,8 +446,8 @@ public class TinyProtocol {
       handleLoginStart(channel, msg);
       try {
         msg = onPacketInAsync(player, channel, msg);
-      } catch (Exception e) {
-        plugin.getLogger().log(Level.SEVERE, "Error in onPacketInAsync().", e);
+      } catch (Exception exception) {
+        plugin.getLogger().log(Level.SEVERE, "Error in onPacketInAsync().", exception);
       }
       if (msg != null) {
         super.channelRead(ctx, msg);

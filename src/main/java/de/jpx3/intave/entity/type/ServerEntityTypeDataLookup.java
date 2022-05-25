@@ -75,8 +75,8 @@ final class ServerEntityTypeDataLookup implements EntityTypeDataResolver {
       EntityTypes<?> entityTypes = IRegistry.ENTITY_TYPE.fromId(type);
       EntitySize entitySize = (EntitySize) entitySizeField.get(entityTypes);
       return HitboxSize.of(entitySize.width, entitySize.height);
-    } catch (IllegalAccessException e) {
-      throw new IntaveInternalException(e);
+    } catch (IllegalAccessException exception) {
+      throw new IntaveInternalException(exception);
     }
   }
 }

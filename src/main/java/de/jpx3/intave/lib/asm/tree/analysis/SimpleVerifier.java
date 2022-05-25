@@ -386,8 +386,8 @@ public class SimpleVerifier extends BasicVerifier {
         return Class.forName(type.getDescriptor().replace('/', '.'), false, loader);
       }
       return Class.forName(type.getClassName(), false, loader);
-    } catch (ClassNotFoundException e) {
-      throw new TypeNotPresentException(e.toString(), e);
+    } catch (ClassNotFoundException exception) {
+      throw new TypeNotPresentException(exception.toString(), exception);
     }
   }
 }

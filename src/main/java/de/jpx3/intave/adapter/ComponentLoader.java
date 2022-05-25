@@ -59,8 +59,8 @@ public final class ComponentLoader {
       try {
         downloadComponentPlugin(componentPluginFile, componentName, downloadURL);
         return true;
-      } catch (Exception e) {
-        throw new IntaveInternalException("Unable to download library " + componentName, e);
+      } catch (Exception exception) {
+        throw new IntaveInternalException("Unable to download library " + componentName, exception);
       }
     }
     return false;

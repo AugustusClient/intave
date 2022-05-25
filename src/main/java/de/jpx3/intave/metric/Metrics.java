@@ -275,7 +275,7 @@ public final class Metrics {
       playerAmount = onlinePlayersMethod.getReturnType().equals(Collection.class)
         ? ((Collection<?>) onlinePlayersMethod.invoke(Bukkit.getServer())).size()
         : ((Player[]) onlinePlayersMethod.invoke(Bukkit.getServer())).length;
-    } catch (Exception e) {
+    } catch (Exception exception) {
       playerAmount = Bukkit.getOnlinePlayers().size(); // Just use the new method if the Reflection failed
     }
     int onlineMode = Bukkit.getOnlineMode() ? 1 : 0;
@@ -326,10 +326,10 @@ public final class Metrics {
                   JsonObject object = new JsonParser().parse(jsonString).getAsJsonObject();
                   pluginData.add(object);
                 }
-              } catch (ClassNotFoundException e) {
+              } catch (ClassNotFoundException exception) {
                 // minecraft version 1.14+
                 if (logFailedRequests) {
-                  this.plugin.getLogger().log(Level.SEVERE, "Encountered unexpected exception", e);
+                  this.plugin.getLogger().log(Level.SEVERE, "Encountered unexpected exception", exception);
                 }
               }
             }

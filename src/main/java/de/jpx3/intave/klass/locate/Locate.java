@@ -42,7 +42,7 @@ public final class Locate {
     } else {
       try {
         return Class.forName(name);
-      } catch (ClassNotFoundException e) {
+      } catch (ClassNotFoundException exception) {
         throw new IllegalArgumentException("Unsupported class " + name);
       }
     }

@@ -25,8 +25,8 @@ public final class SibylPacketRegister {
     try {
       //noinspection unchecked
       return (P) availablePackets.get(label).newInstance();
-    } catch (InstantiationException | IllegalAccessException e) {
-      throw new IllegalStateException(e);
+    } catch (Exception exception) {
+      throw new IllegalStateException(exception);
     }
   }
 }

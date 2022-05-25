@@ -43,8 +43,8 @@ public final class ItemProperties {
       loadPotions();
       loadFoodItems();
       loadArrows();
-    } catch (Exception e) {
-      throw new IllegalStateException(e);
+    } catch (Exception exception) {
+      throw new IllegalStateException(exception);
     }
   }
 

@@ -67,8 +67,6 @@ public final class ModuleLoader {
     prepareModule("de.jpx3.intave.module.player.StorageLoader", lateBoot);
     prepareModule("de.jpx3.intave.module.player.PlaytimeUpdater", lateBoot);
     prepareModule("de.jpx3.intave.module.player.MiscBukkitEvents", defaultBoot);
-
-//    prepareModule("de.jpx3.intave.module.patch.TimeoutHalter", ModuleSettings.builder().requireProtocolLib().bootAt(BootSegment.STAGE_7).build());
   }
 
   private void prepareModule(String moduleClass) {

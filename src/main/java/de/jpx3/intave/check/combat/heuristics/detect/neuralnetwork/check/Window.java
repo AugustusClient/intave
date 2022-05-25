@@ -68,10 +68,8 @@ public class Window extends JFrame {
           Object[] objects = {scene.redPoints, scene.greenPoints};
 
           objectOutputStream.writeObject(objects);
-        } catch (FileNotFoundException ex) {
-          ex.printStackTrace();
-        } catch (IOException ioException) {
-          ioException.printStackTrace();
+        } catch (IOException exception) {
+          exception.printStackTrace();
         }
       }
     });
@@ -87,8 +85,8 @@ public class Window extends JFrame {
           Object[] objects = (Object[]) objectInputStream.readObject();
           scene.redPoints = (CopyOnWriteArrayList<Point>) objects[0];
           scene.greenPoints = (CopyOnWriteArrayList<Point>) objects[1];
-        } catch (Exception ex) {
-          ex.printStackTrace();
+        } catch (Exception exception) {
+          exception.printStackTrace();
         }
       }
     });

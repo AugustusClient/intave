@@ -49,10 +49,10 @@ public final class AttackMetadata {
     User user = UserRepository.userOf(player);
     MovementMetadata movementData = user.meta().movement();
     double positionX = movementData.positionX;
-    double lastPositionX = movementData.lastPositionX;
     double positionY = movementData.positionY;
-    double lastPositionY = movementData.lastPositionY;
     double positionZ = movementData.positionZ;
+    double lastPositionX = movementData.lastPositionX;
+    double lastPositionY = movementData.lastPositionY;
     double lastPositionZ = movementData.lastPositionZ;
 
     // Set prefect yaw & pitch

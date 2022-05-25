@@ -54,8 +54,8 @@ public final class Lookup {
     try {
       //noinspection unchecked
       return (Class<T>) Class.forName(className);
-    } catch (ClassNotFoundException e) {
-      throw new IntaveInternalException(e);
+    } catch (ClassNotFoundException exception) {
+      throw new IntaveInternalException(exception);
     }
   }
 
@@ -66,8 +66,8 @@ public final class Lookup {
   public static Field declaredFieldIn(Class<?> clazz, String name) {
     try {
       return clazz.getDeclaredField(name);
-    } catch (NoSuchFieldException e) {
-      throw new IntaveInternalException(e);
+    } catch (NoSuchFieldException exception) {
+      throw new IntaveInternalException(exception);
     }
   }
 

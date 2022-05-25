@@ -24,8 +24,8 @@ public final class NativeCheck {
     for (Runnable runnable : NATIVE_CHECKS) {
       try {
         runnable.run();
-      } catch (UnsatisfiedLinkError ex) {
-        ex.printStackTrace();
+      } catch (UnsatisfiedLinkError exception) {
+        exception.printStackTrace();
         try {
           Thread.sleep(1000);
         } catch (InterruptedException e) {

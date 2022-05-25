@@ -100,6 +100,21 @@ final class PlaybackPlayerContainer extends SinkPlayerContainer {
   }
 
   @Override
+  public double x() {
+    return posX;
+  }
+
+  @Override
+  public double y() {
+    return posY;
+  }
+
+  @Override
+  public double z() {
+    return posZ;
+  }
+
+  @Override
   public boolean cursorUponEntity(int id, float expansion) {
     return environment.inSight(id);
   }
@@ -173,18 +188,29 @@ final class PlaybackPlayerContainer extends SinkPlayerContainer {
     lastPitch = pitch;
     if (event.applyX()) {
       this.posX = event.x();
+    } else {
+      event.setX(this.posX);
     }
     if (event.applyY()) {
       this.posY = event.y();
+    } else {
+      event.setY(this.posY);
     }
     if (event.applyZ()) {
       this.posZ = event.z();
+    } else {
+      event.setZ(this.posZ);
     }
     if (event.applyYaw()) {
       this.yaw = event.yaw();
+    } else {
+      event.setYaw(this.yaw);
     }
     if (event.applyPitch()) {
       this.pitch = event.pitch();
+    } else {
+      event.setPitch(this.pitch);
     }
+    visitAny(event);
   }
 }

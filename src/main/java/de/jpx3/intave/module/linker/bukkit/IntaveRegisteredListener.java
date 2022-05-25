@@ -53,8 +53,8 @@ public final class IntaveRegisteredListener extends RegisteredListener {
     }
     try {
       eventExecutor.execute(listener, event);
-    } catch (RuntimeException ex) {
-      ex.printStackTrace();
+    } catch (RuntimeException exception) {
+      exception.printStackTrace();
     }
     if (!asynchronous) {
       Timings.EXE_SERVER.stop();

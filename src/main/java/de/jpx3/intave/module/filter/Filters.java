@@ -26,8 +26,8 @@ public final class Filters extends Module {
     try {
       Constructor<? extends Filter> constructor = filterClass.getConstructor(IntavePlugin.class);
       filters.add(constructor.newInstance(plugin));
-    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-      throw new IntaveInternalException("Something went wrong setting up a filter", e);
+    } catch (Exception exception) {
+      throw new IntaveInternalException("Something went wrong setting up a filter", exception);
     }
   }
 

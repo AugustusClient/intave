@@ -102,8 +102,8 @@ public final class CheckService {
         check = checkClass.newInstance();
       }
       addCheck(check);
-    } catch (Exception e) {
-      throw new IntaveInternalException("Unable to load check " + checkClass.getSimpleName(), e);
+    } catch (Exception exception) {
+      throw new IntaveInternalException("Unable to load check " + checkClass.getSimpleName(), exception);
     }
   }
 

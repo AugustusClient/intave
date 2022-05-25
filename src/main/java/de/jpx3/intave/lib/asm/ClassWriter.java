@@ -1051,14 +1051,14 @@ public class ClassWriter extends ClassVisitor {
     Class<?> class1;
     try {
       class1 = Class.forName(type1.replace('/', '.'), false, classLoader);
-    } catch (ClassNotFoundException e) {
+    } catch (ClassNotFoundException exception) {
 //      throw new TypeNotPresentException(type1, e);
       return "java/lang/Object";
     }
     Class<?> class2;
     try {
       class2 = Class.forName(type2.replace('/', '.'), false, classLoader);
-    } catch (ClassNotFoundException e) {
+    } catch (ClassNotFoundException exception) {
 //      throw new TypeNotPresentException(type1, e);
       return "java/lang/Object";
     }

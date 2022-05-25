@@ -68,7 +68,7 @@ public final class ProtocolLibraryAdapter {
         }
       } while ((rootClass = rootClass.getSuperclass()) != Object.class);
       return false;
-    } catch (ClassNotFoundException e) {
+    } catch (ClassNotFoundException exception) {
       return false;
     }
   }

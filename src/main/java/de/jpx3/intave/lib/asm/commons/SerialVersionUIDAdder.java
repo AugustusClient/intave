@@ -314,8 +314,8 @@ public class SerialVersionUIDAdder extends ClassVisitor {
     if (computeSvuid && !hasSvuid) {
       try {
         addSVUID(computeSVUID());
-      } catch (IOException e) {
-        throw new IllegalStateException("Error while computing SVUID for " + name, e);
+      } catch (IOException exception) {
+        throw new IllegalStateException("Error while computing SVUID for " + name, exception);
       }
     }
 
@@ -445,8 +445,8 @@ public class SerialVersionUIDAdder extends ClassVisitor {
   protected byte[] computeSHAdigest(byte[] value) {
     try {
       return MessageDigest.getInstance("SHA").digest(value);
-    } catch (NoSuchAlgorithmException e) {
-      throw new UnsupportedOperationException(e);
+    } catch (NoSuchAlgorithmException exception) {
+      throw new UnsupportedOperationException(exception);
     }
   }
 

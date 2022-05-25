@@ -107,7 +107,7 @@ public final class LabyModsHeuristic extends CheckPart<Heuristics> {
     Object packetDataSerializer = packet.getSpecificModifier(Lookup.serverClass("PacketDataSerializer")).getValues().get(0);
     try {
       return (String) packetDataSerializer.getClass().getMethod("toString", Charset.class).invoke(packetDataSerializer, Charset.defaultCharset());
-    } catch (Exception e) {
+    } catch (Exception exception) {
       return "error";
     }
   }

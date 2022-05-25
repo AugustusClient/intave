@@ -96,7 +96,7 @@ public final class SibylAuthentication implements BukkitEventSubscriber {
               setAuthState(player, success ? SibylAuthenticationState.ATH : SibylAuthenticationState.RGF);
             });
           }
-        } catch (RuntimeException e) {
+        } catch (RuntimeException exception) {
           setAuthState(player, SibylAuthenticationState.RGF);
         }
 
@@ -123,8 +123,8 @@ public final class SibylAuthentication implements BukkitEventSubscriber {
         while (scanner.hasNext()) {
           raw.append(scanner.next());
         }
-        callback.accept(raw.toString().equalsIgnoreCase("success"));
-      } catch (IOException e) {
+        callback.accept("success".equalsIgnoreCase(raw.toString()));
+      } catch (IOException exception) {
         callback.accept(false);
       }
     });

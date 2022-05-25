@@ -34,7 +34,7 @@ public final class ProfileLookup {
       InputStream inputStream = connection.getInputStream();
       Scanner scanner = new Scanner(inputStream, "UTF-8");
       uuid = UUID.fromString(scanner.next());
-    } catch (IOException e) {
+    } catch (IOException exception) {
       uuid = UUID.randomUUID();
       noConnection = true;
     }
@@ -83,7 +83,7 @@ public final class ProfileLookup {
       InputStream inputStream = connection.getInputStream();
       Scanner scanner = new Scanner(inputStream, "UTF-8");
       return (JSONObject) jsonParser.parse(scanner.useDelimiter("\\A").next());
-    } catch (IOException | ParseException e) {
+    } catch (IOException | ParseException exception) {
       return null;
     }
   }
@@ -104,8 +104,8 @@ public final class ProfileLookup {
         String signature = (String) object.get("signature");
         wrappedGameProfile.getProperties().put("textures", new WrappedSignedProperty("textures", value, signature));
       }
-    } catch (Exception e) {
-      throw new IntaveInternalException(e);
+    } catch (Exception exception) {
+      throw new IntaveInternalException(exception);
     }
   }
 }

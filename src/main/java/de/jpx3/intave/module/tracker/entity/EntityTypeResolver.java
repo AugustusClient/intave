@@ -275,8 +275,8 @@ public final class EntityTypeResolver {
     Class<?> handleClass = handle.getClass();
     try {
       return entityByHandle(handle, handleClass.getDeclaredField(dataWatcherEntityFieldName));
-    } catch (NoSuchFieldException e) {
-      throw new IntaveInternalException(e);
+    } catch (NoSuchFieldException exception) {
+      throw new IntaveInternalException(exception);
     }
   }
 
@@ -284,8 +284,8 @@ public final class EntityTypeResolver {
     try {
       ensureAccessibility(entityField);
       return entityField.get(handle);
-    } catch (Exception e) {
-      throw new IntaveInternalException(e);
+    } catch (Exception exception) {
+      throw new IntaveInternalException(exception);
     }
   }
 

@@ -43,8 +43,8 @@ public final class PacketSender {
       method = PROTOCOL_LIB_CORRECTED_THEIR_TYPO ?
         ProtocolManager.class.getMethod("receiveClientPacket", Player.class, PacketContainer.class) :
         ProtocolManager.class.getMethod("recieveClientPacket", Player.class, PacketContainer.class);
-    } catch (NoSuchMethodException e) {
-      e.printStackTrace();
+    } catch (NoSuchMethodException exception) {
+      exception.printStackTrace();
     }
     RECEIVE_PACKET_METHOD = method;
   }

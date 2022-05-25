@@ -36,13 +36,13 @@ abstract class Playback extends SinkEnvironment {
 
   protected Event nextEvent() {
     try {
-      long offset = dataInputStream.readInt();
+      short offset = dataInputStream.readShort();
       int packetId = dataInputStream.readByte();
       Event event = EventRegistry.eventOf(packetId);
       event.deserialize(environment, dataInputStream);
       event.withOffset(offset);
       return event;
-    } catch (IOException e) {
+    } catch (IOException exception) {
       return null;
     }
   }

@@ -31,8 +31,8 @@ class Scene extends JPanel {
         if (sleepTime != 0) {
           try {
             Thread.sleep(sleepTime);
-          } catch (InterruptedException e) {
-            e.printStackTrace();
+          } catch (InterruptedException exception) {
+            exception.printStackTrace();
           }
         }
         train();

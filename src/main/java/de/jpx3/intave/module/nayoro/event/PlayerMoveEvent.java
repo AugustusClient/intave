@@ -115,12 +115,20 @@ public final class PlayerMoveEvent extends Event {
     return (flags & Flag.X) != 0;
   }
 
+  public void setX(double x) {
+    this.x = x;
+  }
+
   public double y() {
     return y;
   }
 
   public boolean applyY() {
     return (flags & Flag.Y) != 0;
+  }
+
+  public void setY(double y) {
+    this.y = y;
   }
 
   public double z() {
@@ -131,6 +139,10 @@ public final class PlayerMoveEvent extends Event {
     return (flags & Flag.Z) != 0;
   }
 
+  public void setZ(double z) {
+    this.z = z;
+  }
+
   public float yaw() {
     return yaw;
   }
@@ -139,12 +151,20 @@ public final class PlayerMoveEvent extends Event {
     return (flags & Flag.YAW) != 0;
   }
 
+  public void setYaw(float yaw) {
+    this.yaw = yaw;
+  }
+
   public float pitch() {
     return pitch;
   }
 
   public boolean applyPitch() {
     return (flags & Flag.PITCH) != 0;
+  }
+
+  public void setPitch(float pitch) {
+    this.pitch = pitch;
   }
 
   @Override

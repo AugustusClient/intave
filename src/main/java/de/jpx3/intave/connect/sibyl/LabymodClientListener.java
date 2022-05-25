@@ -43,8 +43,8 @@ public final class LabymodClientListener implements PacketEventSubscriber {
       Object minecraftKey = packet.getMinecraftKeys().getValues().get(0);
       try {
         tag = (String) minecraftKey.getClass().getMethod("toString").invoke(minecraftKey);
-      } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-        e.printStackTrace();
+      } catch (Exception exception) {
+        exception.printStackTrace();
         tag = "error";
       }
     } else {
@@ -65,8 +65,8 @@ public final class LabymodClientListener implements PacketEventSubscriber {
         JsonElement jsonElement = jsonParser.parse(messageContent);
         elementConsumer.accept(player, jsonElement);
       }
-    } catch (RuntimeException e) {
-      e.printStackTrace();
+    } catch (Exception exception) {
+      exception.printStackTrace();
     } finally {
       bytes.resetReaderIndex();
     }

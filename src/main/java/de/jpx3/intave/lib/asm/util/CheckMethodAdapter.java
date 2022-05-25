@@ -461,27 +461,27 @@ public class CheckMethodAdapter extends MethodVisitor {
           Analyzer<BasicValue> analyzer = new Analyzer<>(new BasicVerifier());
           try {
             analyzer.analyze("dummy", this);
-          } catch (IndexOutOfBoundsException e) {
+          } catch (IndexOutOfBoundsException exception) {
             if (maxLocals == 0 && maxStack == 0) {
               throw new IllegalArgumentException(
                 "Data flow checking option requires valid, non zero maxLocals and maxStack.",
-                e);
+                exception);
             }
-            throwError(analyzer, e);
-          } catch (AnalyzerException e) {
-            throwError(analyzer, e);
+            throwError(analyzer, exception);
+          } catch (AnalyzerException exception) {
+            throwError(analyzer, exception);
           }
           if (methodVisitor != null) {
             accept(methodVisitor);
           }
         }
 
-        private void throwError(Analyzer<BasicValue> analyzer, Exception e) {
+        private void throwError(Analyzer<BasicValue> analyzer, Exception exception) {
           StringWriter stringWriter = new StringWriter();
           PrintWriter printWriter = new PrintWriter(stringWriter, true);
           CheckClassAdapter.printAnalyzerResult(this, analyzer, printWriter);
           printWriter.close();
-          throw new IllegalArgumentException(e.getMessage() + ' ' + stringWriter, e);
+          throw new IllegalArgumentException(exception.getMessage() + ' ' + stringWriter, exception);
         }
       },
       labelInsnIndices);

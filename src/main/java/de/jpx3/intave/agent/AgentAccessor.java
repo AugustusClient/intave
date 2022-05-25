@@ -14,7 +14,7 @@ public final class AgentAccessor {
     try {
       Class.forName("de.jpx3.intaveagent.IntaveAgent");
       return true;
-    } catch (ClassNotFoundException e) {
+    } catch (ClassNotFoundException exception) {
       return false;
     }
   }
@@ -27,8 +27,8 @@ public final class AgentAccessor {
         Class<?> agentClass = Class.forName("de.jpx3.intaveagent.IntaveAgent");
         Method universalInstrumentation = agentClass.getMethod("universalInstrumentation");
         instrumentation = (Instrumentation) universalInstrumentation.invoke(null);
-      } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-        throw new IntaveInternalException(e);
+      } catch (Exception exception) {
+        throw new IntaveInternalException(exception);
       }
     }
     return instrumentation;
@@ -102,8 +102,8 @@ public final class AgentAccessor {
         sourceBytesOfMinecraftClass(clazz.getCanonicalName())
       );
       instrumentation().redefineClasses(new ClassDefinition(clazz, newClass));
-    } catch (IllegalClassFormatException | ClassNotFoundException | UnmodifiableClassException e) {
-      throw new IntaveInternalException(e);
+    } catch (Exception exception) {
+      throw new IntaveInternalException(exception);
     }
   }
 
@@ -154,8 +154,8 @@ public final class AgentAccessor {
       }
       minecraftClassName = minecraftClassName.replace(".", "/");
       return (byte[]) classBytesOfMethod.invoke(null, minecraftClassName);
-    } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-      throw new IntaveInternalException(e);
+    } catch (Exception exception) {
+      throw new IntaveInternalException(exception);
     }
   }
 }

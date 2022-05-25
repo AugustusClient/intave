@@ -195,8 +195,8 @@ class TestNeuralNetwork {
         panel.repaint();
         try {
           Thread.sleep(1);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
+        } catch (InterruptedException exception) {
+          exception.printStackTrace();
         }
       }
     }).start();

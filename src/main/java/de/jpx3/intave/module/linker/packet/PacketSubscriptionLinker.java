@@ -236,8 +236,8 @@ public final class PacketSubscriptionLinker extends Module {
   private <T> T instanceOf(Class<T> clazz) {
     try {
       return clazz.newInstance();
-    } catch (InstantiationException | IllegalAccessException e) {
-      throw new Error(e);
+    } catch (InstantiationException | IllegalAccessException exception) {
+      throw new Error(exception);
     }
   }
 

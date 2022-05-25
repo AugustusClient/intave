@@ -296,13 +296,13 @@ public class Analyzer<V extends Value> implements Opcodes {
             }
           }
         }
-      } catch (AnalyzerException e) {
+      } catch (AnalyzerException exception) {
         throw new AnalyzerException(
-          e.node, "Error at instruction " + insnIndex + ": " + e.getMessage(), e);
-      } catch (RuntimeException e) {
+          exception.node, "Error at instruction " + insnIndex + ": " + exception.getMessage(), exception);
+      } catch (RuntimeException exception) {
         // DontCheck(IllegalCatch): can't be fixed, for backward compatibility.
         throw new AnalyzerException(
-          insnNode, "Error at instruction " + insnIndex + ": " + e.getMessage(), e);
+          insnNode, "Error at instruction " + insnIndex + ": " + exception.getMessage(), exception);
       }
     }
 

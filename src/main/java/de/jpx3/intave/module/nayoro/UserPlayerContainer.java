@@ -134,6 +134,21 @@ public final class UserPlayerContainer implements PlayerContainer {
   }
 
   @Override
+  public double x() {
+    return user.meta().movement().positionX();
+  }
+
+  @Override
+  public double y() {
+    return user.meta().movement().positionY();
+  }
+
+  @Override
+  public double z() {
+    return user.meta().movement().positionZ();
+  }
+
+  @Override
   public boolean cursorUponEntity(int id, float expansion) {
     Player player = user.player();
     MetadataBundle meta = user.meta();

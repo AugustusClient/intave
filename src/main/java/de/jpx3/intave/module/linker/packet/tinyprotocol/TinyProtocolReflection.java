@@ -83,8 +83,8 @@ final class TinyProtocolReflection {
           public T get(Object target) {
             try {
               return (T) field.get(target);
-            } catch (IllegalAccessException e) {
-              throw new RuntimeException("Cannot access reflection.", e);
+            } catch (IllegalAccessException exception) {
+              throw new RuntimeException("Cannot access reflection.", exception);
             }
           }
 
@@ -92,8 +92,8 @@ final class TinyProtocolReflection {
           public void set(Object target, Object value) {
             try {
               field.set(target, value);
-            } catch (IllegalAccessException e) {
-              throw new RuntimeException("Cannot access reflection.", e);
+            } catch (IllegalAccessException exception) {
+              throw new RuntimeException("Cannot access reflection.", exception);
             }
           }
 
@@ -200,8 +200,8 @@ final class TinyProtocolReflection {
         return arguments -> {
           try {
             return constructor.newInstance(arguments);
-          } catch (Exception e) {
-            throw new RuntimeException("Cannot invoke constructor " + constructor, e);
+          } catch (Exception exception) {
+            throw new RuntimeException("Cannot invoke constructor " + constructor, exception);
           }
         };
       }

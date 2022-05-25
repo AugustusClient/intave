@@ -208,8 +208,8 @@ final class IRXClassAssembler {
   private static Class<?> fetchClass(String name) {
     try {
       return Class.forName(name.replaceAll("/", "."), false, pluginClassLoader());
-    } catch (ClassNotFoundException e) {
-      throw new IntaveInternalException(e);
+    } catch (ClassNotFoundException exception) {
+      throw new IntaveInternalException(exception);
     }
   }
 

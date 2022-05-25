@@ -67,8 +67,8 @@ public final class ModernDataWatcherAccessor implements DataWatcherAccessor {
   private Object accessLivingFlags() {
     try {
       return livingFlags.get(null);
-    } catch (IllegalAccessException e) {
-      throw new IntaveInternalException(e);
+    } catch (IllegalAccessException exception) {
+      throw new IntaveInternalException(exception);
     }
   }
 }

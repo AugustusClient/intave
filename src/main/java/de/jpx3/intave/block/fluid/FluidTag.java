@@ -33,8 +33,8 @@ enum FluidTag {
   private Object resolveNativeTag() {
     try {
       return Lookup.serverField("TagsFluid", name()).get(null);
-    } catch (IllegalAccessException e) {
-      throw new IntaveInternalException("Cannot access fluid tag", e);
+    } catch (IllegalAccessException exception) {
+      throw new IntaveInternalException("Cannot access fluid tag", exception);
     }
   }
 }
