@@ -24,7 +24,7 @@ public final class TestingHeuristic extends MetaCheckPart<Heuristics, TestingHeu
   @NayoroRelay
   public void on(PlayerContainer player, ClickEvent event) {
     ExampleMeta meta = player.meta(ExampleMeta.class);
-    player.debug("This is a test, " + meta.uniqueId);
+//    player.debug("This is a test, " + meta.uniqueId);
   }
 
 //  @NayoroRelay
