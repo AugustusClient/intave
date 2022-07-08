@@ -1,7 +1,7 @@
 package de.jpx3.intave.player.collider.complex;
 
 import de.jpx3.intave.math.MathHelper;
-import de.jpx3.intave.shade.Motion;
+import de.jpx3.intave.share.Motion;
 
 public final class ColliderResult {
   private static final ColliderResult INVALID_SIMULATION = new ColliderResult(

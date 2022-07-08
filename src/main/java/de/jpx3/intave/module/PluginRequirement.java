@@ -4,10 +4,10 @@ import org.bukkit.Bukkit;
 
 import java.util.Arrays;
 
-public final class PluginRequirement implements Requirement {
+final class PluginRequirement implements Requirement {
   private final String[] plugins;
 
-  public PluginRequirement(String... plugins) {
+  PluginRequirement(String... plugins) {
     this.plugins = plugins;
   }
 

@@ -16,7 +16,7 @@ public final class HashAccess {
     try {
       MessageDigest md = MessageDigest.getInstance("SHA-256");// MD5
       FileInputStream fis = new FileInputStream(file);
-      byte[] dataBytes = new byte[1024];
+      byte[] dataBytes = new byte[8192];
       int nread;
       while ((nread = fis.read(dataBytes)) != -1) {
         md.update(dataBytes, 0, nread);
@@ -38,7 +38,7 @@ public final class HashAccess {
     StringBuilder jarChecksum = new StringBuilder();
     try {
       MessageDigest md = MessageDigest.getInstance("SHA-256");// MD5
-      byte[] dataBytes = new byte[1024];
+      byte[] dataBytes = new byte[8192];
       int nread;
       while ((nread = inputStream.read(dataBytes)) != -1) {
         md.update(dataBytes, 0, nread);

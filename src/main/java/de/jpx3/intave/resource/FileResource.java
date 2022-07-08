@@ -31,17 +31,14 @@ public final class FileResource implements Resource {
           throw new IllegalStateException("Unable to create file " + file + ", exists: " + file.exists());
         }
       }
-      ByteArrayOutputStream inputBytes = new ByteArrayOutputStream();
-      byte[] buf = new byte[4096];
-      int i;
-      while ((i = inputStream.read(buf)) != -1) {
-        inputBytes.write(buf, 0, i);
+      try (OutputStream output = Files.newOutputStream(file.toPath())) {
+        byte[] buf = new byte[4096];
+        int i;
+        while ((i = inputStream.read(buf)) != -1) {
+          output.write(buf, 0, i);
+        }
+        inputStream.close();
       }
-      inputStream.close();
-      FileChannel fileChannel = new FileOutputStream(file).getChannel();
-      ReadableByteChannel byteChannel = Channels.newChannel(new ByteArrayInputStream(inputBytes.toByteArray()));
-      fileChannel.transferFrom(byteChannel, 0, Long.MAX_VALUE);
-      fileChannel.close();
     } catch (IOException exception) {
       exception.printStackTrace();
     }

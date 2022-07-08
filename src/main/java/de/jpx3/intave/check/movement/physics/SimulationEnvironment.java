@@ -1,7 +1,7 @@
 package de.jpx3.intave.check.movement.physics;
 
-import de.jpx3.intave.shade.Motion;
-import de.jpx3.intave.shade.Position;
+import de.jpx3.intave.share.Motion;
+import de.jpx3.intave.share.Position;
 import org.bukkit.util.Vector;
 
 public interface SimulationEnvironment {

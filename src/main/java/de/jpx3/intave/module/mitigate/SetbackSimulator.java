@@ -18,9 +18,9 @@ import de.jpx3.intave.module.Module;
 import de.jpx3.intave.module.Modules;
 import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.player.Effects;
-import de.jpx3.intave.shade.BlockPosition;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.ClientMathHelper;
+import de.jpx3.intave.share.BlockPosition;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.ClientMathHelper;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.MetadataBundle;
@@ -41,7 +41,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static de.jpx3.intave.math.MathHelper.minmax;
-import static de.jpx3.intave.shade.Direction.Axis.*;
+import static de.jpx3.intave.share.Direction.Axis.*;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.NETHER_PORTAL;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.UNKNOWN;
 

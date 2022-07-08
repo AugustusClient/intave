@@ -6,7 +6,7 @@ import de.jpx3.intave.block.shape.resolve.ShapeResolver;
 import de.jpx3.intave.block.type.BlockTypeAccess;
 import de.jpx3.intave.block.variant.BlockVariantAccess;
 import de.jpx3.intave.player.collider.simple.SimpleColliderResult;
-import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.share.BoundingBox;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -18,8 +18,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static de.jpx3.intave.shade.ClientMathHelper.floor;
-import static de.jpx3.intave.shade.Direction.Axis.*;
+import static de.jpx3.intave.share.ClientMathHelper.floor;
+import static de.jpx3.intave.share.Direction.Axis.*;
 
 public abstract class Movement extends HeadRotationMovement {
   private static final double BOT_DISTANCE_ADJUSTMENT = 0.15;

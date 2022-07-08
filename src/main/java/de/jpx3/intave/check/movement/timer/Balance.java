@@ -1,16 +1,20 @@
 package de.jpx3.intave.check.movement.timer;
 
 import com.comphenix.protocol.events.PacketEvent;
+import de.jpx3.intave.IntaveControl;
+import de.jpx3.intave.access.player.trust.TrustFactor;
 import de.jpx3.intave.annotate.DispatchTarget;
 import de.jpx3.intave.check.CheckStatistics;
 import de.jpx3.intave.check.CheckViolationLevelDecrementer;
 import de.jpx3.intave.check.MetaCheckPart;
 import de.jpx3.intave.check.movement.Timer;
+import de.jpx3.intave.connect.sibyl.SibylBroadcast;
 import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.module.Modules;
 import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
+import de.jpx3.intave.module.mitigate.AttackNerfStrategy;
 import de.jpx3.intave.module.violation.Violation;
 import de.jpx3.intave.module.violation.ViolationContext;
 import de.jpx3.intave.user.User;
@@ -18,6 +22,7 @@ import de.jpx3.intave.user.meta.CheckCustomMetadata;
 import de.jpx3.intave.user.meta.MetadataBundle;
 import de.jpx3.intave.user.meta.MovementMetadata;
 import de.jpx3.intave.user.meta.ViolationMetadata;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -95,13 +100,29 @@ public final class Balance extends MetaCheckPart<Timer, Balance.BalanceMeta> {
     timerData.timerBalance = MathHelper.minmax(lowerPacketBalanceLimit, timerData.timerBalance, 200);
     if (delta > 500) {
       timerData.lastLagSpike = System.currentTimeMillis();
-      Synchronizer.synchronize(() -> {
-        Modules.feedback().synchronize(player, (player1, target) -> {
-          // Lag spike - requesting feedback to reset balance
-          timerData.timerBalance = Math.max(0, timerData.timerBalance);
-        });
-      });
+      Synchronizer.synchronize(() -> Modules.feedback().synchronize(player, (player1, target) -> {
+        // Lag spike - requesting feedback to reset balance
+        timerData.timerBalance = Math.max(0, timerData.timerBalance);
+      }));
     }
+
+    // God, please tell me a better way to solve packet buffer cheats.
+    long transactionPingAvg = user.meta().connection().transactionPingAverage();
+    TrustFactor trustFactor = user.trustFactor();
+    long sinceLastRespawn = System.currentTimeMillis() - timerData.lastRespawn;
+    MovementMetadata movement = meta.movement();
+    boolean mightBeSkippedMovement = !meta.protocol().flyingPacketStream() && (Math.abs(movement.motionX()) > 0.1 || Math.abs(movement.motionY()) > 0.15 || Math.abs(movement.motionZ()) > 0.1);
+    boolean userSuspicious = transactionPingAvg <= 300 && !mightBeSkippedMovement && sinceLastRespawn > 500 && !trustFactor.atLeast(TrustFactor.ORANGE);
+    if (delta >= 100 && userSuspicious && IntaveControl.GOMME_MODE) {
+      if (timerData.spikeVL > 400) {
+        user.applyShortAttackStimulus(AttackNerfStrategy.DMG_HIGH, "XX");
+      }
+      SibylBroadcast.broadcast(ChatColor.RED + player.getName() + " #->#  " + transactionPingAvg + " " + delta + " " + timerData.spikeVL);
+      timerData.spikeVL += 100;
+    } else {
+      timerData.spikeVL--;
+    }
+
     if (timerData.timerBalance < -50 && System.currentTimeMillis() - timerData.lastLagSpike > 500) {
       int adder = timerData.timerBalance < -400 ? 9 : 3;
       timerData.timerBalance += adder;
@@ -212,6 +233,7 @@ public final class Balance extends MetaCheckPart<Timer, Balance.BalanceMeta> {
     public long lastTimerFlag;
     public long lastLagSpike;
     public long lastRespawn;
+    public int spikeVL;
     public boolean receivedMovingPacket;
     public boolean flagTick;
   }

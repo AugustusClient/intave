@@ -4,7 +4,7 @@ import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.player.trust.TrustFactor;
 import de.jpx3.intave.annotate.Native;
-import de.jpx3.intave.block.state.BlockStateAccess;
+import de.jpx3.intave.block.state.BlockStateExtendedCache;
 import de.jpx3.intave.check.Check;
 import de.jpx3.intave.check.CheckStatistics;
 import de.jpx3.intave.check.combat.Heuristics;
@@ -19,7 +19,7 @@ import de.jpx3.intave.diagnostic.timings.Timing;
 import de.jpx3.intave.diagnostic.timings.Timings;
 import de.jpx3.intave.module.Modules;
 import de.jpx3.intave.module.nayoro.Nayoro;
-import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.share.BoundingBox;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import org.bukkit.Bukkit;
@@ -355,7 +355,7 @@ public final class RootStage extends CommandStage {
   @Native
   public void outputReplacements(User user) {
     Player player = user.player();
-    BlockStateAccess bba = user.blockStates();
+    BlockStateExtendedCache bba = user.blockStates();
     player.sendMessage(ChatColor.RED + "You have " + bba.numOfLocatedReplacements() + "/" + bba.numOfIndexedReplacements() + " replacements");
   }
 

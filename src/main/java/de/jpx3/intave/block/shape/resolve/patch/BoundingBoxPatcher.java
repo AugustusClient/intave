@@ -3,7 +3,6 @@ package de.jpx3.intave.block.shape.resolve.patch;
 import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntaveLogger;
 import de.jpx3.intave.block.shape.BlockShape;
-import de.jpx3.intave.shade.BoundingBox;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -54,36 +53,16 @@ public final class BoundingBoxPatcher {
       return shape;
     } else {
       BlockShape normalized = normalize(blockPatch, shape, blockX, blockY, blockZ);
-      BlockShape patched = blockPatch.patch(world, player, blockX, blockY, blockZ, type, blockState, normalized);
+      BlockShape patched = blockPatch.collisionPatch(world, player, blockX, blockY, blockZ, type, blockState, normalized);
       return contextualize(patched, blockX, blockY, blockZ);
     }
   }
 
-  private static List<BoundingBox> contextualizeModifying(List<BoundingBox> boundingBoxes, int posX, int posY, int posZ) {
-    if (boundingBoxes.isEmpty()) {
-      return boundingBoxes;
-    }
-    boundingBoxes = new ArrayList<>(boundingBoxes);
-    for (int i = 0; i < boundingBoxes.size(); i++) {
-      BoundingBox boundingBox = boundingBoxes.get(i);
-      if (boundingBox.isOriginBox()) {
-        boundingBoxes.set(i, boundingBox.offset(posX, posY, posZ));
-      }
-    }
-    return boundingBoxes;
-  }
-
   private static BlockShape normalize(BoundingBoxPatch patch, BlockShape input, int posX, int posY, int posZ) {
-    if (!patch.requireNormalization() || input.isEmpty()) {
-      return input;
-    }
-    return input.normalized(posX, posY, posZ);
+    return patch.requireNormalization() ? input.normalized(posX, posY, posZ) : input;
   }
 
   private static BlockShape contextualize(BlockShape shape, int posX, int posY, int posZ) {
-    if (shape.isEmpty()) {
-      return shape;
-    }
     return shape.contextualized(posX, posY, posZ);
   }
 }

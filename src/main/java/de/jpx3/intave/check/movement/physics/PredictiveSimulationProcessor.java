@@ -9,7 +9,7 @@ import de.jpx3.intave.math.Hypot;
 import de.jpx3.intave.module.dispatch.AttackDispatcher;
 import de.jpx3.intave.module.feedback.Superposition;
 import de.jpx3.intave.player.ItemProperties;
-import de.jpx3.intave.shade.Motion;
+import de.jpx3.intave.share.Motion;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.InventoryMetadata;
 import de.jpx3.intave.user.meta.MetadataBundle;

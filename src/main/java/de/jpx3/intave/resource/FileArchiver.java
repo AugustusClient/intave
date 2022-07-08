@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -59,7 +60,7 @@ public final class FileArchiver {
   private void moveFileToArchive(File file, File archiveFile) {
     try (
       FileInputStream in = new FileInputStream(file);
-      ZipOutputStream out = new ZipOutputStream(new FileOutputStream(archiveFile))
+      ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(archiveFile.toPath()))
     ) {
       out.putNextEntry(new ZipEntry(file.getName()));
       out.setLevel(Deflater.BEST_COMPRESSION);

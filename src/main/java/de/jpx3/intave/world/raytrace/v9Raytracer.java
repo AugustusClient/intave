@@ -1,13 +1,14 @@
 package de.jpx3.intave.world.raytrace;
 
-import de.jpx3.intave.block.state.BlockState;
-import de.jpx3.intave.block.state.BlockStateAccess;
+import de.jpx3.intave.block.state.BlockStateExtendedCache;
+import de.jpx3.intave.block.variant.BlockVariantRegister;
 import de.jpx3.intave.klass.rewrite.PatchyAutoTranslation;
 import de.jpx3.intave.klass.rewrite.PatchyTranslateParameters;
-import de.jpx3.intave.shade.MovingObjectPosition;
-import de.jpx3.intave.shade.NativeVector;
+import de.jpx3.intave.share.MovingObjectPosition;
+import de.jpx3.intave.share.NativeVector;
 import de.jpx3.intave.user.UserRepository;
 import net.minecraft.server.v1_9_R2.*;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_9_R2.CraftWorld;
 import org.bukkit.entity.Player;
@@ -145,9 +146,18 @@ public final class v9Raytracer implements Raytracer {
   @PatchyAutoTranslation
   @PatchyTranslateParameters
   private IBlockData typeOf(Player player, WorldServer world, BlockPosition blockPosition) {
-    BlockStateAccess blockStateAccess = UserRepository.userOf(player).blockStates();
-    BlockState shape = blockStateAccess.overrideOf(blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
-    return shape != null ? Block.getById(shape.type().getId()).fromLegacyData(shape.variantIndex()) : world.getType(blockPosition);
+    BlockStateExtendedCache blockStates = UserRepository.userOf(player).blockStates();
+    int positionX = blockPosition.getX();
+    int positionY = blockPosition.getY();
+    int positionZ = blockPosition.getZ();
+    boolean inOverride = blockStates.currentlyInOverride(positionX, positionY, positionZ);
+    if (inOverride) {
+      Material material = blockStates.typeAt(positionX, positionY, positionZ);
+      int variant = blockStates.variantIndexAt(positionX, positionY, positionZ);
+      return (IBlockData) BlockVariantRegister.rawVariantOf(material, variant);
+    } else {
+      return world.getType(blockPosition);
+    }
   }
 
   private boolean includesInvalidCoordinate(NativeVector nativeVector) {

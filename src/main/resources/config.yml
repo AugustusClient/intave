@@ -1,5 +1,5 @@
 # Selected configuration
 # Enter "file" to use a file configuration (settings.yml)
-# Or enter the name of your online configuration to use a online configuration
+# Or enter the name of your online configuration to use an online configuration
 
 config-identifier: "file"

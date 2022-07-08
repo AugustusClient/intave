@@ -2,7 +2,7 @@ package de.jpx3.intave.block.fluid;
 
 import de.jpx3.intave.block.access.VolatileBlockAccess;
 import de.jpx3.intave.block.physics.MaterialMagic;
-import de.jpx3.intave.shade.*;
+import de.jpx3.intave.share.*;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.MovementMetadata;
 import org.bukkit.Material;

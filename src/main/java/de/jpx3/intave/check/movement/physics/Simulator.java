@@ -1,7 +1,7 @@
 package de.jpx3.intave.check.movement.physics;
 
 import de.jpx3.intave.check.movement.Physics;
-import de.jpx3.intave.shade.Motion;
+import de.jpx3.intave.share.Motion;
 import de.jpx3.intave.user.User;
 
 public abstract class Simulator {

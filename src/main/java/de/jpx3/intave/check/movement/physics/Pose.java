@@ -2,7 +2,7 @@ package de.jpx3.intave.check.movement.physics;
 
 import com.google.common.collect.ImmutableMap;
 import de.jpx3.intave.entity.size.HitboxSize;
-import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.share.BoundingBox;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.MovementMetadata;
 

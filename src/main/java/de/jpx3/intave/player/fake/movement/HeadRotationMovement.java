@@ -1,7 +1,7 @@
 package de.jpx3.intave.player.fake.movement;
 
 import de.jpx3.intave.math.MathHelper;
-import de.jpx3.intave.shade.ClientMathHelper;
+import de.jpx3.intave.share.ClientMathHelper;
 
 import java.util.concurrent.ThreadLocalRandom;
 

@@ -5,7 +5,7 @@ import de.jpx3.intave.block.shape.BlockShape;
 import de.jpx3.intave.block.shape.BlockShapes;
 import de.jpx3.intave.block.variant.BlockVariantRegister;
 import de.jpx3.intave.diagnostic.MemoryTraced;
-import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.share.BoundingBox;
 import org.bukkit.Material;
 
 import java.util.Objects;
@@ -15,12 +15,12 @@ import java.util.Objects;
  * the type and variant index of a block. It is primarily used for block-caching and
  * block-overrides.
  *
- * @see BlockStateLookup
+ * @see BlockStateCache
  * @see BoundingBox
  * @see Material
  * @see BlockVariantRegister
  */
-public final class BlockState extends MemoryTraced {
+final class BlockState extends MemoryTraced {
   private static final BlockState EMPTY = new BlockState(BlockShapes.emptyShape(), BlockShapes.emptyShape(), Material.AIR, 0);
   private final BlockShape outlineShape;
   private final BlockShape collisionShape;
@@ -28,7 +28,7 @@ public final class BlockState extends MemoryTraced {
   private final int variantIndex;
   private final long creation = System.currentTimeMillis();
 
-  public BlockState(BlockShape outlineShape, BlockShape collisionShape, Material type, int variantIndex) {
+  BlockState(BlockShape outlineShape, BlockShape collisionShape, Material type, int variantIndex) {
     this.outlineShape = outlineShape;
     this.collisionShape = collisionShape;
     this.type = type;
@@ -39,7 +39,7 @@ public final class BlockState extends MemoryTraced {
    * Returns the bounding box of this block state.
    * @return the bounding box of this block state
    */
-  public BlockShape outlineShape() {
+  BlockShape outlineShape() {
     return outlineShape;
   }
 
@@ -47,7 +47,7 @@ public final class BlockState extends MemoryTraced {
    * Retrieve the blocks bounding boxes
    * @return the blocks bounding boxes
    */
-  public BlockShape collisionShape() {
+  BlockShape collisionShape() {
     return collisionShape;
   }
 
@@ -56,7 +56,7 @@ public final class BlockState extends MemoryTraced {
    *
    * @return the blocks type
    */
-  public Material type() {
+  Material type() {
     return type;
   }
 
@@ -65,7 +65,7 @@ public final class BlockState extends MemoryTraced {
    *
    * @return the blocks variant
    */
-  public int variantIndex() {
+  int variantIndex() {
     return variantIndex;
   }
 
@@ -75,11 +75,11 @@ public final class BlockState extends MemoryTraced {
    *
    * @return whether the state is expired
    */
-  public boolean expired() {
+  boolean expired() {
     return !IntaveControl.IGNORE_CACHE_REFRESH_ON_SIMULATION_FAULT && age() > 10000;
   }
 
-  public long age() {
+  long age() {
     return System.currentTimeMillis() - creation;
   }
 

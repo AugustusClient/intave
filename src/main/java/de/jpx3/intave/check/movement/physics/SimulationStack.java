@@ -3,23 +3,23 @@ package de.jpx3.intave.check.movement.physics;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserLocal;
 
-public final class SimulationStack {
+final class SimulationStack {
   private static final UserLocal<SimulationStack> stackUserLocal = UserLocal.withInitial(SimulationStack::new);
   private static final int DEFAULT_DISTANCE = Integer.MAX_VALUE;
 
   private Simulation simulation;
   private double smallestDistance;
 
-  public SimulationStack() {
+  SimulationStack() {
     this.smallestDistance = DEFAULT_DISTANCE;
   }
 
-  public void restore() {
+  void restore() {
     simulation = Simulation.invalid();
     smallestDistance = DEFAULT_DISTANCE;
   }
 
-  public void tryAppendToState(
+  void tryAppendToState(
     Simulation simulation,
     double newDistance
   ) {
@@ -36,47 +36,47 @@ public final class SimulationStack {
     this.smallestDistance = newDistance;
   }
 
-  public boolean noMatch() {
+  boolean noMatch() {
     return simulation == null || this.smallestDistance == DEFAULT_DISTANCE;
   }
 
-  public Simulation bestSimulation() {
+  Simulation bestSimulation() {
     return simulation;
   }
 
-  public int forward() {
+  int forward() {
     return configuration().forward();
   }
 
-  public int strafe() {
+  int strafe() {
     return configuration().strafe();
   }
 
-  public boolean jumped() {
+  boolean jumped() {
     return configuration().isJumping();
   }
 
-  public boolean sprinted() {
+  boolean sprinted() {
     return configuration().isSprinting();
   }
 
-  public boolean reduced() {
+  boolean reduced() {
     return configuration().isReducing();
   }
 
-  public boolean handActive() {
+  boolean handActive() {
     return configuration().isHandActive();
   }
 
-  public double smallestDistance() {
+  double smallestDistance() {
     return smallestDistance;
   }
 
-  public MovementConfiguration configuration() {
+  MovementConfiguration configuration() {
     return simulation.configuration();
   }
 
-  public static SimulationStack of(User user) {
+  static SimulationStack of(User user) {
     SimulationStack simulationStack = stackUserLocal.get(user);
     simulationStack.restore();
     return simulationStack;

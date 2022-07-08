@@ -1,8 +1,8 @@
 package de.jpx3.intave.world.raytrace;
 
 import de.jpx3.intave.klass.rewrite.PatchyAutoTranslation;
-import de.jpx3.intave.shade.MovingObjectPosition;
-import de.jpx3.intave.shade.NativeVector;
+import de.jpx3.intave.share.MovingObjectPosition;
+import de.jpx3.intave.share.NativeVector;
 import net.minecraft.server.v1_13_R2.FluidCollisionOption;
 import net.minecraft.server.v1_13_R2.Vec3D;
 import org.bukkit.World;

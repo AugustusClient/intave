@@ -1,6 +1,6 @@
 package de.jpx3.intave.check.movement.physics;
 
-public final class MovementConfiguration {
+final class MovementConfiguration {
   private static final int BOOLEANS = 4;
   private static final MovementConfiguration[] UNIVERSE = new MovementConfiguration[(int) (Math.pow(4, 2) * Math.pow(2, BOOLEANS)) + 1];
 

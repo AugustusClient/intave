@@ -2,14 +2,14 @@ package de.jpx3.intave.player.collider.complex;
 
 import de.jpx3.intave.block.collision.Collision;
 import de.jpx3.intave.block.shape.BlockShape;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.Motion;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.Motion;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.MetadataBundle;
 import de.jpx3.intave.user.meta.MovementMetadata;
 import org.bukkit.entity.Player;
 
-import static de.jpx3.intave.shade.Direction.Axis.*;
+import static de.jpx3.intave.share.Direction.Axis.*;
 
 public final class v14Collider implements Collider {
   @Override

@@ -1,8 +1,8 @@
 package de.jpx3.intave.block.shape;
 
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.Direction;
-import de.jpx3.intave.shade.Position;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.Direction;
+import de.jpx3.intave.share.Position;
 
 import java.util.Collections;
 import java.util.List;

@@ -2,7 +2,7 @@ package de.jpx3.intave.block.shape.resolve.patch;
 
 import de.jpx3.intave.block.shape.BlockShape;
 import de.jpx3.intave.block.shape.BlockShapes;
-import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.share.BoundingBox;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,7 @@ public final class BoundingBoxBuilder {
   }
 
   public BlockShape applyAndResolveAsShape() {
-    return BlockShapes.shapeOf(applyAndResolve());
+    return BlockShapes.merge(applyAndResolve());
   }
 
   public void apply() {

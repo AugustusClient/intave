@@ -2,7 +2,7 @@ package de.jpx3.intave.block.shape.resolve;
 
 import de.jpx3.intave.block.shape.BlockShape;
 import de.jpx3.intave.block.shape.ShapeResolverPipeline;
-import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.share.BoundingBox;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;

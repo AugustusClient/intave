@@ -1,6 +1,6 @@
 package de.jpx3.intave.module;
 
-public final class ModuleSettings {
+final class ModuleSettings {
   private final BootSegment bootSegment;
   private final Requirement requirement;
   private final boolean linkSubscriptions;

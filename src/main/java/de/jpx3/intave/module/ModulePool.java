@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public final class ModulePool {
+final class ModulePool {
   private final Map<Class<? extends Module>, Module> moduleClassMappings = new ConcurrentHashMap<>();
 
   public void loadModule(Module module) {

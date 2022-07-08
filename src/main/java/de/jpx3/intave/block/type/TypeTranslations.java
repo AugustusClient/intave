@@ -12,7 +12,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public final class TypeTranslations {
+final class TypeTranslations {
   private final Collection<TypeTranslation> translations;
 
   private TypeTranslations(Collection<TypeTranslation> translations) {
@@ -28,7 +28,7 @@ public final class TypeTranslations {
     return serverVersion.isAtLeast(typeTranslation.versionTo()) && !clientVersion.isAtLeast(typeTranslation.versionFrom()) && clientVersion.isAtLeast(typeTranslation.versionTo());
   }
 
-  public TypeTranslations filter(Predicate<TypeTranslation> keepConstraint) {
+  public TypeTranslations filter(Predicate<? super TypeTranslation> keepConstraint) {
     return ofCollection(stream().filter(keepConstraint).collect(Collectors.toList()));
   }
 
@@ -40,7 +40,11 @@ public final class TypeTranslations {
     Collectors.toMap(TypeTranslation::typeFrom, TypeTranslation::typeTo, (a, b) -> b);
 
   public Map<Material, Material> asTypeMap() {
-    return translations.stream().collect(MAP_COLLECTOR);
+    return collect(MAP_COLLECTOR);
+  }
+
+  public <R> R collect(Collector<? super TypeTranslation, ?, R> collector) {
+    return translations.stream().collect(collector);
   }
 
   public static TypeTranslations empty() {

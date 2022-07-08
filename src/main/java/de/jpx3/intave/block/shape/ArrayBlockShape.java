@@ -1,9 +1,9 @@
 package de.jpx3.intave.block.shape;
 
 import de.jpx3.intave.diagnostic.MemoryTraced;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.Direction;
-import de.jpx3.intave.shade.Position;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.Direction;
+import de.jpx3.intave.share.Position;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
@@ -16,7 +16,11 @@ import java.util.stream.Collectors;
 final class ArrayBlockShape extends MemoryTraced implements BlockShape {
   private final BlockShape[] contents;
 
-  public ArrayBlockShape(List<BlockShape> contents) {
+  ArrayBlockShape(BlockShape... contents) {
+    this.contents = contents;
+  }
+
+  ArrayBlockShape(List<? extends BlockShape> contents) {
     this.contents = contents.toArray(new BlockShape[0]);
   }
 
@@ -52,20 +56,20 @@ final class ArrayBlockShape extends MemoryTraced implements BlockShape {
 
   @Override
   public BlockShape contextualized(int posX, int posY, int posZ) {
-    List<BlockShape> list = new ArrayList<>();
-    for (BlockShape blockShape : contents) {
-      list.add(blockShape.contextualized(posX, posY, posZ));
+    BlockShape[] array = new BlockShape[contents.length];
+    for (int i = 0; i < contents.length; i++) {
+      array[i] = contents[i].contextualized(posX, posY, posZ);
     }
-    return new ArrayBlockShape(list);
+    return new ArrayBlockShape(array);
   }
 
   @Override
   public BlockShape normalized(int posX, int posY, int posZ) {
-    List<BlockShape> list = new ArrayList<>();
-    for (BlockShape blockShape : contents) {
-      list.add(blockShape.normalized(posX, posY, posZ));
+    BlockShape[] array = new BlockShape[contents.length];
+    for (int i = 0; i < contents.length; i++) {
+      array[i] = contents[i].normalized(posX, posY, posZ);
     }
-    return new ArrayBlockShape(list);
+    return new ArrayBlockShape(array);
   }
 
   @Override

@@ -2,8 +2,8 @@ package de.jpx3.intave.block.shape.resolve.patch;
 
 import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.block.shape.BlockShape;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.Direction;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.Direction;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.ProtocolMetadata;
@@ -17,7 +17,7 @@ final class AnvilBlockPatch extends BoundingBoxPatch {
   }
 
   @Override
-  public BlockShape patch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, BlockShape shape) {
+  public BlockShape collisionPatch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, BlockShape shape) {
     User user = UserRepository.userOf(player);
     boolean legacy = user.meta().protocol().protocolVersion() < ProtocolMetadata.VER_1_13;
     Direction.Axis axis = axisOf(blockState);

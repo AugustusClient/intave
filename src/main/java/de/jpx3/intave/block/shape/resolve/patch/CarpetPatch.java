@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 
 final class CarpetPatch extends BoundingBoxPatch {
   @Override
-  protected BlockShape patch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, BlockShape shape) {
+  protected BlockShape collisionPatch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, BlockShape shape) {
 //    System.out.println("CarpetPatch.patch at " + posX + " " + posY + " " + posZ + " with state " + blockState);
 //    User user = UserRepository.userOf(player);
     return /*user.meta().protocol().protocolVersion() <= 5 ?

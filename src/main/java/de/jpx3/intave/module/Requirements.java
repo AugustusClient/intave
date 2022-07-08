@@ -4,7 +4,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 
 import java.util.Arrays;
 
-public final class Requirements {
+final class Requirements {
   public static Requirement none() {
     return new NoRequirement();
   }

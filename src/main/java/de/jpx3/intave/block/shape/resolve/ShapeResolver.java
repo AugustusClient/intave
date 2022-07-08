@@ -4,12 +4,10 @@ import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.IntaveInternalException;
 import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.block.shape.ShapeResolverPipeline;
-import de.jpx3.intave.block.state.BlockStateAccess;
-import de.jpx3.intave.block.state.MultiChunkKeyBlockStateAccess;
+import de.jpx3.intave.block.state.BlockStateExtendedCache;
 import de.jpx3.intave.klass.rewrite.PatchyLoadingInjector;
 
-import static de.jpx3.intave.adapter.MinecraftVersions.VER1_13_0;
-import static de.jpx3.intave.adapter.MinecraftVersions.VER1_14_0;
+import static de.jpx3.intave.adapter.MinecraftVersions.*;
 
 /**
  * The {@link ShapeResolver} is a factory object that constructs the main bounding box resolver pipeline.
@@ -28,8 +26,7 @@ import static de.jpx3.intave.adapter.MinecraftVersions.VER1_14_0;
  * Use {@link ShapeResolver#pipelineHead()} to retrieve the pipelines head.
  *
  * @see ShapeResolverPipeline
- * @see BlockStateAccess
- * @see MultiChunkKeyBlockStateAccess
+ * @see BlockStateExtendedCache
  */
 public final class ShapeResolver {
   private static ShapeResolverPipeline resolver;
@@ -60,7 +57,7 @@ public final class ShapeResolver {
     } else if (MinecraftVersions.VER1_11_0.atOrAbove()) {
       drillClassName = "de.jpx3.intave.block.shape.resolve.drill.v11ShapeDrill";
       acClassName = "de.jpx3.intave.block.shape.resolve.drill.acbbs.v11AlwaysCollidingBoundingBox";
-    } else if (MinecraftVersions.VER1_9_0.atOrAbove()) {
+    } else if (VER1_9_0.atOrAbove()) {
       drillClassName = "de.jpx3.intave.block.shape.resolve.drill.v9ShapeDrill";
       acClassName = "de.jpx3.intave.block.shape.resolve.drill.acbbs.v9AlwaysCollidingBoundingBox";
     } else {
@@ -78,7 +75,7 @@ public final class ShapeResolver {
     if (!VER1_13_0.atOrAbove()) {
       resolver = new DrillRescuePipe(resolver);
     }
-    if (VER1_14_0.atOrAbove()) {
+    if (VER1_9_0.atOrAbove()) {
       // cache
       resolver = new VariantCachePipe(resolver);
     }

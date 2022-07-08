@@ -9,9 +9,9 @@ import de.jpx3.intave.entity.type.EntityTypeData;
 import de.jpx3.intave.math.Hypot;
 import de.jpx3.intave.module.feedback.FeedbackTracker;
 import de.jpx3.intave.module.feedback.PendingCountingFeedbackTracker;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.ClientMathHelper;
-import de.jpx3.intave.shade.Position;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.ClientMathHelper;
+import de.jpx3.intave.share.Position;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 

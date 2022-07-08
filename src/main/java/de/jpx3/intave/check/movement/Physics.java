@@ -18,7 +18,7 @@ import de.jpx3.intave.block.access.VolatileBlockAccess;
 import de.jpx3.intave.block.collision.Collision;
 import de.jpx3.intave.block.fluid.Fluids;
 import de.jpx3.intave.block.fluid.LegacyWaterflow;
-import de.jpx3.intave.block.state.BlockStateAccess;
+import de.jpx3.intave.block.state.BlockStateExtendedCache;
 import de.jpx3.intave.block.type.BlockTypeAccess;
 import de.jpx3.intave.block.variant.BlockVariantAccess;
 import de.jpx3.intave.check.Check;
@@ -39,9 +39,9 @@ import de.jpx3.intave.packet.PacketSender;
 import de.jpx3.intave.player.collider.Colliders;
 import de.jpx3.intave.player.collider.complex.ColliderResult;
 import de.jpx3.intave.player.collider.simple.SimpleColliderResult;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.Motion;
-import de.jpx3.intave.shade.Position;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.Motion;
+import de.jpx3.intave.share.Position;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.*;
 import org.bukkit.ChatColor;
@@ -58,7 +58,7 @@ import java.util.stream.Collectors;
 
 import static de.jpx3.intave.math.MathHelper.formatDouble;
 import static de.jpx3.intave.math.MathHelper.formatPosition;
-import static de.jpx3.intave.shade.ClientMathHelper.floor;
+import static de.jpx3.intave.share.ClientMathHelper.floor;
 
 @Relocate
 public final class Physics extends Check {
@@ -299,7 +299,7 @@ public final class Physics extends Check {
     ProtocolMetadata protocolMetadata = meta.protocol();
     ViolationMetadata violationLevelData = meta.violationLevel();
     AbilityMetadata abilityData = meta.abilities();
-    BlockStateAccess blockStateAccess = user.blockStates();
+    BlockStateExtendedCache blockStateAccess = user.blockStates();
 
     ColliderResult expectedMovement = simulation.collider();
     Motion context = expectedMovement.motion();

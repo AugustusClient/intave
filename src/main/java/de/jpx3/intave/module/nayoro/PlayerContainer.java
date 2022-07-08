@@ -2,8 +2,8 @@ package de.jpx3.intave.module.nayoro;
 
 import de.jpx3.intave.check.combat.heuristics.Confidence;
 import de.jpx3.intave.module.mitigate.AttackNerfStrategy;
-import de.jpx3.intave.shade.Position;
-import de.jpx3.intave.shade.Rotation;
+import de.jpx3.intave.share.Position;
+import de.jpx3.intave.share.Rotation;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.CheckCustomMetadata;
 import org.bukkit.GameMode;

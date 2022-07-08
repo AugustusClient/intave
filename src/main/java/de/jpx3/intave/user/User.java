@@ -3,10 +3,10 @@ package de.jpx3.intave.user;
 import de.jpx3.intave.access.UnsupportedFallbackOperationException;
 import de.jpx3.intave.access.player.trust.TrustFactor;
 import de.jpx3.intave.access.player.trust.TrustFactorResolver;
-import de.jpx3.intave.block.state.BlockStateAccess;
-import de.jpx3.intave.block.state.BlockStateCaching;
-import de.jpx3.intave.block.state.BlockStateLookup;
-import de.jpx3.intave.block.state.BlockStateOverrides;
+import de.jpx3.intave.block.state.BlockStateExtendedCache;
+import de.jpx3.intave.block.state.BlockStateInvalidatableCache;
+import de.jpx3.intave.block.state.BlockStateCache;
+import de.jpx3.intave.block.state.BlockStateOverridableCache;
 import de.jpx3.intave.check.MetaCheck;
 import de.jpx3.intave.check.MetaCheckPart;
 import de.jpx3.intave.check.movement.physics.Pose;
@@ -179,11 +179,11 @@ public interface User {
    * Retrieve the player's block state cache
    *
    * @return the player's block state cache
-   * @see BlockStateLookup
-   * @see BlockStateCaching
-   * @see BlockStateOverrides
+   * @see BlockStateCache
+   * @see BlockStateInvalidatableCache
+   * @see BlockStateOverridableCache
    */
-  BlockStateAccess blockStates();
+  BlockStateExtendedCache blockStates();
 
   /**
    * Retrieve the {@link User}-associated {@link Collider}
@@ -298,6 +298,14 @@ public interface User {
    * @param checkId  the check id (for debug purposes)
    */
   void applyAttackNerfer(AttackNerfStrategy strategy, String checkId);
+
+  /**
+   * Apply a one time use {@link AttackNerfStrategy} to a player
+   *
+   * @param strategy the strategy to apply
+   * @param checkId  the check id (for debug purposes)
+   */
+  void applyShortAttackStimulus(AttackNerfStrategy strategy, String checkId);
 
   /**
    * Retrieve a player's packet latency

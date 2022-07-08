@@ -15,7 +15,7 @@ import de.jpx3.intave.annotate.Relocate;
 import de.jpx3.intave.block.access.BlockInteractionAccess;
 import de.jpx3.intave.block.access.VolatileBlockAccess;
 import de.jpx3.intave.block.collision.Collision;
-import de.jpx3.intave.block.state.BlockStateAccess;
+import de.jpx3.intave.block.state.BlockStateExtendedCache;
 import de.jpx3.intave.block.type.BlockTypeAccess;
 import de.jpx3.intave.block.variant.BlockVariantAccess;
 import de.jpx3.intave.check.CheckViolationLevelDecrementer;
@@ -38,7 +38,7 @@ import de.jpx3.intave.packet.reader.BlockInteractionReader;
 import de.jpx3.intave.packet.reader.EntityReader;
 import de.jpx3.intave.packet.reader.PacketReaders;
 import de.jpx3.intave.player.ItemProperties;
-import de.jpx3.intave.shade.*;
+import de.jpx3.intave.share.*;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.*;
@@ -377,7 +377,7 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
     Player player = interaction.player();
     User user = userOf(player);
     ResponseType response = interaction.type().response();
-    BlockStateAccess blockStateAccess = user.blockStates();
+    BlockStateExtendedCache blockStateAccess = user.blockStates();
     if (enforceCancel) {
       response = ResponseType.CANCEL;
     }

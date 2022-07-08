@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public final class ModuleLoader {
+final class ModuleLoader {
   private final Map<String, ModuleSettings> pendingModuleClasses = new HashMap<>();
 
   @Native
@@ -58,7 +58,7 @@ public final class ModuleLoader {
     prepareModule("de.jpx3.intave.module.dispatch.MovementDispatcher", lateBoot);
 
     // emulate
-    prepareModule("de.jpx3.intave.module.emulate.MovementEmulation", lateBoot);
+//    prepareModule("de.jpx3.intave.module.emulate.MovementEmulation", lateBoot);
 
     // misc
     prepareModule("de.jpx3.intave.module.nayoro.Nayoro", defaultBoot);
@@ -91,7 +91,7 @@ public final class ModuleLoader {
   }
 
   private Collection<String> classPick(
-    Predicate<ModuleSettings> predicate
+    Predicate<? super ModuleSettings> predicate
   ) {
     return pendingModuleClasses.entrySet().stream()
       .filter(entry -> predicate.test(entry.getValue()))

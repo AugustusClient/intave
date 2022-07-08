@@ -1,0 +1,45 @@
+package de.jpx3.intave.share.link;
+
+import de.jpx3.intave.IntavePlugin;
+import de.jpx3.intave.adapter.MinecraftVersions;
+import de.jpx3.intave.klass.rewrite.PatchyAutoTranslation;
+import de.jpx3.intave.klass.rewrite.PatchyLoadingInjector;
+import de.jpx3.intave.share.BoundingBox;
+import net.minecraft.server.v1_8_R3.AxisAlignedBB;
+
+public final class BoundingBoxLinkage {
+  static ClassConverter<BoundingBox> resolveBoundingBoxConverter() {
+    boolean atLeastAquaticUpdate = MinecraftVersions.VER1_13_0.atOrAbove();
+    String boundingBoxResolverClass = atLeastAquaticUpdate
+      ? "de.jpx3.intave.share.link.BoundingBoxLinkage$BoundingBoxAquaticResolver"
+      : "de.jpx3.intave.share.link.BoundingBoxLinkage$BoundingBoxLegacyResolver";
+    PatchyLoadingInjector.loadUnloadedClassPatched(IntavePlugin.class.getClassLoader(), boundingBoxResolverClass);
+    return atLeastAquaticUpdate ? new BoundingBoxLinkage.BoundingBoxAquaticResolver() : new BoundingBoxLinkage.BoundingBoxLegacyResolver();
+  }
+
+  @PatchyAutoTranslation
+  public static final class BoundingBoxLegacyResolver implements ClassConverter<BoundingBox> {
+    @PatchyAutoTranslation
+    @Override
+    public BoundingBox convert(Object obj) {
+      AxisAlignedBB boundingBox = (AxisAlignedBB) obj;
+      return new BoundingBox(
+        boundingBox.a, boundingBox.b, boundingBox.c,
+        boundingBox.d, boundingBox.e, boundingBox.f
+      );
+    }
+  }
+
+  @PatchyAutoTranslation
+  public static final class BoundingBoxAquaticResolver implements ClassConverter<BoundingBox> {
+    @PatchyAutoTranslation
+    @Override
+    public BoundingBox convert(Object obj) {
+      net.minecraft.server.v1_13_R2.AxisAlignedBB boundingBox = (net.minecraft.server.v1_13_R2.AxisAlignedBB) obj;
+      return new BoundingBox(
+        boundingBox.minX, boundingBox.minY, boundingBox.minZ,
+        boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ
+      );
+    }
+  }
+}

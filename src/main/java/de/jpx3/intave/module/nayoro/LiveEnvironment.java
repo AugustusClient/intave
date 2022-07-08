@@ -2,7 +2,7 @@ package de.jpx3.intave.module.nayoro;
 
 import de.jpx3.intave.module.dispatch.AttackDispatcher;
 import de.jpx3.intave.module.tracker.entity.EntityShade;
-import de.jpx3.intave.shade.Position;
+import de.jpx3.intave.share.Position;
 import de.jpx3.intave.user.User;
 
 import java.util.HashMap;

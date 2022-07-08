@@ -3,7 +3,7 @@ package de.jpx3.intave.player.fake.movement;
 import de.jpx3.intave.block.access.BlockAccess;
 import de.jpx3.intave.block.physics.BlockProperties;
 import de.jpx3.intave.math.SinusCache;
-import de.jpx3.intave.shade.Motion;
+import de.jpx3.intave.share.Motion;
 import org.bukkit.Location;
 import org.bukkit.Material;
 

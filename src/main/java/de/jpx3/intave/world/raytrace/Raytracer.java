@@ -1,8 +1,8 @@
 package de.jpx3.intave.world.raytrace;
 
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.MovingObjectPosition;
-import de.jpx3.intave.shade.NativeVector;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.MovingObjectPosition;
+import de.jpx3.intave.share.NativeVector;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 

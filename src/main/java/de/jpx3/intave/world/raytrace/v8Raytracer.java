@@ -1,13 +1,14 @@
 package de.jpx3.intave.world.raytrace;
 
-import de.jpx3.intave.block.state.BlockState;
-import de.jpx3.intave.block.state.BlockStateAccess;
+import de.jpx3.intave.block.state.BlockStateExtendedCache;
+import de.jpx3.intave.block.variant.BlockVariantRegister;
 import de.jpx3.intave.klass.rewrite.PatchyAutoTranslation;
 import de.jpx3.intave.klass.rewrite.PatchyTranslateParameters;
-import de.jpx3.intave.shade.MovingObjectPosition;
-import de.jpx3.intave.shade.NativeVector;
+import de.jpx3.intave.share.MovingObjectPosition;
+import de.jpx3.intave.share.NativeVector;
 import de.jpx3.intave.user.UserRepository;
 import net.minecraft.server.v1_8_R3.*;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.entity.Player;
@@ -95,39 +96,39 @@ public final class v8Raytracer implements Raytracer {
       } else {
         arrivedAtZ = false;
       }
-      double d3 = 999.0;
-      double d4 = 999.0;
-      double d5 = 999.0;
-      double d6 = targetVector.xCoord - lookVector.xCoord;
-      double d7 = targetVector.yCoord - lookVector.yCoord;
-      double d8 = targetVector.zCoord - lookVector.zCoord;
+      double stepScaleX = 999.0;
+      double stepScaleY = 999.0;
+      double stepScaleZ = 999.0;
+      double finalDistanceX = targetVector.xCoord - lookVector.xCoord;
+      double finalDistanceY = targetVector.yCoord - lookVector.yCoord;
+      double finalDistanceZ = targetVector.zCoord - lookVector.zCoord;
       if (arrivedAtX) {
-        d3 = (lookXStep - lookVector.xCoord) / d6;
+        stepScaleX = (lookXStep - lookVector.xCoord) / finalDistanceX;
       }
       if (arrivedAtY) {
-        d4 = (lookYStep - lookVector.yCoord) / d7;
+        stepScaleY = (lookYStep - lookVector.yCoord) / finalDistanceY;
       }
       if (arrivedAtZ) {
-        d5 = (lookZStep - lookVector.zCoord) / d8;
+        stepScaleZ = (lookZStep - lookVector.zCoord) / finalDistanceZ;
       }
-      if (d3 == -0.0) {
-        d3 = -0.0001;
+      if (stepScaleX == -0.0) {
+        stepScaleX = -0.0001;
       }
-      if (d4 == -0.0) {
-        d4 = -0.0001;
+      if (stepScaleY == -0.0) {
+        stepScaleY = -0.0001;
       }
-      if (d5 == -0.0) {
-        d5 = -0.0001;
+      if (stepScaleZ == -0.0) {
+        stepScaleZ = -0.0001;
       }
-      if (d3 < d4 && d3 < d5) {
+      if (stepScaleX < stepScaleY && stepScaleX < stepScaleZ) {
         enumdirection = targetX > lookX ? EnumDirection.WEST : EnumDirection.EAST;
-        lookVector = new NativeVector(lookXStep, lookVector.yCoord + d7 * d3, lookVector.zCoord + d8 * d3);
-      } else if (d4 < d5) {
+        lookVector = new NativeVector(lookXStep, lookVector.yCoord + finalDistanceY * stepScaleX, lookVector.zCoord + finalDistanceZ * stepScaleX);
+      } else if (stepScaleY < stepScaleZ) {
         enumdirection = targetY > lookY ? EnumDirection.DOWN : EnumDirection.UP;
-        lookVector = new NativeVector(lookVector.xCoord + d6 * d4, lookYStep, lookVector.zCoord + d8 * d4);
+        lookVector = new NativeVector(lookVector.xCoord + finalDistanceX * stepScaleY, lookYStep, lookVector.zCoord + finalDistanceZ * stepScaleY);
       } else {
         enumdirection = targetZ > lookZ ? EnumDirection.NORTH : EnumDirection.SOUTH;
-        lookVector = new NativeVector(lookVector.xCoord + d6 * d5, lookVector.yCoord + d7 * d5, lookZStep);
+        lookVector = new NativeVector(lookVector.xCoord + finalDistanceX * stepScaleZ, lookVector.yCoord + finalDistanceY * stepScaleZ, lookZStep);
       }
       lookX = MathHelper.floor(lookVector.xCoord) - (enumdirection == EnumDirection.EAST ? 1 : 0);
       lookY = MathHelper.floor(lookVector.yCoord) - (enumdirection == EnumDirection.UP ? 1 : 0);
@@ -169,10 +170,15 @@ public final class v8Raytracer implements Raytracer {
   @PatchyAutoTranslation
   @PatchyTranslateParameters
   private IBlockData typeOf(Player player, WorldServer world, BlockPosition blockPosition) {
-    BlockStateAccess blockStateAccess = UserRepository.userOf(player).blockStates();
-    BlockState state = blockStateAccess.overrideOf(blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
-    if (state != null) {
-      return Block.getById(state.type().getId()).fromLegacyData(state.variantIndex());
+    BlockStateExtendedCache blockStates = UserRepository.userOf(player).blockStates();
+    int positionX = blockPosition.getX();
+    int positionY = blockPosition.getY();
+    int positionZ = blockPosition.getZ();
+    boolean inOverride = blockStates.currentlyInOverride(positionX, positionY, positionZ);
+    if (inOverride) {
+      Material material = blockStates.typeAt(positionX, positionY, positionZ);
+      int variant = blockStates.variantIndexAt(positionX, positionY, positionZ);
+      return (IBlockData) BlockVariantRegister.rawVariantOf(material, variant);
     } else {
       return world.getType(blockPosition);
     }

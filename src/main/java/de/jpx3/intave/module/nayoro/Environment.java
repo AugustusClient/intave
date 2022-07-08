@@ -1,6 +1,6 @@
 package de.jpx3.intave.module.nayoro;
 
-import de.jpx3.intave.shade.Position;
+import de.jpx3.intave.share.Position;
 
 import java.util.Map;
 import java.util.Set;

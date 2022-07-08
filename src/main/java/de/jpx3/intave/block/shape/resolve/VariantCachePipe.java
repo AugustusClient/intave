@@ -10,12 +10,13 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
 final class VariantCachePipe implements ShapeResolverPipeline {
   private final ShapeResolverPipeline forward;
   private final Map<Material, /*(SoftReference)*/Map<Integer, BlockShape>> collisionShapeCache = MemoryWatchdog.watch("variant-collide-cache", new ConcurrentHashMap<>());
-  private final Map<Material, /*(SoftReference)*/Map<Integer, BlockShape>> outlierShapeCache = MemoryWatchdog.watch("variant-outlier-cache", new ConcurrentHashMap<>());
+  private final Map<Material, /*(SoftReference)*/Map<Integer, BlockShape>> outlineShapeCache = MemoryWatchdog.watch("variant-outlier-cache", new ConcurrentHashMap<>());
 
   public VariantCachePipe(ShapeResolverPipeline forward) {
     this.forward = forward;
@@ -23,7 +24,7 @@ final class VariantCachePipe implements ShapeResolverPipeline {
   }
 
   private void checkVersion() {
-    if (!MinecraftVersions.VER1_14_0.atOrAbove()) {
+    if (!MinecraftVersions.VER1_9_0.atOrAbove()) {
       throw new UnsupportedOperationException("Can't utilize variant cache on versions older than 1.14");
     }
   }
@@ -38,7 +39,7 @@ final class VariantCachePipe implements ShapeResolverPipeline {
 
   @Override
   public BlockShape outlineShapeOf(World world, Player player, Material type, int blockState, int posX, int posY, int posZ) {
-    Map<Integer, BlockShape> variantCache = outlierShapeCache.computeIfAbsent(type, material -> ReferenceMap.soft(new ConcurrentHashMap<>()));
+    Map<Integer, BlockShape> variantCache = outlineShapeCache.computeIfAbsent(type, material -> ReferenceMap.soft(new ConcurrentHashMap<>()));
     return variantCache.computeIfAbsent(blockState, integer ->
       forward.outlineShapeOf(world, player, type, blockState, posX, posY, posZ).normalized(posX, posY, posZ)
     ).contextualized(posX, posY, posZ);
@@ -47,7 +48,7 @@ final class VariantCachePipe implements ShapeResolverPipeline {
   @Override
   public void downstreamTypeReset(Material type) {
     collisionShapeCache.remove(type);
-    outlierShapeCache.remove(type);
+    outlineShapeCache.remove(type);
     forward.downstreamTypeReset(type);
   }
 }

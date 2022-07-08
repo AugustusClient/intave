@@ -1,6 +1,6 @@
 package de.jpx3.intave.math;
 
-import de.jpx3.intave.shade.Motion;
+import de.jpx3.intave.share.Motion;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 

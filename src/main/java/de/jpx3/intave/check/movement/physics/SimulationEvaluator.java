@@ -5,7 +5,7 @@ import de.jpx3.intave.annotate.refactoring.SplitMeUp;
 import de.jpx3.intave.block.collision.Collision;
 import de.jpx3.intave.math.Hypot;
 import de.jpx3.intave.math.MathHelper;
-import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.share.BoundingBox;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.MetadataBundle;
 import de.jpx3.intave.user.meta.MovementMetadata;

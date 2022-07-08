@@ -1,8 +1,8 @@
 package de.jpx3.intave.block.shape.resolve.patch;
 
 import de.jpx3.intave.block.shape.BlockShape;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.ClientMathHelper;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.ClientMathHelper;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -12,7 +12,7 @@ final class BambooBlockPatch extends BoundingBoxPatch {
   private static final BlockShape[][] CACHE = new BlockShape[16][16];
 
   @Override
-  public BlockShape patch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, BlockShape shape) {
+  public BlockShape collisionPatch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, BlockShape shape) {
     // Small Bamboo Leaves
     if (shape.isEmpty()) {
       return shape;

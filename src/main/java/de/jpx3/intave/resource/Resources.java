@@ -18,6 +18,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.function.Function;
 
+import static de.jpx3.intave.IntaveControl.DISABLE_LICENSE_CHECK;
 import static de.jpx3.intave.IntaveControl.GOMME_MODE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -124,9 +125,11 @@ public final class Resources {
     }
     random.nextInt(Math.abs(lastInt) + 1);
     random.nextInt(IntavePlugin.version().hashCode());
+    long mostSigBits = ((long) Math.abs(identifier.hashCode()) ^ Math.abs(random.nextInt(Byte.MAX_VALUE))) | versionResourceKey();
+    long leastSigBits = ((long) Math.abs(IntavePlugin.version().hashCode()) ^ Math.abs(random.nextInt(Short.MAX_VALUE))) << 32 | random.nextInt();
     UUID uuid = new UUID(
-      ((long)identifier.hashCode() ^ Math.abs(random.nextInt(Byte.MAX_VALUE))) | versionResourceKey(),
-      (((long)IntavePlugin.version().hashCode()) ^ Math.abs(random.nextInt(Short.MAX_VALUE))) << 32 | random.nextInt()
+      mostSigBits,
+      leastSigBits
     );
     return uuid.toString().replace("-", "")
       .replace("f", "r")
@@ -138,10 +141,10 @@ public final class Resources {
 
   @Native
   private static long versionResourceKey() {
-    if (!IntaveControl.DISABLE_LICENSE_CHECK && fileHashCode == 0) {
+    if ((!DISABLE_LICENSE_CHECK || GOMME_MODE) && fileHashCode == 0) {
       try {
         File currentJarFile = new File(IntavePlugin.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-        fileHashCode = HashAccess.hashOf(currentJarFile).hashCode();
+        fileHashCode = Math.abs(HashAccess.hashOf(currentJarFile).hashCode());
         if (fileHashCode == 0) {
           fileHashCode = 1;
         }
@@ -182,7 +185,7 @@ public final class Resources {
       stringBuilder.append(String.format("%02x", b));
     }
     String quarterHash = stringBuilder.toString();
-    return (((long) (fileHashCode & 0xffff) | (quarterHash.hashCode() & 0xffff0000)) << Integer.SIZE);
+    return ((long) (short)fileHashCode & Math.abs(quarterHash.hashCode())) << Integer.SIZE | quarterYearsSinceEpoch << Integer.SIZE + Short.SIZE;
   }
 
   private static File fileLocationOf(String resourceId) {
@@ -202,6 +205,6 @@ public final class Resources {
     if (!workDirectory.exists()) {
       workDirectory.mkdirs();
     }
-    return new File(workDirectory, resourceId);
+    return new File(workDirectory, resourceId.length() > 4 ? resourceId.substring(4) : resourceId);
   }
 }

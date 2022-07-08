@@ -32,7 +32,6 @@ final class PatchyTranslationConfiguration {
     return customFieldTranslations;
   }
 
-  @Native
   public VersionMethodReference resolveCustomMethodDescriptor(String owner, String name, String descriptor) {
     CustomMethodTranslation selectedTranslation = null;
     VersionMethodReference originalMethodReference = null;
@@ -72,7 +71,6 @@ final class PatchyTranslationConfiguration {
     return ImmutableMap.copyOf(map);
   }
 
-  @Native
   static String selectSuitableVersion(CustomMethodTranslation selectedTranslation, VersionMethodReference originalMethod) {
     String serverVersion = PatchyTranslator.CURRENT_SERVER_VERSION;
     String selectedVersion = null;
@@ -131,14 +129,14 @@ final class PatchyTranslationConfiguration {
     return Integer.parseInt(onlyIntegers);
   }
 
-  @Native
+  
   public static PatchyTranslationConfiguration createFrom(ClassNode classNode) {
     PatchyTranslationConfiguration configuration = new PatchyTranslationConfiguration();
     classNode.visibleAnnotations.forEach(annotation -> processAnnotation(configuration, annotation));
     return configuration;
   }
 
-  @Native
+  
   public static PatchyTranslationConfiguration createFrom(MethodNode methodNode) {
     PatchyTranslationConfiguration configuration = new PatchyTranslationConfiguration();
     annotationsOf(methodNode).forEach(annotation -> processAnnotation(configuration, annotation));
@@ -154,7 +152,7 @@ final class PatchyTranslationConfiguration {
     return annotationNodes;
   }
 
-  @Native
+  
   private static void processAnnotation(PatchyTranslationConfiguration configuration, AnnotationNode annotation) {
     String className = className(annotation);
     if (className.equals(AUTO_TRANSLATION_ANNOTATION_PATH)) {

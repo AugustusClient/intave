@@ -9,9 +9,9 @@ import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.math.SinusCache;
 import de.jpx3.intave.player.collider.Colliders;
 import de.jpx3.intave.player.collider.complex.ColliderResult;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.ClientMathHelper;
-import de.jpx3.intave.shade.Motion;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.ClientMathHelper;
+import de.jpx3.intave.share.Motion;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.MetadataBundle;
 import de.jpx3.intave.user.meta.MovementMetadata;
@@ -21,8 +21,8 @@ import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
 
-import static de.jpx3.intave.shade.ClientMathHelper.ceil;
-import static de.jpx3.intave.shade.ClientMathHelper.floor;
+import static de.jpx3.intave.share.ClientMathHelper.ceil;
+import static de.jpx3.intave.share.ClientMathHelper.floor;
 
 public final class BoatSimulator extends Simulator {
   @Override
@@ -53,9 +53,9 @@ public final class BoatSimulator extends Simulator {
     } else if (this.checkInWater(user)) {
       return Status.IN_WATER;
     } else {
-      float f = this.boatGlide(user);
-      if (f > 0.0F) {
-        movement.boatGlide = f;
+      float glide = this.boatGlide(user);
+      if (glide > 0.0F) {
+        movement.boatGlide = glide;
         return Status.ON_LAND;
       } else {
         return Status.IN_AIR;

@@ -1,9 +1,9 @@
 package de.jpx3.intave.block.shape;
 
 import de.jpx3.intave.diagnostic.MemoryTraced;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.Direction;
-import de.jpx3.intave.shade.Position;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.Direction;
+import de.jpx3.intave.share.Position;
 
 import javax.annotation.Nullable;
 import java.lang.ref.Reference;
@@ -11,7 +11,7 @@ import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.List;
 
-import static de.jpx3.intave.shade.Direction.Axis.*;
+import static de.jpx3.intave.share.Direction.Axis.*;
 
 final class CubeShape extends MemoryTraced implements BlockShape {
   private final int x, y, z;
@@ -25,8 +25,8 @@ final class CubeShape extends MemoryTraced implements BlockShape {
   public double allowedOffset(Direction.Axis axis, BoundingBox other, double offset) {
     // always collide if axis is selected
     boolean collidesInXAxis = axis == X_AXIS || other.max(X_AXIS) > this.min(X_AXIS) && other.min(X_AXIS) < this.max(X_AXIS);
-    boolean collidesInYAxis = axis == Y_AXIS || (collidesInXAxis && other.max(Y_AXIS) > this.min(Y_AXIS) && other.min(Y_AXIS) < this.max(Y_AXIS));
-    boolean collidesInZAxis = axis == Z_AXIS || (collidesInYAxis && other.max(Z_AXIS) > this.min(Z_AXIS) && other.min(Z_AXIS) < this.max(Z_AXIS));
+    boolean collidesInYAxis = axis == Y_AXIS || other.max(Y_AXIS) > this.min(Y_AXIS) && other.min(Y_AXIS) < this.max(Y_AXIS);
+    boolean collidesInZAxis = axis == Z_AXIS || other.max(Z_AXIS) > this.min(Z_AXIS) && other.min(Z_AXIS) < this.max(Z_AXIS);
 
     if (collidesInXAxis && collidesInYAxis && collidesInZAxis) {
       if (offset > 0.0D && other.max(axis) <= this.min(axis)) {

@@ -54,6 +54,11 @@ public final class CombatMitigator extends Module {
     });
   }
 
+  @Deprecated
+  public void mitigateOnce(User user, AttackNerfStrategy type, String checkId) {
+    Synchronizer.synchronize(() -> user.meta().punishment().nerferOfType(type).activateOnce());
+  }
+
   @Native
   private void notify(User user, AttackNerfer attackNerfer, String checkId) {
     if (attackNerfer.active()) {

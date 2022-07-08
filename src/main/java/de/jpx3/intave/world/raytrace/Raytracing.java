@@ -5,9 +5,9 @@ import de.jpx3.intave.diagnostic.timings.Timings;
 import de.jpx3.intave.klass.rewrite.PatchyLoadingInjector;
 import de.jpx3.intave.math.SinusCache;
 import de.jpx3.intave.module.tracker.entity.EntityShade;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.MovingObjectPosition;
-import de.jpx3.intave.shade.NativeVector;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.MovingObjectPosition;
+import de.jpx3.intave.share.NativeVector;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.MetadataBundle;
@@ -33,7 +33,7 @@ public final class Raytracing {
     }
     PatchyLoadingInjector.loadUnloadedClassPatched(Raytracing.class.getClassLoader(), className);
     raytracer = instanceOf(className);
-//    raytracer = new CustomRaytracer();
+//    raytracer = new UniversalRaytracer();
   }
 
   private static <T> T instanceOf(String className) {

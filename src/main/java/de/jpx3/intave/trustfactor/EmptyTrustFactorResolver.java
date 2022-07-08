@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 
 import java.util.function.Consumer;
 
-public final class EmptyTrustFactorResolver implements TrustFactorResolver {
+final class EmptyTrustFactorResolver implements TrustFactorResolver {
   @Override
   public void resolve(Player player, Consumer<TrustFactor> callback) {
 

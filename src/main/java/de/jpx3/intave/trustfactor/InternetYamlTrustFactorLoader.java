@@ -9,7 +9,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
 
-public final class InternetYamlTrustFactorLoader implements TrustFactorLoader {
+final class InternetYamlTrustFactorLoader implements TrustFactorLoader {
   @Override
   public TrustFactorConfiguration fetch() {
     Resource trustfactor = Resources.cacheResourceChain("https://service.intave.de/trustfactor/" + IntavePlugin.version(), "trustfactor", TimeUnit.DAYS.toMillis(7));

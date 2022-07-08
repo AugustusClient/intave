@@ -144,7 +144,7 @@ public abstract class Check implements EventProcessor {
     return statistics;
   }
 
-  private final CheckStatistics statisticsFor(TrustFactor trustFactor) {
+  private CheckStatistics statisticsFor(TrustFactor trustFactor) {
     return perTrustFactorStatistics.computeIfAbsent(trustFactor, x -> new CheckStatistics());
   }
 

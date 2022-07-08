@@ -1,8 +1,8 @@
 package de.jpx3.intave.block.tick;
 
 import de.jpx3.intave.block.shape.BlockShape;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.Direction;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.Direction;
 
 public final class ShulkerBox {
   private boolean opening;
@@ -56,7 +56,7 @@ public final class ShulkerBox {
     BlockShape cached = CACHE[directionId][ticks + INTRINSIC_OFFSET];
     if (cached == null) {
       double progress = progress();
-      CACHE[directionId][ticks + INTRINSIC_OFFSET] = cached = FULL_BLOCK.expand(
+      return CACHE[directionId][ticks + INTRINSIC_OFFSET] = FULL_BLOCK.expand(
         0.5 * progress * direction.offsetX(),
         0.5 * progress * direction.offsetY(),
         0.5 * progress * direction.offsetZ()

@@ -1,7 +1,7 @@
 package de.jpx3.intave.block.shape.resolve.patch;
 
 import de.jpx3.intave.adapter.MinecraftVersions;
-import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.share.BoundingBox;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import org.bukkit.Material;
@@ -9,34 +9,28 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 final class ThinBlockPatch extends BoundingBoxPatch {
   private static final BoundingBox[] STATES_8 = new BoundingBox[]{
-    new BoundingBox(0.0F, 0.0F, 0.4375F, 1.0F, 1.0F, 0.5625F), // full ew connection
-    new BoundingBox(0.4375F, 0.0F, 0.0F, 0.5625F, 1.0F, 1.0F), // full ns connection
-    new BoundingBox(0.4375F, 0.0F, 0.0F, 0.5625F, 1.0F, 0.5F), // north
-    new BoundingBox(0.5F, 0.0F, 0.4375F, 1.0F, 1.0F, 0.5625F), // east
-    new BoundingBox(0.4375F, 0.0F, 0.5F, 0.5625F, 1.0F, 1.0F), // south
-    new BoundingBox(0.0F, 0.0F, 0.4375F, 0.5F, 1.0F, 0.5625F), // west
+    BoundingBox.originFrom(0.0F, 0.0F, 0.4375F, 1.0F, 1.0F, 0.5625F), // full ew connection
+    BoundingBox.originFrom(0.4375F, 0.0F, 0.0F, 0.5625F, 1.0F, 1.0F), // full ns connection
+    BoundingBox.originFrom(0.4375F, 0.0F, 0.0F, 0.5625F, 1.0F, 0.5F), // north
+    BoundingBox.originFrom(0.5F, 0.0F, 0.4375F, 1.0F, 1.0F, 0.5625F), // east
+    BoundingBox.originFrom(0.4375F, 0.0F, 0.5F, 0.5625F, 1.0F, 1.0F), // south
+    BoundingBox.originFrom(0.0F, 0.0F, 0.4375F, 0.5F, 1.0F, 0.5625F), // west
   };
 
   private static final BoundingBox[] STATES_9 = new BoundingBox[]{
-    BoundingBox.originFromX16(7, 0, 7, 9, 16, 9), // base
+    BoundingBox.originFromX16(7, 0, 7, 9, 16, 9), // base`
     BoundingBox.originFromX16(7, 0, 0, 9, 16, 9), // north
     BoundingBox.originFromX16(7, 0, 7, 16, 16, 9), // east
     BoundingBox.originFromX16(7, 0, 7, 9, 16, 16), // south
     BoundingBox.originFromX16(0, 0, 7, 9, 16, 9), // west
   };
 
-  public ThinBlockPatch() {
-    Arrays.stream(STATES_8).forEach(BoundingBox::makeOriginBox);
-    Arrays.stream(STATES_9).forEach(BoundingBox::makeOriginBox);
-  }
-
   @Override
-  protected List<BoundingBox> patch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, List<BoundingBox> bbs) {
+  protected List<BoundingBox> collisionPatch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, List<BoundingBox> bbs) {
     User user = UserRepository.userOf(player);
     if (MinecraftVersions.VER1_9_0.atOrAbove()) {
       if (!user.meta().protocol().combatUpdate()) {

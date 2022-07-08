@@ -2,7 +2,7 @@ package de.jpx3.intave.block.shape.resolve.patch;
 
 import de.jpx3.intave.block.shape.BlockShape;
 import de.jpx3.intave.block.shape.BlockShapes;
-import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.share.BoundingBox;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -17,20 +17,20 @@ abstract class BoundingBoxPatch {
     this.material = materials;
   }
 
-  protected BlockShape patch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, BlockShape shape) {
+  protected BlockShape collisionPatch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, BlockShape shape) {
     // should be overriden
     List<BoundingBox> input = shape.boundingBoxes();
-    List<BoundingBox> output = patch(world, player, posX, posY, posZ, type, blockState, input);
+    List<BoundingBox> output = collisionPatch(world, player, posX, posY, posZ, type, blockState, input);
 
     if (input.equals(output)) {
       return shape;
     } else {
-      return BlockShapes.shapeOf(output);
+      return BlockShapes.merge(output);
     }
   }
 
   @Deprecated
-  protected List<BoundingBox> patch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, List<BoundingBox> bbs) {
+  protected List<BoundingBox> collisionPatch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, List<BoundingBox> bbs) {
     return bbs;
   }
 

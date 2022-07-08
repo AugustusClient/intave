@@ -39,7 +39,7 @@ public final class BlackListService implements BukkitEventSubscriber {
   }
 
   private void loadFilterList() {
-    blackList = BlackList.fromInputStream(resource.read());
+    blackList = BlackList.fromLines(resource.lines());
   }
 
   private void linkEvents() {

@@ -59,7 +59,7 @@ import de.jpx3.intave.resource.legacy.EncryptedLegacyResource;
 import de.jpx3.intave.security.*;
 import de.jpx3.intave.security.blacklist.BlackListService;
 import de.jpx3.intave.security.letis.Letis;
-import de.jpx3.intave.shade.link.WrapperConverter;
+import de.jpx3.intave.share.link.WrapperConverter;
 import de.jpx3.intave.trustfactor.TrustFactorService;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.version.DurationTranslator;
@@ -160,7 +160,6 @@ public final class IntavePlugin extends JavaPlugin {
     }
 
     if (IntaveControl.GOMME_MODE) {
-      logger.info("GommeMode!");
       ContextSecrets.setup();
     }
 

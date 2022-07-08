@@ -6,7 +6,7 @@ import de.jpx3.intave.module.nayoro.event.EntityMoveEvent;
 import de.jpx3.intave.module.nayoro.event.Event;
 import de.jpx3.intave.module.nayoro.event.EventRegistry;
 import de.jpx3.intave.module.nayoro.event.PropertiesEvent;
-import de.jpx3.intave.shade.Position;
+import de.jpx3.intave.share.Position;
 
 import java.io.DataInputStream;
 import java.io.IOException;

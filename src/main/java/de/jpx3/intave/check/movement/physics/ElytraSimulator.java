@@ -3,14 +3,14 @@ package de.jpx3.intave.check.movement.physics;
 import de.jpx3.intave.player.collider.Colliders;
 import de.jpx3.intave.player.collider.complex.ColliderResult;
 import de.jpx3.intave.player.collider.simple.SimpleColliderResult;
-import de.jpx3.intave.shade.Motion;
+import de.jpx3.intave.share.Motion;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.MovementMetadata;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import static de.jpx3.intave.shade.ClientMathHelper.cos;
-import static de.jpx3.intave.shade.ClientMathHelper.sin;
+import static de.jpx3.intave.share.ClientMathHelper.cos;
+import static de.jpx3.intave.share.ClientMathHelper.sin;
 
 final class ElytraSimulator extends BaseSimulator {
   @Override

@@ -3,6 +3,7 @@ package de.jpx3.intave.module.tracker.player;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.module.Module;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.user.User;
@@ -109,7 +110,7 @@ public class ItemCrashTracker extends Module {
     PacketContainer packet = event.getPacket();
     ItemStack itemStack = packet.getItemModifier().readSafely(0);
     String probableName = ownerFromSkull(itemStack);
-    if (probableName != null) {
+    if (probableName != null && IntaveControl.GOMME_MODE) {
       if (/*probableName.length() < 3 || */probableName.length() > 128 || !inventoryData.skullWhitelisted(probableName)) {
         // cancel all following
         inventoryData.windowClickCounter = 1000;

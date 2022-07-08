@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public final class YamlTrustFactorConfiguration implements TrustFactorConfiguration {
+final class YamlTrustFactorConfiguration implements TrustFactorConfiguration {
   private final Map<String, EnumMap<TrustFactor, Integer>> settingsMap = new HashMap<>();
 
   public YamlTrustFactorConfiguration(YamlConfiguration configuration) {
@@ -19,6 +19,7 @@ public final class YamlTrustFactorConfiguration implements TrustFactorConfigurat
     for (Map.Entry<String, Object> configEntry : trustFactorSettings.getValues(true).entrySet()) {
       if (configEntry.getValue() instanceof ArrayList) {
         List<?> values = (List<?>) configEntry.getValue();
+        //noinspection unchecked
         apply(configEntry.getKey(), (List<Integer>) values);
       }
     }

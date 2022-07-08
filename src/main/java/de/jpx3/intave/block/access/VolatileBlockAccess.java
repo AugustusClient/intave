@@ -3,8 +3,8 @@ package de.jpx3.intave.block.access;
 import de.jpx3.intave.annotate.Relocate;
 import de.jpx3.intave.block.variant.BlockVariant;
 import de.jpx3.intave.block.variant.BlockVariantRegister;
-import de.jpx3.intave.shade.BlockPosition;
-import de.jpx3.intave.shade.Position;
+import de.jpx3.intave.share.BlockPosition;
+import de.jpx3.intave.share.Position;
 import de.jpx3.intave.user.User;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -43,7 +43,7 @@ public final class VolatileBlockAccess {
     return fallbackBlock(blockAccess, 0);
   }
 
-  private final static int MAX_ATTEMPTS = 10;
+  private static final int MAX_ATTEMPTS = 10;
 
   private static Block fallbackBlock(World world, int attempts) {
     Location spawnLocation = world.getSpawnLocation();

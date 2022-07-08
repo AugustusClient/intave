@@ -1,7 +1,7 @@
 package de.jpx3.intave.player.collider.simple;
 
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.Motion;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.Motion;
 import de.jpx3.intave.user.User;
 
 public interface SimpleCollider {

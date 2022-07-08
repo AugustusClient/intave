@@ -6,7 +6,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public final class DebugYamlTrustFactorLoader implements TrustFactorLoader {
+final class DebugYamlTrustFactorLoader implements TrustFactorLoader {
   @Override
   public TrustFactorConfiguration fetch() {
     String fileName = "/" + IntavePlugin.version().replace(".", "-") + ".yml";

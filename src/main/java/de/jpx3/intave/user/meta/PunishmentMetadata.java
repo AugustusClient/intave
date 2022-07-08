@@ -54,6 +54,13 @@ public final class PunishmentMetadata {
         }
       ),
       new AttackNerfer(
+        AttackNerfStrategy.DMG_HIGH, DAMAGE_CANCEL_HEAVY_DURATION,
+        event -> {
+          event.setDamage(BASE, event.getDamage(BASE) * 0.5);
+          DamageModify.refreshModifiers(event);
+        }
+      ),
+      new AttackNerfer(
         AttackNerfStrategy.DMG_MEDIUM, DAMAGE_CANCEL_MEDIUM_DURATION,
         event -> {
           event.setDamage(BASE, event.getDamage(BASE) * 0.7);
@@ -129,6 +136,8 @@ public final class PunishmentMetadata {
     private final Consumer<EntityDamageByEntityEvent> executor;
     private final long duration;
     private final boolean inverseEvent;
+    private int executed = 0;
+    private int limit = -1;
     private long activated;
 
     public AttackNerfer(
@@ -155,8 +164,18 @@ public final class PunishmentMetadata {
       activated = System.currentTimeMillis();
     }
 
+    public void activateOnce() {
+      activated = System.currentTimeMillis();
+      limit = 1;
+      executed = 0;
+    }
+
     public boolean active() {
-      return System.currentTimeMillis() - activated < duration;
+      if (limit == -1) {
+        return System.currentTimeMillis() - activated < duration;
+      } else {
+        return executed < limit && System.currentTimeMillis() - activated < 750;
+      }
     }
 
     public boolean inverseEvent() {
@@ -164,6 +183,7 @@ public final class PunishmentMetadata {
     }
 
     public Consumer<EntityDamageByEntityEvent> executor() {
+      executed++;
       return executor;
     }
 

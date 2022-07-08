@@ -1,11 +1,8 @@
 package de.jpx3.intave.block.shape;
 
-import de.jpx3.intave.shade.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -24,51 +21,51 @@ public final class BlockShapes {
     return new CubeShape(posX, posY, posZ);
   }
 
-  public static BlockShape shapeOf(@NotNull List<BoundingBox> boundingBoxes) {
-    switch (boundingBoxes.size()) {
+  public static BlockShape merge(@NotNull List<? extends BlockShape> shapes) {
+    switch (shapes.size()) {
       case 0:
         return emptyShape();
       case 1:
-        return boundingBoxes.get(0);
+        return shapes.get(0);
       case 2:
-        return new MergeBlockShape(boundingBoxes.get(0), boundingBoxes.get(1));
+        return shapeFromTwo(shapes.get(0), shapes.get(1));
       default:
-        return new ArrayBlockShape(new ArrayList<>(boundingBoxes));
+        return shapeFromMultiple(shapes);
     }
   }
 
-  public static BlockShape merge(BlockShape... boundingBoxes) {
-    return new ArrayBlockShape(Arrays.asList(boundingBoxes));
-  }
-
-  public static BlockShape merge(@NotNull BlockShape shapeA, @NotNull BlockShape shapeB) {
-    if (shapeA.isEmpty()) {
-      return shapeB;
-    }
-    if (shapeB.isEmpty()) {
-      return shapeA;
-    }
-    if (shapeA == shapeB) {
-      return shapeA;
-    }
-    return new MergeBlockShape(shapeA, shapeB);
-  }
-
-  public static Function<@Nullable List<BlockShape>, @NotNull BlockShape> mergeShapes() {
-    return shapes -> {
-      if (shapes == null) {
+  public static BlockShape merge(@NotNull BlockShape... shapes) {
+    switch (shapes.length) {
+      case 0:
         return emptyShape();
-      }
-      switch (shapes.size()) {
-        case 0:
-          return emptyShape();
-        case 1:
-          return shapes.get(0);
-        case 2:
-          return merge(shapes.get(0), shapes.get(1));
-        default:
-          return new ArrayBlockShape(shapes);
-      }
-    };
+      case 1:
+        return shapes[0];
+      case 2:
+        return shapeFromTwo(shapes[0], shapes[1]);
+      default:
+        return shapeFromMultiple(shapes);
+    }
+  }
+
+  private static BlockShape shapeFromTwo(@NotNull BlockShape first, @NotNull BlockShape second) {
+    if (first.isEmpty()) {
+      return second;
+    }
+    if (second.isEmpty() || first == second) {
+      return first;
+    }
+    return new MergeBlockShape(first, second);
+  }
+
+  private static BlockShape shapeFromMultiple(BlockShape... boundingBoxes) {
+    return new ArrayBlockShape(boundingBoxes);
+  }
+
+  private static BlockShape shapeFromMultiple(@NotNull List<? extends BlockShape> shapes) {
+    return new ArrayBlockShape(shapes);
+  }
+
+  public static Function<@Nullable List<BlockShape>, @NotNull BlockShape> shapeMerger() {
+    return shapes -> shapes == null ? emptyShape() : merge(shapes);
   }
 }

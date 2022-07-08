@@ -1,7 +1,7 @@
 package de.jpx3.intave.world.raytrace;
 
-import de.jpx3.intave.shade.NativeVector;
-import de.jpx3.intave.shade.Position;
+import de.jpx3.intave.share.NativeVector;
+import de.jpx3.intave.share.Position;
 
 public final class Raytrace {
   private final Position from;

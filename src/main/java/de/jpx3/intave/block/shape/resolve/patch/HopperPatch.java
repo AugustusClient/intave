@@ -5,8 +5,8 @@ import de.jpx3.intave.block.shape.BlockShape;
 import de.jpx3.intave.block.shape.BlockShapes;
 import de.jpx3.intave.block.variant.BlockVariant;
 import de.jpx3.intave.block.variant.BlockVariantRegister;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.Direction;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.Direction;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import org.bukkit.Material;
@@ -27,16 +27,16 @@ final class HopperPatch extends BoundingBoxPatch {
   private static final BlockShape SHAPE_BASE = BoundingBox.originFromX16(4, 4, 4, 12, 10.0, 12);
   private static final BlockShape MAIN_SHAPE = BlockShapes.merge(SHAPE_WALLS, SHAPE_CLOSURE, SHAPE_BASE);
 
-  private static final BlockShape LEGACY_HOPPER_BOX_SHAPE = BlockShapes.merge(SHAPE_WALLS, BoundingBox.originFromX16(0, 0, 0, 16, 10.0f, 16));
-
   private static final BlockShape SHAPE_DOWN = BlockShapes.merge(MAIN_SHAPE, BoundingBox.originFromX16(6.0D, 0.0D, 6.0D, 10.0D, 4.0D, 10.0D));
   private static final BlockShape SHAPE_NORTH = BlockShapes.merge(MAIN_SHAPE, BoundingBox.originFromX16(12.0D, 4.0D, 6.0D, 16.0D, 8.0D, 10.0D));
   private static final BlockShape SHAPE_EAST = BlockShapes.merge(MAIN_SHAPE, BoundingBox.originFromX16(6.0D, 4.0D, 0.0D, 10.0D, 8.0D, 4.0D));
   private static final BlockShape SHAPE_SOUTH = BlockShapes.merge(MAIN_SHAPE, BoundingBox.originFromX16(6.0D, 4.0D, 12.0D, 10.0D, 8.0D, 16.0D));
   private static final BlockShape SHAPE_WEST = BlockShapes.merge(MAIN_SHAPE, BoundingBox.originFromX16(0.0D, 4.0D, 6.0D, 4.0D, 8.0D, 10.0D));
 
+  private static final BlockShape LEGACY_SHAPE = BlockShapes.merge(SHAPE_WALLS, BoundingBox.originFromX16(0, 0, 0, 16, 10.0f, 16));
+
   @Override
-  protected BlockShape patch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, BlockShape originalShape) {
+  protected BlockShape collisionPatch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, BlockShape originalShape) {
     User user = UserRepository.userOf(player);
     if (user.meta().protocol().protocolVersion() >= VER_1_13) {
       if (MinecraftVersion.AQUATIC_UPDATE.atOrAbove()) {
@@ -68,7 +68,7 @@ final class HopperPatch extends BoundingBoxPatch {
       }
     } else {
       if (MinecraftVersion.AQUATIC_UPDATE.atOrAbove()) {
-        return LEGACY_HOPPER_BOX_SHAPE;
+        return LEGACY_SHAPE;
       } else {
         return originalShape;
       }

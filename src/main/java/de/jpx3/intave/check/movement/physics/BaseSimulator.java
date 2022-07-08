@@ -16,10 +16,10 @@ import de.jpx3.intave.player.Enchantments;
 import de.jpx3.intave.player.collider.Colliders;
 import de.jpx3.intave.player.collider.complex.ColliderResult;
 import de.jpx3.intave.player.collider.simple.SimpleColliderResult;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.ClientMathHelper;
-import de.jpx3.intave.shade.Motion;
-import de.jpx3.intave.shade.Position;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.ClientMathHelper;
+import de.jpx3.intave.share.Motion;
+import de.jpx3.intave.share.Position;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.MetadataBundle;
 import de.jpx3.intave.user.meta.MovementMetadata;
@@ -33,7 +33,7 @@ import org.bukkit.util.Vector;
 
 import java.util.Collection;
 
-import static de.jpx3.intave.shade.ClientMathHelper.floor;
+import static de.jpx3.intave.share.ClientMathHelper.floor;
 import static de.jpx3.intave.user.meta.ProtocolMetadata.VER_1_14;
 
 @Relocate
@@ -71,7 +71,7 @@ class BaseSimulator extends Simulator {
 
     forward = ((int) forward) * 0.98f;
     strafe = ((int) strafe) * 0.98f;
-    if (pose == Pose.CROUCHING || !clientData.beeUpdate() && environment.isSneaking()) {
+    if ((pose == Pose.CROUCHING) || (!clientData.beeUpdate() && environment.isSneaking())) {
       forward = (float) ((double) forward * 0.3);
       strafe = (float) ((double) strafe * 0.3);
     }

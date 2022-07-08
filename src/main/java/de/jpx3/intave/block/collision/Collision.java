@@ -8,11 +8,11 @@ import de.jpx3.intave.block.shape.BlockShape;
 import de.jpx3.intave.block.shape.BlockShapes;
 import de.jpx3.intave.block.shape.ShapeResolverPipeline;
 import de.jpx3.intave.block.shape.resolve.ShapeResolver;
-import de.jpx3.intave.block.state.BlockStateAccess;
+import de.jpx3.intave.block.state.BlockStateExtendedCache;
 import de.jpx3.intave.block.type.BlockTypeAccess;
 import de.jpx3.intave.block.variant.BlockVariantAccess;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.Position;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.Position;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.MovementMetadata;
@@ -34,7 +34,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import static de.jpx3.intave.shade.ClientMathHelper.floor;
+import static de.jpx3.intave.share.ClientMathHelper.floor;
 
 @Relocate
 @DoNotFlowObfuscate
@@ -43,7 +43,7 @@ public final class Collision {
   private static final int COLLISION_CHECK_LIMIT = 256;
 
   private static final Collector<BlockShape, ?, BlockShape> SHAPE_COMPILATION =
-    Collectors.collectingAndThen(Collectors.toList(), BlockShapes.mergeShapes());
+    Collectors.collectingAndThen(Collectors.toList(), BlockShapes.shapeMerger());
 //    Collectors.reducing(BlockShapes.emptyShape(), BlockShapes::merge, BlockShapes::merge);
 
   private static final Collector<BlockShape, ?, Boolean> EXISTS_ANY_SHAPE = shapeCountMatch(s -> s > 0);
@@ -80,7 +80,7 @@ public final class Collision {
     User user = UserRepository.userOf(player);
     World world = player.getWorld();
     MovementMetadata movementData = user.meta().movement();
-    BlockStateAccess stateAccess = user.blockStates();
+    BlockStateExtendedCache stateAccess = user.blockStates();
     boolean outsideBorderLast = movementData.outsideBorder;
     boolean outsideBorderCurrent = playerOutsideBorder(user);
     if (outsideBorderLast && outsideBorderCurrent) {
@@ -143,7 +143,7 @@ public final class Collision {
     int maxZ = floor(playerBox.maxZ);
     int ystart = Math.max(minY - 1, WorldHeight.LOWER_WORLD_LIMIT);
     User user = UserRepository.userOf(player);
-    BlockStateAccess stateAccess = user.blockStates();
+    BlockStateExtendedCache stateAccess = user.blockStates();
     int blocksRemaining = COLLISION_CHECK_LIMIT;
     int collisionsRemaining = Math.min(collisionLimit, COLLISION_CHECK_LIMIT);
     exit:
@@ -227,7 +227,7 @@ public final class Collision {
     } else if (!outsideBorderLast && !outsideBorderCurrent) {
       movementData.outsideBorder = true;
     }
-    BlockStateAccess stateAccess = user.blockStates();
+    BlockStateExtendedCache stateAccess = user.blockStates();
     World world = player.getWorld();
     int blockRemaining = COLLISION_CHECK_LIMIT;
     exit:

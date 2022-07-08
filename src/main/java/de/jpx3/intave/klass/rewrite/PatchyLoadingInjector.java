@@ -18,7 +18,7 @@ public final class PatchyLoadingInjector {
     className = className.replace("/", ".");
     byte[] classBytes = new byte[0];
     try {
-      if (!classIsLoaded(classLoader, className)) {
+      if (!de.jpx3.classloader.ClassLoader.classLoaded((className))) {
         classBytes = classBytesOf(classLoader, className);
         classBytes = PatchyTranslator.translateClass(classBytes);
         de.jpx3.classloader.ClassLoader.classLoad(classBytes);
@@ -26,7 +26,7 @@ public final class PatchyLoadingInjector {
       return classByName(className);
     } catch (Error | Exception exception) {
       if (classBytes.length > 0) {
-        File dumpFile = null;
+        File dumpFile;
         try {
           dumpFile = File.createTempFile("intave-patchy-" + className, ".class");
           FileOutputStream fileOutputStream = new FileOutputStream(dumpFile);
@@ -39,21 +39,6 @@ public final class PatchyLoadingInjector {
       }
       throw new IllegalStateException("Failed to load class " + className, exception);
     }
-  }
-
-  @Native
-  private static boolean classIsLoaded(ClassLoader classLoader, String className) {
-//    try {
-//      Method findLoadedClass = ClassLoader.class.getDeclaredMethod("findLoadedClass", String.class);
-//      if (!findLoadedClass.isAccessible()) {
-//        findLoadedClass.setAccessible(true);
-//      }
-//      return findLoadedClass.invoke(classLoader, className) != null;
-//    } catch (Exception exception) {
-//      exception.printStackTrace();
-//      return true;
-//    }
-    return de.jpx3.classloader.ClassLoader.classLoaded(className);
   }
 
   @Native

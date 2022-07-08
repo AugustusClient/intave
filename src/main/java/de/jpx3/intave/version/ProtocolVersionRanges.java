@@ -6,15 +6,11 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public final class ProtocolVersionRanges implements Iterable<ProtocolVersionRange> {
+final class ProtocolVersionRanges implements Iterable<ProtocolVersionRange> {
   private final Collection<ProtocolVersionRange> versionRanges;
 
   public ProtocolVersionRanges(List<ProtocolVersionRange> versionRanges) {
     this.versionRanges = versionRanges;
-  }
-
-  public Stream<ProtocolVersionRange> stream() {
-    return versionRanges.stream();
   }
 
   public Optional<ProtocolVersionRange> newest() {
@@ -27,10 +23,7 @@ public final class ProtocolVersionRanges implements Iterable<ProtocolVersionRang
       versionRanges.stream()
         .filter(range -> range.includes(version))
         .findFirst()
-        .orElseGet(() -> {
-          Optional<ProtocolVersionRange> newest = newest();
-          return newest.orElseGet(() -> new ProtocolVersionRange(Integer.MIN_VALUE, Integer.MAX_VALUE, "error"));
-        });
+        .orElseGet(() -> newest().orElseGet(() -> new ProtocolVersionRange(Integer.MIN_VALUE, Integer.MAX_VALUE, "error")));
     return protocolVersionRange.version();
   }
 

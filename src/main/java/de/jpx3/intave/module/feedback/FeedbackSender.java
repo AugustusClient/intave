@@ -145,17 +145,53 @@ public final class FeedbackSender extends Module {
       append = true;//pendingTransactions(userOf(player)) > 0;
     }
     if (append) {
-      appendRequestToContext(player, target, callback);
+      appendRequestToContext_LEGACY(player, target, callback);
       return;
     }
     countTransactionPacket(player);
-    FeedbackRequest<T> request = createRequest(player, target, callback, tracker);
+    FeedbackRequest<T> request = createRequest_LEGACY(player, target, callback, tracker);
+    performRequest(player, request);
+  }
+
+  public <T> void tracedSingleSynchronize(
+    Player player, FeedbackTracker tracker, int options
+  ) {
+    if (!Bukkit.isPrimaryThread()) {
+      if (FeedbackOptions.matches(SELF_SYNCHRONIZATION, options)) {
+        Synchronizer.synchronize(() -> tracedSingleSynchronize(player, tracker, options));
+      } else {
+        IntaveLogger.logger().error("Can't perform tick-validation off main thread");
+        IntaveLogger.logger().error("Please check if you sent a packet / performed a bukkit player action asynchronously in the following trace:");
+        Thread.dumpStack();
+        tracker.failed();
+      }
+      return;
+    }
+    User user = UserRepository.userOf(player);
+    if (!user.hasPlayer()) {
+      return;
+    }
+    boolean append = false;
+    if (FeedbackOptions.matches(APPEND_ON_OVERFLOW, options)) {
+      boolean tooManyPending = pendingTransactions(userOf(player)) > OPTIONAL_PENDING_LIMIT;
+      boolean sentTooManyRecently = user.meta().connection().transactionPacketCounter > OPTIONAL_SENT_LIMIT;
+      append = tooManyPending || sentTooManyRecently;
+    }
+    if (FeedbackOptions.matches(APPEND, options)) {
+      append = true;//pendingTransactions(userOf(player)) > 0;
+    }
+    if (append) {
+      appendRequestToContext(player, tracker);
+      return;
+    }
+    countTransactionPacket(player);
+    FeedbackRequest<T> request = createRequest(player, tracker);
     performRequest(player, request);
   }
 
   private static final Object FALLBACK_OBJECT = new Object();
 
-  private <T> void appendRequestToContext(
+  private <T> void appendRequestToContext_LEGACY(
     Player player, T obj, FeedbackCallback<T> callback
   ) {
     User user = UserRepository.userOf(player);
@@ -173,7 +209,36 @@ public final class FeedbackSender extends Module {
     queue.add(new FeedbackRequest<>(callback, null, obj, (short) -1, -1));
   }
 
+  private <T> void appendRequestToContext(
+    Player player,
+    FeedbackTracker tracker
+  ) {
+    User user = UserRepository.userOf(player);
+    if (!user.hasPlayer()) {
+      return;
+    }
+    ConnectionMetadata synchronizeData = user.meta().connection();
+    Queue<FeedbackRequest<?>> queue = synchronizeData
+      .transactionAppendMap()
+      .computeIfAbsent(synchronizeData.transactionNumCounter, aLong -> new LinkedBlockingDeque<>());
+    queue.add(new FeedbackRequest<>(null, null, null, (short) -1, -1));
+  }
+
   private /* synchronized (is already always sync) */ <T> FeedbackRequest<T> createRequest(
+    Player player, FeedbackTracker tracker
+  ) {
+    User user = UserRepository.userOf(player);
+    ConnectionMetadata synchronizeData = user.meta().connection();
+    short transactionKey = findAvailableTransactionIdFor(player);
+    long transactionNumCounter = synchronizeData.transactionNumCounter++;
+    FeedbackRequest<T> feedbackEntry = new FeedbackRequest<>(null, tracker, null, transactionKey, transactionNumCounter);
+    synchronizeData.transactionShortKeyMap().put(transactionKey, feedbackEntry);
+    synchronizeData.transactionGlobalKeyMap().put(transactionNumCounter, feedbackEntry);
+//    return transactionKey;
+    return feedbackEntry;
+  }
+
+  private /* synchronized (is already always sync) */ <T> FeedbackRequest<T> createRequest_LEGACY(
     Player player, T obj, FeedbackCallback<T> callback, FeedbackTracker tracker
   ) {
     User user = UserRepository.userOf(player);

@@ -10,14 +10,14 @@ import de.jpx3.intave.block.access.BlockInteractionAccess;
 import de.jpx3.intave.block.access.VolatileBlockAccess;
 import de.jpx3.intave.block.collision.Collision;
 import de.jpx3.intave.block.physics.MaterialMagic;
-import de.jpx3.intave.block.state.BlockStateAccess;
+import de.jpx3.intave.block.state.BlockStateExtendedCache;
 import de.jpx3.intave.block.type.BlockTypeAccess;
 import de.jpx3.intave.block.variant.BlockVariantAccess;
 import de.jpx3.intave.check.EventProcessor;
 import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.module.tracker.player.AbilityTracker;
-import de.jpx3.intave.shade.Direction;
+import de.jpx3.intave.share.Direction;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.world.permission.WorldPermission;
@@ -52,7 +52,7 @@ public final class InteractionEmulator implements EventProcessor {
   public void onPre(BlockPlaceEvent place) {
     if (place.getClass().equals(BlockPlaceEvent.class)) {
       Block block = place.getBlock();
-      BlockStateAccess blockStateAccess = userOf(place.getPlayer()).blockStates();
+      BlockStateExtendedCache blockStateAccess = userOf(place.getPlayer()).blockStates();
       blockStateAccess.invalidateCacheAt(block.getX(), block.getY(), block.getZ());
 //      blockStateAccess.invalidateOverride(block.getX(), block.getY(), block.getZ());
     }
@@ -62,7 +62,7 @@ public final class InteractionEmulator implements EventProcessor {
   public void on(PlayerBucketFillEvent fill) {
     Player player = fill.getPlayer();
     Block block = fill.getBlockClicked().getRelative(fill.getBlockFace());
-    BlockStateAccess blockStateAccess = userOf(player).blockStates();
+    BlockStateExtendedCache blockStateAccess = userOf(player).blockStates();
     blockStateAccess.invalidateCacheAt(block.getX(), block.getY(), block.getZ());
     blockStateAccess.invalidateOverride(block.getX(), block.getY(), block.getZ());
   }
@@ -71,7 +71,7 @@ public final class InteractionEmulator implements EventProcessor {
   public void on(PlayerBucketEmptyEvent empty) {
     Player player = empty.getPlayer();
     Block block = empty.getBlockClicked().getRelative(empty.getBlockFace());
-    BlockStateAccess blockStateAccess = userOf(player).blockStates();
+    BlockStateExtendedCache blockStateAccess = userOf(player).blockStates();
     blockStateAccess.invalidateCacheAt(block.getX(), block.getY(), block.getZ());
     blockStateAccess.invalidateOverride(block.getX(), block.getY(), block.getZ());
   }
@@ -80,7 +80,7 @@ public final class InteractionEmulator implements EventProcessor {
   public void onPre(BlockBreakEvent breeak) {
     if (breeak.getClass().equals(BlockBreakEvent.class)) {
       Block block = breeak.getBlock();
-      BlockStateAccess blockStateAccess = userOf(breeak.getPlayer()).blockStates();
+      BlockStateExtendedCache blockStateAccess = userOf(breeak.getPlayer()).blockStates();
       blockStateAccess.invalidateCacheAt(block.getX(), block.getY(), block.getZ());
 //      blockStateAccess.invalidateOverride(block.getX(), block.getY(), block.getZ());
     }
@@ -121,7 +121,7 @@ public final class InteractionEmulator implements EventProcessor {
       int blockY = blockBreakLocation.getBlockY();
       int blockZ = blockBreakLocation.getBlockZ();
       // add to future bounding boxes
-      BlockStateAccess blockStateAccess = userOf(player).blockStates();
+      BlockStateExtendedCache blockStateAccess = userOf(player).blockStates();
 
       Location verifiedLocation = user.meta().movement().verifiedLocation();
       if (distance(verifiedLocation, blockPosition) < 2 && blockPosition.getY() < verifiedLocation.getBlockY()) {
@@ -192,7 +192,7 @@ public final class InteractionEmulator implements EventProcessor {
         }
       }
       user.meta().movement().pastBlockPlacement = 0;
-      BlockStateAccess blockStates = user.blockStates();
+      BlockStateExtendedCache blockStates = user.blockStates();
       blockStates.override(world, blockX, blockY, blockZ, replacementType, variant);
       blockStates.invalidateCacheAt(blockX, blockY, blockZ);
       // enforce block reset later
@@ -223,7 +223,7 @@ public final class InteractionEmulator implements EventProcessor {
     Material itemTypeInHand
   ) {
     User user = userOf(player);
-    BlockStateAccess blockStateAccess = user.blockStates();
+    BlockStateExtendedCache blockStateAccess = user.blockStates();
     World world = player.getWorld();
     switch (itemTypeInHand) {
       case BUCKET: {
@@ -253,7 +253,7 @@ public final class InteractionEmulator implements EventProcessor {
 
   private void emulatePhysicalInteract(Player player, Block block) {
     World world = player.getWorld();
-    BlockStateAccess blockStateAccess = userOf(player).blockStates();
+    BlockStateExtendedCache blockStateAccess = userOf(player).blockStates();
     Material clickedType = BlockTypeAccess.typeAccess(block, player);
 
     if (DUMP_BLOCK_HITBOX_ON_RIGHT_CLICK) {

@@ -5,7 +5,7 @@ import de.jpx3.intave.resource.CompilerStreamFunctionProvider;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ProtocolVersionRangesCompiler implements CompilerStreamFunctionProvider<ProtocolVersionRanges> {
+final class ProtocolVersionRangesCompiler implements CompilerStreamFunctionProvider<ProtocolVersionRanges> {
   @Override
   public ProtocolVersionRanges apply(List<String> lines) {
     int lastEnd = Integer.MIN_VALUE;

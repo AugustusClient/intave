@@ -56,19 +56,7 @@ public final class BlackList {
     return new BlackList(ImmutableList.of());
   }
 
-  public static BlackList fromInputStream(InputStream inputStream) {
-    List<String> blacklistedHash = new ArrayList<>();
-    try {
-      Scanner scanner = new Scanner(inputStream);
-      while (scanner.hasNextLine()) {
-        String line = scanner.nextLine();
-        if (line.length() == 64) {
-          blacklistedHash.add(line);
-        }
-      }
-      inputStream.close();
-    } catch (Exception ignored) {
-    }
-    return new BlackList(ImmutableList.copyOf(blacklistedHash));
+  public static BlackList fromLines(List<String> lines) {
+    return new BlackList(lines);
   }
 }

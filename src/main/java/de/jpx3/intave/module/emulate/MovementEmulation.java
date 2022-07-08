@@ -16,8 +16,8 @@ import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.packet.PacketSender;
 import de.jpx3.intave.player.Effects;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.ClientMathHelper;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.ClientMathHelper;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.ConnectionMetadata;
 import de.jpx3.intave.user.meta.MovementMetadata;
@@ -33,7 +33,7 @@ import static de.jpx3.intave.math.MathHelper.minmax;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
 import static de.jpx3.intave.module.linker.packet.PacketId.Server.REL_ENTITY_MOVE;
 import static de.jpx3.intave.module.linker.packet.PacketId.Server.REL_ENTITY_MOVE_LOOK;
-import static de.jpx3.intave.shade.Direction.Axis.*;
+import static de.jpx3.intave.share.Direction.Axis.*;
 import static de.jpx3.intave.user.UserRepository.userOf;
 
 public final class MovementEmulation extends Module {

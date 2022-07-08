@@ -2,15 +2,15 @@ package de.jpx3.intave.block.fluid;
 
 import de.jpx3.intave.block.access.VolatileBlockAccess;
 import de.jpx3.intave.block.physics.MaterialMagic;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.NativeVector;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.NativeVector;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.MovementMetadata;
 import org.bukkit.Material;
 import org.bukkit.World;
 
-import static de.jpx3.intave.shade.ClientMathHelper.ceil;
-import static de.jpx3.intave.shade.ClientMathHelper.floor;
+import static de.jpx3.intave.share.ClientMathHelper.ceil;
+import static de.jpx3.intave.share.ClientMathHelper.floor;
 
 public abstract class FluidResolver {
   public final Fluid fluidAt(User user, double x, double y, double z) {

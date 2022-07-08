@@ -8,8 +8,8 @@ import de.jpx3.intave.block.physics.BlockProperties;
 import de.jpx3.intave.block.physics.MaterialMagic;
 import de.jpx3.intave.block.variant.BlockVariant;
 import de.jpx3.intave.player.ItemProperties;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.Direction;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.Direction;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.EffectMetadata;
@@ -20,7 +20,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import static de.jpx3.intave.shade.ClientMathHelper.floor;
+import static de.jpx3.intave.share.ClientMathHelper.floor;
 
 @Deprecated
 @WhyMustIExist

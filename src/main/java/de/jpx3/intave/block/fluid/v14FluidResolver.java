@@ -2,8 +2,8 @@ package de.jpx3.intave.block.fluid;
 
 import de.jpx3.intave.klass.rewrite.PatchyAutoTranslation;
 import de.jpx3.intave.klass.rewrite.PatchyTranslateParameters;
-import de.jpx3.intave.shade.NativeVector;
-import de.jpx3.intave.shade.link.WrapperConverter;
+import de.jpx3.intave.share.NativeVector;
+import de.jpx3.intave.share.link.WrapperConverter;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.MovementMetadata;
 import net.minecraft.server.v1_14_R1.BlockPosition;

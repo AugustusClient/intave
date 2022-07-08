@@ -3,8 +3,8 @@ package de.jpx3.intave.block.fluid;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.IntaveInternalException;
 import de.jpx3.intave.klass.rewrite.PatchyLoadingInjector;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.ClientMathHelper;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.ClientMathHelper;
 import de.jpx3.intave.user.User;
 import org.bukkit.Location;
 

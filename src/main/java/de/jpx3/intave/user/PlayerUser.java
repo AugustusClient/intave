@@ -9,8 +9,8 @@ import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.IntaveInternalException;
 import de.jpx3.intave.access.player.trust.TrustFactor;
 import de.jpx3.intave.annotate.Relocate;
-import de.jpx3.intave.block.state.BlockStateAccess;
-import de.jpx3.intave.block.state.MultiChunkKeyBlockStateAccess;
+import de.jpx3.intave.block.state.BlockStateExtendedCache;
+import de.jpx3.intave.block.state.BlockStateCaches;
 import de.jpx3.intave.block.type.BlockTypeAccess;
 import de.jpx3.intave.check.movement.physics.Pose;
 import de.jpx3.intave.connect.customclient.CustomClientSupportConfig;
@@ -69,7 +69,7 @@ final class PlayerUser implements User {
   private final Map<MessageChannel, Predicate<Player>> channelConstraints = Maps.newEnumMap(MessageChannel.class);
   private final Map<Material, Material> typeTranslations = Maps.newHashMap();
   private Map<Pose, HitboxSize> poseSizes;
-  private final BlockStateAccess blockStateAccess;
+  private final BlockStateExtendedCache blockStateAccess;
   private boolean ignoreNextInboundPacket;
   private boolean ignoreNextOutboundPacket;
   private CustomClientSupportConfig customClientConfig = CustomClientSupportConfig.createDefault();
@@ -86,7 +86,7 @@ final class PlayerUser implements User {
     this.playerConnection = new WeakReference<>(ReflectiveHandleAccess.playerConnectionOf(player));
     this.metadata = new MetadataBundle(player, this);
     this.permissionCache = new ExpiringPermissionCache(16, TimeUnit.SECONDS);
-    this.blockStateAccess = MultiChunkKeyBlockStateAccess.forPlayer(player);
+    this.blockStateAccess = BlockStateCaches.forPlayer(player);
     this.collider = Colliders.suitableComplexColliderProcessorFor(this);
     this.simpleCollider = Colliders.suitableSimpleColliderProcessorFor(this);
     Synchronizer.synchronize(this::setDefaultMessagingChannel);
@@ -246,7 +246,7 @@ final class PlayerUser implements User {
   }
 
   @Override
-  public BlockStateAccess blockStates() {
+  public BlockStateExtendedCache blockStates() {
     return blockStateAccess;
   }
 
@@ -282,7 +282,7 @@ final class PlayerUser implements User {
 
   @Override
   public boolean receives(MessageChannel channel) {
-    boolean receives = receivingUserChannels.contains(channel);
+    boolean receives = receivesCurrently(channel);
     if (receives && !BukkitPermissionCheck.permissionCheck(player(), channel.permission())) {
       toggleReceive(channel);
       return false;
@@ -292,13 +292,17 @@ final class PlayerUser implements User {
 
   @Override
   public void toggleReceive(MessageChannel channel) {
-    boolean remove = receives(channel);
+    boolean remove = receivesCurrently(channel);
     if (remove) {
       receivingUserChannels.remove(channel);
     } else {
       receivingUserChannels.add(channel);
     }
     MessageChannelSubscriptions.setChannelActivation(player(), channel, !remove);
+  }
+
+  private boolean receivesCurrently(MessageChannel channel) {
+    return receivingUserChannels.contains(channel);
   }
 
   @Override
@@ -325,13 +329,22 @@ final class PlayerUser implements User {
   }
 
   @Override
+  public void applyShortAttackStimulus(AttackNerfStrategy strategy, String checkId) {
+    if (trustFactor().atLeast(TrustFactor.BYPASS)) {
+      return;
+    }
+    Modules.mitigate().combat().mitigateOnce(this, strategy, checkId);
+  }
+
+  @Override
   public void removeChannelConstraint(MessageChannel channel) {
     channelConstraints.remove(channel);
   }
 
   @Override
   public int latency() {
-    return meta().connection().latency;
+    return (int) meta().connection().transactionPingAverage();
+    //return meta().connection().latency;
   }
 
   @Override

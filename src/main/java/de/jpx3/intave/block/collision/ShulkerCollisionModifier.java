@@ -3,7 +3,7 @@ package de.jpx3.intave.block.collision;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import de.jpx3.intave.block.shape.BlockShape;
 import de.jpx3.intave.block.tick.ShulkerBox;
-import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.share.BoundingBox;
 import de.jpx3.intave.user.User;
 import org.bukkit.Material;
 

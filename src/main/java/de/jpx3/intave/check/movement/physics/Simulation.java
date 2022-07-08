@@ -2,7 +2,7 @@ package de.jpx3.intave.check.movement.physics;
 
 import de.jpx3.intave.annotate.Relocate;
 import de.jpx3.intave.player.collider.complex.ColliderResult;
-import de.jpx3.intave.shade.Motion;
+import de.jpx3.intave.share.Motion;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserLocal;
 
@@ -62,13 +62,13 @@ public final class Simulation {
     return new Simulation(configuration, colliderResult);
   }
 
-  public static Simulation of(User user, MovementConfiguration configuration, ColliderResult colliderResult) {
+  static Simulation of(User user, MovementConfiguration configuration, ColliderResult colliderResult) {
     Simulation simulation = simulationUserLocal.get(user);
     simulation.flush(configuration, colliderResult);
     return simulation;
   }
 
-  public static Simulation invalid() {
+  static Simulation invalid() {
     return INVALID_SIMULATION;
   }
 }

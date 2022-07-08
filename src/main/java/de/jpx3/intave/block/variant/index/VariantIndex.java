@@ -25,10 +25,15 @@ public class VariantIndex {
     }
     Indexer indexer;
     try {
-      Class<Object> indexerClass = PatchyLoadingInjector.loadUnloadedClassPatched(
+      Class<Indexer> indexerClass = PatchyLoadingInjector.loadUnloadedClassPatched(
         IntavePlugin.class.getClassLoader(), indexerClassName
       );
-      indexer = (Indexer) indexerClass.newInstance();
+      if (indexerClass == null) {
+        throw new IllegalStateException("Failed to load indexer class " + indexerClassName);
+      }
+      indexer = indexerClass.newInstance();
+    } catch (RuntimeException exception) {
+      throw exception;
     } catch (Exception exception) {
       throw new RuntimeException(exception);
     }
@@ -37,8 +42,8 @@ public class VariantIndex {
 
   public static void indexApplyWithReverse(
     Material material,
-    BiConsumer<Material, Map<Object, Integer>> indexApply,
-    BiConsumer<Material, Map<Integer, Object>> registerApply
+    BiConsumer<Material, ? super Map<Object, Integer>> indexApply,
+    BiConsumer<Material, ? super Map<Integer, Object>> registerApply
   ) {
     Map<Object, Integer> index = index(material);
     // reverse map

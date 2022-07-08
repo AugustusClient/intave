@@ -1,7 +1,7 @@
 package de.jpx3.intave.diagnostic;
 
 import de.jpx3.intave.IntaveControl;
-import de.jpx3.intave.shade.BoundingBox;
+import de.jpx3.intave.share.BoundingBox;
 
 import java.util.HashMap;
 import java.util.Map;

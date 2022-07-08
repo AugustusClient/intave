@@ -44,7 +44,10 @@ public final class v14BlockAccessor implements BlockAccessor {
     if (blockAccess == null) {
       return Material.AIR;
     }
-    return CraftMagicNumbers.getMaterial(blockAccess.getType(positionOfBlock(block)).getBlock());
+    net.minecraft.server.v1_14_R1.BlockPosition blockPosition = positionOfBlock(block);
+    IBlockData blockData = blockAccess.getType(blockPosition);
+    net.minecraft.server.v1_14_R1.Block nmsBlock = blockData.getBlock();
+    return CraftMagicNumbers.getMaterial(nmsBlock);
   }
 
   @Override

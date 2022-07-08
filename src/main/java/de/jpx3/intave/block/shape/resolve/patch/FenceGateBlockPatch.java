@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 
 final class FenceGateBlockPatch extends BoundingBoxPatch {
   @Override
-  public BlockShape patch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, BlockShape shape) {
+  public BlockShape collisionPatch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, BlockShape shape) {
     return shape;
   }
 

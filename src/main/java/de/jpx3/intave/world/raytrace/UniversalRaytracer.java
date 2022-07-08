@@ -2,8 +2,8 @@ package de.jpx3.intave.world.raytrace;
 
 import de.jpx3.intave.block.shape.BlockRaytrace;
 import de.jpx3.intave.block.shape.BlockShape;
-import de.jpx3.intave.block.state.BlockStateAccess;
-import de.jpx3.intave.shade.*;
+import de.jpx3.intave.block.state.BlockStateExtendedCache;
+import de.jpx3.intave.share.*;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import org.bukkit.Effect;
@@ -11,8 +11,8 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import static de.jpx3.intave.shade.ClientMathHelper.floor;
-import static de.jpx3.intave.shade.Direction.*;
+import static de.jpx3.intave.share.ClientMathHelper.floor;
+import static de.jpx3.intave.share.Direction.*;
 
 public final class UniversalRaytracer implements Raytracer {
   @Override
@@ -22,7 +22,7 @@ public final class UniversalRaytracer implements Raytracer {
 
   public MovingObjectPosition raytrace(Player player, Position observerPosition, Position targetPosition) {
     User user = UserRepository.userOf(player);
-    BlockStateAccess blockStateAccess = user.blockStates();
+    BlockStateExtendedCache blockStateAccess = user.blockStates();
     if (observerPosition.hasNaNCoordinate() || targetPosition.hasNaNCoordinate()) {
       return MovingObjectPosition.none();
     }
@@ -35,10 +35,11 @@ public final class UniversalRaytracer implements Raytracer {
     int lookY = floor(observerPosition.getY());
     int lookZ = floor(observerPosition.getZ());
     BlockPosition blockposition = observerPosition.toBlockPosition();
-    BlockShape currentShape = blockStateAccess.collisionShapeAt(lookX, lookY, lookZ);
+    BlockShape currentShape = blockStateAccess.outlineShapeAt(lookX, lookY, lookZ);
     Material material = blockStateAccess.typeAt(lookX, lookY, lookZ);
     movingObjectPosition = innerBlockRaytrace(material, currentShape, blockposition, initialPosition, observerPosition, targetPosition);
     if (movingObjectPosition != MovingObjectPosition.none()) {
+      player.playEffect(movingObjectPosition.hitVec.toLocation(player.getWorld()), Effect.HAPPY_VILLAGER, 1);
       return movingObjectPosition;
     }
     int jumps = 50;
@@ -116,7 +117,7 @@ public final class UniversalRaytracer implements Raytracer {
       lookY = floor(observerPosition.getY()) - (direction == UP ? 1 : 0);
       lookZ = floor(observerPosition.getZ()) - (direction == SOUTH ? 1 : 0);
       blockposition = new BlockPosition(lookX, lookY, lookZ);
-      currentShape = blockStateAccess.collisionShapeAt(lookX, lookY, lookZ);
+      currentShape = blockStateAccess.outlineShapeAt(lookX, lookY, lookZ);
       material = blockStateAccess.typeAt(lookX, lookY, lookZ);
       movingObjectPosition = innerBlockRaytrace(material, currentShape, blockposition, initialPosition, observerPosition, targetPosition);
       if (movingObjectPosition != MovingObjectPosition.none()) {
@@ -125,16 +126,18 @@ public final class UniversalRaytracer implements Raytracer {
         return movingObjectPosition;
       }
     }
+    System.out.println("No hit found");
     return MovingObjectPosition.none();
   }
 
   private MovingObjectPosition innerBlockRaytrace(Material material, BlockShape shape, BlockPosition blockPosition, Position initialObserverPosition, Position currentObserverPosition, Position targetPosition) {
     if (shape.isEmpty()) {
+      System.out.println("Empty shape at " + blockPosition);
       return MovingObjectPosition.none();
     }
-    System.out.println("Penetrating " + material + " at " + blockPosition);
+    System.out.println("Penetrating " + material + " at " + blockPosition + ", shape " + shape);
 //    System.out.println("Raytracing " + shape + " at " + blockPosition);
-    BlockRaytrace raytrace = shape.raytrace(initialObserverPosition, targetPosition);
+    BlockRaytrace raytrace = shape.raytrace(currentObserverPosition, targetPosition);
     if (raytrace == BlockRaytrace.none()) {
       System.out.println("No raytrace");
       return MovingObjectPosition.none();

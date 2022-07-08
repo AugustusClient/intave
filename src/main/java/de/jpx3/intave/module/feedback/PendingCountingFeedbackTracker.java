@@ -15,6 +15,9 @@ public final class PendingCountingFeedbackTracker implements FeedbackTracker {
     counter.decrementAndGet();
   }
 
+  @Override
+  public void failed() {}
+
   public long pending() {
     return counter.get();
   }

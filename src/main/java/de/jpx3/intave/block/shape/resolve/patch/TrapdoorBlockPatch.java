@@ -20,7 +20,7 @@ final class TrapdoorBlockPatch extends BoundingBoxPatch {
    makes variant-control constrain redundant
    */
   @Override
-  public BlockShape patch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, BlockShape shape) {
+  public BlockShape collisionPatch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, BlockShape shape) {
     BoundingBoxBuilder boundingBoxBuilder = BoundingBoxBuilder.create();
 
     BlockVariant variant = BlockVariantRegister.variantOf(type, blockState);

@@ -10,7 +10,7 @@ import de.jpx3.intave.block.access.VolatileBlockAccess;
 import de.jpx3.intave.block.type.BlockTypeAccess;
 import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.packet.PacketSender;
-import de.jpx3.intave.shade.ClientMathHelper;
+import de.jpx3.intave.share.ClientMathHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;

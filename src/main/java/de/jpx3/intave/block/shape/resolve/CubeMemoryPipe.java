@@ -9,11 +9,12 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.Set;
+import java.util.function.Supplier;
 
 final class CubeMemoryPipe implements ShapeResolverPipeline {
   private final ShapeResolverPipeline forward;
   private final CubeMemory collisionCubeMemory = new CubeMemory();
-  private final CubeMemory outlierCubeMemory = new CubeMemory();
+  private final CubeMemory outlineCubeMemory = new CubeMemory();
 
   public CubeMemoryPipe(ShapeResolverPipeline forward) {
     this.forward = forward;
@@ -24,7 +25,8 @@ final class CubeMemoryPipe implements ShapeResolverPipeline {
     for (Material type : Material.values()) {
       String typeName = type.name();
       if (typeName.contains("SLAB") /* can be doubled */) {
-        collisionCubeMemory.rememberCubic(type);
+        collisionCubeMemory.rememberNonCubic(type);
+        outlineCubeMemory.rememberNonCubic(type);
       }
     }
   }
@@ -32,16 +34,14 @@ final class CubeMemoryPipe implements ShapeResolverPipeline {
   @Override
   public BlockShape collisionShapeOf(World world, Player player, Material type, int variantIndex, int posX, int posY, int posZ) {
     CubeMemory memory = collisionCubeMemory;
-    if (memory.knownToBeNonCubic(type)) {
+    if (memory.knownToBeCubic(type)) {
       ShapeAccessFlowStudy.incremDynamic();
       return BlockShapes.cubeAt(posX, posY, posZ);
-    } else if (memory.knownToBeNonCubic(type)) {
-      return forward.collisionShapeOf(world, player, type, variantIndex, posX, posY, posZ);
     }
     BlockShape shape = forward.collisionShapeOf(world, player, type, variantIndex, posX, posY, posZ);
-    if (isInLoadedChunk(world, posX, posZ)) {
+    if (!memory.knownToBeNonCubic(type) && isInLoadedChunk(world, posX, posZ)) {
       if (shape.isCubic()) {
-        downstreamTypeReset(type); // flush downstream type
+        forward.downstreamTypeReset(type); // flush downstream type
         memory.rememberCubic(type);
       } else {
         memory.rememberNonCubic(type);
@@ -52,17 +52,15 @@ final class CubeMemoryPipe implements ShapeResolverPipeline {
 
   @Override
   public BlockShape outlineShapeOf(World world, Player player, Material type, int variantIndex, int posX, int posY, int posZ) {
-    CubeMemory memory = outlierCubeMemory;
-    if (memory.knownToBeNonCubic(type)) {
+    CubeMemory memory = outlineCubeMemory;
+    if (memory.knownToBeCubic(type)) {
       ShapeAccessFlowStudy.incremDynamic();
       return BlockShapes.cubeAt(posX, posY, posZ);
-    } else if (memory.knownToBeNonCubic(type)) {
-      return forward.outlineShapeOf(world, player, type, variantIndex, posX, posY, posZ);
     }
     BlockShape shape = forward.outlineShapeOf(world, player, type, variantIndex, posX, posY, posZ);
-    if (isInLoadedChunk(world, posX, posZ)) {
+    if (!memory.knownToBeNonCubic(type) && isInLoadedChunk(world, posX, posZ)) {
       if (shape.isCubic()) {
-        downstreamTypeReset(type); // flush downstream type
+        forward.downstreamTypeReset(type); // flush downstream type
         memory.rememberCubic(type);
       } else {
         memory.rememberNonCubic(type);
@@ -74,7 +72,7 @@ final class CubeMemoryPipe implements ShapeResolverPipeline {
   @Override
   public void downstreamTypeReset(Material type) {
     collisionCubeMemory.reset(type);
-    outlierCubeMemory.reset(type);
+    outlineCubeMemory.reset(type);
     forward.downstreamTypeReset(type);
   }
 

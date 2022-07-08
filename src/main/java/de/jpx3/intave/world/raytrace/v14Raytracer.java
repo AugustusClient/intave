@@ -1,12 +1,12 @@
 package de.jpx3.intave.world.raytrace;
 
-import de.jpx3.intave.block.state.BlockStateAccess;
+import de.jpx3.intave.block.state.BlockStateExtendedCache;
 import de.jpx3.intave.block.variant.BlockVariantRegister;
 import de.jpx3.intave.klass.rewrite.PatchyAutoTranslation;
 import de.jpx3.intave.klass.rewrite.PatchyTranslateParameters;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.MovingObjectPosition;
-import de.jpx3.intave.shade.NativeVector;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.MovingObjectPosition;
+import de.jpx3.intave.share.NativeVector;
 import de.jpx3.intave.user.User;
 import net.minecraft.server.v1_14_R1.*;
 import org.bukkit.World;
@@ -132,7 +132,7 @@ public final class v14Raytracer implements Raytracer {
   @PatchyAutoTranslation
   @PatchyTranslateParameters
   private MovingObjectPositionBlock dualRaytrace(User user, RayTrace var0x, BlockPosition var1) {
-    BlockStateAccess blockStateAccess = user.blockStates();
+    BlockStateExtendedCache blockStateAccess = user.blockStates();
     WorldServer worldServer = ((CraftWorld) user.player().getWorld()).getHandle();
     IBlockAccess blockAccess = worldServer.getChunkProvider().c(var1.getX() >> 4, var1.getZ() >> 4);
     if (blockAccess == null) {

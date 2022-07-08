@@ -3,7 +3,7 @@ package de.jpx3.intave.block.type;
 import com.comphenix.protocol.utility.MinecraftVersion;
 import org.bukkit.Material;
 
-public final class TypeTranslation {
+final class TypeTranslation {
   private final MinecraftVersion versionFrom, versionTo;
   private final Material typeFrom, typeTo;
 

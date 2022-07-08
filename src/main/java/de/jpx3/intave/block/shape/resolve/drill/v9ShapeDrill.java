@@ -5,8 +5,7 @@ import de.jpx3.intave.block.shape.BlockShapes;
 import de.jpx3.intave.block.shape.resolve.drill.acbbs.v9AlwaysCollidingBoundingBox;
 import de.jpx3.intave.block.variant.BlockVariantRegister;
 import de.jpx3.intave.klass.rewrite.PatchyAutoTranslation;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.link.WrapperConverter;
+import de.jpx3.intave.share.link.WrapperConverter;
 import net.minecraft.server.v1_9_R2.*;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -44,7 +43,7 @@ public final class v9ShapeDrill extends AbstractShapeDrill {
     }
     WorldServer worldServer = ((CraftWorld) world).getHandle();
     Block block = blockData.getBlock();
-    AxisAlignedBB bb = block.a(blockData, worldServer, blockposition);
+    AxisAlignedBB bb = block.a(blockData, (IBlockAccess) worldServer, blockposition);
     return bb == null ? BlockShapes.emptyShape() : WrapperConverter.boundingBoxFromAABB(bb);
   }
 }

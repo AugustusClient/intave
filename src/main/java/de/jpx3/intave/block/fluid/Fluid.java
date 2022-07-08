@@ -45,6 +45,7 @@ public final class Fluid {
     return EMPTY_FLUID;
   }
 
+  // 2^5 states + one empty state
   private static final Fluid[] FLUID_UNIVERSE = new Fluid[(1 << 5) + 1];
 
   public static Fluid of(FluidTag fluidTag, boolean source, float height) {

@@ -3,8 +3,8 @@ package de.jpx3.intave.user;
 import de.jpx3.intave.access.UnsupportedFallbackOperationException;
 import de.jpx3.intave.access.player.trust.TrustFactor;
 import de.jpx3.intave.annotate.Relocate;
-import de.jpx3.intave.block.state.BlockStateAccess;
-import de.jpx3.intave.block.state.EmptyBlockStateAccess;
+import de.jpx3.intave.block.state.BlockStateCaches;
+import de.jpx3.intave.block.state.BlockStateExtendedCache;
 import de.jpx3.intave.check.movement.physics.Pose;
 import de.jpx3.intave.connect.customclient.CustomClientSupportConfig;
 import de.jpx3.intave.entity.size.HitboxSize;
@@ -37,7 +37,7 @@ public final class FallbackUser implements User {
   private final Collider collider;
   private final SimpleCollider simpleCollider;
   private final Map<Pose, HitboxSize> poseSizes;
-  private final BlockStateAccess blockStateAccess;
+  private final BlockStateExtendedCache blockStateAccess;
   private final CustomClientSupportConfig customClientSupportConfig = CustomClientSupportConfig.createDefault();
 
   private final UserContext userContext = new UserContext(this);
@@ -48,7 +48,7 @@ public final class FallbackUser implements User {
   FallbackUser() {
     this.metadata = new MetadataBundle(null, this);
     this.permissionCache = new ExpiringPermissionCache(16, TimeUnit.SECONDS);
-    this.blockStateAccess = new EmptyBlockStateAccess();
+    this.blockStateAccess = BlockStateCaches.empty();
     this.collider = Colliders.suitableComplexColliderProcessorFor(this);
     this.simpleCollider = Colliders.suitableSimpleColliderProcessorFor(this);
     this.poseSizes = Pose.AT_LEAST_1_8_POSE;
@@ -159,7 +159,7 @@ public final class FallbackUser implements User {
   }
 
   @Override
-  public BlockStateAccess blockStates() {
+  public BlockStateExtendedCache blockStates() {
     return blockStateAccess;
   }
 
@@ -222,6 +222,11 @@ public final class FallbackUser implements User {
 
   @Override
   public void applyAttackNerfer(AttackNerfStrategy strategy, String checkId) {
+  }
+
+  @Override
+  public void applyShortAttackStimulus(AttackNerfStrategy strategy, String checkId) {
+
   }
 
   @Override

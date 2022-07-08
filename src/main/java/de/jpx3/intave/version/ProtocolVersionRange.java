@@ -1,6 +1,6 @@
 package de.jpx3.intave.version;
 
-public class ProtocolVersionRange implements Comparable<ProtocolVersionRange> {
+class ProtocolVersionRange implements Comparable<ProtocolVersionRange> {
   private final int from;
   private final int to;
   private final String version;

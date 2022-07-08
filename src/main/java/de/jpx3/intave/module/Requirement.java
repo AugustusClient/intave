@@ -1,6 +1,6 @@
 package de.jpx3.intave.module;
 
-public interface Requirement {
+interface Requirement {
   boolean fulfilled();
 
   default Requirement and(Requirement other) {

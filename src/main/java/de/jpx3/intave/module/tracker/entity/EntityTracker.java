@@ -26,7 +26,7 @@ import de.jpx3.intave.module.nayoro.event.sink.EventSink;
 import de.jpx3.intave.packet.reader.EntityDestroyReader;
 import de.jpx3.intave.packet.reader.PacketReaders;
 import de.jpx3.intave.player.fake.FakePlayer;
-import de.jpx3.intave.shade.ClientMathHelper;
+import de.jpx3.intave.share.ClientMathHelper;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.*;

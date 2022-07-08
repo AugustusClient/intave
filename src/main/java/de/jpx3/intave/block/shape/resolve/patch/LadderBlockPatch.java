@@ -3,8 +3,8 @@ package de.jpx3.intave.block.shape.resolve.patch;
 import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.block.shape.BlockShape;
 import de.jpx3.intave.block.shape.BlockShapes;
-import de.jpx3.intave.shade.BoundingBox;
-import de.jpx3.intave.shade.Direction;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.Direction;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import org.bukkit.Material;
@@ -19,7 +19,7 @@ final class LadderBlockPatch extends BoundingBoxPatch {
   }
 
   @Override
-  public BlockShape patch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, BlockShape originalShape) {
+  public BlockShape collisionPatch(World world, Player player, int posX, int posY, int posZ, Material type, int blockState, BlockShape originalShape) {
     User user = UserRepository.userOf(player);
     Direction direction = Direction.getFront(blockState);
     boolean modern = user.meta().protocol().combatUpdate();
