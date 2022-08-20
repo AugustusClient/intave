@@ -1,5 +1,7 @@
 package de.jpx3.intave.module.feedback;
 
+import de.jpx3.intave.IntaveControl;
+import de.jpx3.intave.IntaveLogger;
 import org.bukkit.entity.Player;
 
 public final class FeedbackRequest<T> {
@@ -26,9 +28,16 @@ public final class FeedbackRequest<T> {
   }
 
   void acknowledge(Player player) {
-    callback.success(player, obj);
-    if (tracker != null) {
-      tracker.received(this);
+    try {
+      callback.success(player, obj);
+      if (tracker != null) {
+        tracker.received(this);
+      }
+    } catch (Exception e) {
+      if (IntaveControl.DISABLE_LICENSE_CHECK) {
+        IntaveLogger.logger().error("Error while acknowledging " + callback + " for " + player);
+        e.printStackTrace();
+      }
     }
   }
 

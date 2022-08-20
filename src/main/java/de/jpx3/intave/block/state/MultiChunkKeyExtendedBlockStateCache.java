@@ -11,12 +11,14 @@ import de.jpx3.intave.diagnostic.ShapeAccessFlowStudy;
 import de.jpx3.intave.math.Hypot;
 import de.jpx3.intave.share.Position;
 import de.jpx3.intave.world.WorldHeight;
-import io.netty.util.collection.LongObjectHashMap;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static de.jpx3.intave.IntaveControl.DISABLE_BLOCK_CACHING_ENTIRELY;
 
@@ -24,7 +26,7 @@ import static de.jpx3.intave.IntaveControl.DISABLE_BLOCK_CACHING_ENTIRELY;
 final class MultiChunkKeyExtendedBlockStateCache implements ExtendedBlockStateCache {
   private final Player player;
   private final ShapeResolverPipeline shapeResolver;
-  private final LongObjectHashMap<BlockState> blockCache = new LongObjectHashMap<>(1024);
+  private final Map<Long, BlockState> blockCache = new HashMap<>(1024);
   private final BlockStateReplacementCache<Long> replacementCache;
   private int originChunkX, originChunkZ;
   private int chunkX, chunkZ;

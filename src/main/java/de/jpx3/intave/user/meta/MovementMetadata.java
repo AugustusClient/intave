@@ -33,10 +33,7 @@ import de.jpx3.intave.share.Motion;
 import de.jpx3.intave.share.Rotation;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -744,6 +741,8 @@ public final class MovementMetadata implements SimulationEnvironment {
     if (!isInVehicle()) {
       return;
     }
+    // player.getLocation() is assumed to be correct
+    player.teleport(player.getLocation());
     this.vehicle = null;
   }
 

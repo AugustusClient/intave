@@ -163,6 +163,7 @@ public final class FeedbackReceiver extends Module {
     } catch (Exception e) {
       if (IntaveControl.DISABLE_LICENSE_CHECK) {
         IntaveLogger.logger().error("Error while acknowledging " + feedbackRequest.callback() + " for " + feedbackRequest.target());
+        e.printStackTrace();
       }
     }
   }
