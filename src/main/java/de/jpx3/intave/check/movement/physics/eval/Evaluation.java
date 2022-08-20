@@ -13,7 +13,7 @@ public final class Evaluation {
     new FireworkRocketEvaluator()
   );
 
-  public EvaluationContext evaluate(User user, Simulation simulation) {
+  public Evaluable evaluate(User user, Simulation simulation) {
     EvaluationContext evaluationContext = EvaluationContext.from(user);
     MovementMetadata movement = user.meta().movement();
     for (Evaluator evaluator : evaluators) {

@@ -6,7 +6,7 @@ import de.jpx3.intave.user.UserLocal;
 import java.util.Collections;
 import java.util.List;
 
-public final class EvaluationContext {
+public final class EvaluationContext implements Evaluable {
   private static final UserLocal<EvaluationContext> evalUserLocal = UserLocal.withInitial(EvaluationContext::new);
 
   private double verticalVL;
@@ -33,11 +33,11 @@ public final class EvaluationContext {
     responsibleEvaluators = Collections.emptyList();
   }
 
-  void withVerticalUncertaintyOf(double uncertainty) {
+  public void withVerticalUncertaintyOf(double uncertainty) {
     verticalUncertainty = Math.max(uncertainty, verticalUncertainty);
   }
 
-  void withHorizontalUncertaintyOf(double uncertainty) {
+  public void withHorizontalUncertaintyOf(double uncertainty) {
     horizontalUncertainty = Math.max(uncertainty, horizontalUncertainty);
   }
 
