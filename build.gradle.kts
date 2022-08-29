@@ -174,6 +174,7 @@ fun registerServerTask(serverVersion: String, javaVersion: Int) {
         pluginJars.from("build/libs/$simpleName.jar")
         minecraftVersion(serverVersion)
         runDirectory(File("paper_${serverVersion}-j$javaVersion"))
+        jvmArgs("-Dcom.mojang.eula.agree=true") // speak with our lawyer about this!!
         javaLauncher.set(
             project.javaToolchains.launcherFor {
                 languageVersion.set(JavaLanguageVersion.of(javaVersion))
@@ -203,14 +204,11 @@ tasks {
             attributes("Implementation-Vendor" to "Jpx3")
             attributes("Main-Class" to "de.jpx3.intave.IntaveApplication")
         }
-        // TODO: remove kotlin module files in META-INF...
     }
 
     shadowJar {
         val classifier = "file"
         archiveFileName.set("$simpleName.jar")
         archiveClassifier.set(classifier)
-        // TODO: since kotlin stdlib is shaded into the jar, jetbrains annotations is also present
-        // despite not being needed...
     }
 }
