@@ -14,7 +14,6 @@ import de.jpx3.intave.check.movement.Physics;
 import de.jpx3.intave.check.movement.Timer;
 import de.jpx3.intave.check.other.InventoryClickAnalysis;
 import de.jpx3.intave.check.other.ProtocolScanner;
-import de.jpx3.intave.check.physics2.Simulator;
 import de.jpx3.intave.check.world.BreakSpeedLimiter;
 import de.jpx3.intave.check.world.InteractionRaytrace;
 import de.jpx3.intave.check.world.PlacementAnalysis;
@@ -70,7 +69,6 @@ public final class CheckService {
     addCheck(BreakSpeedLimiter.class);
     addCheck(ProtocolScanner.class);
     addCheck(PlacementAnalysis.class);
-    addCheck(Simulator.class);
     addCheck(InventoryClickAnalysis.class);
 
     bakeQuickAccess();

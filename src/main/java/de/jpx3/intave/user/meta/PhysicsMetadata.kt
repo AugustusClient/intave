@@ -1,7 +1,7 @@
 package de.jpx3.intave.user.meta
 
-import de.jpx3.intave.check.physics2.Vec
-import de.jpx3.intave.check.physics2.toVec
+import de.jpx3.intave.check.movement.physics.Vec
+import de.jpx3.intave.check.movement.physics.toVec
 import de.jpx3.intave.share.BoundingBox
 import de.jpx3.intave.user.UserRepository
 import org.bukkit.entity.Player
