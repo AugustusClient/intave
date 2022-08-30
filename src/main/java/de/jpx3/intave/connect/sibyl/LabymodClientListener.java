@@ -52,7 +52,7 @@ public final class LabymodClientListener implements PacketEventSubscriber {
     if (tag.startsWith("minecraft:")) {
       tag = tag.substring(10);
     }
-    if (!tag.equalsIgnoreCase("LMC")) {
+    if (!tag.equalsIgnoreCase("LMC") && !tag.equalsIgnoreCase("labymod3:main")) {
       return;
     }
     ByteBuf bytes = (ByteBuf) packet.getSpecificModifier(Lookup.serverClass("PacketDataSerializer")).getValues().get(0);
