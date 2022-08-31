@@ -28,6 +28,7 @@ public final class BlockTypeAccess {
   public static final Material NETHER_PORTAL = resolveFrom("PORTAL", "NETHER_PORTAL");
   public static final Material END_PORTAL_FRAME = resolveFrom("END_PORTAL_FRAME", "ENDER_PORTAL_FRAME");
   public static final Material SKULL = resolveFrom("SKULL", "LEGACY_SKULL");
+  public static final Material COBBLESTONE_WALL = resolveFrom("COBBLESTONE_WALL", "COBBLE_WALL");
 
   public static void setup() {
   }

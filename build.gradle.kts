@@ -47,7 +47,7 @@ dependencies {
  */
 bukkit {
     name = simpleName
-    authors = listOf("DarkAndBlue", "Jpx3", "vento")
+    authors = listOf("DarkAndBlue", "Jpx3", "vento", "lennoxlotl", "Trattue")
     version = "${rootProject.version}"
     description = "${rootProject.description}"
 
