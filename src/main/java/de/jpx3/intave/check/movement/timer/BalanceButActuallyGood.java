@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
 
+@Deprecated
 public final class BalanceButActuallyGood extends MetaCheckPart<Timer, BalanceButActuallyGood.MovementFrequencyData> {
   private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(IntaveThreadFactory.ofLowestPriority());
 

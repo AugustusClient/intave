@@ -13,6 +13,7 @@ import org.bukkit.entity.LivingEntity;
 
 import static de.jpx3.intave.module.linker.packet.PacketId.Server.ENTITY_METADATA;
 
+@Deprecated
 public final class HealthFilter extends Filter {
   private final IntavePlugin plugin;
 

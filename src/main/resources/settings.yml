@@ -164,7 +164,6 @@ fault-kicks:
   ignoring-keep-alive: true
   invalid-key-input: true
 
-
 logging:
   console-log: false
   file-log: true

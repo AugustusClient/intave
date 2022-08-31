@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 final class ThinBlockPatch extends BoundingBoxPatch {
-  private static final BoundingBox[] STATES_8 = new BoundingBox[]{
+  private static final BoundingBox[] STATES_8 = new BoundingBox[] {
     BoundingBox.originFrom(0.0F, 0.0F, 0.4375F, 1.0F, 1.0F, 0.5625F), // full ew connection
     BoundingBox.originFrom(0.4375F, 0.0F, 0.0F, 0.5625F, 1.0F, 1.0F), // full ns connection
     BoundingBox.originFrom(0.4375F, 0.0F, 0.0F, 0.5625F, 1.0F, 0.5F), // north
@@ -21,7 +21,7 @@ final class ThinBlockPatch extends BoundingBoxPatch {
     BoundingBox.originFrom(0.0F, 0.0F, 0.4375F, 0.5F, 1.0F, 0.5625F), // west
   };
 
-  private static final BoundingBox[] STATES_9 = new BoundingBox[]{
+  private static final BoundingBox[] STATES_9 = new BoundingBox[] {
     BoundingBox.originFromX16(7, 0, 7, 9, 16, 9), // base`
     BoundingBox.originFromX16(7, 0, 0, 9, 16, 9), // north
     BoundingBox.originFromX16(7, 0, 7, 16, 16, 9), // east

@@ -15,6 +15,7 @@ import org.bukkit.util.Vector;
 
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
 
+@Deprecated
 public final class PacketLoss extends MetaCheckPart<Timer, PacketLoss.PacketLossMeta> {
   private static final double AVERAGE = 50;
   private final BalanceButActuallyGood balanceButActuallyGood;

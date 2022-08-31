@@ -36,7 +36,14 @@ public class ViaVersionAdapter {
       return;
     }
     String version = viaVersion.getDescription().getVersion();
-    access = available.stream().filter(access -> access.available(version)).findFirst().orElse(null);
+    ViaVersionAccess found = null;
+    for (ViaVersionAccess viaVersionAccess : available) {
+      if (viaVersionAccess.available(version)) {
+        found = viaVersionAccess;
+        break;
+      }
+    }
+    access = found;
     available.clear();
     if (access != null) {
       access.setup();

@@ -105,7 +105,7 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
       }
       Attack attack = new Attack(packetClone, entityId, checkAgain);
       List<Attack> pendingAttacks = attackRaytraceMeta.pendingAttacks;
-      if (pendingAttacks.size() < 4) {
+      if (pendingAttacks.size() < 6) {
         pendingAttacks.add(attack);
       }
     }
@@ -184,7 +184,7 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
                 && attackRaytraceMeta.lastFlyPacketCounterReach > 1
               ) {
                 // 1.9+ beim bewegen
-                cancelHit = processReachCheck(player, entity, 0.1f);
+                cancelHit = processReachCheck(player, entity, 0.11f);
               } else {
                 // 1.9+ beim still stehen oder wenn das entity nicht synchronisiert ist
                 cancelHit = processIterativeReachCheck(player, entity);

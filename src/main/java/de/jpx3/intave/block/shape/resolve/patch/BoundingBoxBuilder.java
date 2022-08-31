@@ -60,18 +60,6 @@ public final class BoundingBoxBuilder {
     return boundingBoxes;
   }
 
-  @Override
-  public String toString() {
-    return "BoundingBoxBuilder{" +
-      "boundingBoxes=" + boundingBoxes +
-      ", minX=" + minX +
-      ", minY=" + minY +
-      ", minZ=" + minZ +
-      ", maxX=" + maxX +
-      ", maxY=" + maxY +
-      ", maxZ=" + maxZ +
-      '}';
-  }
 
   public static BoundingBoxBuilder create() {
     return new BoundingBoxBuilder();

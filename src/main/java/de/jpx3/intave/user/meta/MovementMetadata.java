@@ -154,6 +154,7 @@ public final class MovementMetadata implements SimulationEnvironment {
   public Location teleportLocation = null;
   public Vector teleportOffset = null;
   public int teleportResendCountdown = 10;
+  public int outgoingTeleportCountdown = 5;
   public int speculativeTicks = 0;
   public Map<UUID, Integer> pendingSpeculativeMovementTicks = GarbageCollector.watch(new HashMap<>());
   public boolean inReceiveSpeculativePacketRoutine = false;

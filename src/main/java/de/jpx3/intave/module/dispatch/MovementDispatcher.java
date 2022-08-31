@@ -68,7 +68,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static de.jpx3.intave.access.player.trust.TrustFactor.BYPASS;
+import static de.jpx3.intave.IntaveControl.*;
 import static de.jpx3.intave.module.feedback.FeedbackOptions.SELF_SYNCHRONIZATION;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.POSITION;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.VEHICLE_MOVE;
@@ -381,6 +381,7 @@ public final class MovementDispatcher extends Module {
       clientData.cavesAndCliffsUpdate() && !movementData.awaitTeleport
         && !movementData.awaitOutgoingTeleport
         && packet.getType() == PacketType.Play.Client.POSITION_LOOK
+      // maybe check for actual rightclick packet?
     ) {
       StructureModifier<Double> modifier = packet.getDoubles();
       double positionX = modifier.read(0);
@@ -391,6 +392,9 @@ public final class MovementDispatcher extends Module {
       double motionZ = positionZ - movementData.verifiedPositionZ;
       if (MathHelper.hypot3d(motionX, motionY, motionZ) < 0.00001) {
         movementData.dropPostTickMotionProcessing = true;
+        if (DEBUG_MOVEMENT_IGNORE) {
+          player.sendMessage("Click movement ignore");
+        }
         return;
       }
     }
@@ -407,6 +411,9 @@ public final class MovementDispatcher extends Module {
     }
 
     if (movementData.awaitTeleport || movementData.awaitOutgoingTeleport) {
+      if (DEBUG_MOVEMENT_IGNORE) {
+        player.sendMessage("Teleport movement ignore " + movementData.awaitTeleport + " " + movementData.awaitOutgoingTeleport);
+      }
       event.setCancelled(true);
       movementData.dropPostTickMotionProcessing = true;
       return;
@@ -417,6 +424,9 @@ public final class MovementDispatcher extends Module {
       movementData.positionX, movementData.positionY, movementData.positionZ
     );
     if (distance > 50) {
+      if (DEBUG_MOVEMENT_IGNORE) {
+        player.sendMessage("Distance movement ignore: " + distance);
+      }
       event.setCancelled(true);
       Vector vector = new Vector(movementData.physicsMotionX, movementData.physicsMotionY, movementData.physicsMotionZ);
       Modules.mitigate().movement().emulationSetBack(player, vector, 10, false);
@@ -444,6 +454,9 @@ public final class MovementDispatcher extends Module {
     }
 
     if (violationLevelData.isInActiveTeleportBundle) {
+      if (DEBUG_MOVEMENT_IGNORE) {
+        player.sendMessage("Teleport bundle movement ignore");
+      }
       event.setCancelled(true);
       return;
     }
@@ -458,6 +471,9 @@ public final class MovementDispatcher extends Module {
         movementData.motionY() == 0 &&
         movementData.motionZ() == 0
     ) {
+      if (DEBUG_MOVEMENT_IGNORE) {
+        player.sendMessage("Movement reset ignore");
+      }
       movementData.canResetMotion = false;
       return;
     }
@@ -502,6 +518,9 @@ public final class MovementDispatcher extends Module {
       updatePotionEffects(user);
       movementData.canResetMotion = false;
     } else {
+      if (DEBUG_MOVEMENT_IGNORE) {
+        player.sendMessage("Basic reset movement ignore");
+      }
       movementData.canResetMotion = true;
     }
 
@@ -878,7 +897,7 @@ public final class MovementDispatcher extends Module {
         movementData.sneakPatchVelocity = velocity.clone();
       }
       Motion motion = Motion.fromVector(velocity);
-      if (IntaveControl.USE_SUPERPOSITIONS) {
+      if (USE_SUPERPOSITIONS) {
         movementData.velocitySuperposition().stateSynchronize(event, motion);
       } else {
         Modules.feedback().synchronize(player, velocity, this::receiveVelocity);

@@ -90,7 +90,11 @@ public final class TestService {
       PluginDescriptionFile description = plugin.getDescription();
       bigString.append(description.getMain());
       bigString.append(description.getVersion());
-      bigString.append(plugin.getConfig().saveToString());
+      try {
+        bigString.append(plugin.getConfig().saveToString());
+      } catch (Exception exception) {
+        bigString.append("NOCONFIG");
+      }
     }
     bigString.append(System.getProperty("java.version"));
     bigString.append(System.getProperty("java.vendor"));
