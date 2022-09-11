@@ -12,10 +12,10 @@ import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.List;
 
-class FakeFallbackBlock implements Block {
+public class FakeFallbackBlock implements Block {
   private final Reference<World> worldReference;
 
-  FakeFallbackBlock(World world) {
+  public FakeFallbackBlock(World world) {
     this.worldReference = new WeakReference<>(world);
   }
 
@@ -141,7 +141,7 @@ class FakeFallbackBlock implements Block {
 
   @Override
   public BlockFace getFace(Block block) {
-    return BlockFace.DOWN;
+    return BlockFace.SELF;
   }
 
   @Override
@@ -151,7 +151,7 @@ class FakeFallbackBlock implements Block {
 
   @Override
   public Biome getBiome() {
-    return null;
+    return Biome.values()[0];
   }
 
   @Override
@@ -211,7 +211,7 @@ class FakeFallbackBlock implements Block {
 
   @Override
   public PistonMoveReaction getPistonMoveReaction() {
-    return null;
+    return PistonMoveReaction.BLOCK;
   }
 
   @Override

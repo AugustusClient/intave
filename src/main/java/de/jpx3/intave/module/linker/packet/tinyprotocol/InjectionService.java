@@ -3,6 +3,7 @@ package de.jpx3.intave.module.linker.packet.tinyprotocol;
 import com.comphenix.protocol.PacketType;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.check.EventProcessor;
+import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.module.linker.packet.FilteringPacketAdapter;
 import org.bukkit.Bukkit;
@@ -44,7 +45,8 @@ public final class InjectionService implements EventProcessor {
 
   @BukkitEventSubscription
   public void onJoin(PlayerJoinEvent join) {
-    inject(join.getPlayer());
+    Player player = join.getPlayer();
+    Synchronizer.synchronize(() -> inject(player));
   }
 
   @BukkitEventSubscription

@@ -100,7 +100,7 @@ public class TinyProtocol {
           synchronized (networkManagers) {
             // Stop injecting channels
             if (!closed) {
-              channel.eventLoop().submit(() -> injectChannelInternal(channel));
+//              channel.eventLoop().submit(() -> injectChannelInternal(channel));
             }
           }
         } catch (Exception exception) {
@@ -143,13 +143,13 @@ public class TinyProtocol {
         if (closed) {
           return;
         }
-        Synchronizer.synchronize(() -> {
-          Channel channel = getChannel(join.getPlayer());
-          // Don't inject players that have been explicitly uninjected
-          if (!uninjectedChannels.contains(channel)) {
-            injectPlayer(join.getPlayer());
-          }
-        });
+//        Synchronizer.synchronize(() -> {
+//          Channel channel = getChannel(join.getPlayer());
+//          // Don't inject players that have been explicitly uninjected
+//          if (!uninjectedChannels.contains(channel)) {
+//            injectPlayer(join.getPlayer());
+//          }
+//        });
       }
 
       @EventHandler
@@ -321,9 +321,9 @@ public class TinyProtocol {
    *
    * @param channel - the channel to inject.
    */
-  public void injectChannel(Channel channel) {
-    injectChannelInternal(channel);
-  }
+//  public void injectChannel(Channel channel) {
+//    injectChannelInternal(channel);
+//  }
 
   /**
    * Add a custom channel handler to the given channel.
@@ -340,8 +340,9 @@ public class TinyProtocol {
         try {
           channel.pipeline().addBefore("packet_handler", handlerName, interceptor);
         } catch (Exception exception) {
-          System.out.println("[Intave] Failed to find packet_handler pipeline element for " + channel);
-          System.out.println("[Intave] Netty broken?!");
+          IntaveLogger.logger().warn("Failed to find packet_handler pipeline element for " + channel);
+          IntaveLogger.logger().warn("Netty broken?!");
+          exception.printStackTrace();
 //          System.out.println("Available channel: " + channel.pipeline().names());
 //          throw new IllegalStateException("Unable to find packet_handler", exception);
         }

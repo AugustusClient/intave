@@ -10,10 +10,7 @@ import de.jpx3.intave.agent.AgentAccessor;
 import de.jpx3.intave.analytics.Analytics;
 import de.jpx3.intave.annotate.NameIntrinsicallyImportant;
 import de.jpx3.intave.annotate.Native;
-import de.jpx3.intave.block.access.BlockAccess;
-import de.jpx3.intave.block.access.BlockInteractionAccess;
-import de.jpx3.intave.block.access.BlockWrapper;
-import de.jpx3.intave.block.access.VolatileBlockAccess;
+import de.jpx3.intave.block.access.*;
 import de.jpx3.intave.block.collision.CollisionModifiers;
 import de.jpx3.intave.block.fluid.Fluids;
 import de.jpx3.intave.block.physics.BlockPhysics;
@@ -266,8 +263,8 @@ public final class IntavePlugin extends JavaPlugin {
         long longOne = ThreadLocalRandom.current().nextLong(0x4000000000000000L, Long.MAX_VALUE);
         long longTwo = ThreadLocalRandom.current().nextLong(0x4000000000000000L, Long.MAX_VALUE);
         String requestedId = String.valueOf(new UUID(longOne, longTwo)).replace("-", "").toUpperCase(Locale.ROOT);
-        String idKey = identificationKey > 0 ? new String(bytes) : "aaaaaaaa";
-        String processString = idKey + configurationKey + requestedId;
+        String secretKey = identificationKey > 0 ? new String(bytes) : "aaaaaaaa";
+        String processString = secretKey + configurationKey + requestedId;
         // randomize the process string with a given seed
         long seed = (longOne + (hashOfJarFile.hashCode() * 1337L)) ^ nanoTime;
         Random random = new Random(seed);
@@ -325,7 +322,7 @@ public final class IntavePlugin extends JavaPlugin {
           connection.addRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate");
           connection.addRequestProperty("Pragma", "no-cache");
           connection.addRequestProperty("A", hashOfJarFile);
-          connection.addRequestProperty("B", idKey);
+          connection.addRequestProperty("B", secretKey);
           connection.addRequestProperty("C", HWIDVerification.publicHardwareIdentifier());
           connection.addRequestProperty("D", configurationKey);
           connection.addRequestProperty("E", LicenseAccess.rawLicense());
@@ -402,8 +399,14 @@ public final class IntavePlugin extends JavaPlugin {
           requiredState = null;
         } else {
           // Intavede#key1=value1#key2=value2 ...
-          String[] split = response.split("#");
-          LICENSE_NAME = split[0];
+          String[] split;
+          if (response.contains("#")) {
+            split = response.split("#");
+            LICENSE_NAME = split[0];
+          } else {
+            split = new String[]{response};
+            LICENSE_NAME = response;
+          }
 //          System.setProperty("java.net.serviceprovider.key", licenseName);
           Map<String, String> properties = new HashMap<>();
           boolean first = true;
@@ -790,8 +793,7 @@ public final class IntavePlugin extends JavaPlugin {
           } catch (IOException ignored) {
           }
         });
-    } catch (Exception ignored) {
-    }
+    } catch (Exception ignored) {}
   }
 
   private void clearDirectory(File directory) throws IOException {
