@@ -139,7 +139,7 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
         interactionMeta.interactionList.add(interaction);
         // For items which require longer consume time, the cancellation should be done after double checking
         boolean usable = ItemProperties.canItemBeUsed(player, heldItem)
-               && interaction.itemTypeInHand() != Material.SPLASH_POTION;
+               && !ItemProperties.isPotion(interaction.itemTypeInHand());
         if (!usable) {
           event.setCancelled(true);
         }
