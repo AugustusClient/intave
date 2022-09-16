@@ -69,6 +69,6 @@ public final class v13BlockAccessor implements BlockAccessor {
     int heldItemType = user.meta().inventory().handSlot();
     IBlockData blockData = chunk.getBlockData(blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
     Item heldItem = ((CraftPlayer) player).getHandle().inventory.getItem(heldItemType).getItem();
-    return blockData.getMaterial().isReplaceable() && blockData.getBlock().getItem().getItem() == heldItem;
+    return blockData.getMaterial().isReplaceable() && blockData.getBlock().getItem().getItem() != heldItem;
   }
 }
