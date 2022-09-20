@@ -12,6 +12,7 @@ import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.annotate.Native;
 import de.jpx3.intave.cleanup.GarbageCollector;
+import de.jpx3.intave.connect.IntaveDomains;
 import de.jpx3.intave.connect.sibyl.LabyModChannelHelper;
 import de.jpx3.intave.connect.sibyl.LabymodClientListener;
 import de.jpx3.intave.executor.BackgroundExecutor;
@@ -34,7 +35,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.sql.SQLOutput;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -112,7 +112,7 @@ public final class SibylAuthentication implements BukkitEventSubscriber {
 
   @Native
   private void verifyAuthKey(String authKey, Consumer<Boolean> callback) {
-    String url_path = "https://service.intave.de/sibyl/verify";
+    String url_path = "https://"+ IntaveDomains.primaryServiceDomain() +"/sibyl/verify";
     BackgroundExecutor.execute(
         () -> {
           try {

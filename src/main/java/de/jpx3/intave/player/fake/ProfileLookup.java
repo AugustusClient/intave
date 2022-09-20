@@ -4,6 +4,7 @@ import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.comphenix.protocol.wrappers.WrappedSignedProperty;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.IntaveInternalException;
+import de.jpx3.intave.connect.IntaveDomains;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -22,7 +23,7 @@ public final class ProfileLookup {
     UUID uuid;
     boolean noConnection = false;
     try {
-      String url = "https://service.intave.de/randomid";
+      String url = "https://"+ IntaveDomains.primaryServiceDomain() +"/randomid";
       URLConnection connection = new URL(url).openConnection();
       connection.setUseCaches(false);
       connection.setDefaultUseCaches(false);

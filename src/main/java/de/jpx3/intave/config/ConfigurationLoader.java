@@ -4,6 +4,7 @@ import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.IntaveBootFailureException;
 import de.jpx3.intave.annotate.Native;
+import de.jpx3.intave.connect.IntaveDomains;
 import de.jpx3.intave.resource.legacy.EncryptedLegacyResource;
 import de.jpx3.intave.security.ContextSecrets;
 import de.jpx3.intave.security.LicenseAccess;
@@ -173,14 +174,14 @@ public final class ConfigurationLoader {
             throw new IntaveBootFailureException("Please download Intave again to use file configurations");
           }
         }
-        inputStream = new FileInputStream(settingFile);
+        inputStream = Files.newInputStream(settingFile.toPath());
       } else if (IntaveControl.USE_DEBUG_RESOURCES) {
         inputStream = ConfigurationLoader.class.getResourceAsStream("/settings.yml");
         if (inputStream == null) {
           throw new IntaveBootFailureException("Debug resources not found");
         }
       } else {
-        URL url = new URL("https://service.intave.de/settings/download");
+        URL url = new URL("https://"+ IntaveDomains.primaryServiceDomain()+"/settings/download");
         URLConnection urlConnection = url.openConnection();
         urlConnection.addRequestProperty("User-Agent", "Intave/" + IntavePlugin.version());
         urlConnection.addRequestProperty("Cache-Control", "no-cache, no-store, must-revalidate");

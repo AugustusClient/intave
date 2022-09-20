@@ -1,12 +1,17 @@
 package de.jpx3.intave.user.meta;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketContainer;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.annotate.DispatchTarget;
 import de.jpx3.intave.annotate.Relocate;
 import de.jpx3.intave.module.feedback.DelayedPacket;
 import de.jpx3.intave.module.feedback.FeedbackRequest;
 import de.jpx3.intave.module.tracker.entity.EntityShade;
+import de.jpx3.intave.packet.PacketSender;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -102,6 +107,17 @@ public final class ConnectionMetadata {
       transactionSum /= 2;
       transactionNum /= 2;
     }
+    if (IntaveControl.LATENCY_PING_AS_XP_LEVEL && transactionNum % 10 == 0) {
+      sendPacketWithExperience(player, (int) transactionPingAverage());
+    }
+  }
+
+  private void sendPacketWithExperience(Player player, int level) {
+    PacketContainer packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.EXPERIENCE);
+    packet.getFloat().write(0, 0f);
+    packet.getIntegers().write(0, 0);
+    packet.getIntegers().write(1, level);
+    PacketSender.sendServerPacket(player, packet);
   }
 
   public long transactionPingAverage() {

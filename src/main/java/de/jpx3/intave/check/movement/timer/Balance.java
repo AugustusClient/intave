@@ -99,15 +99,16 @@ public final class Balance extends MetaCheckPart<Timer, Balance.BalanceMeta> {
       timerData.timerBalance += timerData.timerBalance < -400 ? 45 : 15;
     }
     statisticApply(user, CheckStatistics::increaseTotal);
-    boolean suspicious = violationLevelOf(user) > 10 && !user.trustFactor().atLeast(TrustFactor.ORANGE) && System.currentTimeMillis() - timerData.lastTimerFlag < 2000;
+    boolean suspicious = /*violationLevelOf(user) > 10 && */!user.trustFactor().atLeast(TrustFactor.ORANGE) /*&& System.currentTimeMillis() - timerData.lastTimerFlag < 2000*/;
     int overflowLimit = highToleranceMode ? 750 : (suspicious ? 100 : 250);
 
+    player.sendMessage("timer: " + timerData.timerBalance + " / " + overflowLimit);
     if (timerData.timerBalance > overflowLimit && !user.meta().movement().isInVehicle()) {
       String balanceAsString = MathHelper.formatDouble(timerData.timerBalance / 50, 2);
       statisticApply(user, CheckStatistics::increaseFails);
       Violation violation = Violation.builderFor(Timer.class).forPlayer(player)
-        .withMessage("moved too frequently").withDetails(balanceAsString + " ticks ahead").withVL(0.5)
-        .build();
+        .withMessage("moved too frequently").withDetails(balanceAsString + " ticks ahead")
+        .withVL(System.currentTimeMillis() - timerData.lastTimerFlag < 1000 || violationLevelOf(user) > 16 ? 0.25 : 1).build();
       ViolationContext violationContext = Modules.violationProcessor().processViolation(violation);
       if (violationContext.shouldCounterThreat()) {
         MovementMetadata movementData = user.meta().movement();

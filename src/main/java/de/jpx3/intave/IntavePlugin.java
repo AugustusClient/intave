@@ -690,6 +690,10 @@ public final class IntavePlugin extends JavaPlugin {
       logger.info(ChatColor.YELLOW + "This version will use the Intave/locate file for class mappings");
     }
 
+    if (IntaveControl.LATENCY_PING_AS_XP_LEVEL) {
+      logger.info(ChatColor.YELLOW + "This version sets the latency ping as the player's xp level");
+    }
+
     registerNativeCheck();
 
     Modules.linker().packetEvents().refreshLinkages();

@@ -33,7 +33,6 @@ public final class AttackInInvalidStateHeuristic extends MetaCheckPart<Heuristic
   }
 
   @PacketSubscription(
-//    priority = ListenerPriority.HIGH,
     packetsIn = {
       USE_ENTITY
     }
@@ -60,13 +59,10 @@ public final class AttackInInvalidStateHeuristic extends MetaCheckPart<Heuristic
   private void checkBlocking(PacketEvent event) {
     Player player = event.getPlayer();
     User user = userOf(player);
-
     // Disable check on 1.9+ due to inconsitencies in mc source
     if (user.protocolVersion() > 47) {
       return;
     }
-
-
     // not checked yet
     if (user.meta().inventory().handActive()) {
       Anomaly anomaly = Anomaly.anomalyOf("162", Confidence.NONE, Anomaly.Type.KILLAURA, "attacked whilst using an item");
@@ -86,11 +82,8 @@ public final class AttackInInvalidStateHeuristic extends MetaCheckPart<Heuristic
       packet.getBlockPositionModifier().write(0, new BlockPosition(0, 0, 0));
       packet.getDirections().write(0, EnumWrappers.Direction.DOWN);
       packet.getPlayerDigTypes().write(0, EnumWrappers.PlayerDigType.RELEASE_USE_ITEM);
-
       userOf(player).ignoreNextInboundPacket();
       PacketSender.receiveClientPacketFrom(player, packet);
-//        ProtocolLibrary.getProtocolManager().recieveClientPacket(player, packet, true);
-
       updatePlayerHandItem(player);
     }
     Synchronizer.synchronize(player::updateInventory);

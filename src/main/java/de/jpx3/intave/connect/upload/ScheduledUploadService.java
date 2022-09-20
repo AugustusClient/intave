@@ -3,6 +3,7 @@ package de.jpx3.intave.connect.upload;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.annotate.Native;
 import de.jpx3.intave.cleanup.ShutdownTasks;
+import de.jpx3.intave.connect.IntaveDomains;
 import de.jpx3.intave.executor.BackgroundExecutor;
 import de.jpx3.intave.security.ContextSecrets;
 import de.jpx3.intave.security.HWIDVerification;
@@ -211,7 +212,7 @@ public final class ScheduledUploadService {
       }
     }
     try {
-      URL url = new URL("https://service.intave.de/analytics/upload");
+      URL url = new URL("https://"+ IntaveDomains.primaryServiceDomain() +"/analytics/upload");
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setDoOutput(true);
       connection.setRequestMethod("POST");

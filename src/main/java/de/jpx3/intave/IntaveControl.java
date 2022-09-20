@@ -6,6 +6,7 @@ public final class IntaveControl {
   public static final boolean DEBUG_MOVEMENT = false;
   public static final boolean DEBUG_EMULATION = false;
   public static final boolean DEBUG_HEURISTICS = false;
+  public static final boolean LATENCY_PING_AS_XP_LEVEL = false;
   public static final boolean DEBUG_MOVEMENT_IGNORE = false;
   public static final boolean DEBUG_TELEPORT_LOCKS = false;
   public static final boolean DEBUG_TELEPORT_CAUSE_AND_CAUSER = false;
