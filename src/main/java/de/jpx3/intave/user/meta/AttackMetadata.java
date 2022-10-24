@@ -8,6 +8,8 @@ import de.jpx3.intave.module.tracker.entity.EntityShade;
 import de.jpx3.intave.module.tracker.entity.EntityShade.EntityPositionContext;
 import de.jpx3.intave.module.tracker.entity.EntityTracker;
 import de.jpx3.intave.player.fake.FakePlayer;
+import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.share.ClientMathHelper;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import org.bukkit.entity.Player;
@@ -25,7 +27,9 @@ public final class AttackMetadata {
 
   private EntityShade lastAttackedEntity;
   private float perfectYaw, perfectPitch;
+  private float perfectClosestYaw;
   private float previousPerfectYaw, previousPerfectPitch;
+  private float previousPerfectClosestYaw;
 
   @Nullable
   public MiningStrategyContainer activeMiningStrategy;
@@ -61,8 +65,10 @@ public final class AttackMetadata {
       EntityPositionContext lastPosition = lastAttackedEntity.lastPosition;
       perfectYaw = resolveYawRotation(currentPosition, positionX, positionZ);
       perfectPitch = resolvePitchRotation(currentPosition, positionX, positionY, positionZ);
+      perfectClosestYaw = resolveClosestYawRotation(lastAttackedEntity, currentPosition, positionX, positionZ);
       previousPerfectYaw = resolveYawRotation(lastPosition, lastPositionX, lastPositionZ);
       previousPerfectPitch = resolvePitchRotation(lastPosition, lastPositionX, lastPositionY, lastPositionZ);
+      previousPerfectClosestYaw = resolveClosestYawRotation(lastAttackedEntity, lastPosition, lastPositionX, lastPositionZ);
     }
   }
 
@@ -84,6 +90,17 @@ public final class AttackMetadata {
     double diffZ = entityPositions.posZ - posZ;
     double d3 = Math.sqrt(diffX * diffX + diffZ * diffZ);
     return (float) (-Math.atan2(diffY, d3) * 180.0 / Math.PI);
+  }
+
+  private static float resolveClosestYawRotation(
+    EntityShade entity,
+    EntityShade.EntityPositionContext entityPositions,
+    double posX, double posZ
+  ) {
+    BoundingBox targetBoundingBox = EntityShade.entityBoundingBoxFrom(entityPositions, entity);
+    double bestTargetX = ClientMathHelper.clamp_double(posX, targetBoundingBox.minX, targetBoundingBox.maxX);
+    double bestTargetZ = ClientMathHelper.clamp_double(posZ, targetBoundingBox.minZ, targetBoundingBox.maxZ);
+    return resolveYawRotation(entityPositions, bestTargetX, bestTargetZ);
   }
 
   public FakePlayer fakePlayer() {
