@@ -12,14 +12,11 @@ import de.jpx3.intave.block.shape.resolve.BlockShapeDrillTests;
 import de.jpx3.intave.block.shape.resolve.BlockShapePipelineTests;
 import de.jpx3.intave.check.EventProcessor;
 import de.jpx3.intave.executor.Synchronizer;
-import de.jpx3.intave.klass.locate.ReferenceExistenceTests;
 import de.jpx3.intave.module.Modules;
-import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscriber;
 import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.resource.Resource;
 import de.jpx3.intave.resource.Resources;
 import de.jpx3.intave.security.HashAccess;
-import net.minecraft.server.MinecraftServer;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.world.WorldLoadEvent;
@@ -33,14 +30,15 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 @HighOrderService
 public final class TestService implements EventProcessor {
   private static final Resource environmentHashResource = Resources.fileCache("environmentHashes");
-  private static final List<String> supportedEnvironments = environmentHashResource.lines();
+  private static final Map<String, Long> supportedEnvironments = environmentHashResource.lines().stream().map(line -> line.split(":")).collect(Collectors.toMap(split -> split[0], split -> Long.parseLong(split[1])));
   private static final String environmentHash = environmentHash();
 
   private static String environmentHash() {
@@ -90,11 +88,9 @@ public final class TestService implements EventProcessor {
   private static YamlConfiguration loadConfiguration(Plugin plugin) {
     YamlConfiguration config = new YamlConfiguration();
     InputStream resource = plugin.getResource("config.yml");
-
     if (resource == null) {
       return null;
     }
-
     try {
       InputStreamReader reader = new InputStreamReader(resource, Charsets.UTF_8);
       config.load(reader);
@@ -171,14 +167,17 @@ public final class TestService implements EventProcessor {
   }
 
   public boolean environmentKnown() {
-//    return true;
     String environmentHash = environmentHash();
-    return supportedEnvironments.contains(environmentHash);
+    return supportedEnvironments.containsKey(environmentHash);
   }
 
+  private static final long MILLIS_IN_A_MONTH = 1000L * 60L * 60L * 24L * 30L;
+
   public void dontCheckThisEnvironmentAgain() {
-    supportedEnvironments.add(environmentHash);
-    environmentHashResource.write(supportedEnvironments);
+    supportedEnvironments.put(environmentHash, System.currentTimeMillis());
+    // delete system older than 1 month
+    supportedEnvironments.entrySet().removeIf(entry -> entry.getValue() < System.currentTimeMillis() - MILLIS_IN_A_MONTH);
+    environmentHashResource.write(supportedEnvironments.entrySet().stream().map(entry -> entry.getKey() + ":" + entry.getValue()).collect(Collectors.joining(System.lineSeparator())));
   }
 
   public void performTest(Class<? extends Tests> testsClass) {
