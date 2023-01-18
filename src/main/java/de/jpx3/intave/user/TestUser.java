@@ -248,7 +248,7 @@ final class TestUser implements User {
   }
 
   @Override
-  public void applyShortAttackStimulus(AttackNerfStrategy strategy, String checkId) {
+  public void nerfOnce(AttackNerfStrategy strategy, String checkId) {
 
   }
 

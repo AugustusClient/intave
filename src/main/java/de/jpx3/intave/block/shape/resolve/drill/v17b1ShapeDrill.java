@@ -67,8 +67,7 @@ public final class v17b1ShapeDrill extends AbstractShapeDrill {
       return BlockShapes.cubeAt(posX, posY, posZ);
     }
     // convert complex blocks to native BBs
-    List<AxisAlignedBB> nativeBoxes = shape.toList();
-    return translateWithOffset(nativeBoxes, posX, posY, posZ);
+    return translateWithOffset(shape.toList(), posX, posY, posZ);
   }
 
   @PatchyAutoTranslation

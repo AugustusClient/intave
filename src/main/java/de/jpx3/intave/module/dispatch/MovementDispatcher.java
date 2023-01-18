@@ -173,9 +173,13 @@ public final class MovementDispatcher extends Module {
     if (toLocation.getWorld() != player.getWorld() || toLocation.distance(fromLocation) > 8) {
       BoundingBox bb = BoundingBox.fromPosition(user, toLocation);
       int shiftAllowed = 5;
+      Location oldToLocation = toLocation.clone();
       while (toLocation.getY() < WorldHeight.UPPER_WORLD_LIMIT && shiftAllowed-- > 0 && Collision.unsafePresent(world, player, bb) && Collision.unsafeNonePresent(world, player, bb.offset(0, 0.5, 0))) {
         toLocation.add(0, 0.1, 0);
         bb = BoundingBox.fromPosition(user, toLocation);
+      }
+      if (IntaveControl.DEBUG_STUCK_REVIVAL) {
+        player.sendMessage("SREV " + shiftAllowed + " " + toLocation.distance(oldToLocation) + " cause " + cause);
       }
       event.setTo(toLocation);
     }
@@ -218,6 +222,9 @@ public final class MovementDispatcher extends Module {
     while (respawnLocation.getY() < WorldHeight.UPPER_WORLD_LIMIT && shiftAllowed-- > 0 && Collision.unsafePresent(world, player, bb) && Collision.unsafeNonePresent(world, player, bb.offset(0, 0.5, 0))) {
       respawnLocation.add(0, 0.1, 0);
       bb = BoundingBox.fromPosition(user, respawnLocation);
+      if (IntaveControl.DEBUG_STUCK_REVIVAL) {
+        player.sendMessage("SREV " + shiftAllowed + " " + respawnLocation.distance(respawn.getRespawnLocation()) + " respawn");
+      }
     }
     respawn.setRespawnLocation(respawnLocation);
   }
@@ -379,7 +386,7 @@ public final class MovementDispatcher extends Module {
       }
     }
 
-    if (hasMovement || movementData.isInVehicle()) {
+    if (hasMovement || movementData.isInVehicle() || movementData.inRespawnScreen) {
       movementData.lastPositionUpdate = 0;
     } else if (++movementData.lastPositionUpdate > 20 && FaultKicks.MISSING_POSITION_UPDATE && !user.trustFactor().atLeast(TrustFactor.BYPASS)) {
       user.kick("Missing position update");
@@ -505,7 +512,7 @@ public final class MovementDispatcher extends Module {
       interactionRaytraceCheck.receiveMovement(event);
 
       if (hasMovement || hasRotation) {
-        physicsCheck.receiveMovement(user);
+        physicsCheck.receiveMovement(user, hasMovement, hasRotation);
       } else {
         physicsCheck.updateOnGroundIfFlying(user);
       }
@@ -586,10 +593,8 @@ public final class MovementDispatcher extends Module {
     packet.getDirections().write(0, EnumWrappers.Direction.DOWN);
     packet.getPlayerDigTypes().write(0, EnumWrappers.PlayerDigType.RELEASE_USE_ITEM);
     user.ignoreNextInboundPacket();
-
     PacketSender.receiveClientPacketFrom(player, packet);
     updatePlayerHandItem(player);
-
     Synchronizer.synchronize(player::updateInventory);
   }
 
@@ -730,6 +735,7 @@ public final class MovementDispatcher extends Module {
       movement.sneakingTicks = 0;
     }
     movement.pastBlockPlacement++;
+    inventoryData.pastSlotSwitch++;
     inventoryData.pastHotBarSlotChange++;
     inventoryData.pastItemUsageTransition++;
     movement.pastWaterMovement++;

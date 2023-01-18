@@ -88,14 +88,14 @@ public final class BlockRotation extends MetaCheckPart<PlacementAnalysis, BlockR
 
     if (movement.rotationPitch > 85 && average < 400) {
       if (meta.vl++ > 3) {
-        String details = "pitch of " + ((int) movement.rotationPitch) + " placing blocks in " + MathHelper.formatDouble(average, 2) + " ms/block";
+        int pitch = (int) movement.rotationPitch;
+        int ticksPerBlock = (int) (average / 50d);
+        String details = "pitch of " + pitch + " placing blocks in " + ticksPerBlock + " t/b";
         Violation violation = Violation.builderFor(PlacementAnalysis.class)
           .forPlayer(player).withMessage(COMMON_FLAG_MESSAGE).withDetails(details)
-          .withDefaultThreshold().withVL(4).build();
+          .withDefaultThreshold().withVL(10).build();
         Modules.violationProcessor().processViolation(violation);
       }
-//      event.setCancelled(true);
-//      Synchronizer.synchronizeDelayed(() -> refreshBlocksAround(player, blockPosition.toLocation(player.getWorld())), 20);
     } else if (meta.vl > 0) {
       meta.vl *= 0.98;
       meta.vl -= 0.002;

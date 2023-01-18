@@ -159,6 +159,11 @@ public final class StorageTests extends Tests {
       data = input.readInt();
     }
 
+    @Override
+    public int version() {
+      return 0;
+    }
+
     public int data() {
       return data;
     }

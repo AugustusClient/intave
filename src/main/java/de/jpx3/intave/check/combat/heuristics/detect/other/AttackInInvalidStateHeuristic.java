@@ -6,6 +6,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.EnumWrappers;
+import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.adapter.ProtocolLibraryAdapter;
 import de.jpx3.intave.check.MetaCheckPart;
@@ -19,6 +20,7 @@ import de.jpx3.intave.packet.PacketSender;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.*;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.USE_ENTITY;
@@ -85,6 +87,9 @@ public final class AttackInInvalidStateHeuristic extends MetaCheckPart<Heuristic
       userOf(player).ignoreNextInboundPacket();
       PacketSender.receiveClientPacketFrom(player, packet);
       updatePlayerHandItem(player);
+      if (IntaveControl.DEBUG_ITEM_USAGE) {
+        player.sendMessage(ChatColor.RED + "Manual stop use item packet sent");
+      }
     }
     Synchronizer.synchronize(player::updateInventory);
   }

@@ -218,7 +218,7 @@ public final class BlockingHeuristic extends MetaCheckPart<Heuristics, BlockingH
 
   @PacketSubscription(
     packetsIn = {
-      HELD_ITEM_SLOT
+      HELD_ITEM_SLOT_IN
     }
   )
   public void receiveHeldItemSlot(PacketEvent event) {

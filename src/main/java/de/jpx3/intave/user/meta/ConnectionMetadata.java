@@ -5,6 +5,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gson.JsonObject;
 import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.annotate.DispatchTarget;
 import de.jpx3.intave.annotate.Relocate;
@@ -21,8 +22,8 @@ import java.util.concurrent.ThreadLocalRandom;
 @Relocate
 public final class ConnectionMetadata {
   private final Player player;
-  private final Map<Short, FeedbackRequest<?>> transactionShortMap = Maps.newConcurrentMap();
   private final Map<Long, FeedbackRequest<?>> transactionGlobalKeyMap = Maps.newConcurrentMap();
+  private final Map<Short, FeedbackRequest<?>> transactionShortMap = Maps.newConcurrentMap();
   private final Map<Long, Queue<FeedbackRequest<?>>> transactionOptionalAppendixMap = Maps.newConcurrentMap();
   private final Map<Integer, Entity> entitiesById = Maps.newConcurrentMap();
   private final Set<Integer> entityIds = new HashSet<>();
@@ -43,10 +44,14 @@ public final class ConnectionMetadata {
   @Deprecated
   public boolean markAttackInvalid;
 
+  public int windowClickId;
+
   public enum DecoySide {
     FIRST_IS_DECOY,
     SECOND_IS_DECOY,
   }
+
+  public int pendingTransactions;
 
 //  private final Set<Integer> takenLocalEntityIds = new HashSet<>();
   private int localEntityIdCounter = 1;
@@ -84,6 +89,9 @@ public final class ConnectionMetadata {
   // Lag identification
   private long lastMovementTimestamps;
   private final List<Long> movementLagSpikeHistory = new ArrayList<>();
+
+  // labymod data
+  public JsonObject labyModData = new JsonObject();
 
   public ConnectionMetadata(Player player) {
     this.player = player;

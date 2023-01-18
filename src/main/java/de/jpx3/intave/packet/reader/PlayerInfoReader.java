@@ -21,6 +21,7 @@ public final class PlayerInfoReader extends AbstractPacketReader {
   }
 
   public List<PlayerInfoData> playerInfoData() {
-    return packet().getLists(PlayerInfoDataConverter.threadConverter()).read(0);
+//    return packet().getPlayerInfoDataLists().read(0);
+    return packet().getModifier().withType(List.class, PlayerInfoDataConverter.threadConverter()).read(0);
   }
 }

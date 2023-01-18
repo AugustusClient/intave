@@ -5,6 +5,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntaveLogger;
 import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.executor.Synchronizer;
@@ -16,6 +17,7 @@ import de.jpx3.intave.user.meta.ConnectionMetadata;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayDeque;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -25,8 +27,8 @@ import java.util.function.Consumer;
 import static de.jpx3.intave.module.feedback.FeedbackOptions.*;
 
 public final class FeedbackSender extends Module {
-  public static final short TRANSACTION_MIN_CODE = -32768;
-  public static final short TRANSACTION_MAX_CODE = -16370;
+  public static final short TRANSACTION_MIN_CODE = 0;
+  public static final short TRANSACTION_MAX_CODE = 24000;
   public static final int PING_MASK = 0xf5550000;
   private static final boolean USE_PING_PONG_PACKETS = MinecraftVersions.VER1_17_0.atOrAbove();
   private static final long OPTIONAL_PENDING_LIMIT = 20;
@@ -248,21 +250,21 @@ public final class FeedbackSender extends Module {
     Player player, T obj, FeedbackCallback<T> callback, FeedbackTracker tracker
   ) {
     User user = UserRepository.userOf(player);
-    ConnectionMetadata synchronizeData = user.meta().connection();
+    ConnectionMetadata connection = user.meta().connection();
     if (obj == null) {
       //noinspection unchecked
       obj = (T) FALLBACK_OBJECT;
     }
     short transactionKey = findAvailableTransactionIdFor(player);
-    long transactionNumCounter = synchronizeData.transactionNumCounter++;
+    long transactionNumCounter = connection.transactionNumCounter++;
     FeedbackRequest<T> feedbackEntry = new FeedbackRequest<>(callback, tracker, obj, transactionKey, transactionNumCounter);
-    synchronizeData.transactionShortKeyMap().put(transactionKey, feedbackEntry);
-    synchronizeData.transactionGlobalKeyMap().put(transactionNumCounter, feedbackEntry);
-//    return transactionKey;
+    connection.transactionShortKeyMap().put(transactionKey, feedbackEntry);
+    connection.transactionGlobalKeyMap().put(transactionNumCounter, feedbackEntry);
+    connection.pendingTransactions++;
     return feedbackEntry;
   }
 
-  private static final short ID_START = (short) (USE_PING_PONG_PACKETS ? 13 : TRANSACTION_MIN_CODE + ThreadLocalRandom.current().nextInt(0, 1000));
+  private static final short ID_START = 0;//(short) (USE_PING_PONG_PACKETS ? 13 : TRANSACTION_MIN_CODE + ThreadLocalRandom.current().nextInt(0, 1000));
 
   private /* synchronized (is already always sync) */ short findAvailableTransactionIdFor(Player player) {
     User user = UserRepository.userOf(player);
@@ -323,6 +325,10 @@ public final class FeedbackSender extends Module {
         packetCache[index] = packet;
       }
     }
+    if (IntaveControl.DEBUG_FEEDBACK_PACKETS) {
+//      System.out.println("Received " + transactionIdentifier + "/" +transactionResponse.num() + " from " + player.getName());
+      System.out.println("Sent " + id + "/"+request.num() + " to " + receiver.getName());
+    }
     sendPacket(receiver, packet);
     request.sent();
   }
@@ -332,7 +338,7 @@ public final class FeedbackSender extends Module {
   }
 
   private static long pendingTransactions(User user) {
-    return user.meta().connection().transactionShortKeyMap().size();
+    return user.meta().connection().pendingTransactions;
   }
 
   private User userOf(Player player) {

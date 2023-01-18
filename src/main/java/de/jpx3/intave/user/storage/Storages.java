@@ -8,6 +8,7 @@ public final class Storages {
     storage.append(PlaytimeStorage.class);
     storage.append(ViolationStorage.class);
     storage.append(HeuristicsStorage.class);
+    storage.append(NerferStorage.class);
     return storage;
   }
 }

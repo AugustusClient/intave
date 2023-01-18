@@ -21,6 +21,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Deque;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.DelayQueue;
 
 import static de.jpx3.intave.module.linker.packet.PacketId.Server.*;
@@ -95,7 +96,7 @@ public final class PacketDelayer extends Module {
       CUSTOM_SOUND_EFFECT,
       NAMED_SOUND_EFFECT,
       ANIMATION,
-      CHAT,
+      CHAT_OUT,
     }
   )
   public void enqueueOutgoingPackets(PacketEvent event) {

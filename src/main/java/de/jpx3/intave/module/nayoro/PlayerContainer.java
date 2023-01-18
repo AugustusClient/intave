@@ -45,5 +45,6 @@ public interface PlayerContainer {
   void debug(String message);
   void nerf(AttackNerfStrategy strategy, String originCode);
   void noteAnomaly(String key, Confidence confidence, String description);
+  @Deprecated
   void applyIfUserPresent(Consumer<User> action);
 }

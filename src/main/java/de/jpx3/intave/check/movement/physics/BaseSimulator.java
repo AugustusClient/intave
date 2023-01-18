@@ -139,7 +139,7 @@ class BaseSimulator extends Simulator {
     Material material = VolatileBlockAccess.typeAccess(user, user.player().getWorld(), position);
     if (MaterialMagic.isLiquid(material)) {
       BlockVariant variant = VolatileBlockAccess.variantAccess(user, position);
-      return variant.propertyOf("level");
+      return variant == null ? -1 : variant.propertyOf("level");
     } else {
       return -1;
     }
@@ -447,6 +447,7 @@ class BaseSimulator extends Simulator {
       }
     }
     movementData.increaseFlyingPacket();
+    movementData.pastEntityUse++;
     if (movementData.pastPlayerAttackPhysics < 100) {
       movementData.pastPlayerAttackPhysics++;
     }

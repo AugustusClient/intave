@@ -106,7 +106,7 @@ public final class Collision {
           Material material = stateAccess.typeAt(x, y, z);
           if (CollisionModifiers.isModified(material)) {
             // this should not happen too often
-            resolve = CollisionModifiers.modified(material, user, playerBox, x, y, z, resolve, CollisionRequestType.MOTION_CALCULATION);
+            resolve = CollisionModifiers.modified(user, playerBox, material, x, y, z, resolve, CollisionRequestType.MOTION_CALCULATION);
           }
           boolean blockOutsideBorder = !blockInsideBorder(world, x, z);
           if (blockOutsideBorder && !movementData.outsideBorder) {
@@ -133,10 +133,7 @@ public final class Collision {
         }
       }
     }
-    if (container == null) {
-      return escapeReturn.get();
-    }
-    return finisher.apply(container);
+    return container == null ? escapeReturn.get() : finisher.apply(container);
   }
 
   public static <C, R> R collectCollidingPositions(
@@ -271,7 +268,7 @@ public final class Collision {
                 Material material = stateAccess.typeAt(x, y, z);
                 if (CollisionModifiers.isModified(material)) {
                   blockShape = CollisionModifiers.modified(
-                    material, user, playerBoundingBox, x, y, z, blockShape, CollisionRequestType.INTERSECTION_CHECK
+                    user, playerBoundingBox, material, x, y, z, blockShape, CollisionRequestType.INTERSECTION_CHECK
                   );
                 }
                 boolean blockOutsideBorder = !blockInsideBorder(world, x, z);

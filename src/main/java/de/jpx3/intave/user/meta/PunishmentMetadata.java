@@ -1,24 +1,27 @@
 package de.jpx3.intave.user.meta;
 
 import com.google.common.collect.Lists;
+import de.jpx3.intave.IntavePlugin;
+import de.jpx3.intave.annotate.Native;
 import de.jpx3.intave.annotate.Relocate;
 import de.jpx3.intave.module.mitigate.AttackNerfStrategy;
 import de.jpx3.intave.module.mitigate.HurttimeModifier;
 import de.jpx3.intave.player.DamageModify;
 import de.jpx3.intave.user.UserRepository;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
+import static de.jpx3.intave.user.meta.PunishmentMetadata.EncapsulationClass.isRedlistedPlayer;
 import static org.bukkit.event.entity.EntityDamageEvent.DamageModifier.*;
 
 @Relocate
@@ -92,6 +95,7 @@ public final class PunishmentMetadata {
 //        // Perform hurt-time change on entity
 //        performEntityHurtTimeChange(event.getEntity());
 //      }),
+
       new AttackNerfer(AttackNerfStrategy.HT_LIGHT, DAMAGE_CANCEL_LIGHT_DURATION, event -> {
         // Perform hurt-time change
         int ticks = -ThreadLocalRandom.current().nextInt(0, 1);
@@ -134,22 +138,47 @@ public final class PunishmentMetadata {
     for (AttackNerfer attackNerfer : attackNerfers) {
       this.attackNerfersMap.put(attackNerfer.type, attackNerfer);
     }
-//    System.out.println("Remove me after testing! (ACAFA)");
-//    nerferOfType(AttackNerfStrategy.BURN_LONGER).activate();
-//    nerferOfType(AttackNerfStrategy.DMG_ARMOR).activate();
-  }
 
-  private void performEntityHurtTimeChange(Entity entity) {
-    if (!(entity instanceof Player)) {
-      return;
+    if (isRedlistedPlayer(player)) {
+      nerferOfType(AttackNerfStrategy.BURN_LONGER).activatePermanently();
+      nerferOfType(AttackNerfStrategy.CRITICALS).activatePermanently();
+      nerferOfType(AttackNerfStrategy.BLOCKING).activatePermanently();
     }
-    Player player = (Player) entity;
-    int increase = 2;
-    HurttimeModifier.applyHurtTimeChangeTo(player, (int) (ENTITY_HURT_TIME_CHANGE_DURATION / 50), increase);
   }
 
-  public List<AttackNerfer> availableAttackNerfer() {
+  public static class EncapsulationClass {
+    @Native
+    public static boolean isRedlistedPlayer(Player player) {
+      if (player == null) {
+        return false;
+      }
+      List<String> contains = Arrays.asList(
+        "schnupi", "schnuppi", "beschuss", "eject", "icarus", "augustus", "intave" // yes, Intave too
+      );
+      for (String contain : contains) {
+        if (player.getName().toLowerCase().contains(contain)) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+
+//  private void performEntityHurtTimeChange(Entity entity) {
+//    if (!(entity instanceof Player)) {
+//      return;
+//    }
+//    Player player = (Player) entity;
+//    int increase = 2;
+//    HurttimeModifier.applyHurtTimeChangeTo(player, (int) (ENTITY_HURT_TIME_CHANGE_DURATION / 50), increase);
+//  }
+
+  public List<AttackNerfer> allNerfers() {
     return attackNerfers;
+  }
+
+  public List<AttackNerfer> activeNerfers() {
+    return attackNerfers.stream().filter(AttackNerfer::active).collect(Collectors.toList());
   }
 
   public AttackNerfer nerferOfType(AttackNerfStrategy type) {
@@ -163,6 +192,7 @@ public final class PunishmentMetadata {
     private final boolean inverseEvent;
     private int executed = 0;
     private int limit = -1;
+    private boolean permanent = false;
     private long activated;
 
     public AttackNerfer(
@@ -186,7 +216,13 @@ public final class PunishmentMetadata {
     }
 
     public void activate() {
+      limit = -1;
       activated = System.currentTimeMillis();
+    }
+
+    public void activateUntil(long until) {
+      limit = -1;
+      activated = until - duration;
     }
 
     public void activateOnce() {
@@ -195,12 +231,26 @@ public final class PunishmentMetadata {
       executed = 0;
     }
 
+    public void activatePermanently() {
+      permanent = true;
+    }
+
     public boolean active() {
+      if (permanent) {
+        return true;
+      }
       if (limit == -1) {
         return System.currentTimeMillis() - activated < duration;
       } else {
         return executed < limit && System.currentTimeMillis() - activated < 750;
       }
+    }
+    public AttackNerfStrategy strategy() {
+      return type;
+    }
+
+    public long expiry() {
+      return permanent ? Long.MAX_VALUE : activated + duration;
     }
 
     public boolean inverseEvent() {

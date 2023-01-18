@@ -5,7 +5,6 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedBlockData;
 import de.jpx3.intave.IntaveControl;
-import de.jpx3.intave.IntaveLogger;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.check.MitigationStrategy;
 import de.jpx3.intave.access.player.trust.TrustFactor;
@@ -114,7 +113,7 @@ public final class Physics extends Check {
   }
 
   @DispatchTarget
-  public void receiveMovement(User user) {
+  public void receiveMovement(User user, boolean withMovement, boolean withRotation) {
     MetadataBundle meta = user.meta();
     MovementMetadata movementData = meta.movement();
     ProtocolMetadata clientData = meta.protocol();
@@ -152,10 +151,19 @@ public final class Physics extends Check {
     // evaluation
     evaluateBestSimulation(user, simulation);
     Timings.CHECK_PHYSICS_EVAL.stop();
-    movementData.lastMovement = System.currentTimeMillis();
+    if (withMovement) {
+      movementData.lastMovement = System.currentTimeMillis();
+    }
+    if (withRotation) {
+      if (movementData.rotationYaw != movementData.lastRotationYaw || movementData.rotationPitch != movementData.lastRotationPitch) {
+        movementData.lastRotation = System.currentTimeMillis();
+      }
+    }
     movementData.lastKeyStrafe = movementData.keyStrafe;
     movementData.lastKeyForward = movementData.keyForward;
-    movementData.pastRiptideSpin++;
+    if (movementData.pastRiptideSpin++ > 40) {
+      movementData.highestLocalRiptideLevel = 0;
+    }
   }
 
   private void simulateMotionClamp(User user) {
@@ -281,11 +289,10 @@ public final class Physics extends Check {
     if (clientData.waterUpdate()) {
       movementData.inWater = Fluids.handleFluidAcceleration(user, movementData.boundingBox());
     } else {
-      BoundingBox entityBoundingBox = movementData.boundingBox();
-      BoundingBox checkableBoundingBox = entityBoundingBox
+      BoundingBox boundingBox = movementData.boundingBox()
         .grow(0.0D, -0.4000000059604645D, 0.0D)
         .contract(0.001D, 0.001D, 0.001D);
-      movementData.inWater = LegacyWaterflow.handleMaterialAcceleration(user, checkableBoundingBox);
+      movementData.inWater = LegacyWaterflow.handleMaterialAcceleration(user, boundingBox);
     }
     if (movementData.inWater) {
       movementData.pastWaterMovement = 0;
@@ -303,6 +310,7 @@ public final class Physics extends Check {
     boolean spectator = player.getGameMode() == GameMode.SPECTATOR;
 
     MovementMetadata movementData = meta.movement();
+    InventoryMetadata inventory = meta.inventory();
     ProtocolMetadata protocolMetadata = meta.protocol();
     ViolationMetadata violationLevelData = meta.violationLevel();
     AbilityMetadata abilityData = meta.abilities();
@@ -355,14 +363,14 @@ public final class Physics extends Check {
       && !movementData.collidedWithBoat();
 
     if (checkVelocity && movementData.pastExternalVelocity < 10 && !movementData.recentlyEncounteredFlyingPacket(2)) {
-      if (distance > 0.008 && !onLadder) {
-        boolean aggressive = violationLevelData.physicsVelocityVL++ >= VELOCITY_VL_THRESHOLD;
+      if (distance > 0.005 && !onLadder) {
+        boolean aggressive = violationLevelData.physicsVelocityVL++ >= VELOCITY_VL_THRESHOLD || movementData.pastExternalVelocity == 0;
         if (aggressive || distance > 0.01) {
           if (aggressive) {
             horizontalViolationIncrease = Math.max(2, horizontalViolationIncrease);
             velocityDetected = true;
           }
-          horizontalViolationIncrease *= 10.0;
+          horizontalViolationIncrease *= 20.0;
         }
       }
     }
@@ -375,7 +383,10 @@ public final class Physics extends Check {
     // trustfactor limit is just temporary
     boolean suspectSafeWalk = !user.trustFactor().atLeast(TrustFactor.YELLOW);
     if (distance > 0.008 && suspectSafeWalk && movementData.pastBlockPlacement <= 8 && horizontalViolationIncrease > 0.1 && !movementData.isSneaking()) {
-      horizontalViolationIncrease = Math.max(100, horizontalViolationIncrease * 75);
+      boolean smallMovement = (Math.abs(movementData.motionX()) < 0.08 || Math.abs(movementData.motionZ()) < 0.08) && movementData.onGround();
+      if (smallMovement && !movementData.recentlyEncounteredFlyingPacket(3)) {
+        horizontalViolationIncrease = Math.max(100, horizontalViolationIncrease * 50);
+      }
     }
 
     if (violationLevelData.physicsVelocityVL > 10) {
@@ -679,10 +690,20 @@ public final class Physics extends Check {
       if (movementData.pastNearbyCollisionInaccuracy < 3) {
         debug += ChatColor.ITALIC + " pci:" + movementData.pastNearbyCollisionInaccuracy + chatColor;
       }
-
       if (movementData.pastEdgeSneak < 4) {
-        debug += ChatColor.ITALIC + " esnk:" + movementData.pastEdgeSneak + chatColor;
+        debug += ChatColor.ITALIC + " esk:" + movementData.pastEdgeSneak + chatColor;
       }
+      if (movementData.pastRiptideSpin < 4) {
+        debug += ChatColor.ITALIC + " rt:" + movementData.pastRiptideSpin + "@" + movementData.highestLocalRiptideLevel + chatColor;
+      }
+      if (inventory.handActive()) {
+        debug += ChatColor.ITALIC + " hnd:" + inventory.handActiveTicks + chatColor;
+      }
+      if (velocityDetected) {
+        // velocity low tolerance
+        debug += ChatColor.ITALIC + " vlt:" + movementData.pastExternalVelocity + chatColor;
+      }
+
 //      debug += " ai ?" + movementData.aiMoveSpeed();
 //      debug += " sprint " + shortenBoolean(movementData.sprinting) + "/" + shortenBoolean(movementData.hasSprintSpeed);
 //      debug += " (sneak " + movementData.sneaking + "/"+movementData.actualSneaking()+")";

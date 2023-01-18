@@ -11,6 +11,7 @@ import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.PunishmentMetadata;
 import de.jpx3.intave.user.meta.PunishmentMetadata.AttackNerfer;
+import de.jpx3.intave.user.storage.NerferStorage;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -18,8 +19,46 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+
+import java.util.Map;
 
 public final class CombatMitigator extends Module {
+
+  @BukkitEventSubscription
+  public void on(PlayerJoinEvent event) {
+    Player player = event.getPlayer();
+    User user = UserRepository.userOf(player);
+    user.onStorageReady(storage -> storageLoad(user));
+  }
+
+  @BukkitEventSubscription
+  public void on(PlayerQuitEvent event) {
+    Player player = event.getPlayer();
+    User user = UserRepository.userOf(player);
+    user.onStorageReady(storage -> storageSave(user));
+  }
+
+  public void storageLoad(User user) {
+    Map<String, Long> nerfers = user.storageOf(NerferStorage.class).nerfers();
+    nerfers.forEach((name, expires) -> {
+      AttackNerfStrategy nerfStrategy = AttackNerfStrategy.byName(name);
+      if (nerfStrategy == null) {
+        return;
+      }
+      AttackNerfer nerfer = user.meta().punishment().nerferOfType(nerfStrategy);
+      nerfer.activateUntil(expires);
+      notify(user, nerfer, "00");
+    });
+  }
+
+  public void storageSave(User user) {
+    Map<String, Long> nerfers = user.storageOf(NerferStorage.class).nerfers();
+    for (AttackNerfer activeNerfer : user.meta().punishment().activeNerfers()) {
+      nerfers.put(activeNerfer.strategy().name(), activeNerfer.expiry());
+    }
+  }
 
   @BukkitEventSubscription
   public void receiveAttack(EntityDamageByEntityEvent event) {
@@ -29,7 +68,7 @@ public final class CombatMitigator extends Module {
     }
     Player player = (Player) attacker;
     PunishmentMetadata punishmentData = UserRepository.userOf(player).meta().punishment();
-    for (AttackNerfer attackNerfer : punishmentData.availableAttackNerfer()) {
+    for (AttackNerfer attackNerfer : punishmentData.allNerfers()) {
       if (attackNerfer.active() && !attackNerfer.inverseEvent()) {
         attackNerfer.executor().accept(event);
       }
@@ -52,7 +91,7 @@ public final class CombatMitigator extends Module {
 
     Player attackedPlayer = (Player) attacked;
     punishmentData = UserRepository.userOf(attackedPlayer).meta().punishment();
-    for (AttackNerfer attackNerfer : punishmentData.availableAttackNerfer()) {
+    for (AttackNerfer attackNerfer : punishmentData.allNerfers()) {
       if (attackNerfer.active() && attackNerfer.inverseEvent()) {
         attackNerfer.executor().accept(event);
       }
@@ -92,9 +131,9 @@ public final class CombatMitigator extends Module {
     }
 
     Player player = user.player();
-    String message = ChatColor.RED + "[CM] Applied " + attackNerfer.name() + " combat nerfer on " + player.getName() + " (dmc" + checkId + ")";
+    String message = ChatColor.RED + "[CM] Applied " + attackNerfer.name() + " combat nerfer on " + player.getName() + " (dmc" + checkId + ") for " + (System.currentTimeMillis() - attackNerfer.expiry()) + "ms";
 
-    if (IntaveControl.DEBUG_HEURISTICS && !plugin.sibylIntegrationService().isAuthenticated(player)) {
+    if (IntaveControl.DEBUG_HEURISTICS && !plugin.sibyl().isAuthenticated(player)) {
       player.sendMessage(message);
     }
 
@@ -103,7 +142,7 @@ public final class CombatMitigator extends Module {
     }
 
     for (Player authenticatedPlayer : MessageChannelSubscriptions.sibylReceiver()/*Bukkit.getOnlinePlayers()*/) {
-      if (plugin.sibylIntegrationService().isAuthenticated(authenticatedPlayer)) {
+      if (plugin.sibyl().isAuthenticated(authenticatedPlayer)) {
         authenticatedPlayer.sendMessage(message);
       }
     }

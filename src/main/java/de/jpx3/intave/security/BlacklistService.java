@@ -1,6 +1,5 @@
 package de.jpx3.intave.security;
 
-import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.annotate.HighOrderService;
 import de.jpx3.intave.annotate.Native;
@@ -120,8 +119,7 @@ public final class BlacklistService implements BukkitEventSubscriber {
     Player player = join.getPlayer();
     if (blacklisted(player) && enabled()) {
       disconnect(player);
-    }
-    if (graylisted(player)) {
+    } else if (graylisted(player)) {
       graylistEvent(player);
       saveKnowledgeToResource();
     }
@@ -132,9 +130,9 @@ public final class BlacklistService implements BukkitEventSubscriber {
     if (graylistKnowledge.contains(player.getUniqueId().toString())) {
       return;
     }
-    if (DEBUG_GRAYLIST) {
-      player.sendMessage(ChatColor.RED + "You are graylisted, login request has been recorded.");
-    }
+//    if (DEBUG_GRAYLIST) {
+//      player.sendMessage(ChatColor.RED + "You are graylisted.");
+//    }
     graylistKnowledge.add(player.getUniqueId().toString());
   }
 

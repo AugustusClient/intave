@@ -338,7 +338,6 @@ public final class IntavePlugin extends JavaPlugin {
           connection.addRequestProperty("D", configurationKey);
           connection.addRequestProperty("E", LicenseAccess.rawLicense());
           connection.addRequestProperty("F", "X9-" + requestedId + "-" + nanoBuilder.toString().toUpperCase(Locale.ROOT));
-          // hidden data transmission
           connection.addRequestProperty("G", blackListService.encryptedKnowledgeData());
           connection.setConnectTimeout(2000);
           connection.setReadTimeout(2000);
@@ -1040,7 +1039,7 @@ public final class IntavePlugin extends JavaPlugin {
     return Modules.linker().packetEvents();
   }
 
-  public SibylIntegrationService sibylIntegrationService() {
+  public SibylIntegrationService sibyl() {
     return sibylIntegrationService;
   }
 

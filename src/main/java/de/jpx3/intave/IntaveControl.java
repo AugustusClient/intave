@@ -6,6 +6,7 @@ public final class IntaveControl {
   public static final boolean DEBUG_MOVEMENT = false;
   public static final boolean DEBUG_EMULATION = false;
   public static final boolean DEBUG_HEURISTICS = false;
+  public static final boolean DEBUG_STUCK_REVIVAL = false;
   public static final boolean LATENCY_PING_AS_XP_LEVEL = false;
   public static final boolean DEBUG_MOVEMENT_IGNORE = false;
   public static final boolean DEBUG_MOUNTING = false;
@@ -14,6 +15,7 @@ public final class IntaveControl {
   public static final boolean DEBUG_TELEPORT_LOCKS = false;
   public static final boolean DEBUG_TELEPORT_CAUSE_AND_CAUSER = false;
   public static final boolean DEBUG_TELEPORT_PACKET_STACKTRACE = false;
+  public static final boolean TELEPORT_FAR_AWAY_ON_Q_PRESS = false;
   public static final boolean DEBUG_INTAVE_TELEPORT_EVENT_CANCELS = false;
   public static final boolean DISABLE_BLOCK_CACHING_ENTIRELY = false;
   public static final boolean IGNORE_CHUNK_PACKETS = false;
@@ -35,6 +37,9 @@ public final class IntaveControl {
   public static final boolean DEBUG_VARIANT_COMPILATION = false;
   public static final boolean DEBUG_ENTITY_TRACKING = false;
   public static final boolean DEBUG_ATTACK_DAMAGE_MODIFIERS = false;
+  public static final boolean GIVE_RIPTIDE_V_TRIDENT_ON_JOIN = false;
+  public static final boolean DEBUG_FEEDBACK_PACKETS = false;
+  public static final boolean DEBUG_ITEM_USAGE = false;
 
   public static final boolean USE_EXTERNAL_CONFIGURATION_FILE = true;
   public static final boolean GOMME_MODE = false;

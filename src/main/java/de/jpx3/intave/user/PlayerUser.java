@@ -378,7 +378,7 @@ final class PlayerUser implements User {
   }
 
   @Override
-  public void applyShortAttackStimulus(AttackNerfStrategy strategy, String checkId) {
+  public void nerfOnce(AttackNerfStrategy strategy, String checkId) {
     if (trustFactor().atLeast(TrustFactor.BYPASS)) {
       return;
     }
@@ -482,15 +482,13 @@ final class PlayerUser implements User {
   @Override
   public void noteFeedbackFault() {
     ConnectionMetadata connectionData = metadata.connection();
-    if (plugin().sibylIntegrationService().isAuthenticated(player())) {
+    if (plugin().sibyl().isAuthenticated(player())) {
       Synchronizer.synchronize(() -> {
         player().sendMessage(ChatColor.RED + "Feedback fault");
       });
     }
-
-    // why is the limit at 100? I don't know!
-    if (connectionData.hardTransactionResponse++ > 100 && FaultKicks.FEEDBACK_FAULTS) {
-      IntaveLogger.logger().info(player().getName() + " has been removed for repeated feedback faults");
+    if (!justJoined() && connectionData.lastReceivedTransactionNum > 100 && connectionData.hardTransactionResponse++ > 3 && FaultKicks.FEEDBACK_FAULTS) {
+      IntaveLogger.logger().info(player().getName() + " will be removed for repeated feedback faults");
       kick("Repeated feedback faults");
     }
   }

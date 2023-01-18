@@ -315,7 +315,7 @@ public interface User {
    * @param strategy the strategy to apply
    * @param checkId  the check id (for debug purposes)
    */
-  void applyShortAttackStimulus(AttackNerfStrategy strategy, String checkId);
+  void nerfOnce(AttackNerfStrategy strategy, String checkId);
 
   /**
    * Retrieve a player's packet latency

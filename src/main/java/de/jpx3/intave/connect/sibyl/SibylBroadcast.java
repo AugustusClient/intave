@@ -31,7 +31,7 @@ public final class SibylBroadcast {
     }
     IntavePlugin intavePlugin = IntavePlugin.singletonInstance();
     for (Player authenticatedPlayer : receiver) {
-      if (intavePlugin.sibylIntegrationService().isAuthenticated(authenticatedPlayer)) {
+      if (intavePlugin.sibyl().isAuthenticated(authenticatedPlayer)) {
 //        authenticatedPlayer.sendMessage(message);
         SibylMessageTransmitter.sendMessage(authenticatedPlayer, message);
       }

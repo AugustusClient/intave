@@ -30,7 +30,7 @@ check:
       400: "intave internals sendnotify &c{player}&7/{trust-color}&7 is moving incorrectly #2"
       500: "intave internals storelog {player} {check} {vl}"
       999:
-        - "intave internals collectivekick {player} &cYou have been kicked, as an account with your ip address was removed from the game"
+        - "intave internals kickip {player} &cYou have been kicked, as an account with your ip address was removed from the game"
         - "kick {player} &cYou have been removed from the game based on data that was collected by the anti-cheat"
 
   timer:
@@ -51,7 +51,7 @@ check:
         25:
           - "intave internals storelog {player} {check} {vl}"
           - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for attacking suspiciously (!!) (heuristics)"
-          - "intave internals collectivekick {player} &cYou have been kicked, as an account with your ip address was removed from the game"
+          - "intave internals kickip {player} &cYou have been kicked, as an account with your ip address was removed from the game"
           - "kick {player} &cYou have been removed from the game based on data that was collected by the anti-cheat"
       "!":
         25:
@@ -59,7 +59,7 @@ check:
           - "intave internals sendnotify &c{player}&7/{trust-color}&7 is attacking suspiciously (!) (heuristics)"
         50:
           - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for attacking suspiciously (!) (heuristics)"
-          - "intave internals collectivekick {player} &cYou have been kicked, as an account with your ip address was removed from the game"
+          - "intave internals kickip {player} &cYou have been kicked, as an account with your ip address was removed from the game"
           - "kick {player} &cYou have been removed from the game based on data that was collected by the anti-cheat"
       "?!":
         50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is attacking suspiciously (?!) (heuristics)"
@@ -73,7 +73,7 @@ check:
         100:
           - "intave internals storelog {player} {check} {vl}"
           - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for attacking suspiciously (reach)"
-          - "intave internals collectivekick {player} &cYou have been kicked, as an account with your ip address was removed from the game"
+          - "intave internals kickip {player} &cYou have been kicked, as an account with your ip address was removed from the game"
           - "kick {player} &cYou have been removed from the game based on data that was collected by the anti-cheat"
 
       hitbox:
@@ -92,7 +92,7 @@ check:
       50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is clicking statistically anomalously (auto-clicker)"
       100:
         - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for clicking statistically anomalously (auto-clicker)"
-        - "intave internals collectivekick {player} &cYou have been kicked, as an account with your ip address was removed from the game"
+        - "intave internals kickip {player} &cYou have been kicked, as an account with your ip address was removed from the game"
         - "kick {player} &cYou have been removed from the game based on data that was collected by the anti-cheat"
 
   clickspeedlimiter:
@@ -102,7 +102,7 @@ check:
       50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is attacking too quickly"
       100:
         - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for attacking too quickly"
-        - "intave internals collectivekick {player} &cYou have been kicked, as an account with your ip address was removed from the game"
+        - "intave internals kickip {player} &cYou have been kicked, as an account with your ip address was removed from the game"
         - "kick {player} &cYou have been removed from the game based on data that was collected by the anti-cheat"
 
   breakspeedlimiter:
@@ -118,7 +118,7 @@ check:
       50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is sending invalid packets"
       100:
         - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for sending invalid packets"
-        - "intave internals collectivekick {player} &cYou have been kicked, as an account with your ip address was removed from the game"
+        - "intave internals kickip {player} &cYou have been kicked, as an account with your ip address was removed from the game"
         - "kick {player} &cYou have been removed from the game based on data that was collected by the anti-cheat"
 
   placementanalysis:
@@ -129,7 +129,7 @@ check:
       100:
         - "intave internals storelog {player} {check} {vl}"
         - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for placing blocks incorrectly"
-        - "intave internals collectivekick {player} &cYou have been kicked, as an account with your ip address was removed from the game"
+        - "intave internals kickip {player} &cYou have been kicked, as an account with your ip address was removed from the game"
         - "kick {player} &cYou have been removed from the game based on data that was collected by the anti-cheat"
 
   inventoryclickanalysis:
@@ -139,7 +139,7 @@ check:
       50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is performing invalid item-operations"
       100:
         - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for clicking suspiciously on items"
-        - "intave internals collectivekick {player} &cYou have been kicked, as an account with your ip address was removed from the game"
+        - "intave internals kickip {player} &cYou have been kicked, as an account with your ip address was removed from the game"
         - "kick {player} &cYou have been removed from the game based on data that was collected by the anti-cheat"
 
 storage:
@@ -159,7 +159,7 @@ clientwarning:
   enable: true
 
 filter:
-  health: true
+  health: false
   vanish: true
   equipmentdata: false
 

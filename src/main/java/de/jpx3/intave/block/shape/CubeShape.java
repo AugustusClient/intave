@@ -133,8 +133,8 @@ final class CubeShape extends MemoryTraced implements BlockShape {
     return inheritDirection;
   }
 
-  private static final Reference<List<BoundingBox>> EMPTY_REFERENCE = new WeakReference<>(null);
-  private Reference<List<BoundingBox>> boundingBoxCache = EMPTY_REFERENCE;
+  private static final Reference<List<BoundingBox>> NULL_REFERENCE = new WeakReference<>(null);
+  private Reference<List<BoundingBox>> boundingBoxCache = NULL_REFERENCE;
 
   @Override
   public List<BoundingBox> boundingBoxes() {

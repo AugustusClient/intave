@@ -27,7 +27,6 @@ import de.jpx3.intave.check.combat.heuristics.detect.other.*;
 import de.jpx3.intave.check.combat.heuristics.detect.testing.TestingHeuristic;
 import de.jpx3.intave.check.combat.heuristics.mine.MiningStrategyContainer;
 import de.jpx3.intave.check.combat.heuristics.mine.MiningStrategyExecutor;
-import de.jpx3.intave.check.world.placementanalysis.PacketOrder;
 import de.jpx3.intave.diagnostic.natives.NativeCheck;
 import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.executor.TaskTracker;
@@ -179,14 +178,14 @@ public final class Heuristics extends MetaCheck<Heuristics.HeuristicMeta> {
     String confidenceDetails = overallConfidence.output() + " (" + levelFrom(allConfidences.toArray(new Confidence[0])) + "+" + anomaly.confidence().level() + ")";
     String message = ChatColor.RED + "[IH] " + player.getName() + " on p[" + pattern + "]" + confidenceDetails + " " + description;
 
-    if (IntaveControl.DEBUG_HEURISTICS && !plugin.sibylIntegrationService().isAuthenticated(player)) {
+    if (IntaveControl.DEBUG_HEURISTICS && !plugin.sibyl().isAuthenticated(player)) {
       player.sendMessage(message);
     }
     if (IntaveControl.GOMME_MODE) {
       IntaveLogger.logger().printLine(message);
     }
     for (Player authenticatedPlayer : MessageChannelSubscriptions.sibylReceiver()/*Bukkit.getOnlinePlayers()*/) {
-      if (plugin.sibylIntegrationService().isAuthenticated(authenticatedPlayer)) {
+      if (plugin.sibyl().isAuthenticated(authenticatedPlayer)) {
         authenticatedPlayer.sendMessage(message);
       }
     }

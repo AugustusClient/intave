@@ -125,9 +125,9 @@ public final class PredictiveSimulationProcessor implements SimulationProcessor 
       SimulationStack simulationStack = simulateMovementIterative(user, simulator);
       simulation = simulationStack.bestSimulation();
       enterIterativeSimulationStack(user, simulationStack);
-      if (simulationStack.trials() >= 8) {
-        simulation.append("t" + simulationStack.trials());
-      }
+//      if (simulationStack.trials() >= 8) {
+        simulation.append("i" + simulationStack.trials());
+//      }
     } else {
       for (Superposition<?> superposition : superpositions) {
         superposition.collapseVariation(0);
@@ -208,7 +208,7 @@ public final class PredictiveSimulationProcessor implements SimulationProcessor 
       configuration = configuration.withJump();
     }
     // active hand
-    if (inventoryData.handActive()) {
+    if (inventoryData.handActive() && (ItemProperties.canItemBeUsed(user.player(), inventoryData.heldItem()) || ItemProperties.canItemBeUsed(user.player(), inventoryData.offhandItem()))) {
       configuration = configuration.withActiveHand();
     }
     // reducing
@@ -320,7 +320,7 @@ public final class PredictiveSimulationProcessor implements SimulationProcessor 
       }
     }
     // hand active
-    if (inventoryData.handActive()) {
+    if (inventoryData.handActive() && (ItemProperties.canItemBeUsed(user.player(), inventoryData.heldItem()) || ItemProperties.canItemBeUsed(user.player(), inventoryData.offhandItem()))) {
       configuration = configuration.withActiveHand();
     }
     // block invalid sprint
@@ -360,13 +360,28 @@ public final class PredictiveSimulationProcessor implements SimulationProcessor 
     MetadataBundle meta = user.meta();
     InventoryMetadata inventoryData = meta.inventory();
     MovementMetadata movementData = meta.movement();
-    ProtocolMetadata clientData = meta.protocol();
+    ProtocolMetadata protocol = meta.protocol();
     SimulationStack simulationStack = SimulationStack.of(user);
     boolean inLava = movementData.inLava();
     boolean inWater = movementData.inWater();
     boolean lastOnGround = movementData.lastOnGround();
     boolean estimatedJump = Math.abs(movementData.motionY() - (1 - user.sizeOf(movementData.pose()).height() % 1)) < 1e-5 || Math.abs(movementData.motionY() - movementData.jumpMotion()) < 0.0001;
-    boolean skipUseItem = !clientData.sprintWhenHandActive() && movementData.sprinting;
+    boolean skipUseItem = (!protocol.sprintWhenHandActive() && movementData.sprinting) || !inventoryData.usableItemInEitherHand();
+    boolean requireUseItem = !protocol.combatUpdate() && inventoryData.handActive() && inventoryData.pastHotBarSlotChange > 20;
+
+    if (requireUseItem && movementData.pastEntityUse <= inventoryData.handActiveTicks) {
+      requireUseItem = false;
+    }
+
+    if (requireUseItem) {
+//      user.player().sendMessage("Require use item " + inventoryData.handActive() + " " + inventoryData.pastHotBarSlotChange + " " + inventoryData.pastSlotSwitch);
+      skipUseItem = false;
+    }
+
+    // if we are under blocks, this gives us extra simulations, with smaller inputs (reduces false positives)
+    if (user.sizeOf(movementData.pose()).height() <= 1) {
+      skipUseItem = false;
+    }
 
     int iterativeRuns = 0;
     int nearestForwardKey = -2, nearestStrafeKey = -2;
@@ -382,8 +397,8 @@ public final class PredictiveSimulationProcessor implements SimulationProcessor 
     SIMULATION:
     for (int j = 0; j < (useSuperpositions ? superpositions.size() : 1); j++) {
       Superposition<?> superposition = useSuperpositions ? superpositions.get(j) : null;
-      int variations = useSuperpositions ? superposition.variationsCount() : 1;
-      for (int variationIndex = 0; variationIndex < Math.max(variations, 1); variationIndex++) {
+      int variations = useSuperpositions ? Math.max(superposition.variationsCount(), 1) : 1;
+      for (int variationIndex = 0; variationIndex < variations; variationIndex++) {
         if (useSuperpositions) {
           superposition.applyVariation(variationIndex);
         }
@@ -391,6 +406,9 @@ public final class PredictiveSimulationProcessor implements SimulationProcessor 
           movementData.refreshFriction(sprinting);
           for (boolean useItemState : inventoryData.handActive() ? OPTIMISTIC : PESSIMISTIC) {
             if (skipUseItem && useItemState) {
+              continue;
+            }
+            if (requireUseItem && !useItemState) {
               continue;
             }
             IterativeStudy.USE_ITEM_ITERATOR.run();
@@ -429,7 +447,7 @@ public final class PredictiveSimulationProcessor implements SimulationProcessor 
                   if (sprinting && keyForward != 1) {
                     continue;
                   }
-                   iterativeRuns++;
+                  iterativeRuns++;
                   MovementConfiguration movementConfiguration = MovementConfiguration.select(
                     keyForward, keyStrafe, attackReduce, sprinting, jumped, useItemState
                   );

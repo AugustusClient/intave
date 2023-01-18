@@ -4,14 +4,17 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.annotate.Reserved;
 import de.jpx3.intave.check.MetaCheckPart;
 import de.jpx3.intave.check.combat.Heuristics;
 import de.jpx3.intave.check.combat.heuristics.Anomaly;
 import de.jpx3.intave.check.combat.heuristics.Confidence;
 import de.jpx3.intave.math.MathHelper;
+import de.jpx3.intave.module.linker.nayoro.NayoroRelay;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
+import de.jpx3.intave.module.nayoro.PlayerContainer;
+import de.jpx3.intave.module.nayoro.event.AttackEvent;
+import de.jpx3.intave.module.nayoro.event.ClickEvent;
 import de.jpx3.intave.module.tracker.entity.Entity;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.AttackMetadata;
@@ -22,9 +25,9 @@ import static de.jpx3.intave.module.linker.packet.PacketId.Client.ARM_ANIMATION;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.USE_ENTITY;
 
 @Reserved
-public final class LongTermClickAccuracyHeuristic extends MetaCheckPart<Heuristics, LongTermClickAccuracyHeuristic.ClickAccuracyMeta> {
-  public LongTermClickAccuracyHeuristic(Heuristics parentCheck) {
-    super(parentCheck, ClickAccuracyMeta.class);
+public final class LongTermClickAccuracyRelayHeuristic extends MetaCheckPart<Heuristics, LongTermClickAccuracyRelayHeuristic.ClickAccuracyMeta> {
+  public LongTermClickAccuracyRelayHeuristic(Heuristics parentCheck) {
+    super(parentCheck, LongTermClickAccuracyRelayHeuristic.ClickAccuracyMeta.class);
   }
 
   @PacketSubscription(
@@ -36,7 +39,7 @@ public final class LongTermClickAccuracyHeuristic extends MetaCheckPart<Heuristi
     Player player = event.getPlayer();
     User user = userOf(player);
     AttackMetadata attackData = user.meta().attack();
-    ClickAccuracyMeta heuristicMeta = metaOf(user);
+    LongTermClickAccuracyRelayHeuristic.ClickAccuracyMeta heuristicMeta = metaOf(user);
     PacketType packetType = event.getPacketType();
     PacketContainer packet = event.getPacket();
     Entity entity = attackData.lastAttackedEntity();
@@ -68,6 +71,24 @@ public final class LongTermClickAccuracyHeuristic extends MetaCheckPart<Heuristi
         }
       }
     }
+  }
+
+  @NayoroRelay
+  public void on(PlayerContainer player, AttackEvent attack) {
+
+  }
+
+  @NayoroRelay
+  public void on(PlayerContainer player, ClickEvent attack) {
+
+  }
+
+  private boolean entityRequirementMet(PlayerContainer player) {
+//    player.environment().hasPassed()
+    if (!player.recentlyAttacked(500) || !player.recentlySwitchedEntity(1000)) {
+      return false;
+    }
+    return true;
   }
 
   public static class ClickAccuracyMeta extends CheckCustomMetadata {

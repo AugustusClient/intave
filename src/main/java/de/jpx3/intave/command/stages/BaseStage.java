@@ -99,7 +99,7 @@ public final class BaseStage extends CommandStage {
     selectors = {"cps", "clicks"},
     permission = "intave.command.cps",
     usage = "[<player...>]",
-    description = "Toggle CPS messages"
+    description = "Show a click visualizer"
   )
   public void cpsCommand(User user, @Optional Player selectedPlayer) {
     Player player = user.player();

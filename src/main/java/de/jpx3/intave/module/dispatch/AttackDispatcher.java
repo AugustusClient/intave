@@ -88,6 +88,7 @@ public final class AttackDispatcher extends Module {
     if (entity == null) {
       return;
     }
+    movementData.pastEntityUse = 0;
     if (action == EnumWrappers.EntityUseAction.ATTACK) {
       attackData.setLastAttackedEntityID(entityId);
       if (entity.isPlayer) {

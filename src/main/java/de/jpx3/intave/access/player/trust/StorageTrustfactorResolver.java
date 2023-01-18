@@ -35,7 +35,7 @@ public final class StorageTrustfactorResolver implements TrustFactorResolver {
       } else if (hoursPlayed >= 1 && joins >= 1) {
         factor = TrustFactor.RED;
       } else {
-        factor = TrustFactor.DARK_RED;
+        factor = TrustFactor.RED; // TrustFactor.DARK_RED;
       }
       ViolationStorage violationStorage = playerStorage.storageOf(ViolationStorage.class);
 

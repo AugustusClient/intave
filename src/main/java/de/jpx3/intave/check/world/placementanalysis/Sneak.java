@@ -67,10 +67,11 @@ public final class Sneak extends MetaCheckPart<PlacementAnalysis, Sneak.SneakMet
         limit /= 0.15 * speedAmplifier * speedAmplifier + 1;
 
         if (average < limit && inOneLine && noSneaking) {
+          int ticksPerBlock = (int) (average / 50d);
           Violation violation = Violation.builderFor(PlacementAnalysis.class)
             .forPlayer(player).withDefaultThreshold()
             .withMessage(COMMON_FLAG_MESSAGE)
-            .withDetails(((int) average) + "ms/block in a straight line without sneaking")
+            .withDetails(ticksPerBlock + " t/b in a straight line without sneaking")
             .withDefaultThreshold().withVL(3).build();
           ViolationContext violationContext = Modules.violationProcessor().processViolation(violation);
           if (violationContext.violationLevelAfter() > 20) {

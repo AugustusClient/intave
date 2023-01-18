@@ -43,7 +43,7 @@ public final class DebugBroadcast {
       return;
     }
     for (Player receiver : receivers) {
-      if (IntavePlugin.singletonInstance().sibylIntegrationService().isAuthenticated(receiver)) {
+      if (IntavePlugin.singletonInstance().sibyl().isAuthenticated(receiver)) {
         OutputConfiguration configuration = configurationOf(receiver.getUniqueId());
         if (configuration.canOutput(category, target) && !severity.isLowerThan(configuration.minimumSeverity())) {
           String color = configuration.colorOf(category).toString();

@@ -85,7 +85,7 @@ public final class MovementMetadata implements SimulationEnvironment {
   public float lastRotationYaw, lastRotationPitch;
   public long recordedMoves;
   // Timestamps
-  public long lastSneakingTimestamps, lastJump, lastMovement;
+  public long lastSneakingTimestamps, lastJump, lastMovement, lastRotation;
   public Vector emulationVelocity;
   public Vector sneakPatchVelocity;
   public Vector setbackOverrideVelocity = new Vector(0, 0, 0);
@@ -97,6 +97,7 @@ public final class MovementMetadata implements SimulationEnvironment {
   public int lastPositionUpdate;
   @Nullable
   public Fluid interactingFluid;
+  public boolean inRespawnScreen;
   public boolean inWater;
   public boolean inWeb;
   public boolean checkWebStateAgainNextTick = false;
@@ -106,6 +107,7 @@ public final class MovementMetadata implements SimulationEnvironment {
   public int pastInventoryOpen = 100;
   public int pastBlockPlacement = 100;
   public int pastEdgeSneak = 100;
+  public int pastEntityUse = 100;
   public boolean onLadderLast;
   public boolean aquaticUpdateInLava;
   public boolean sprintResetNextTick;
@@ -117,6 +119,7 @@ public final class MovementMetadata implements SimulationEnvironment {
   public double physicsMotionXResetCache, physicsMotionYResetCache, physicsMotionZResetCache;
   public double physicsMotionXBeforeVelocityResetCache, physicsMotionYBeforeVelocityResetCache, physicsMotionZBeforeVelocityResetCache;
   public int pastRiptideSpin = 100;
+  public int highestLocalRiptideLevel = 0;
   public int pastPlayerAttackPhysics = 100;
   public int pastInPowderSnow = 100;
   public int pastEdgeSneakTickGrants;
@@ -160,12 +163,14 @@ public final class MovementMetadata implements SimulationEnvironment {
   public int lastTeleport;
   public int teleportId;
   public volatile boolean awaitTeleport = false, expectTeleport = false, awaitOutgoingTeleport = false;
+  public volatile boolean expectTeleportWithRotation = false;
   public volatile boolean transactionTeleportAllow = false;
   public boolean awaitClickMovementSkip;
   public Location teleportLocation;
   public Vector teleportOffset = null;
   public int teleportResendCountdown = 20;
   public int outgoingTeleportCountdown = 5;
+  public long lastRescueAttempt;
   public int speculativeTicks = 0;
   public Map<UUID, Integer> pendingSpeculativeMovementTicks = GarbageCollector.watch(new HashMap<>());
   public boolean inReceiveSpeculativePacketRoutine = false;
