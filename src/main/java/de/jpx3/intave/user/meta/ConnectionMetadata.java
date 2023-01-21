@@ -48,7 +48,7 @@ public final class ConnectionMetadata {
     SECOND_IS_DECOY,
   }
 
-//  private final Set<Integer> takenLocalEntityIds = new HashSet<>();
+  //  private final Set<Integer> takenLocalEntityIds = new HashSet<>();
   private int localEntityIdCounter = 1;
   public long lastCCCInfoMessageSent = 0;
   public boolean sendAsyncMessage = false;

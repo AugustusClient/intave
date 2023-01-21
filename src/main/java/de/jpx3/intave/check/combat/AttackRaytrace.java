@@ -207,8 +207,8 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
     int vl = calculateVlFor(user, raytrace, result, attacked, expansion, estimated);
     String estimationSuffix = estimated ? " (estimated)" : "";
     String message, details, thresholdKey, sibyl;
+    player.sendMessage("Reach: " + raytrace.reach());
     double reach = 0;
-    System.out.println("Server Reach: " + raytrace.reach() + estimationSuffix);
     switch (result) {
       case MISS: {
         message = "attacked " + resolveArticle(entityName) + " " + entityName.toLowerCase() + " out of sight" + estimationSuffix;
