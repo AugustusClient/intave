@@ -17,9 +17,10 @@ public final class SibylMessageTransmitter {
     }
     SibylIntegrationService sibyl = IntavePlugin.singletonInstance().sibyl();
     if (sibyl.encryptionActiveFor(player)) {
-      SibylPacketOutMessage packet = new SibylPacketOutMessage();
-      packet.setMessage(String.format(message, (Object[]) args));
-      sibyl.sendTrustedPacket(player, packet);
+//      SibylPacketOutMessage packet = new SibylPacketOutMessage();
+//      packet.setMessage(String.format(message, (Object[]) args));
+//      sibyl.sendTrustedPacket(player, packet);
+      player.sendMessage(ChatColor.RED + "(insecure) " + ChatColor.RESET + String.format(message, (Object[]) args));
     } else {
       // for now, just send the message to the player
       player.sendMessage(ChatColor.RED + "(insecure) " + ChatColor.RESET + String.format(message, (Object[]) args));

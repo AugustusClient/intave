@@ -234,8 +234,12 @@ public final class PunishmentMetadata {
     }
 
     public void activateOnce() {
-      activated = System.currentTimeMillis();
-      limit = 1;
+      if (permanent) {
+        return;
+      }
+//      activated = System.currentTimeMillis();
+      activated = System.currentTimeMillis() + 2_500 - duration;
+      limit = 3;
       executed = 0;
     }
 
@@ -251,7 +255,7 @@ public final class PunishmentMetadata {
       if (limit == -1) {
         return System.currentTimeMillis() - activated < duration;
       } else {
-        return executed < limit && System.currentTimeMillis() - activated < 750;
+        return executed < limit;// && System.currentTimeMillis() - activated < 750;
       }
     }
     public AttackNerfStrategy strategy() {

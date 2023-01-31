@@ -1,7 +1,6 @@
 package de.jpx3.intave.check.movement.timer;
 
 import com.comphenix.protocol.events.PacketEvent;
-import de.jpx3.intave.access.player.trust.TrustFactor;
 import de.jpx3.intave.annotate.DispatchTarget;
 import de.jpx3.intave.check.CheckStatistics;
 import de.jpx3.intave.check.CheckViolationLevelDecrementer;
@@ -11,6 +10,7 @@ import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.module.Modules;
 import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
+import de.jpx3.intave.module.mitigate.AttackNerfStrategy;
 import de.jpx3.intave.module.violation.Violation;
 import de.jpx3.intave.module.violation.ViolationContext;
 import de.jpx3.intave.user.User;
@@ -29,6 +29,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import static de.jpx3.intave.access.player.trust.TrustFactor.ORANGE;
+import static de.jpx3.intave.access.player.trust.TrustFactor.RED;
 import static de.jpx3.intave.math.MathHelper.formatDouble;
 import static de.jpx3.intave.module.linker.packet.PacketId.Server.POSITION;
 import static de.jpx3.intave.module.linker.packet.PacketId.Server.RESPAWN;
@@ -36,11 +38,13 @@ import static de.jpx3.intave.module.linker.packet.PacketId.Server.RESPAWN;
 public final class Balance extends MetaCheckPart<Timer, Balance.BalanceMeta> {
   private final CheckViolationLevelDecrementer decrementer;
   private final boolean highToleranceMode;
+  private final boolean antiStutter;
 
   public Balance(Timer parentCheck) {
     super(parentCheck, BalanceMeta.class);
     this.decrementer = parentCheck.decrementer();
     this.highToleranceMode = parentCheck().highToleranceMode();
+    this.antiStutter = parentCheck().stutterPatch();
   }
 
   @PacketSubscription(
@@ -75,7 +79,6 @@ public final class Balance extends MetaCheckPart<Timer, Balance.BalanceMeta> {
     }
     User user = userOf(player);
     MetadataBundle meta = user.meta();
-    ConnectionMetadata connection = meta.connection();
     BalanceMeta timerData = metaOf(user);
     long time = System.currentTimeMillis();
     long delta = time - timerData.lastFlyingPacket;
@@ -102,7 +105,7 @@ public final class Balance extends MetaCheckPart<Timer, Balance.BalanceMeta> {
 //      timerData.timerBalance += timerData.timerBalance < -400 ? 45 : 15;
 //    }
     statisticApply(user, CheckStatistics::increaseTotal);
-    boolean lowToleranceMode = parentCheck().lowToleranceMode() &&/*violationLevelOf(user) > 10 && */user.trustFactor().atOrBelow(TrustFactor.ORANGE) /*&& System.currentTimeMillis() - timerData.lastTimerFlag < 2000*/;
+    boolean lowToleranceMode = parentCheck().lowToleranceMode() &&/*violationLevelOf(user) > 10 && */user.trustFactor().atOrBelow(ORANGE) /*&& System.currentTimeMillis() - timerData.lastTimerFlag < 2000*/;
     int overflowLimit = lowToleranceMode ? 40 : 120;
 
 //    List<Double> safeTimerBalanceHistory = timerData.safeTimerBalanceHistory;
@@ -140,11 +143,16 @@ public final class Balance extends MetaCheckPart<Timer, Balance.BalanceMeta> {
 //    if (timerData.balanceUnderflowVL > 15 && combatMicroLag && IntaveControl.GOMME_MODE && hasRedTrustfactor) {
 //      connection.lastAttackQueueRequest = System.currentTimeMillis();
 //    }
+    boolean hasSuspiciousBalance = timerData.timerBalance < -150 && Math.abs(delta) > 100 && timerData.timerBalance + delta > -150;
+    if (antiStutter && user.latency() < 150 && hasSuspiciousBalance && !user.justJoined() && user.meta().protocol().flyingPacketsAreSent() && user.trustFactor().atOrBelow(RED)) {
+      user.nerfOnce(AttackNerfStrategy.DMG_HIGH, "76");
+//      user.player().sendMessage(ChatColor.RED + "Stutter detected");
+//      player.sendMessage(timerData.timerBalance + "/" + overflowLimit + " @" + user.latency() + "ms");
+    }
 
 //    player.sendMessage("vl: " + timerData.balanceUnderflowVL);
 //    player.sendMessage("§c" + timerData.timerBalance + "§7 ~§c" + mean + "§7 -> §c" + formatDouble(timerData.balanceUnderflowVL, 2));
-//    System.out.println(timerData.timerBalance + "/" + overflowLimit);
-
+//    player.setLevel((int) timerData.timerBalance);
     if (timerData.timerBalance > overflowLimit && !user.meta().movement().isInVehicle()) {
       String balanceAsString = formatDouble(timerData.timerBalance / 50, 2);
       statisticApply(user, CheckStatistics::increaseFails);

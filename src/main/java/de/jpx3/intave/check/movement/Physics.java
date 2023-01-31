@@ -709,9 +709,9 @@ public final class Physics extends Check {
         debug += ChatColor.ITALIC + " slk:" + movementData.shulkerXToleranceRemaining + "," + movementData.shulkerYToleranceRemaining + "," + movementData.shulkerZToleranceRemaining + chatColor;
       }
 //      debug += " web (a: " + shortenBoolean(movementData.inWeb) + ", r: " + shortenBoolean(collidesWeb(user, currentBoundingBox)) + ")";
-      if (movementData.pastNearbyCollisionInaccuracy < 3) {
-        debug += ChatColor.ITALIC + " pci:" + movementData.pastNearbyCollisionInaccuracy + chatColor;
-      }
+//      if (movementData.pastNearbyCollisionInaccuracy < 3) {
+//        debug += ChatColor.ITALIC + " pci:" + movementData.pastNearbyCollisionInaccuracy + chatColor;
+//      }
       if (movementData.pastEdgeSneak < 4) {
         debug += ChatColor.ITALIC + " esk:" + movementData.pastEdgeSneak + chatColor;
       }
@@ -737,6 +737,8 @@ public final class Physics extends Check {
       if (movementData.endMotionZOverride) {
         debug += ChatColor.ITALIC + " emz:" + MathHelper.formatDouble(movementData.endMotionZOverrideValue, 4) + chatColor;
       }
+
+//      debug += " spr:" + (simulation.wasSprinting() ? 1 : 0);
 
 //      debug += " ai ?" + movementData.aiMoveSpeed();
 //      debug += " sprint " + shortenBoolean(movementData.sprinting) + "/" + shortenBoolean(movementData.hasSprintSpeed);

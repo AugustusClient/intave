@@ -124,7 +124,7 @@ public final class PacketDelayer extends Module {
 
     long lastMovementPacket = System.currentTimeMillis() - connection.lastMovementPacket();
     long oldestTransactionPacket = oldestPendingTransaction(user);
-    long positionTimeoutTolerance = user.meta().protocol().flyingPacketStream() ? 0 : 1050;
+    long positionTimeoutTolerance = user.meta().protocol().flyingPacketsAreSent() ? 0 : 1050;
 
     long lagTolerance = user.trustFactorSetting("timer.lt");
     boolean transactionTimeout = oldestTransactionPacket * (lowToleranceMode ? 1.25 : 1) > connection.transactionPingAverage() + LatencyStudy.transactionPingAverage() / 2 + lagTolerance;

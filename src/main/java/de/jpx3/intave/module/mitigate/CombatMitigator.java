@@ -19,6 +19,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -75,7 +76,7 @@ public final class CombatMitigator extends Module {
     }
   }
 
-  @BukkitEventSubscription
+  @BukkitEventSubscription(priority = EventPriority.LOWEST)
   public void receiveAttack(EntityDamageByEntityEvent event) {
     Entity attacker = event.getDamager();
     if (!(attacker instanceof Player) || event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK || !(event.getEntity() instanceof LivingEntity)) {
