@@ -79,6 +79,7 @@ final class FileSpreadLayer implements Resource {
         } catch (IOException e) {
           deactivateMarking = true;
           copyMainToSpread();
+          return;
         }
       }
     }
