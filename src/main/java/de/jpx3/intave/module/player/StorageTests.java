@@ -61,7 +61,7 @@ public final class StorageTests extends Tests {
 
   @Test(
     testCode = "A",
-    severity = Severity.WARNING
+    severity = Severity.ERROR
   )
   public void testBasicIO() {
     ByteBuffer invalidByteBuffer = ByteBuffer.wrap(EXAMPLE_TEXT.toUpperCase().getBytes(StandardCharsets.UTF_8));
@@ -86,7 +86,7 @@ public final class StorageTests extends Tests {
       fail("Empty return buffer for request");
     }
     if (!gateawayReturn.equals(validByteBuffer)) {
-      fail("Does not support overriding or is fundamentally broken");
+      fail("Does not support override or is fundamentally broken");
     }
   }
 
@@ -94,7 +94,7 @@ public final class StorageTests extends Tests {
 
   @Test(
     testCode = "B",
-    severity = Severity.WARNING
+    severity = Severity.ERROR
   )
   public void testMultipleIds() {
     ByteBuffer byteBufferA = ByteBuffer.wrap(EXAMPLE_TEXT.getBytes(StandardCharsets.UTF_8));

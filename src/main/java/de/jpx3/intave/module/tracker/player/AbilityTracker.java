@@ -1,24 +1,15 @@
 package de.jpx3.intave.module.tracker.player;
 
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketEvent;
-import de.jpx3.intave.adapter.MinecraftVersions;
-import de.jpx3.intave.klass.Lookup;
 import de.jpx3.intave.module.Module;
-import de.jpx3.intave.module.Modules;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
-import de.jpx3.intave.module.tracker.entity.EntityTracker;
-import de.jpx3.intave.packet.reader.*;
-import de.jpx3.intave.share.ClientMathHelper;
+import de.jpx3.intave.packet.reader.AbilityInReader;
+import de.jpx3.intave.packet.reader.AbilityOutReader;
+import de.jpx3.intave.packet.reader.EntityReader;
+import de.jpx3.intave.packet.reader.GameStateChangeReader;
 import de.jpx3.intave.user.User;
-import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.AbilityMetadata;
 import de.jpx3.intave.user.meta.MovementMetadata;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-
-import java.lang.reflect.Field;
 
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.ABILITIES_IN;
 import static de.jpx3.intave.module.linker.packet.PacketId.Server.*;
