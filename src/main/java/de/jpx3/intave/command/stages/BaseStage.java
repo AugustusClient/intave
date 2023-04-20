@@ -10,6 +10,7 @@ import de.jpx3.intave.command.SubCommand;
 import de.jpx3.intave.module.Modules;
 import de.jpx3.intave.module.actionbar.ActionBarDisplayer;
 import de.jpx3.intave.module.actionbar.DisplayType;
+import de.jpx3.intave.module.nayoro.Nayoro;
 import de.jpx3.intave.player.ProfileLookup;
 import de.jpx3.intave.security.LicenseAccess;
 import de.jpx3.intave.user.MessageChannel;
@@ -97,6 +98,48 @@ public final class BaseStage extends CommandStage {
       return defaultColor + String.join(defaultColor + ", ", elements.subList(0, size - 1)) + defaultColor + " and " + elements.get(size - 1);
     }
   }
+
+  // REMOVE ON LIVE SERVER
+  /*
+  @SubCommand(
+    selectors = "record",
+    usage = "",
+    description = "Record timings"
+  )
+  @Native
+  public void recordCommand(User user, @Optional Player target) {
+    if (IntaveControl.DISABLE_LICENSE_CHECK && !IntaveControl.GOMME_MODE) {
+      User targetUser = target != null ? UserRepository.userOf(target) : user;
+      Nayoro nayoro = Modules.nayoro();
+      if (!nayoro.recordingActiveFor(targetUser)) {
+        nayoro.enableRecordingFor(targetUser);
+        user.player().sendMessage(ChatColor.GREEN + "Recording enabled for " + ChatColor.RED + targetUser.player().getName());
+      } else {
+        nayoro.disableRecordingFor(targetUser);
+        user.player().sendMessage(ChatColor.GREEN + "Recording disabled for " + ChatColor.RED + targetUser.player().getName());
+      }
+    } else {
+      user.player().sendMessage(ChatColor.RED + "This command is not available.");
+    }
+  }
+
+  @SubCommand(
+    selectors = "playback",
+    usage = "",
+    description = "Playback recorded timings"
+  )
+  @Native
+  public void playbackCommand(User user, @Optional Player target) {
+    if (IntaveControl.DISABLE_LICENSE_CHECK && !IntaveControl.GOMME_MODE) {
+      User targetUser = target != null ? UserRepository.userOf(target) : user;
+      user.player().sendMessage(ChatColor.GREEN + "Playback for " + ChatColor.RED + targetUser.player().getName() + ChatColor.GREEN + " started");
+      Nayoro nayoro = Modules.nayoro();
+      nayoro.instantPlayback(targetUser);
+    } else {
+      user.player().sendMessage(ChatColor.RED + "This command is not available.");
+    }
+  }
+  */
 
   @SubCommand(
     selectors = {"cps", "clicks"},

@@ -1,6 +1,11 @@
 package de.jpx3.intave.world.permission;
 
+import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.access.player.event.BucketAction;
+import de.jpx3.intave.executor.Synchronizer;
+import de.jpx3.intave.math.MathHelper;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -22,13 +27,25 @@ public final class WorldPermission {
   public static boolean blockPlacePermission(
     Player player, World world, boolean mainHand, int blockX, int blockY, int blockZ, int enumDirection, Material type, int variant
   ) {
-    return blockPlacePermissionCheck.hasPermission(player, world, mainHand, blockX, blockY, blockZ, enumDirection, type, variant);
+    boolean permission = blockPlacePermissionCheck.hasPermission(player, world, mainHand, blockX, blockY, blockZ, enumDirection, type, variant);
+    if (IntaveControl.DEBUG_PLACE_AND_BREAK_PERMISSIONS) {
+      Synchronizer.synchronize(() -> {
+        player.sendMessage(ChatColor.GRAY + "Place of " + MathHelper.formatPosition(new Location(world, blockX, blockY, blockZ)) + " is " + (permission ? "allowed" : "denied"));
+      });
+    }
+    return permission;
   }
 
   public static boolean blockBreakPermission(
     Player player, Block block
   ) {
-    return blockBreakPermissionCheck.hasPermission(player, block);
+    boolean permission = blockBreakPermissionCheck.hasPermission(player, block);
+    if (IntaveControl.DEBUG_PLACE_AND_BREAK_PERMISSIONS) {
+      Synchronizer.synchronize(() -> {
+        player.sendMessage(ChatColor.GRAY + "Break of " + MathHelper.formatPosition(block.getLocation()) + " is " + (permission ? "allowed" : "denied"));
+      });
+    }
+    return permission;
   }
 
   public static boolean bukkitActionPermission(

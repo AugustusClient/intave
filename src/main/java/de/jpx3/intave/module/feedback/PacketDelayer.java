@@ -154,7 +154,7 @@ public final class PacketDelayer extends Module {
     }
 
     connection.lastBlinkState = requestBuffer;
-    boolean activatePacketBuffer = !tooManyPackets &&  !player.isDead() && (requestBuffer || (System.currentTimeMillis() - connection.blinkDeactivated < 1000));
+    boolean activatePacketBuffer = !tooManyPackets && !player.isDead() && System.currentTimeMillis() - connection.lastRespawn > 3000 && (requestBuffer || (System.currentTimeMillis() - connection.blinkDeactivated < 1000));
 
     if (activatePacketBuffer && reverseBlink) {
       // put all delayed packets into the enqueuedPacket queue

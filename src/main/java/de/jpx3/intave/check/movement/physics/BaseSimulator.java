@@ -407,9 +407,7 @@ class BaseSimulator extends Simulator {
       double blockPositionX = floor(environment.verifiedPositionX());
       double blockPositionY = floor(environment.verifiedPositionY() - environment.frictionPosSubtraction());
       double blockPositionZ = floor(environment.verifiedPositionZ());
-      slipperiness =
-        MovementCharacteristics.currentSlipperiness(
-          user, world, blockPositionX, blockPositionY, blockPositionZ);
+      slipperiness = MovementCharacteristics.currentSlipperiness(user, world, blockPositionX, blockPositionY, blockPositionZ);
     } else {
       slipperiness = 0.91f;
     }

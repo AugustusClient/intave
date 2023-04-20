@@ -79,14 +79,20 @@ abstract class Playback extends SinkEnvironment {
     if (event.applyX()) {
       distance += Math.abs(position.getX() - event.x());
       position.setX(event.x());
+    } else {
+      event.setX(position.getX());
     }
     if (event.applyY()) {
       distance += Math.abs(position.getY() - event.y());
       position.setY(event.y());
+    } else {
+      event.setY(position.getY());
     }
     if (event.applyZ()) {
       distance += Math.abs(position.getZ() - event.z());
       position.setZ(event.z());
+    } else {
+      event.setZ(position.getZ());
     }
     distance = Math.min(distance, 1);
     entityPositions.put(entityId, position);

@@ -720,8 +720,7 @@ public final class Physics extends Check {
 
       debug += " y:" + formatDouble(movementData.motionY(), 4) + "@" + decimalPlacesOf(movementData.positionY(), 4);
 
-
-      debug += " x:" + formatDouble(movementData.motionX(), 4) + " z:" + formatDouble(movementData.motionZ(), 4);
+//      debug += " x:" + formatDouble(movementData.motionX(), 4) + " z:" + formatDouble(movementData.motionZ(), 4);
       if (!simulation.details().isEmpty()) {
         debug += ChatColor.ITALIC + " " + simulation.details() + chatColor;
       }

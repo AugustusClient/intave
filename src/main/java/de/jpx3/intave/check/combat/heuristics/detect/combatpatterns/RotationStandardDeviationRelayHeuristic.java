@@ -10,9 +10,11 @@ import de.jpx3.intave.module.linker.nayoro.NayoroRelay;
 import de.jpx3.intave.module.mitigate.AttackNerfStrategy;
 import de.jpx3.intave.module.nayoro.Environment;
 import de.jpx3.intave.module.nayoro.PlayerContainer;
+import de.jpx3.intave.module.nayoro.event.EntityMoveEvent;
 import de.jpx3.intave.module.nayoro.event.PlayerMoveEvent;
 import de.jpx3.intave.user.meta.CheckCustomMetadata;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 
 import java.util.List;
 
@@ -28,7 +30,7 @@ public final class RotationStandardDeviationRelayHeuristic extends MetaCheckPart
     Environment environment = player.environment();
     int lastAttacked = player.lastAttackedEntity();
     if (lastAttacked != -1) {
-      Bukkit.broadcastMessage(lastAttacked + " " + player.recentlyAttacked(500) + " " + environment.entityMoved(lastAttacked, 0.05));
+//      Bukkit.broadcastMessage(lastAttacked + " " + player.recentlyAttacked(500) + " " + environment.entityMoved(lastAttacked, 0.05));
     }
     if (lastAttacked != -1 && player.recentlyAttacked(500) && environment.entityMoved(lastAttacked, 0.05)) {
       float yaw = event.yaw();
@@ -54,6 +56,13 @@ public final class RotationStandardDeviationRelayHeuristic extends MetaCheckPart
         evaluatePitchPatterns(player);
         meta.distancesToPerfectPitch.clear();
       }
+    }
+  }
+
+  @NayoroRelay
+  public void onEntityMove(PlayerContainer player, EntityMoveEvent move) {
+    if (move.entityId() == player.lastAttackedEntity() && player.recentlyAttacked(500)) {
+      Bukkit.broadcastMessage(MathHelper.formatPosition(new Location(null, move.x(), move.y(), move.z())));
     }
   }
 

@@ -12,6 +12,7 @@ import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.module.violation.Violation;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.CheckCustomMetadata;
+import net.minecraft.network.protocol.BundlePacket;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -167,7 +168,7 @@ public final class JumpAndPlace extends MetaCheckPart<PlacementAnalysis, JumpAnd
     meta.lastBlocksPlaced.add(place.getBlock().getLocation().toVector());
   }
 
-  private boolean isOneLine(List<Vector> blocks) {
+  private boolean isOneLine(List<? extends Vector> blocks) {
     int lastBlockX = 0,
       lastBlockY = 0,
       lastBlockZ = 0;

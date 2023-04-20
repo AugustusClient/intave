@@ -1,5 +1,6 @@
 package de.jpx3.intave;
 
+import com.comphenix.protocol.utility.MinecraftVersion;
 import de.jpx3.intave.access.IntaveAccess;
 import de.jpx3.intave.access.IntaveInternalException;
 import de.jpx3.intave.accessbackend.IntaveAccessService;
@@ -165,6 +166,12 @@ public final class IntavePlugin extends JavaPlugin {
   @Override
   public void onEnable() {
     logger.info("Please stand by..");
+
+    if (IntaveControl.DEBUG_SERVER_VERSION) {
+      MinecraftVersion version = MinecraftVersion.getCurrentVersion();
+      int ver = version.getMinor() * 10 + version.getBuild();
+      logger.info("[debug] Server version: " + version + " (" + ver + ")");
+    }
 
     // stage 4
     Modules.proceedBoot(BootSegment.STAGE_4);

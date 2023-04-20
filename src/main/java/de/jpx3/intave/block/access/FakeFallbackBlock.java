@@ -29,7 +29,7 @@ public class FakeFallbackBlock implements Block {
   }
 
   @Override
-  public Block getRelative(int i, int i1, int i2) {
+  public Block getRelative(int x, int y, int z) {
     return this;
   }
 
@@ -105,42 +105,42 @@ public class FakeFallbackBlock implements Block {
 
   @Override
   public Chunk getChunk() {
-    return null;
+    throw new UnsupportedOperationException("An intermediate block does not have a bukkit chunk");
   }
 
   @Override
   public void setData(byte b) {
-
+    throw new UnsupportedOperationException("An intermediate block is not allowed to be changed");
   }
 
   @Override
   public void setData(byte b, boolean b1) {
-
+    throw new UnsupportedOperationException("An intermediate block is not allowed to be changed");
   }
 
   @Override
   public void setType(Material material) {
-
+    throw new UnsupportedOperationException("An intermediate block is not allowed to be changed");
   }
 
   @Override
   public void setType(Material material, boolean b) {
-
+    throw new UnsupportedOperationException("An intermediate block is not allowed to be changed");
   }
 
   @Override
   public boolean setTypeId(int i) {
-    return false;
+    throw new UnsupportedOperationException("An intermediate block is not allowed to be changed");
   }
 
   @Override
   public boolean setTypeId(int i, boolean b) {
-    return false;
+    throw new UnsupportedOperationException("An intermediate block is not allowed to be changed");
   }
 
   @Override
   public boolean setTypeIdAndData(int i, byte b, boolean b1) {
-    return false;
+    throw new UnsupportedOperationException("An intermediate block is not allowed to be changed");
   }
 
   @Override
@@ -150,7 +150,7 @@ public class FakeFallbackBlock implements Block {
 
   @Override
   public BlockState getState() {
-    return null;
+    throw new UnsupportedOperationException("An intermediate block does not have a bukkit state");
   }
 
   @Override
@@ -160,7 +160,7 @@ public class FakeFallbackBlock implements Block {
 
   @Override
   public void setBiome(Biome biome) {
-
+    throw new UnsupportedOperationException("An intermediate block is not allowed to be changed");
   }
 
   @Override
@@ -245,7 +245,7 @@ public class FakeFallbackBlock implements Block {
 
   @Override
   public List<MetadataValue> getMetadata(String s) {
-    return null;
+    return Collections.emptyList();
   }
 
   @Override

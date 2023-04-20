@@ -74,6 +74,7 @@ public final class ConnectionMetadata {
   public long delayedPackets = 0;
   public long lastDelayRequest = 0;
   public long blinkDeactivated = 0;
+  public long lastRespawn = 0;
   public boolean lastBlinkState = false;
 
   // Client Synchronization

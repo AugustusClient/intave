@@ -201,9 +201,11 @@ public final class MovementDispatcher extends Module {
     Player player = event.getPlayer();
     User user = UserRepository.userOf(player);
     MetadataBundle meta = user.meta();
+    ConnectionMetadata connection = meta.connection();
     MovementMetadata movementData = meta.movement();
     movementData.artificialFallDistance = 0;
     movementData.dismountRidingEntity();
+    connection.lastRespawn = System.currentTimeMillis();
     FakePlayer fakePlayer = meta.attack().fakePlayer();
     if (fakePlayer != null) {
       fakePlayer.respawn();
