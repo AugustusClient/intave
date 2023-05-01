@@ -19,11 +19,14 @@ import de.jpx3.intave.executor.TaskTracker;
 import de.jpx3.intave.module.Module;
 import de.jpx3.intave.module.Modules;
 import de.jpx3.intave.module.feedback.EmptyFeedbackCallback;
+import de.jpx3.intave.module.feedback.FeedbackCallback;
 import de.jpx3.intave.module.feedback.FeedbackObserver;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.module.nayoro.Nayoro;
 import de.jpx3.intave.module.nayoro.event.EntityMoveEvent;
+import de.jpx3.intave.module.nayoro.event.EntityRemoveEvent;
+import de.jpx3.intave.module.nayoro.event.EntitySpawnEvent;
 import de.jpx3.intave.module.nayoro.event.sink.EventSink;
 import de.jpx3.intave.packet.PacketSender;
 import de.jpx3.intave.packet.reader.EntityDestroyReader;
@@ -511,31 +514,32 @@ public final class EntityTracker extends Module {
 
     entity.immediateEntityTeleport(user, packet);
     if (entity.typeData().isLivingEntity() && entity.tracingEnabled()) {
+      FeedbackObserver observer = entity.feedbackTracker();
       EmptyFeedbackCallback task = () -> {
         entity.verifiedPosition = false;
-        entity.flyingPacketMap.put(event, 0);
+//        entity.flyingPacketMap.put(event, 0);
         entity.handleEntityTeleport(user, packet);
         entity.clientSynchronized = true;
         nayoroEntityPositionUpdate(player, entity);
       };
-//      FeedbackObserver observer = entity.feedbackTracker();
-//////      if (entity.doubleVerification) {
-//////        FeedbackCallback<PacketEvent> verificationTask = (x, theEvent) -> entity.verifiedPosition = true;
-//////        Modules.feedback().tracedDoubleSynchronize(player, event, event, task, verificationTask, feedbackTracker, feedbackTracker);
-//////      } else {
-////      Modules.feedback().tracedSingleSynchronize(player, event, task, observer);
-//      user.tracedTickFeedback(task, observer);
-//
-//////      }
-      FeedbackCallback<PacketEvent> doubleTransactionTask = (player1, event1) -> {
-        int flyingPacketSent = entity.flyingPacketMap.remove(event);
-        // Handle transaction split
-        if (flyingPacketSent > 0) {
-          entity.splitAmount = flyingPacketSent;
-        }
-      };
-      FeedbackTracker feedbackTracker = entity.feedbackTracker();
-      Modules.feedback().tracedDoubleSynchronize(player, event, event, task, doubleTransactionTask, feedbackTracker, feedbackTracker);
+////      if (entity.doubleVerification) {
+////        FeedbackCallback<PacketEvent> verificationTask = (x, theEvent) -> entity.verifiedPosition = true;
+////        Modules.feedback().tracedDoubleSynchronize(player, event, event, task, verificationTask, feedbackTracker, feedbackTracker);
+////      } else {
+//      Modules.feedback().tracedSingleSynchronize(player, event, task, observer);
+      user.tracedTickFeedback(task, observer);
+
+////      }
+//      FeedbackCallback<PacketEvent> doubleTransactionTask = (p, e) -> {
+//        int flyingPacketSent = entity.flyingPacketMap.remove(event);
+//        // Handle transaction split
+//        if (flyingPacketSent > 0) {
+//          entity.splitAmount = flyingPacketSent;
+//          Bukkit.broadcastMessage("Detected split transaction for " + p.getName() + "!");
+//        }
+//      };
+//      FeedbackObserver feedbackTracker = entity.feedbackTracker();
+//      Modules.feedback().tracedDoubleSynchronize(player, event, event, task, doubleTransactionTask, feedbackTracker, feedbackTracker);
     } else {
       entity.handleEntityTeleport(user, packet);
       entity.clientSynchronized = false;
@@ -591,28 +595,29 @@ public final class EntityTracker extends Module {
     entity.immediateEntityMovement(packet);
 
     if (entity.typeData().isLivingEntity() && entity.tracingEnabled()) {
-      FeedbackCallback<PacketEvent> task = (player1, event1) -> {
+      EmptyFeedbackCallback task = () -> {
         entity.verifiedPosition = false;
-        entity.flyingPacketMap.put(event, 0);
+//        entity.flyingPacketMap.put(event, 0);
         entity.handleEntityMovement(packet);
         nayoroEntityPositionUpdate(player, entity);
       };
-      FeedbackCallback<PacketEvent> doubleTransactionTask = (player1, event1) -> {
-        int flyingPacketSent = entity.flyingPacketMap.remove(event);
-        // Handle transaction split
-        if (flyingPacketSent > 0) {
-          entity.splitAmount = flyingPacketSent;
-        }
-      };
-      FeedbackTracker tracker = entity.feedbackTracker();
-      Modules.feedback().tracedDoubleSynchronize(player, event, event, task, doubleTransactionTask, tracker, tracker);
+//      FeedbackCallback<PacketEvent> doubleTransactionTask = (player1, event1) -> {
+//        int flyingPacketSent = entity.flyingPacketMap.remove(event);
+//        // Handle transaction split
+//        if (flyingPacketSent > 0) {
+//          entity.splitAmount = flyingPacketSent;
+//          Bukkit.broadcastMessage("Detected split transaction for " + player1.getName() + "!");
+//        }
+//      };
       FeedbackObserver tracker = entity.feedbackTracker();
+//      Modules.feedback().tracedDoubleSynchronize(player, event, event, task, doubleTransactionTask, tracker, tracker);
+//      FeedbackObserver tracker = entity.feedbackTracker();
 ////      if (entity.doubleVerification) {
 ////        FeedbackCallback<PacketEvent> verificationTask = (x, theEvent) -> entity.verifiedPosition = true;
 ////        Modules.feedback().tracedDoubleSynchronize(player, event, event, task, verificationTask, tracker, tracker);
 ////      } else {
 //      Modules.feedback().tracedSingleSynchronize(player, event, task, tracker);
-//      user.tracedTickFeedback(task, tracker);
+      user.tracedTickFeedback(task, tracker);
 ////      }
     } else {
       entity.handleEntityMovement(packet);

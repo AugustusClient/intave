@@ -196,7 +196,7 @@ public final class AttackRaytraceOld extends MetaCheck<AttackRaytraceOld.AttackR
             && !abilityData.ignoringMovementPackets();
 
           if (checkActivated) {
-            if (!protocolMetadata.flyingPacketStream()) {
+            if (!protocolMetadata.flyingPacketsAreSent()) {
               // >= 1.9.x
               if (entity.clientSynchronized
                 && !movementData.recentlyEncounteredFlyingPacket(2)

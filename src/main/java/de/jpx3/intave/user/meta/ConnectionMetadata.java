@@ -44,7 +44,6 @@ public final class ConnectionMetadata {
   public final Set<Integer> shouldNotBeAttacked = new HashSet<>();
   @Deprecated
   public boolean markAttackInvalid;
-
   public int windowClickId;
 
   public enum DecoySide {
