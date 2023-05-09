@@ -189,6 +189,11 @@ public final class SimulationEvaluator {
       }
     }
 
+    // Sometimes shit happens
+    if (movement.sneakingTicks <= 1) {
+      verticalLegitimateDeviation = Math.max(verticalLegitimateDeviation, 0.08f);
+    }
+
     double abuseVertically = Math.max(0, differenceY - verticalLegitimateDeviation);
     boolean allowDeviation = fastMathAffected || movement.inLava() || movement.isInVehicle();
     double multiplier;
