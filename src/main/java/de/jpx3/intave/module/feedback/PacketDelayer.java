@@ -154,7 +154,7 @@ public final class PacketDelayer extends Module {
     }
 
     connection.lastBlinkState = requestBuffer;
-    boolean activatePacketBuffer = !tooManyPackets && !player.isDead() && System.currentTimeMillis() - connection.lastRespawn > 3000 && (requestBuffer || (System.currentTimeMillis() - connection.blinkDeactivated < 1000));
+    boolean activatePacketBuffer = !tooManyPackets && !player.isDead() && System.currentTimeMillis() - connection.lastRespawn > 3000 && (requestBuffer || (System.currentTimeMillis() - connection.blinkDeactivated < 750));
 
     if (activatePacketBuffer && reverseBlink) {
       // put all delayed packets into the enqueuedPacket queue
@@ -238,11 +238,7 @@ public final class PacketDelayer extends Module {
 
   private long oldestPendingTransaction(User user) {
     ConnectionMetadata connection = user.meta().connection();
-    Queue<FeedbackRequest<?>> feedbackRequests = connection.pendingFeedbackRequests();
-    FeedbackRequest<?> peek = feedbackRequests.peek();
-    if (peek == null) {
-      return 0;
-    }
-    return System.currentTimeMillis() - peek.requested();
+    FeedbackRequest<?> peek = connection.feedbackQueue().peek();
+    return peek == null ? 0 : System.currentTimeMillis() - peek.requested();
   }
 }
