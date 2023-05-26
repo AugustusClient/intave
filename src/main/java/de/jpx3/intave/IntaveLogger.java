@@ -4,6 +4,7 @@ import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.adapter.ProtocolLibraryAdapter;
 import de.jpx3.intave.diagnostic.ConsoleOutput;
 import de.jpx3.intave.executor.BackgroundExecutor;
+import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.resource.FileArchiver;
 import de.jpx3.intave.version.JavaVersion;
 import org.bukkit.Bukkit;
@@ -42,6 +43,7 @@ public final class IntaveLogger extends PluginLogger {
     this.plugin = plugin;
     this.archiver = new FileArchiver();
 //    outputStreams.add(System.out);
+    FILE_OUTPUT = plugin.settings().getBoolean("logging.file-log", true);
     setup();
   }
 

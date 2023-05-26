@@ -80,7 +80,7 @@ public class FakeFallbackBlock implements Block {
 
   @Override
   public int getY() {
-    return WorldHeight.LOWER_WORLD_LIMIT - 1;
+    return WorldHeight.LOWER_WORLD_LIMIT - 1; // important
   }
 
   @Override

@@ -44,7 +44,6 @@ public final class SneakAndPlace extends MetaCheckPart<PlacementAnalysis, SneakA
     Player player = event.getPlayer();
     SneakAndPlaceMeta meta = metaOf(player);
     if (meta.placedInThisTick || meta.sneakChangedInThisTick) {
-//      player.sendMessage(meta.sneakInThisTick + "("+meta.startSneakInThisTick+","+meta.stopSneakInThisTick+")/" + meta.placedInThisTick);
       if (meta.placedInThisTick) {
         // difference to last sneak start
         long diff = meta.startSneakInThisTick ? 0 : meta.tickCount - meta.lastSneakStart;
@@ -54,7 +53,6 @@ public final class SneakAndPlace extends MetaCheckPart<PlacementAnalysis, SneakA
           meta.violationLevel -= 0.05;
         } else if (suspiciousSneaking) {
           meta.violationLevel += diff > 1 ? 0.1 : 1;
-//          player.sendMessage(ChatColor.YELLOW + "Sneak start -> Place: " + diff + " last duration: " + meta.lastSneakDuration);
         }
       }
       if (meta.sneakChangedInThisTick) {
@@ -65,7 +63,6 @@ public final class SneakAndPlace extends MetaCheckPart<PlacementAnalysis, SneakA
           meta.violationLevel -= 0.05;
         } else if (suspiciousSneaking) {
           meta.violationLevel += diff > 1 ? 0.1 : 1;
-//          player.sendMessage(ChatColor.YELLOW +"Place -> Sneak start: " + diff + " last duration: " + meta.lastSneakDuration);
         }
       }
     }
@@ -123,22 +120,16 @@ public final class SneakAndPlace extends MetaCheckPart<PlacementAnalysis, SneakA
     PlayerActionReader reader = PacketReaders.readerOf(packet);
 
     PlayerAction action = reader.playerAction();
-    switch (action) {
-      case START_SNEAKING:
-        meta.startSneakInThisTick = true;
-        meta.sneakChangedInThisTick = true;
-        meta.isSneaking = true;
-        meta.sneakDuration = 0;
-        break;
-      case STOP_SNEAKING:
-        meta.stopSneakInThisTick = true;
-        meta.sneakChangedInThisTick = true;
-        meta.isSneaking = false;
-        meta.lastSneakDuration = meta.sneakDuration;
-        meta.sneakDuration = 0;
-        break;
+    if (action.isStartSneak()) {
+      meta.startSneakInThisTick = true;
+      meta.sneakChangedInThisTick = true;
+      meta.sneakDuration = 0;
+    } else if (action.isStopSneak()) {
+      meta.stopSneakInThisTick = true;
+      meta.sneakChangedInThisTick = true;
+      meta.lastSneakDuration = meta.sneakDuration;
+      meta.sneakDuration = 0;
     }
-
     reader.release();
   }
 
@@ -221,8 +212,6 @@ public final class SneakAndPlace extends MetaCheckPart<PlacementAnalysis, SneakA
     private boolean stopSneakInThisTick;
     private boolean sneakChangedInThisTick;
     private boolean placedInThisTick;
-    private boolean isSneaking;
-    private boolean suspicious;
     private long lastSneakStart;
     private long lastPlace;
     private long lastSneakDuration = 10;

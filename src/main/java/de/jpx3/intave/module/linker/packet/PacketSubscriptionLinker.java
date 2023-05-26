@@ -31,7 +31,7 @@ import static de.jpx3.intave.IntaveControl.IGNORE_CHUNK_PACKETS;
 
 @DoNotFlowObfuscate
 public final class PacketSubscriptionLinker extends Module {
-  private static final boolean IGNORE_CHAT_PACKETS = false;
+  private static boolean IGNORE_CHAT_PACKETS = false;
   private final IntavePlugin plugin;
   private final Map<PacketType, SCOWAList<FilteringPacketAdapter>> customEngineListenerMappings = new ConcurrentHashMap<>();
   private final Map<PacketType, SCOWAList<FilteringPacketAdapter>> internalPacketListenerMappings = new ConcurrentHashMap<>();
@@ -41,6 +41,7 @@ public final class PacketSubscriptionLinker extends Module {
 
   public PacketSubscriptionLinker(IntavePlugin plugin) {
     this.plugin = plugin;
+    IGNORE_CHAT_PACKETS |= plugin.settings().getBoolean("command.fix-tab-kicks", false);
   }
 
   @Override

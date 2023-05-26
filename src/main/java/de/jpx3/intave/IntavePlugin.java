@@ -63,6 +63,7 @@ import de.jpx3.intave.resource.Resources;
 import de.jpx3.intave.resource.legacy.EncryptedLegacyResource;
 import de.jpx3.intave.security.*;
 import de.jpx3.intave.security.letis.Letis;
+import de.jpx3.intave.share.ClientMathHelper;
 import de.jpx3.intave.share.link.WrapperConverter;
 import de.jpx3.intave.test.TestService;
 import de.jpx3.intave.trustfactor.TrustFactorService;
@@ -192,6 +193,8 @@ public final class IntavePlugin extends JavaPlugin {
     }
 
     InterceptorDetection.setup();
+
+    System.out.println(1 + ClientMathHelper.calculateLogBaseTwo(ClientMathHelper.roundUpToPowerOfTwo(30000000)));
 
     try {
       // We need to put this here before setting up the Synchronizer

@@ -7,6 +7,7 @@ import de.jpx3.intave.klass.rewrite.PatchyAutoTranslation;
 import de.jpx3.intave.klass.rewrite.PatchyTranslateParameters;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
+import de.jpx3.intave.world.WorldHeight;
 import net.minecraft.server.v1_14_R1.*;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -39,6 +40,10 @@ public final class v14BlockAccessor implements BlockAccessor {
   @Override
   @PatchyAutoTranslation
   public Material typeOf(Block block) {
+    int blockY = block.getY();
+    if (blockY < WorldHeight.LOWER_WORLD_LIMIT || blockY > WorldHeight.UPPER_WORLD_LIMIT) {
+      return Material.AIR;
+    }
     WorldServer worldServer = ((CraftWorld) block.getWorld()).getHandle();
     IBlockAccess blockAccess = worldServer.getChunkProvider().c(block.getX() >> 4, block.getZ() >> 4);
     if (blockAccess == null) {
@@ -52,6 +57,10 @@ public final class v14BlockAccessor implements BlockAccessor {
   @Override
   @PatchyAutoTranslation
   public int variantIndexOf(Block block) {
+    int blockY = block.getY();
+    if (blockY < WorldHeight.LOWER_WORLD_LIMIT || blockY > WorldHeight.UPPER_WORLD_LIMIT) {
+      return 0;
+    }
     Material type = typeOf(block);
     IBlockData blockData = (IBlockData) nativeVariantOf(block);
     int variantIndex = BlockVariantRegister.variantIndexOf(type, blockData);
@@ -61,6 +70,10 @@ public final class v14BlockAccessor implements BlockAccessor {
   @Override
   @PatchyAutoTranslation
   public Object nativeVariantOf(Block block) {
+    int blockY = block.getY();
+    if (blockY < WorldHeight.LOWER_WORLD_LIMIT || blockY > WorldHeight.UPPER_WORLD_LIMIT) {
+      return Blocks.AIR.getBlockData();
+    }
     WorldServer worldServer = ((CraftWorld) block.getWorld()).getHandle();
     IBlockAccess blockAccess = worldServer.getChunkProvider().c(block.getX() >> 4, block.getZ() >> 4);
     if (blockAccess == null) {

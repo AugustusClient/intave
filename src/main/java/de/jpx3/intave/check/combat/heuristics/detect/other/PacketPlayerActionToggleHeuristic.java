@@ -61,7 +61,7 @@ public final class PacketPlayerActionToggleHeuristic extends MetaCheckPart<Heuri
     PlayerAction action = PlayerActionResolver.resolveActionFromPacket(packet);
 
     boolean sprint = action == PlayerAction.START_SPRINTING || action == PlayerAction.STOP_SPRINTING;
-    boolean sneak = action.isSneaking();
+    boolean sneak = action.isSneakRelated();
     if (!sprint && !sneak) {
       return;
     }

@@ -38,13 +38,13 @@ public final class DoubleEntityActionHeuristic extends MetaCheckPart<Heuristics,
     DoubleEntityActionHeuristicMeta meta = metaOf(user);
 
     String message = null;
-    if (action == PlayerAction.START_SNEAKING) {
+    if (action.isStartSneak()) {
       if (meta.isSneaking != null && meta.isSneaking) {
         message = "sent start_sneak packet twice";
       }
       meta.isSneaking = true;
     }
-    if (action == PlayerAction.STOP_SNEAKING) {
+    if (action.isStopSneak()) {
       if (meta.isSneaking != null && !meta.isSneaking) {
         message = "sent stop_sneak packet twice";
       }

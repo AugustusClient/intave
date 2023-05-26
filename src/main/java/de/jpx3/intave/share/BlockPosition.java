@@ -206,6 +206,30 @@ public final class BlockPosition extends NativeVector {
     );
   }
 
+  public int getBlockX() {
+    return (int) xCoord;
+  }
+
+  public int getX() {
+    return (int) xCoord;
+  }
+
+  public int getBlockY() {
+    return (int) yCoord;
+  }
+
+  public int getY() {
+    return (int) yCoord;
+  }
+
+  public int getBlockZ() {
+    return (int) zCoord;
+  }
+
+  public int getZ() {
+    return (int) zCoord;
+  }
+
   /**
    * Serialize this BlockPos into a long value
    */

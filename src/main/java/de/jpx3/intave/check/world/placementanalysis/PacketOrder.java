@@ -21,11 +21,8 @@ import static de.jpx3.intave.math.MathHelper.averageOf;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
 
 public final class PacketOrder extends MetaCheckPart<PlacementAnalysis, PacketOrder.PlacementOrderMeta> {
-  private final IntavePlugin plugin;
-
   public PacketOrder(PlacementAnalysis parentCheck) {
     super(parentCheck, PlacementOrderMeta.class);
-    plugin = IntavePlugin.singletonInstance();
   }
 
   @PacketSubscription(

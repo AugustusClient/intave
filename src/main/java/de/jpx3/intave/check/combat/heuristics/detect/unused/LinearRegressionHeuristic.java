@@ -40,7 +40,7 @@ public final class LinearRegressionHeuristic extends MetaCheckPart<Heuristics, L
     Player player = event.getPlayer();
     PlayerAction action = PlayerActionResolver.resolveActionFromPacket(event.getPacket());
 
-    if (action == PlayerAction.START_SNEAKING) {
+    if (action.isStartSneak()) {
       createNewWindow(player);
     }
   }

@@ -9,6 +9,13 @@ import de.jpx3.intave.packet.converter.BlockPositionConverter;
 public class BlockPositionReader extends AbstractPacketReader {
   private final boolean MODERN_RESOLVE = MinecraftVersions.VER1_14_0.atOrAbove();
 
+  public de.jpx3.intave.share.BlockPosition nativeBlockPosition() {
+    BlockPosition blockPosition = blockPosition();
+    return new de.jpx3.intave.share.BlockPosition(
+      blockPosition.getX(), blockPosition.getY(), blockPosition.getZ()
+    );
+  }
+
   public BlockPosition blockPosition() {
     if (MODERN_RESOLVE) {
       MovingObjectPositionBlock movingObjectPositionBlock = packet().getMovingBlockPositions().readSafely(0);

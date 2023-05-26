@@ -164,6 +164,10 @@ command:
     "/alerts": "/intave verbose"
     "/cps": "/intave cps"
 
+  # Apply a fix that disables command hide and reroute features,
+  # but fixes a 1.12 bug that kicks players when they tab a command
+  fix-tab-kicks: false
+
 rejoin:
   # Don't forget to reset this value when you deactivate it
   delay: 3600

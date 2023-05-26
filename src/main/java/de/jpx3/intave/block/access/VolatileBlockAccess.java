@@ -113,16 +113,15 @@ public final class VolatileBlockAccess {
   private static Block fallbackBlock(World world) {
     Location spawnLocation = world.getSpawnLocation();
     if (!world.isChunkLoaded(spawnLocation.getBlockX(), spawnLocation.getBlockZ())) {
-      try {
-        Chunk[] loadedChunks = world.getLoadedChunks();
-        if (loadedChunks.length > 0) {
-          Chunk anyChunk = loadedChunks[0];
-          return world.getBlockAt(anyChunk.getX() << 4, LOWER_WORLD_LIMIT - 1, anyChunk.getZ() << 4);
-        }
-      } catch (ConcurrentModificationException ignored) {}
-      return EMERGENCY_FALLBACK_BLOCKS.computeIfAbsent(
-        world, FakeFallbackBlock::new
-      );
+      // too expensive
+//      try {
+//        Chunk[] loadedChunks = world.getLoadedChunks();
+//        if (loadedChunks.length > 0) {
+//          Chunk anyChunk = loadedChunks[0];
+//          return world.getBlockAt(anyChunk.getX() << 4, LOWER_WORLD_LIMIT - 1, anyChunk.getZ() << 4);
+//        }
+//      } catch (ConcurrentModificationException ignored) {}
+      return EMERGENCY_FALLBACK_BLOCKS.computeIfAbsent(world, FakeFallbackBlock::new);
     }
     return world.getBlockAt(spawnLocation.getBlockX(), LOWER_WORLD_LIMIT - 1, spawnLocation.getBlockZ());
   }

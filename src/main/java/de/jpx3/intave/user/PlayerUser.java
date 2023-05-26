@@ -173,7 +173,7 @@ final class PlayerUser implements User {
   public Player player() {
     Player player = this.player.get();
     if (player == null) {
-      throw new IntaveInternalException("Unable to reference player through service repo: Fallback user lacks reference");
+      throw new IntaveInternalException("Player be gone");
     }
     return player;
   }
@@ -190,8 +190,7 @@ final class PlayerUser implements User {
 
   @Override
   public boolean hasPlayer() {
-    Player player = this.player.get();
-    return isOnline(player);
+    return isOnline(player.get());
   }
 
   private boolean isOnline(OfflinePlayer player) {
@@ -200,15 +199,17 @@ final class PlayerUser implements User {
 
   @Override
   public CheckCustomMetadata checkMetadata(Class<? extends CheckCustomMetadata> metaClass) {
-    return metadataPool.computeIfAbsent(metaClass, initializeMe -> {
-      try {
-        return initializeMe.newInstance();
-      } catch (RuntimeException exception) {
-        throw exception;
-      } catch (Exception exception) {
-        throw new IllegalStateException(exception);
-      }
-    });
+    return metadataPool.computeIfAbsent(metaClass, this::newMetadata);
+  }
+
+  private CheckCustomMetadata newMetadata(Class<? extends CheckCustomMetadata> initializeMe) {
+    try {
+      return initializeMe.newInstance();
+    } catch (RuntimeException exception) {
+      throw exception;
+    } catch (Exception exception) {
+      throw new IllegalStateException(exception);
+    }
   }
 
   @Override
@@ -222,8 +223,8 @@ final class PlayerUser implements User {
   }
 
   @Override
-  public void setCustomClientSupport(CustomClientSupportConfig customClientSupportConfig) {
-    this.customClientConfig = customClientSupportConfig;
+  public void setCustomClientSupport(CustomClientSupportConfig config) {
+    this.customClientConfig = config;
   }
 
   @Override

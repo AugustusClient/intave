@@ -46,9 +46,9 @@ public final class SprintResetHeuristic extends MetaCheckPart<Heuristics, Sprint
 
     if (playerAction == PlayerAction.START_SPRINTING) {
       meta.startSprint = true;
-    } else if (playerAction == PlayerAction.STOP_SPRINTING) {
+    } else if (playerAction.isStopSneak()) {
       meta.stopSprint = true;
-    } else if (playerAction == PlayerAction.START_SNEAKING) {
+    } else if (playerAction.isStartSneak()) {
       meta.startSneak = true;
     }
   }
