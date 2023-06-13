@@ -7,6 +7,7 @@ import com.comphenix.protocol.wrappers.PlayerInfoData;
 import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.google.common.collect.Lists;
 import de.jpx3.intave.IntaveControl;
+import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.packet.reader.PacketReaders;
 import de.jpx3.intave.packet.reader.PlayerInfoReader;
@@ -25,8 +26,11 @@ import static com.comphenix.protocol.wrappers.EnumWrappers.NativeGameMode.SURVIV
 import static de.jpx3.intave.module.linker.packet.PacketId.Server.*;
 
 public final class VanishFilter extends Filter {
-  public VanishFilter() {
+  private final boolean disabled;
+
+  public VanishFilter(IntavePlugin plugin) {
     super("vanish");
+    disabled = plugin.settings().getBoolean("command.fix-tab-kicks", false);
   }
 
   private static final PlayerInfoData FAKE_JPX3_DATA = new PlayerInfoData(
@@ -143,6 +147,6 @@ public final class VanishFilter extends Filter {
 
   @Override
   protected boolean enabled() {
-    return true;
+    return !disabled;
   }
 }

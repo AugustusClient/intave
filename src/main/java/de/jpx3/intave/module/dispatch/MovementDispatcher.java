@@ -1016,12 +1016,10 @@ public final class MovementDispatcher extends Module {
   private static final Set<Material> PISTON_MATERIALS = MaterialSearch.materialsThatContain("PISTON");
 
   @PacketSubscription(
-      packetsOut = {
-          BLOCK_ACTION
-      }
+    packetsOut = BLOCK_ACTION
   )
   public void onBlockAction(
-      User user, BlockActionReader reader
+    User user, BlockActionReader reader
   ) {
     Player player = user.player();
     MovementMetadata movement = user.meta().movement();

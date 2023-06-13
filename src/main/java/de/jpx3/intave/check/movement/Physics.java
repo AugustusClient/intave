@@ -843,8 +843,8 @@ public final class Physics extends Check {
     if (!refreshNearbyBlocksOnDetection()) {
       return;
     }
+    BoundingBox box = BoundingBox.fromPosition(user, user.meta().movement(), x, y, z).grow(1.2);
     Player player = user.player();
-    BoundingBox box = BoundingBox.fromPosition(user, user.meta().movement(), x, y, z).grow(1.5);
     List<Position> positions = Collision.collectCollidingPositions(player, box, 16, Collectors.toList());
     Synchronizer.synchronize(() -> {
       for (Position position : positions) {

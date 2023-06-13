@@ -74,8 +74,6 @@ public final class ForwardingPacketAdapter extends WeakReferencePacketAdapter {
 
   @Override
   public String toString() {
-    return "ForwardingPacketAdapter{" +
-      "targetList=" + targetList +
-      '}';
+    return targetList.toString();
   }
 }

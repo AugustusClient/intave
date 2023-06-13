@@ -197,10 +197,14 @@ public final class PacketSubscriptionLinker extends Module {
   }
 
   private boolean excluded(PacketType packetType) {
+    boolean tabChatPacket = packetType == PacketType.Play.Client.TAB_COMPLETE ||
+      packetType == PacketType.Play.Server.TAB_COMPLETE ||
+      packetType == PacketType.Play.Client.CHAT;
+//    if (tabChatPacket) {
+//      Thread.dumpStack();
+//    }
     if (IGNORE_CHAT_PACKETS) {
-      return packetType == PacketType.Play.Client.TAB_COMPLETE ||
-        packetType == PacketType.Play.Server.TAB_COMPLETE ||
-        packetType == PacketType.Play.Client.CHAT;
+      return tabChatPacket;
     }
     if (IGNORE_CHUNK_PACKETS) {
       return packetType == PacketType.Play.Server.MAP_CHUNK ||

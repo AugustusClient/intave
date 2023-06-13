@@ -37,7 +37,7 @@ public final class StartupTasks {
       try {
         task.run();
       } catch (Exception exception) {
-        System.out.println("[Intave] Shutdown task " + task + " failed to complete");
+        System.out.println("[Intave] Startup task " + task + " failed to complete");
         exception.printStackTrace();
       }
     }

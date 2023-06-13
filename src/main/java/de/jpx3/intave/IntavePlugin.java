@@ -15,7 +15,7 @@ import de.jpx3.intave.block.access.BlockAccess;
 import de.jpx3.intave.block.access.BlockInteractionAccess;
 import de.jpx3.intave.block.access.BlockWrapper;
 import de.jpx3.intave.block.access.VolatileBlockAccess;
-import de.jpx3.intave.block.collision.CollisionModifiers;
+import de.jpx3.intave.block.collision.modifier.CollisionModifiers;
 import de.jpx3.intave.block.fluid.Fluids;
 import de.jpx3.intave.block.physics.BlockPhysics;
 import de.jpx3.intave.block.physics.BlockProperties;
@@ -65,7 +65,6 @@ import de.jpx3.intave.resource.Resources;
 import de.jpx3.intave.resource.legacy.EncryptedLegacyResource;
 import de.jpx3.intave.security.*;
 import de.jpx3.intave.security.letis.Letis;
-import de.jpx3.intave.share.ClientMathHelper;
 import de.jpx3.intave.share.link.WrapperConverter;
 import de.jpx3.intave.test.TestService;
 import de.jpx3.intave.trustfactor.TrustFactorService;
@@ -761,10 +760,18 @@ public final class IntavePlugin extends JavaPlugin {
       }
     }
 
-    if (SIBYL_ALLOW_ALL) {
-      logger.warn("Sibyl is current disabled");
-      if (!DISABLE_LICENSE_CHECK || GOMME_MODE) {
-        throw new IllegalStateException("Sibyl is disabled, but license check is enabled");
+    Map<String, Boolean> enforceDisabled = new HashMap<>();
+    enforceDisabled.put("S????? is enabled", SIBYL_ALLOW_ALL);
+    enforceDisabled.put("Heuristic debugging is enabled", DEBUG_HEURISTICS);
+    enforceDisabled.put("Movement debugging is enabled", DEBUG_MOVEMENT);
+    enforceDisabled.put("Red trustfactor is enabled globally", APPLY_GLOBAL_LOW_TRUSTFACTOR);
+
+    for (Map.Entry<String, Boolean> entry : enforceDisabled.entrySet()) {
+      if (entry.getValue()) {
+        logger.warn(entry.getKey());
+        if (!DISABLE_LICENSE_CHECK || GOMME_MODE) {
+          throw new IllegalStateException(entry.getKey() + ", but license check is disabled");
+        }
       }
     }
 

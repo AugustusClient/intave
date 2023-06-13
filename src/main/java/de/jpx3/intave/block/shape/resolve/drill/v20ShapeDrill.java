@@ -78,7 +78,7 @@ public final class v20ShapeDrill extends AbstractShapeDrill {
   @PatchyTranslateParameters
   private IBlockAccess chunkAccessOf(World world, int posX, int posZ) {
     WorldServer handle = ((CraftWorld) world).getHandle();
-    return handle.getChunkProvider().c(posX >> 4, posZ >> 4);
+    return findChunk(handle.getChunkProvider(), posX >> 4, posZ >> 4);//handle.getChunkProvider().c(posX >> 4, posZ >> 4);
   }
 
   @PatchyAutoTranslation
