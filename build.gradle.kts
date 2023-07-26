@@ -1,9 +1,9 @@
-import net.minecrell.pluginyml.bukkit.BukkitPluginDescription.Permission.Default.FALSE
-import net.minecrell.pluginyml.bukkit.BukkitPluginDescription.Permission.Default.OP
+import net.minecrell.pluginyml.bukkit.BukkitPluginDescription.Permission.Default.*
 import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
   java
+  id("com.github.gmazzo.buildconfig") version "4.1.2"
   id("net.minecrell.plugin-yml.bukkit") version "0.5.2"
   id("com.github.johnrengelman.shadow") version "7.1.2"
   id("xyz.jpenilla.run-paper") version "2.1.0"
@@ -18,10 +18,7 @@ description = "Cheat detection software, providing fair play"
  * Dependencies
  */
 repositories {
-
   mavenCentral()
-
-  // Spigot
   maven { url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") }
   maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
 }
@@ -43,6 +40,7 @@ dependencies {
   compileOnly("org.jetbrains:annotations:23.1.0")
   compileOnly("it.unimi.dsi:fastutil:8.5.11")
 
+  // smile
   compileOnly("com.github.haifengl:smile-base:3.0.1")
   compileOnly("com.github.haifengl:smile-core:3.0.1")
 
@@ -116,47 +114,92 @@ bukkit {
 /*
  * Intave Gradle Tasks
  */
-tasks.register("iacClean") {
-  group = simpleName
-  dependsOn(tasks.clean)
-}
 
-tasks.register("iacBuild") {
+tasks.register("buildProduction") {
   group = simpleName
   dependsOn(tasks.build)
+  buildConfigFieldSafe("boolean", "PRODUCTION", "true")
+  dumpBuildConfig()
 }
 
-tasks.register("iacDeploy") {
+tasks.register("buildGomme") {
   group = simpleName
-  dependsOn("iacBuild")
-  doLast {
-    copy {
-      from("build/libs/$simpleName.jar")
-      into(TODO("enter custom deployment path, e.g. plugin directory"))
-    }
-  }
+  dependsOn(tasks.build)
+  buildConfigFieldSafe("boolean", "GOMME", "true")
+  dumpBuildConfig()
+}
+
+/*
+ * IntaveSettings build config
+ */
+buildConfig {
+  className("IntaveBuildConfig")
+  packageName("de.jpx3.intave")
+  useJavaOutput()
+
+  buildConfigFieldSafe("boolean", "PRODUCTION", "false");
+  buildConfigFieldSafe("boolean", "GOMME", "false")
+  buildConfigFieldSafe("String", "VERSION", "\"${rootProject.version}\"")
+}
+
+fun buildConfigFieldSafe(type: String, name: String, value: String) {
+  val buildConfig = buildConfig
+  val buildConfigFields = buildConfig.buildConfigFields
+  buildConfigFields.removeIf { it.name == name }
+  buildConfig.buildConfigField(type, name, value)
+}
+
+fun dumpBuildConfig() {
+  val buildConfig = buildConfig
+  val buildConfigFields = buildConfig.buildConfigFields
+  println(">> BuildConfig:")
+  buildConfigFields.forEach { println("  ${it.name} = ${it.value.get()}") }
 }
 
 run {
-  registerServerTask("1.8.8", 8)
-  registerServerTask("1.9.4", 8)
-  registerServerTask("1.10.2", 8)
-  registerServerTask("1.11.2", 8)
-  registerServerTask("1.12.2", 8)
-  registerServerTask("1.13.2", 8)
-  registerServerTask("1.14.4", 8)
-  registerServerTask("1.15.2", 8)
-  registerServerTask("1.16.5", 8)
-  registerServerTask("1.17.1", 16)
-  registerServerTask("1.18.2", 17)
-  registerServerTask("1.19.4", 17)
-  registerServerTask("1.20.1", 17)
+  registerServer("1.8.8", 8)
+  registerServer("1.9.4", 8)
+  registerServer("1.10.2", 8)
+  registerServer("1.11.2", 8)
+  registerServer("1.12.2", 8)
+  registerServer("1.13.2", 8)
+  registerServer("1.14.4", 8)
+  registerServer("1.15.2", 8)
+  registerServer("1.16.5", 8)
+  registerServer("1.17.1", 16)
+  registerServer("1.18.2", 17)
+  registerServer("1.19.4", 17)
+  registerServer("1.20.1", 17)
+}
+
+fun registerServer(serverVersion: String, javaVersion: Int) {
+  registerTestTask(serverVersion, javaVersion)
+  registerServerTask(serverVersion, javaVersion)
+}
+
+fun registerTestTask(serverVersion: String, javaVersion: Int) {
+  tasks.register<RunServer>("test_${serverVersion}") {
+    group = simpleName
+    dependsOn("build")
+    pluginJars.from("build/libs/$simpleName.jar")
+    minecraftVersion(serverVersion)
+    runDirectory(File("runs/test_${serverVersion}-j$javaVersion"))
+    jvmArgs("-Dcom.mojang.eula.agree=true")
+    jvmArgs("-Dintave.test.success=shutdown")
+    javaLauncher.set(
+      project.javaToolchains.launcherFor {
+        // Sets the JDK version for the Minecraft server, Intave is still built using Java
+        // 1.8
+        languageVersion.set(JavaLanguageVersion.of(javaVersion))
+      }
+    )
+  }
 }
 
 fun registerServerTask(serverVersion: String, javaVersion: Int) {
-  tasks.register<RunServer>("paper_${serverVersion}") {
+  tasks.register<RunServer>("run_${serverVersion}") {
     group = simpleName
-    dependsOn("iacBuild")
+    dependsOn("build")
     pluginJars.from("build/libs/$simpleName.jar")
     minecraftVersion(serverVersion)
     runDirectory(File("runs/paper_${serverVersion}-j$javaVersion"))

@@ -52,7 +52,7 @@ public final class IntaveControl {
   public static final boolean ENABLE_MOVEMENT_DEBUGGER_COLLECTOR = false;
   public static final boolean MOVEMENT_DEBUGGER_COLLECTOR_POSTTICK_OUTPUT = false;
 
-  public static final boolean USE_EXTERNAL_CONFIGURATION_FILE = true;
-  public static final boolean GOMME_MODE = false;
-  public static final boolean DISABLE_LICENSE_CHECK = true;
+  public static final boolean USE_EXTERNAL_CONFIGURATION_FILE = !IntaveBuildConfig.PRODUCTION;
+  public static final boolean GOMME_MODE = IntaveBuildConfig.GOMME;
+  public static final boolean DISABLE_LICENSE_CHECK = !IntaveBuildConfig.PRODUCTION;
 }
