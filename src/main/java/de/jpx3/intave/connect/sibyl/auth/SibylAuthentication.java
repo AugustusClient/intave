@@ -182,7 +182,6 @@ public final class SibylAuthentication implements BukkitEventSubscriber {
     }
     internalWhitelist.add(UUID.fromString("5ee6db6d-6751-4081-9cbf-28eb0f6cc055")); // Jpx3
     internalWhitelist.add("Jpx3");
-    //    internalWhitelist.add(UUID.fromString("3fef889a-fb68-4dfb-bcee-38d56637f6f6")); // Klaus
     internalWhitelist.add(UUID.fromString("31eee66d-d818-40ad-b58a-7467f09a6a2c")); // Henriks9
     internalWhitelist.add("Henriks9");
     internalWhitelist.add(UUID.fromString("4669e155-946a-4aeb-a15b-aeb1123509c8")); // vento
@@ -195,6 +194,9 @@ public final class SibylAuthentication implements BukkitEventSubscriber {
     internalWhitelist.add("lennoxlotl");
     internalWhitelist.add(UUID.fromString("9ff4c4a6-5928-4dd3-b1a4-1e0c98ed1d42")); // Trattue
     internalWhitelist.add("Trattue");
+    internalWhitelist.add(UUID.fromString("3a9fa3aa-21f4-4c5d-b0fc-3165e4aaab7d")); // vxcus
+    internalWhitelist.add("vxcus");
+
     internalWhitelist = ImmutableList.copyOf(internalWhitelist);
   }
 
