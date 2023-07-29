@@ -39,7 +39,7 @@ class FlowingLava implements Liquid {
       '}';
   }
 
-  public static FlowingLava ofHeight(float height) {
+  static FlowingLava ofHeight(float height) {
     return new FlowingLava(height);
   }
 }

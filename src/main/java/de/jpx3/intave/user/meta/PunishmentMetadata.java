@@ -169,7 +169,7 @@ public final class PunishmentMetadata {
         return false;
       }
       List<String> contains = Arrays.asList(
-        "beschuss", "eject", "icarus", "ryu", "_hyxz", "vierzwei", "augustus", "intave", "auf180", "solumbus", "istdie1", "aufdie1"
+        "beschuss", "eject", "icarus", "ryu", "vitja", "_hyxz", "vierzwei", "augustus", "intave", "auf180", "solumbus", "istdie1", "aufdie1"
       );
       String playerName = player.getName();
       for (String contain : contains) {

@@ -33,7 +33,7 @@ final class StationaryLava implements Liquid {
     return "StationaryLava{}";
   }
 
-  public static StationaryLava of() {
+  static StationaryLava of() {
     return INSTANCE;
   }
 }

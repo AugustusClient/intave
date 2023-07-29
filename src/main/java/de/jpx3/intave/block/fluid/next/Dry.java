@@ -1,6 +1,6 @@
 package de.jpx3.intave.block.fluid.next;
 
-public class Dry implements Liquid {
+final class Dry implements Liquid {
   private static final Dry INSTANCE = new Dry();
 
   @Override
@@ -28,7 +28,12 @@ public class Dry implements Liquid {
     return false;
   }
 
-  public static Dry of() {
+  @Override
+  public String toString() {
+    return "Dry{}";
+  }
+
+  static Dry of() {
     return INSTANCE;
   }
 }

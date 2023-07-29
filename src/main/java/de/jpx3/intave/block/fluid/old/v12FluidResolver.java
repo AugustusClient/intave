@@ -108,7 +108,7 @@ final class v12FluidResolver extends FluidResolver {
   }
 
   private static int levelOfLiquidAt(Material material, int variantIndex) {
-    if (MaterialMagic.isLiquid(material)) {
+    if (MaterialMagic.isWater(material) || MaterialMagic.isLava(material)) {
       return BlockVariantRegister.variantOf(material, variantIndex).propertyOf("level");
     } else {
       return -1;

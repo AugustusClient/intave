@@ -2,6 +2,8 @@ package de.jpx3.intave.check.movement.physics;
 
 import de.jpx3.intave.block.access.VolatileBlockAccess;
 import de.jpx3.intave.block.collision.Collision;
+import de.jpx3.intave.block.fluid.next.Liquid;
+import de.jpx3.intave.block.fluid.next.Liquids;
 import de.jpx3.intave.block.fluid.old.Fluid;
 import de.jpx3.intave.block.fluid.old.Fluids;
 import de.jpx3.intave.block.physics.BlockProperties;
@@ -77,9 +79,11 @@ public final class BoatSimulator extends Simulator {
     for (int x = minX; x < maxX; ++x) {
       for (int y = minY; y < maxY; ++y) {
         for (int z = minZ; z < maxZ; ++z) {
-          Fluid fluid = Fluids.fluidAt(user, x, y, z);
-          if (fluid.isOfWater()) {
-            float f = y + fluid.height();
+//          Fluid fluid = Fluids.fluidAt(user, x, y, z);
+          Liquid liquid = Liquids.liquidAt(user, x, y, z);
+//          if (fluid.isOfWater()) {
+          if (liquid.isOfWater()) {
+            float f = y + liquid.height();
             movement.waterLevel = Math.max(f, movement.waterLevel);
             flag |= boundingBox.minY < f;
           }

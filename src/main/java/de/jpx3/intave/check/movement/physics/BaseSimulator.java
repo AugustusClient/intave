@@ -114,8 +114,7 @@ class BaseSimulator extends Simulator {
     if (waterUpdate && swimming) {
       double d3 = environment.lookVector().getY();
       double d4 = d3 < -0.2D ? 0.085D : 0.06D;
-      boolean fluidStateEmpty =
-        Fluids.fluidStateEmpty(user, positionX, positionY + 1.0 - 0.1, positionZ);
+      boolean fluidStateEmpty = Fluids.fluidStateEmpty(user, positionX, positionY + 1.0 - 0.1, positionZ);
       if (d3 <= 0.0D || jumped || !fluidStateEmpty) {
         motion.motionY += (d3 - motion.motionY) * d4;
       }

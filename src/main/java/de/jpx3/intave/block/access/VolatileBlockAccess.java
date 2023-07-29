@@ -7,12 +7,14 @@ import de.jpx3.intave.cleanup.GarbageCollector;
 import de.jpx3.intave.share.BlockPosition;
 import de.jpx3.intave.share.Position;
 import de.jpx3.intave.user.User;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.metadata.MetadataValue;
 
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

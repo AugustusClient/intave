@@ -39,7 +39,7 @@ class FlowingWater implements Liquid {
       '}';
   }
 
-  public static FlowingWater ofHeight(float height) {
+  static FlowingWater ofHeight(float height) {
     return new FlowingWater(height);
   }
 }

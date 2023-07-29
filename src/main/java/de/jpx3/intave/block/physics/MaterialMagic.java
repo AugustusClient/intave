@@ -1,6 +1,7 @@
 package de.jpx3.intave.block.physics;
 
 import de.jpx3.intave.annotate.refactoring.IdoNotBelongHere;
+import de.jpx3.intave.block.fluid.next.Liquids;
 import de.jpx3.intave.block.type.BlockTypeAccess;
 import org.bukkit.Material;
 
@@ -85,8 +86,10 @@ public final class MaterialMagic {
   private static final Material STATIONARY_WATER = Material.getMaterial("STATIONARY_WATER");
   private static final Material STATIONARY_LAVA = Material.getMaterial("STATIONARY_LAVA");
 
+  @Deprecated
   public static boolean isLiquid(Material material) {
-    return isLava(material) || isWater(material);
+    //return isLava(material) || isWater(material);
+    return Liquids.isLiquid(material);
   }
 
   public static boolean isLava(Material material) {

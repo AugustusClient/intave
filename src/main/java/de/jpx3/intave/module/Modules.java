@@ -26,11 +26,15 @@ public final class Modules {
     ShutdownTasks.add(Modules::shutdown);
   }
 
+  private static long lastBootSegment = 0L;
+
   @Native
   public static void proceedBoot(BootSegment bootSegment) {
 //    System.out.println("Proceeding boot segment " + bootSegment + "...");
+//    System.out.println("Last took " + (System.currentTimeMillis() - lastBootSegment) + "ms");
     loader.loadRequests(bootSegment).forEach(pool::loadModule);
     pool.bootRequests(bootSegment).forEach(pool::enableModule);
+    lastBootSegment = System.currentTimeMillis();
   }
 
   public static void shutdown() {

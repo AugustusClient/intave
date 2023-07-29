@@ -33,7 +33,7 @@ final class StationaryWater implements Liquid {
     return "StationaryWater{}";
   }
 
-  public static StationaryWater of() {
+  static StationaryWater of() {
     return INSTANCE;
   }
 }
