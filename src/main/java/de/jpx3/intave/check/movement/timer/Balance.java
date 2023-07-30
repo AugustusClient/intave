@@ -102,7 +102,7 @@ public final class Balance extends MetaCheckPart<Timer, Balance.BalanceMeta> {
     long overflowLimit = TimeUnit.MILLISECONDS.toNanos(25);
     MovementMetadata movementData = user.meta().movement();
 
-    player.setLevel((int) TimeUnit.NANOSECONDS.toMicros(timerData.timerBalance));
+//    player.setLevel((int) TimeUnit.NANOSECONDS.toMicros(timerData.timerBalance));
 
     if (timerData.timerBalance > overflowLimit && !user.meta().movement().isInVehicle()) {
 //      System.out.println(timerData.timerBalance + " > " + overflowLimit);
