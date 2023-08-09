@@ -57,19 +57,6 @@ public final class Balance extends MetaCheckPart<Timer, Balance.BalanceMeta> {
     metaOf(player).timerBalance -= TimeUnit.MILLISECONDS.toNanos(50);
   }
 
-  @PacketSubscription(
-    packetsOut = {
-      POSITION
-    }
-  )
-  public void sentPosition(PacketEvent event) {
-    User user = userOf(event.getPlayer());
-//    double leniency = user.meta().violationLevel().isInActiveTeleportBundle ? 10 : 60;
-    BalanceMeta timerData = metaOf(user);
-    timerData.timerBalance -= TimeUnit.MILLISECONDS.toNanos(50);
-    timerData.lastFlyingPacket = System.nanoTime();
-  }
-
   @DispatchTarget
   public void receiveMovement(PacketEvent event) {
     Player player = event.getPlayer();
@@ -167,12 +154,6 @@ public final class Balance extends MetaCheckPart<Timer, Balance.BalanceMeta> {
       int attackCancelThreshold = trustFactorSetting("act", player);
       int attackCancelLength = trustFactorSetting("acl", player);
       cancelOnPacketOverflow(player, event, attackCancelThreshold, attackCancelLength);
-
-//      User user = userOf(player);
-//      ConnectionMetadata connection = user.meta().connection();
-//      if (System.currentTimeMillis() - connection.lastAttackQueueRequest < 250) {
-//        event.setCancelled(true);
-//      }
     }
   }
 
@@ -204,20 +185,6 @@ public final class Balance extends MetaCheckPart<Timer, Balance.BalanceMeta> {
     Map<String, Double> stringDoubleMap = violationLevel.get(name);
     return stringDoubleMap.get("thresholds");
   }
-
-//  @Deprecated
-//  public void checkSetback(PacketEvent event) {
-//    Player player = event.getPlayer();
-//    User user = userOf(player);
-//    MovementMetadata movementData = user.meta().movement();
-//    TimerData timerData = metaOf(user);
-//    if (timerData.flagTick) {
-//      ComplexColliderSimulationResult result = this.simulationProcessor.simulateMovementWithoutKeyPress(user);
-//      Vector bukkitVector = result.context().toBukkitVector();
-//      Modules.mitigate().movementEmulator().emulationSetBack(player, bukkitVector, 6, false);
-//      movementData.invalidMovement = true;
-//    }
-//  }
 
   public static class BalanceMeta extends CheckCustomMetadata {
     public long timerBalance = Long.MIN_VALUE / 2; // give initial breathing room
