@@ -10,7 +10,22 @@ public final class Bursts extends TickAlignedHistoryBlueprint<Bursts.BurstMeta> 
 
   @Override
   public void analyzeClicks(User user, BurstMeta meta) {
+    int accumulativeConsecutiveClicks = 0;
+    int consecutiveClicks = 0;
+    for (TickAction tickAction : meta.tickActions) {
+      if (tickAction == TickAction.CLICK || tickAction == TickAction.ATTACK) {
+        consecutiveClicks++;
+      } else {
+        consecutiveClicks = 0;
+      }
+      if (consecutiveClicks > 4) {
+        accumulativeConsecutiveClicks += consecutiveClicks;
+      }
+    }
 
+    if (accumulativeConsecutiveClicks > 10) {
+      flag(user, "exhibits repetitive bursts of clicks");
+    }
   }
 
   public static class BurstMeta extends TickAlignedMeta {

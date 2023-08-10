@@ -42,7 +42,7 @@ public final class EqualDelay extends TickAlignedHistoryBlueprint<EqualDelay.Equ
     for (Integer integer : delay) {
       if (integer == lastDelay) {
         streak++;
-        int streakLimit = 7;
+        int streakLimit = 10;
         if (lastDelay > 1) {
           streakLimit += 2;
         }

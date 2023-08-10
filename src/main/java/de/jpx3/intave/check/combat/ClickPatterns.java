@@ -36,7 +36,10 @@ public final class ClickPatterns extends Check {
       new Spikes(this),
       new Kurtosis(this)
     );
-    appendCheckPart(new EqualDelay(this));
+    appendCheckParts(
+      new EqualDelay(this),
+      new Bursts(this)
+    );
   }
 
   @PacketSubscription(
