@@ -86,7 +86,9 @@ public final class Balance extends MetaCheckPart<Timer, Balance.BalanceMeta> {
     }
     // transactions!
     statisticApply(user, CheckStatistics::increaseTotal);
-    long overflowLimit = TimeUnit.MILLISECONDS.toNanos(25);
+
+    // 12 is theoretical limit, 25 works well
+    long overflowLimit = TimeUnit.MILLISECONDS.toNanos(35);
     MovementMetadata movementData = user.meta().movement();
 
 //    player.setLevel((int) TimeUnit.NANOSECONDS.toMicros(timerData.timerBalance) + 1000000);
