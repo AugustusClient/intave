@@ -7,6 +7,7 @@ import de.jpx3.intave.annotate.Relocate;
 import de.jpx3.intave.module.mitigate.AttackNerfStrategy;
 import de.jpx3.intave.module.mitigate.HurttimeModifier;
 import de.jpx3.intave.player.DamageModify;
+import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -109,7 +110,12 @@ public final class PunishmentMetadata {
       new AttackNerfer(AttackNerfStrategy.BLOCKING, BLOCKING_DAMAGE_CANCEL_DURATION, event -> {
         Entity damaged = event.getEntity();
         if (damaged instanceof Player) {
-          if (((Player) damaged).getInventory().getItemInMainHand().getType().name().toUpperCase().contains("SHIELD")) {
+          User target = UserRepository.userOf((Player) damaged);
+          ItemStack heldItem = target.meta().inventory().heldItem();
+          ItemStack offHandItem = target.meta().inventory().offhandItem();
+          if ((heldItem != null && heldItem.getType().name().toUpperCase().contains("SHIELD"))
+            || (offHandItem != null && offHandItem.getType().name().toUpperCase().contains("SHIELD"))
+          ) {
             return;
           }
         }
@@ -163,6 +169,8 @@ public final class PunishmentMetadata {
       nerferOfType(AttackNerfStrategy.CRITICALS).activatePermanently();
       nerferOfType(AttackNerfStrategy.BLOCKING).activatePermanently();
     }
+
+    nerferOfType(AttackNerfStrategy.BLOCKING).activatePermanently();
   }
 
   public static class EncapsulationClass {

@@ -1,11 +1,13 @@
 package de.jpx3.intave.module.patcher;
 
+import de.jpx3.intave.annotate.DoNotFlowObfuscate;
 import it.unimi.dsi.fastutil.longs.AbstractLongSet;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.longs.LongSet;
 
+@DoNotFlowObfuscate
 public final class DSILongSetWrapper extends AbstractLongSet {
-  private LongSet set;
+  private final LongSet set;
 
   public DSILongSetWrapper(LongSet set) {
     this.set = set;

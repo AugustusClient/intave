@@ -75,7 +75,6 @@ public final class ChunkAccessPatcher extends Module {
           iterator.forEachRemaining(newQueue::add);
         } else { // NachoSpigot - SynchronizedDSILongHashSet
           patchName = "s(dsi/lhs)";
-
           try {
             if (failedDSIFirstPatch) {
               throw new Exception("Failed before");

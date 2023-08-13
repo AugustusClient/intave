@@ -29,8 +29,13 @@ import de.jpx3.intave.security.HashAccess;
 import de.jpx3.intave.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -140,6 +145,24 @@ public final class DiagnosticsStage extends CommandStage {
       }
       player.teleport(player.getLocation().add(0, 0, 0));
     }, 20, 3);
+  }
+
+  @SubCommand(
+    selectors = "vehicleboost",
+    usage = "",
+    description = "Boost your vehicle",
+    permission = "intave.command.diagnostics.performance"
+  )
+  public void boostVehicle(User user) {
+    Player player = user.player();
+    LivingEntity strider = (LivingEntity) player.getVehicle();
+
+    int duration = 100;
+    if (strider.hasPotionEffect(PotionEffectType.SPEED)) {
+      duration += strider.getPotionEffect(PotionEffectType.SPEED).getDuration();
+    }
+    strider.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, duration, 2,
+      false, false));
   }
 
   @SubCommand(
