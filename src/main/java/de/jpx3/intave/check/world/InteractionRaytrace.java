@@ -454,6 +454,8 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
     }
 
     if (failedFacingCheck) {
+//      System.out.println("Failed facing check");
+//      System.out.println("Real " + interaction.facingX() + " " + interaction.facingY() + " " + interaction.facingZ());
       violationMetadata.facingFailedCounter++;
     } else {
       violationMetadata.facingFailedCounter = 0;
