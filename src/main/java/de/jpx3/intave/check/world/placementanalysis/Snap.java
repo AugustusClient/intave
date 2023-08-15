@@ -1,6 +1,7 @@
 package de.jpx3.intave.check.world.placementanalysis;
 
 import com.comphenix.protocol.events.PacketEvent;
+import de.jpx3.intave.annotate.Reserved;
 import de.jpx3.intave.check.MetaCheckPart;
 import de.jpx3.intave.check.other.ProtocolScanner;
 import de.jpx3.intave.check.world.PlacementAnalysis;
@@ -21,6 +22,7 @@ import static de.jpx3.intave.check.world.PlacementAnalysis.COMMON_FLAG_MESSAGE;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
 import static de.jpx3.intave.module.violation.Violation.ViolationFlags.DISPLAY_IN_ALL_VERBOSE_MODES;
 
+@Reserved
 public final class Snap extends MetaCheckPart<PlacementAnalysis, Snap.SnapMeta> {
   public Snap(PlacementAnalysis parentCheck) {
     super(parentCheck, SnapMeta.class);

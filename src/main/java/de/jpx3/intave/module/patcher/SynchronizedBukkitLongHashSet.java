@@ -3,7 +3,8 @@ package de.jpx3.intave.module.patcher;
 import de.jpx3.intave.klass.rewrite.PatchyAutoTranslation;
 import org.bukkit.craftbukkit.v1_8_R3.util.LongHashSet;
 
-final class SynchronizedBukkitLongHashSet extends LongHashSet {
+@PatchyAutoTranslation
+public final class SynchronizedBukkitLongHashSet extends LongHashSet {
   @PatchyAutoTranslation
   public SynchronizedBukkitLongHashSet() {
     super();

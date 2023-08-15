@@ -1,8 +1,10 @@
 package de.jpx3.intave.module.patcher;
 
+import de.jpx3.intave.annotate.DoNotFlowObfuscate;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 
-final class SynchronizedLongArraySet extends LongArraySet {
+@DoNotFlowObfuscate
+public final class SynchronizedLongArraySet extends LongArraySet {
   @Override
   public synchronized boolean add(long l) {
     return super.add(l);
