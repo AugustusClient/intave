@@ -57,6 +57,7 @@ import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerDigType.*;
 import static de.jpx3.intave.check.world.interaction.InteractionEmulator.EmulationResult.FAILED;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
 import static de.jpx3.intave.module.linker.packet.PacketId.Server.BLOCK_BREAK_ANIMATION;
+import static de.jpx3.intave.module.tracker.player.AbilityTracker.GameMode.CREATIVE;
 
 @Relocate
 public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.InteractionMeta> {
@@ -218,7 +219,7 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
 
     EnumWrappers.PlayerDigType playerDigType = packet.getPlayerDigTypes().readSafely(0);
     float blockDamage = BlockInteractionAccess.blockDamage(player, inventoryData.heldItem(), blockPosition);
-    boolean instantBreak = blockDamage >= 1.0f || abilityData.inGameMode(AbilityTracker.GameMode.CREATIVE);
+    boolean instantBreak = blockDamage >= 1.0f || abilityData.inGameMode(CREATIVE);
     boolean breakBlock = instantBreak || playerDigType == STOP_DESTROY_BLOCK;
 
     EnumWrappers.Direction direction = packet.getDirections().readSafely(0);
@@ -469,7 +470,7 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
       interactionMeta.estimateMouseDelayFix = raytraceFailed == interactionMeta.estimateMouseDelayFix;
     }
 
-    if (failedFacingCheck) {
+    if (failedFacingCheck && !user.meta().abilities().inGameModeIncludePending(CREATIVE)) {
 //      System.out.println("Failed facing check");
 //      System.out.println("Real " + interaction.facingX() + " " + interaction.facingY() + " " + interaction.facingZ());
       violationMetadata.facingFailedCounter++;
@@ -646,7 +647,7 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
         vl = longBreakDuration ? 20 : 15;
       }
       float blockDamage = BlockInteractionAccess.blockDamage(player, user.meta().inventory().heldItem(), interaction.targetBlock());
-      boolean instantBreak = blockDamage >= 1.0f || user.meta().abilities().inGameMode(AbilityTracker.GameMode.CREATIVE);
+      boolean instantBreak = blockDamage >= 1.0f || user.meta().abilities().inGameMode(CREATIVE);
       if (instantBreak) {
         vl = 0;
       }

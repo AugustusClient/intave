@@ -39,8 +39,7 @@ import java.util.function.Function;
 
 import static com.comphenix.protocol.wrappers.EnumWrappers.EntityUseAction.ATTACK;
 import static de.jpx3.intave.math.MathHelper.formatDouble;
-import static de.jpx3.intave.module.linker.packet.ListenerPriority.HIGH;
-import static de.jpx3.intave.module.linker.packet.ListenerPriority.LOW;
+import static de.jpx3.intave.module.linker.packet.ListenerPriority.*;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
 import static de.jpx3.intave.module.violation.Violation.ViolationFlags.DISPLAY_IN_ALL_VERBOSE_MODES;
 import static de.jpx3.intave.module.violation.Violation.ViolationFlags.DONT_PROCESS_VIOSTAT;
@@ -76,6 +75,8 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
     User user = userOf(player);
     AttackRaytraceMeta meta = metaOf(user);
     AbilityMetadata abilities = user.meta().abilities();
+    MovementMetadata movement = user.meta().movement();
+    ViolationMetadata violationMeta = user.meta().violationLevel();
 
     PacketContainer packet = event.getPacket();
     EntityUseReader reader = PacketReaders.readerOf(packet);
@@ -90,13 +91,15 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
       if (entity == null
         || entity instanceof Entity.Destroyed
         || abilities.unsynchronizedHealth <= 0) {
+        // check again?
         reader.release();
         return;
       }
+      boolean inTeleport = movement.lastTeleport == 0 || violationMeta.isInActiveTeleportBundle;
       boolean firstRaytraceSuccessful = false;
-      if (!entityInTimeout(user, entity, entity.pendingFeedbackPackets())) {
+      if (!inTeleport && !entityInTimeout(user, entity, entity.pendingFeedbackPackets())) {
         // Make a first attempt at ray-tracing to reduce compute time
-        Raytrace raytrace = fireRaytraceFor(user, entity, computeExpansionFor(user), false);
+        Raytrace raytrace = fireRaytraceFor(user, entity, computeExpansionFor(user), true);
         double blockReachDistance = Raytracing.reachDistanceOf(user);
         if (raytrace.reach() <= blockReachDistance) {
           firstRaytraceSuccessful = true;
@@ -121,7 +124,7 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
   }
 
   @PacketSubscription(
-    priority = HIGH,
+    priority = NORMAL,
     packetsIn = {FLYING, LOOK, POSITION, POSITION_LOOK}
   )
   public void receiveMovementPacket(PacketEvent event) {

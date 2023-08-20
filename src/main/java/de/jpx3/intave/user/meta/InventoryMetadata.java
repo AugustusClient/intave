@@ -115,7 +115,6 @@ public final class InventoryMetadata {
         Synchronizer.synchronize(() -> {
           player.sendMessage("Item usage started: " + activeItem);
         });
-        Thread.dumpStack();
         System.out.println("Item usage started: " + this.activeItemType);
       }
     } finally {
@@ -164,6 +163,9 @@ public final class InventoryMetadata {
   }
 
   public void releaseItemNextTick() {
+    if (IntaveControl.DEBUG_ITEM_USAGE) {
+      player.sendMessage("Forceful item release next tick");
+    }
     releaseItemNextTick = true;
     releaseItemType = heldItemType();
   }
@@ -184,7 +186,7 @@ public final class InventoryMetadata {
       this.forceInventoryOnClickOpen = true;
     }
 //    deactivateHand();
-//    deactivateHand();
+    releaseItemNextTick();
     this.inventoryOpen = inventoryOpen;
   }
 

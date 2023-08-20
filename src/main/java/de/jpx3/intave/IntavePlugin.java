@@ -809,8 +809,10 @@ public final class IntavePlugin extends JavaPlugin {
     enforceDisabled.put("Debug SK is enabled", SIBYL_ALLOW_ALL);
     enforceDisabled.put("Heuristic debugging is enabled", DEBUG_HEURISTICS);
     enforceDisabled.put("Movement debugging is enabled", DEBUG_MOVEMENT);
+    enforceDisabled.put("Interaction debugging is enabled", DEBUG_INTERACTION);
+    enforceDisabled.put("CM debugging is enabled", DEBUG_CMS);
     enforceDisabled.put("Red trustfactor is enabled globally", APPLY_GLOBAL_LOW_TRUSTFACTOR);
-    enforceDisabled.put("Blockplacements are deactivated", DISALLOW_ALL_BLOCK_PLACEMENTS);
+    enforceDisabled.put("Block-placements are deactivated", DISALLOW_ALL_BLOCK_PLACEMENTS);
 
     for (Map.Entry<String, Boolean> entry : enforceDisabled.entrySet()) {
       if (entry.getValue()) {

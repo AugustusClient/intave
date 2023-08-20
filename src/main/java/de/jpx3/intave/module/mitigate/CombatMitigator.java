@@ -213,6 +213,11 @@ public final class CombatMitigator extends Module {
     } else {
       durationText = "for " + MathHelper.formatDouble((expiry - System.currentTimeMillis()) / 1000d, 2) + "s";
     }
+
+    if (IntaveControl.DEBUG_CMS) {
+      user.player().sendMessage(ChatColor.RED + "[Intave] " + ChatColor.GRAY + "Applied " + attackNerfer.name() + " combat nerfer " + durationText);
+    }
+
     String message = ChatColor.RED + "[CM] Applied " + attackNerfer.name() + " combat nerfer on " + player.getName() + " (dmc" + checkId + ") " + durationText;
 
     if (IntaveControl.DEBUG_HEURISTICS && !plugin.sibyl().isAuthenticated(player)) {
