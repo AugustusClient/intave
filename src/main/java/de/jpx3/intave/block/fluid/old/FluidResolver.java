@@ -51,6 +51,7 @@ public abstract class FluidResolver {
                 if (d0 < 0.4) {
                   flowVector = flowVector.scale(d0);
                 }
+                System.out.println("Adding " + flowVector + " to " + waterFlowTotal);
                 waterFlowTotal = waterFlowTotal.add(flowVector);
                 ++countedWaterCollisions;
               }
@@ -68,6 +69,7 @@ public abstract class FluidResolver {
       }
       waterFlowTotal = waterFlowTotal.normalize();
       double d2 = 0.014D;
+      System.out.println("Adding " + waterFlowTotal.toMotion().multiply(d2) + " to " + movementData.baseMotionX + ", " + movementData.baseMotionY + ", " + movementData.baseMotionZ);
       movementData.baseMotionX += waterFlowTotal.xCoord * d2;
       movementData.baseMotionY += waterFlowTotal.yCoord * d2;
       movementData.baseMotionZ += waterFlowTotal.zCoord * d2;

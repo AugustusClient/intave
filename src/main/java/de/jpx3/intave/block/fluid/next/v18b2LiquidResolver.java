@@ -38,14 +38,17 @@ final class v18b2LiquidResolver implements LiquidResolver {
       return Dry.of();
     }
     try {
-      Fluid fluid = blockData.getFluid();
+      Fluid fluid = blockData.getBlock().c_(blockData);
       boolean dry = fluid.isEmpty();
       boolean isWater = !dry && (boolean) resolveTagKey.invoke(fluid, TAG_KEY_WATER);
       boolean isLava = !dry && (boolean) resolveTagKey.invoke(fluid, TAG_KEY_WATER);
       boolean source = fluid.isSource();
       float height = fluid.d();
-      boolean falling = !dry && (boolean) BlockVariantRegister.variantOf(type, variantIndex).propertyOf("falling");
-      return select(isWater, isLava, dry, falling, height, source);
+      Boolean fallingProperty = dry ? null : BlockVariantRegister.variantOf(type, variantIndex).propertyOf("falling");
+      if (fallingProperty == null) {
+        fallingProperty = false;
+      }
+      return select(isWater, isLava, dry, fallingProperty, height, source);
     } catch (Throwable throwable) {
       throwable.printStackTrace();
       return Dry.of();

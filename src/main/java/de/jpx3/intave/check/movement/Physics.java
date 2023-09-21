@@ -314,13 +314,13 @@ public final class Physics extends Check {
     if (clientData.waterUpdate()) {
       BoundingBox boundingBox = movementData.boundingBox().shrink(0.001D);
 //      movementData.inWater = Liquids.liquidFlow().applyFlowTo(user, boundingBox);
-      Fluids.handleFluidAcceleration(user, movementData.boundingBox());
+      movementData.inWater = Fluids.handleFluidAcceleration(user, movementData.boundingBox());
     } else {
       BoundingBox boundingBox = movementData.boundingBox()
         .grow(0.0D, -0.4000000059604645D, 0.0D)
         .contract(0.001D, 0.001D, 0.001D);
-//      movementData.inWater = Liquids.liquidFlow().applyFlowTo(user, boundingBox);
-      LegacyWaterflow.handleMaterialAcceleration(user, boundingBox);
+      movementData.inWater = Liquids.liquidFlow().applyFlowTo(user, boundingBox);
+//      LegacyWaterflow.handleMaterialAcceleration(user, boundingBox);
     }
     if (movementData.inWater) {
       movementData.pastWaterMovement = 0;

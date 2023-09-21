@@ -141,6 +141,7 @@ public interface SimulationEnvironment {
 
   void increaseEdgeSneakTickGrants();
   void increaseVehicleTicks();
+  void resetPushedByWaterFlowTicks();
 
   void aquaticUpdateLavaReset();
 

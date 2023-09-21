@@ -844,6 +844,11 @@ public final class MovementMetadata implements SimulationEnvironment {
   }
 
   @Override
+  public void resetPushedByWaterFlowTicks() {
+    pastPushedByWaterFlow = 0;
+  }
+
+  @Override
   public void resetPhysicsPacketRelinkFlyVL() {
     physicsPacketRelinkFlyVL = 0;
   }
