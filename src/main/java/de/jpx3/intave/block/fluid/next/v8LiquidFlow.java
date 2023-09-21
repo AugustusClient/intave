@@ -6,8 +6,8 @@ import de.jpx3.intave.user.User;
 
 public final class v8LiquidFlow implements LiquidFlow {
   @Override
-  public boolean applyFlow(User user, BoundingBox boundingBox) {
-
+  public boolean applyFlowTo(User user, BoundingBox boundingBox) {
+    return false;
   }
 
   @Override

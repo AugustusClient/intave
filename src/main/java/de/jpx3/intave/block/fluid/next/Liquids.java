@@ -45,7 +45,7 @@ public class Liquids {
       throw new IntaveInternalException(exception);
     }
 
-    flow = VER1_13_0.atOrAbove() ? new v13LiquidFlow() : new v8LiquidFlow();
+    flow = null;//VER1_13_0.atOrAbove() ? new v13LiquidFlow() : new v8LiquidFlow();
 
 //    int variantCount = 0;
     for (Material value : Material.values()) {
