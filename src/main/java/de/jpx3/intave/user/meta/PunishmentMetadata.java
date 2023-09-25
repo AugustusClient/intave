@@ -115,6 +115,7 @@ public final class PunishmentMetadata {
           ItemStack offHandItem = target.meta().inventory().offhandItem();
           if ((heldItem != null && heldItem.getType().name().toUpperCase().contains("SHIELD"))
             || (offHandItem != null && offHandItem.getType().name().toUpperCase().contains("SHIELD"))
+            || target.meta().protocol().combatUpdate()
           ) {
             return;
           }

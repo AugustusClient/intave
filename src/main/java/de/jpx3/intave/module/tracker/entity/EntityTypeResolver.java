@@ -287,18 +287,14 @@ public final class EntityTypeResolver {
     int attempts = 0;
     while (!hierarchySearch.getPackage().getName().toLowerCase().startsWith("net.minecraft")) {
       if (hierarchySearch.getSuperclass() == null) {
+        subClassCache.put(entityClass, (Class<? extends Entity>) hierarchySearch);
         return entityClass;
       }
       hierarchySearch = hierarchySearch.getSuperclass();
       if (attempts++ > 8) {
+        subClassCache.put(entityClass, (Class<? extends Entity>) hierarchySearch);
         return entityClass;
       }
-    }
-    if (attempts > 0) {
-      Class<?> finalHierarchySearch = hierarchySearch;
-      Synchronizer.synchronize(() -> {
-        Bukkit.broadcastMessage("Found custom entity class " + entityClass.getName() + " with parent class " + finalHierarchySearch.getName());
-      });
     }
     subClassCache.put(entityClass, (Class<? extends Entity>) hierarchySearch);
     return (Class<? extends Entity>) hierarchySearch;
