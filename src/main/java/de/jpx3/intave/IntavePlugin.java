@@ -15,8 +15,7 @@ import de.jpx3.intave.block.access.BlockInteractionAccess;
 import de.jpx3.intave.block.access.BlockWrapper;
 import de.jpx3.intave.block.access.VolatileBlockAccess;
 import de.jpx3.intave.block.collision.modifier.CollisionModifiers;
-import de.jpx3.intave.block.fluid.next.Liquids;
-import de.jpx3.intave.block.fluid.old.Fluids;
+import de.jpx3.intave.block.fluid.Fluids;
 import de.jpx3.intave.block.physics.BlockPhysics;
 import de.jpx3.intave.block.physics.BlockProperties;
 import de.jpx3.intave.block.shape.resolve.patch.BoundingBoxPatcher;
@@ -663,8 +662,6 @@ public final class IntavePlugin extends JavaPlugin {
       WrapperConverter.setup();
       Raytracing.setup();
       Fluids.setup();
-
-      Liquids.setup();
 
       VolatileBlockAccess.setup();
       BlockAccess.setup();

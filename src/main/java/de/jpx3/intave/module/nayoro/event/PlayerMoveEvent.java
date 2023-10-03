@@ -6,7 +6,6 @@ import de.jpx3.intave.module.nayoro.event.sink.EventSink;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.security.Key;
 
 public final class PlayerMoveEvent extends Event {
   private int flags;

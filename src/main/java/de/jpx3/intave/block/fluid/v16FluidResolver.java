@@ -1,23 +1,22 @@
-package de.jpx3.intave.block.fluid.next;
+package de.jpx3.intave.block.fluid;
 
 import de.jpx3.intave.block.variant.BlockVariant;
 import de.jpx3.intave.block.variant.BlockVariantRegister;
 import de.jpx3.intave.klass.rewrite.PatchyAutoTranslation;
-import net.minecraft.server.v1_16_R3.Fluid;
 import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.TagsFluid;
 import org.bukkit.Material;
 
 @PatchyAutoTranslation
-final class v16LiquidResolver implements LiquidResolver {
+final class v16FluidResolver implements FluidResolver {
   @Override
   @PatchyAutoTranslation
-  public Liquid liquidFrom(Material type, int variantIndex) {
+  public Fluid liquidFrom(Material type, int variantIndex) {
     IBlockData blockData = (IBlockData) BlockVariantRegister.rawVariantOf(type, variantIndex);
     if (blockData == null) {
       return Dry.of();
     }
-    Fluid fluid = blockData.getFluid();
+    net.minecraft.server.v1_16_R3.Fluid fluid = blockData.getFluid();
     if (fluid == null) {
       return Dry.of();
     }
@@ -27,8 +26,9 @@ final class v16LiquidResolver implements LiquidResolver {
     boolean isLava = fluid.a(TagsFluid.LAVA);
     boolean source = fluid.isSource();
     boolean falling = variant.propertyOf("falling");
-    float height = fluid.e() / 9f;
-    return select(isWater, isLava, dry, falling, height, source);
+    int level = fluid.e();
+    float height = level / 9f;
+    return select(isWater, isLava, dry, falling, height, level);
   }
 }
 

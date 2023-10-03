@@ -30,7 +30,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static de.jpx3.intave.access.player.trust.TrustFactor.*;
+import static de.jpx3.intave.access.player.trust.TrustFactor.ORANGE;
+import static de.jpx3.intave.access.player.trust.TrustFactor.RED;
 import static de.jpx3.intave.module.mitigate.AttackNerfStrategy.HT_SPOOF;
 
 public final class CombatMitigator extends Module {

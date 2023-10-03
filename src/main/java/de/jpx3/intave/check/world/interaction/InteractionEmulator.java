@@ -12,8 +12,8 @@ import de.jpx3.intave.annotate.Relocate;
 import de.jpx3.intave.block.access.BlockInteractionAccess;
 import de.jpx3.intave.block.access.VolatileBlockAccess;
 import de.jpx3.intave.block.collision.Collision;
-import de.jpx3.intave.block.fluid.old.Fluid;
-import de.jpx3.intave.block.fluid.old.Fluids;
+import de.jpx3.intave.block.fluid.Fluid;
+import de.jpx3.intave.block.fluid.Fluids;
 import de.jpx3.intave.block.physics.MaterialMagic;
 import de.jpx3.intave.block.state.ExtendedBlockStateCache;
 import de.jpx3.intave.block.type.BlockTypeAccess;
@@ -471,9 +471,9 @@ public final class InteractionEmulator implements EventProcessor {
       BlockVariant properties = BlockVariantRegister.variantOf(type, variant);
       String propertyString = "{"+properties.propertyNames().stream().map(s -> s + ": " + properties.propertyOf(s)).collect(Collectors.joining(", ")) +"}";
 
+//      Fluid fluid = Fluids.fluidAt(userOf(player), block.getX(), block.getY(), block.getZ());
       Fluid fluid = Fluids.fluidAt(userOf(player), block.getX(), block.getY(), block.getZ());
-
-      player.sendMessage(type + "/" + variant + "."+propertyString+" f"+fluid+" -> " + blockStateAccess.collisionShapeAt(block.getX(), block.getY(), block.getZ()));
+      player.sendMessage(type + "/" + variant + "."+propertyString+" f"+ fluid +" -> " + blockStateAccess.collisionShapeAt(block.getX(), block.getY(), block.getZ()));
     }
 
     switch (clickedType) {

@@ -1,11 +1,13 @@
-package de.jpx3.intave.block.fluid.next;
+package de.jpx3.intave.block.fluid;
 
-class FlowingLava implements Liquid {
+class Lava implements Fluid {
   private final float height;
+  private final int heightIndex;
   private final boolean falling;
 
-  private FlowingLava(float height, boolean falling) {
+  private Lava(float height, int heightIndex, boolean falling) {
     this.height = height;
+    this.heightIndex = heightIndex;
     this.falling = falling;
   }
 
@@ -30,8 +32,18 @@ class FlowingLava implements Liquid {
   }
 
   @Override
+  public int level() {
+    return heightIndex;
+  }
+
+  @Override
   public boolean falling() {
     return falling;
+  }
+
+  @Override
+  public boolean isSource() {
+    return false;
   }
 
   @Override
@@ -42,7 +54,7 @@ class FlowingLava implements Liquid {
       '}';
   }
 
-  public static FlowingLava ofHeight(float height, boolean falling) {
-    return new FlowingLava(height, falling);
+  public static Lava ofHeight(float height, int level, boolean falling) {
+    return new Lava(height, level, falling);
   }
 }

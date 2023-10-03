@@ -1,7 +1,7 @@
 package de.jpx3.intave.block.physics;
 
 import de.jpx3.intave.annotate.refactoring.IdoNotBelongHere;
-import de.jpx3.intave.block.fluid.next.Liquids;
+import de.jpx3.intave.block.fluid.Fluids;
 import de.jpx3.intave.block.type.BlockTypeAccess;
 import org.bukkit.Material;
 
@@ -97,7 +97,14 @@ public final class MaterialMagic {
     if (material == null) {
       return false;
     }
-    return isLavaOrWater(material) || Liquids.canContainLiquid(material);
+    return isLavaOrWater(material) || Fluids.canContainFluid(material);
+  }
+
+  public static boolean couldContainLiquid(Material material, int variantIndex) {
+    if (material == null) {
+      return false;
+    }
+    return isLavaOrWater(material) || Fluids.isFluid(material, variantIndex);
   }
 
   public static boolean isLava(Material material) {

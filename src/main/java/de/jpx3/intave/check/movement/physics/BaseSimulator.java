@@ -7,8 +7,7 @@ import de.jpx3.intave.annotate.Relocate;
 import de.jpx3.intave.annotate.refactoring.IdoNotBelongHere;
 import de.jpx3.intave.block.access.VolatileBlockAccess;
 import de.jpx3.intave.block.collision.modifier.PowderSnowCollisionModifier;
-import de.jpx3.intave.block.fluid.old.Fluids;
-import de.jpx3.intave.block.fluid.old.LegacyWaterflow;
+import de.jpx3.intave.block.fluid.Fluids;
 import de.jpx3.intave.block.physics.BlockPhysics;
 import de.jpx3.intave.block.physics.BlockProperties;
 import de.jpx3.intave.block.physics.MaterialMagic;
@@ -29,6 +28,7 @@ import de.jpx3.intave.user.meta.MetadataBundle;
 import de.jpx3.intave.user.meta.MovementMetadata;
 import de.jpx3.intave.user.meta.ProtocolMetadata;
 import de.jpx3.intave.user.meta.ViolationMetadata;
+import de.jpx3.intave.world.WorldHeight;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -93,9 +93,10 @@ class BaseSimulator extends Simulator {
       boolean allowJumpInWater = false;
       if (protocol.waterUpdate() && inWater && environment.onGround()) {
         Position lastPosition = environment.lastPosition();
-        float heightPercentage = LegacyWaterflow.resolveLiquidHeightPercentage(levelOfLiquidAt(user, lastPosition));
-        heightPercentage += environment.positionY() % 1;
-        boolean fluidStateEmpty = Fluids.fluidStateEmpty(user, lastPosition);
+        float heightPercentage = resolveLiquidHeightPercentage(levelOfLiquidAt(user, lastPosition));
+        double convertedPositionY = environment.positionY() + Math.abs(WorldHeight.LOWER_WORLD_LIMIT);
+        heightPercentage += convertedPositionY % 1;
+        boolean fluidStateEmpty = !Fluids.fluidPresentAt(user, lastPosition);
         allowJumpInWater = fluidStateEmpty || heightPercentage > 0.5;
       }
       if (inWater && !allowJumpInWater) {
@@ -114,8 +115,8 @@ class BaseSimulator extends Simulator {
     if (waterUpdate && swimming) {
       double d3 = environment.lookVector().getY();
       double d4 = d3 < -0.2D ? 0.085D : 0.06D;
-      boolean fluidStateEmpty = Fluids.fluidStateEmpty(user, positionX, positionY + 1.0 - 0.1, positionZ);
-      if (d3 <= 0.0D || jumped || !fluidStateEmpty) {
+      boolean liquidPresent = Fluids.fluidPresentAt(user, positionX, positionY + 1.0 - 0.1, positionZ);
+      if (d3 <= 0.0D || jumped || liquidPresent) {
         motion.motionY += (d3 - motion.motionY) * d4;
       }
     }
@@ -142,6 +143,13 @@ class BaseSimulator extends Simulator {
     } else {
       return -1;
     }
+  }
+
+  private static float resolveLiquidHeightPercentage(int level) {
+    if (level >= 8) {
+      level = 0;
+    }
+    return (float) (level + 1) / 9.0F;
   }
 
   private void performSimulationInWaterOfState(

@@ -5,8 +5,8 @@ import de.jpx3.intave.annotate.Relocate;
 import de.jpx3.intave.block.access.VolatileBlockAccess;
 import de.jpx3.intave.block.collision.entity.StaticEntityCollisions;
 import de.jpx3.intave.block.collision.modifier.CollisionModifiers;
-import de.jpx3.intave.block.fluid.next.Liquid;
-import de.jpx3.intave.block.fluid.next.Liquids;
+import de.jpx3.intave.block.fluid.Fluid;
+import de.jpx3.intave.block.fluid.Fluids;
 import de.jpx3.intave.block.physics.MaterialMagic;
 import de.jpx3.intave.block.shape.BlockShape;
 import de.jpx3.intave.block.shape.BlockShapes;
@@ -405,18 +405,18 @@ public final class Collision {
   }
 
   public static boolean rasterizedLiquidSearch(
-    User user, BoundingBox boundingBox, Predicate<? super Liquid> liquidPredicate
+    User user, BoundingBox boundingBox, Predicate<? super Fluid> liquidPredicate
   ) {
     return rasterizedSearch(
-      boundingBox, blockPosition -> liquidPredicate.test(Liquids.liquidAt(user, blockPosition))
+      boundingBox, blockPosition -> liquidPredicate.test(Fluids.fluidAt(user, blockPosition))
     );
   }
 
   public static boolean rasterizedLiquidEnforcement(
-    User user, BoundingBox boundingBox, Predicate<? super Liquid> liquidPredicate
+    User user, BoundingBox boundingBox, Predicate<? super Fluid> liquidPredicate
   ) {
     return rasterizedEnforcement(
-      boundingBox, blockPosition -> liquidPredicate.test(Liquids.liquidAt(user, blockPosition))
+      boundingBox, blockPosition -> liquidPredicate.test(Fluids.fluidAt(user, blockPosition))
     );
   }
 
@@ -424,7 +424,7 @@ public final class Collision {
     User user, BoundingBox boundingBox
   ) {
     return rasterizedSearch(
-      boundingBox, blockPosition -> Liquids.liquidPresentAt(user, blockPosition)
+      boundingBox, blockPosition -> Fluids.fluidPresentAt(user, blockPosition)
     );
   }
 
@@ -432,7 +432,7 @@ public final class Collision {
     User user, BoundingBox boundingBox
   ) {
     return rasterizedEnforcement(
-      boundingBox, blockPosition -> Liquids.liquidPresentAt(user, blockPosition)
+      boundingBox, blockPosition -> Fluids.fluidPresentAt(user, blockPosition)
     );
   }
 

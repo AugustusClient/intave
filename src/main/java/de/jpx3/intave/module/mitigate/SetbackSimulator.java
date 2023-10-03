@@ -9,7 +9,6 @@ import de.jpx3.intave.block.collision.Collision;
 import de.jpx3.intave.block.shape.BlockShape;
 import de.jpx3.intave.block.type.BlockTypeAccess;
 import de.jpx3.intave.check.movement.Physics;
-import de.jpx3.intave.check.movement.physics.MovementCharacteristics;
 import de.jpx3.intave.check.movement.physics.Pose;
 import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.klass.Lookup;

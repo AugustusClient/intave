@@ -1,24 +1,24 @@
-package de.jpx3.intave.block.fluid.next;
+package de.jpx3.intave.block.fluid;
 
 import org.bukkit.Material;
 
-public interface LiquidResolver {
-  Liquid liquidFrom(Material type, int variantIndex);
+public interface FluidResolver {
+  Fluid liquidFrom(Material type, int variantIndex);
 
-  default Liquid select(
+  default Fluid select(
     boolean isWater,
     boolean isLava,
     boolean dry,
     boolean falling,
     float height,
-    boolean source
+    int level
   ) {
     if (dry) {
       return Dry.of();
     } else if (isWater) {
-      return FlowingWater.ofHeight(height, falling);
+      return Water.ofHeight(height, level, falling);
     } else if (isLava) {
-      return FlowingLava.ofHeight(height, falling);
+      return Lava.ofHeight(height, level, falling);
     }
     return Dry.of();
   }

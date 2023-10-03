@@ -1,6 +1,6 @@
-package de.jpx3.intave.block.fluid.next;
+package de.jpx3.intave.block.fluid;
 
-final class Dry implements Liquid {
+final class Dry implements Fluid {
   private static final Dry INSTANCE = new Dry();
 
   @Override
@@ -24,7 +24,17 @@ final class Dry implements Liquid {
   }
 
   @Override
+  public int level() {
+    return 0;
+  }
+
+  @Override
   public boolean falling() {
+    return false;
+  }
+
+  @Override
+  public boolean isSource() {
     return false;
   }
 

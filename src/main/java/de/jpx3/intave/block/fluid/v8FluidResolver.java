@@ -1,13 +1,13 @@
-package de.jpx3.intave.block.fluid.next;
+package de.jpx3.intave.block.fluid;
 
 import org.bukkit.Material;
 
-final class v8LiquidResolver implements LiquidResolver {
+final class v8FluidResolver implements FluidResolver {
   private static final Material STATIONARY_WATER = Material.getMaterial("STATIONARY_WATER");
   private static final Material STATIONARY_LAVA = Material.getMaterial("STATIONARY_LAVA");
 
   @Override
-  public Liquid liquidFrom(Material type, int variantIndex) {
+  public Fluid liquidFrom(Material type, int variantIndex) {
     boolean isWater = type == Material.WATER || type == STATIONARY_WATER;
     boolean isLava = type == Material.LAVA || type == STATIONARY_LAVA;
     if (!isWater && !isLava) {
@@ -15,9 +15,9 @@ final class v8LiquidResolver implements LiquidResolver {
     }
     float height = heightFromLegacyLevel(variantIndex);
     if (isWater) {
-      return FlowingWater.ofHeight(height, variantIndex >= 8);
+      return Water.ofHeight(height, variantIndex >= 8 ? 0 : variantIndex, variantIndex >= 8);
     } else {
-      return FlowingLava.ofHeight(height, variantIndex >= 8);
+      return Lava.ofHeight(height, variantIndex >= 8 ? 0 : variantIndex, variantIndex >= 8);
     }
   }
 }

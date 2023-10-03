@@ -13,9 +13,8 @@ import de.jpx3.intave.annotate.Nullable;
 import de.jpx3.intave.annotate.Relocate;
 import de.jpx3.intave.block.access.VolatileBlockAccess;
 import de.jpx3.intave.block.collision.Collision;
-import de.jpx3.intave.block.fluid.next.Liquid;
-import de.jpx3.intave.block.fluid.old.Fluid;
-import de.jpx3.intave.block.fluid.old.Fluids;
+import de.jpx3.intave.block.fluid.Fluid;
+import de.jpx3.intave.block.fluid.Fluids;
 import de.jpx3.intave.block.physics.BlockProperties;
 import de.jpx3.intave.block.tick.ShulkerBox;
 import de.jpx3.intave.block.type.BlockTypeAccess;
@@ -443,6 +442,7 @@ public final class MovementMetadata implements SimulationEnvironment {
     this.eyesInWater = interactingFluid != null && interactingFluid.isOfWater();
     this.interactingFluid = null;
 
+//    Fluid fluid = Fluids.fluidAt(user, positionX, yPos, positionZ);
     Fluid fluid = Fluids.fluidAt(user, positionX, yPos, positionZ);
     if (fluid.isOfWater()) {
       double d1 = (float) floor(yPos) + 1.0f;
@@ -678,7 +678,7 @@ public final class MovementMetadata implements SimulationEnvironment {
         -0.4000000059604645D,
         -0.1f
       );
-      return Collision.rasterizedLiquidSearch(user, lavaBoundingBox, Liquid::isOfLava);
+      return Collision.rasterizedLiquidSearch(user, lavaBoundingBox, Fluid::isOfLava);
     }
   }
 

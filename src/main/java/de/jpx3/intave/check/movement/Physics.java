@@ -16,9 +16,7 @@ import de.jpx3.intave.annotate.refactoring.IdoNotBelongHere;
 import de.jpx3.intave.annotate.refactoring.SplitMeUp;
 import de.jpx3.intave.block.access.VolatileBlockAccess;
 import de.jpx3.intave.block.collision.Collision;
-import de.jpx3.intave.block.fluid.next.Liquids;
-import de.jpx3.intave.block.fluid.old.Fluids;
-import de.jpx3.intave.block.fluid.old.LegacyWaterflow;
+import de.jpx3.intave.block.fluid.Fluids;
 import de.jpx3.intave.block.state.ExtendedBlockStateCache;
 import de.jpx3.intave.block.type.BlockTypeAccess;
 import de.jpx3.intave.block.variant.BlockVariantNativeAccess;
@@ -313,14 +311,14 @@ public final class Physics extends Check {
     MovementMetadata movementData = meta.movement();
     if (clientData.waterUpdate()) {
       BoundingBox boundingBox = movementData.boundingBox().shrink(0.001D);
-//      movementData.inWater = Liquids.liquidFlow().applyFlowTo(user, boundingBox);
-      movementData.inWater = Fluids.handleFluidAcceleration(user, movementData.boundingBox());
+      movementData.inWater = Fluids.waterflow().applyFlowTo(user, boundingBox);
+//      movementData.inWater = Fluids.handleFluidAcceleration(user, movementData.boundingBox());
     } else {
       BoundingBox boundingBox = movementData.boundingBox()
         .grow(0.0D, -0.4000000059604645D, 0.0D)
         .contract(0.001D, 0.001D, 0.001D);
-      movementData.inWater = Liquids.liquidFlow().applyFlowTo(user, boundingBox);
-//      LegacyWaterflow.handleMaterialAcceleration(user, boundingBox);
+      movementData.inWater = Fluids.waterflow().applyFlowTo(user, boundingBox);
+//      movementData.inWater = LegacyWaterflow.handleMaterialAcceleration(user, boundingBox);
     }
     if (movementData.inWater) {
       movementData.pastWaterMovement = 0;

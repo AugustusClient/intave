@@ -9,7 +9,8 @@ import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserLocal;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class StaticEntityCollisions {
   private static final UserLocal<EntityCollisionData> userData = UserLocal.withInitial(EntityCollisionData::new);
