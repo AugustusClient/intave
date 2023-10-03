@@ -574,7 +574,7 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
         }
         receiveExcludedPacket(player, packet);
         if (refreshBlocks && rewritePacket) {
-          Synchronizer.synchronize(() -> refreshBlocksAround(player, targetLocation));
+          refreshBlocksAround(player, targetLocation);
         }
       }
     } else {
