@@ -21,6 +21,8 @@ public interface Clientbound extends PacketListener {
       onSetTrustfactor((ClientboundSetTrustfactorPacket) packet);
     } else if (packet instanceof ClientboundViolationPacket) {
       onViolation((ClientboundViolationPacket) packet);
+    } else if (packet instanceof ClientboundShardsPacket) {
+      onShardsPacket((ClientboundShardsPacket) packet);
     }
   }
 
@@ -45,6 +47,10 @@ public interface Clientbound extends PacketListener {
   }
 
   default void onSetTrustfactor(ClientboundSetTrustfactorPacket packet) {
+    onUncaught(packet);
+  }
+
+  default void onShardsPacket(ClientboundShardsPacket packet) {
     onUncaught(packet);
   }
 

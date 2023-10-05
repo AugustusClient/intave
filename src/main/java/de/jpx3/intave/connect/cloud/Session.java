@@ -12,8 +12,6 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 
 import javax.crypto.Cipher;
@@ -77,18 +75,21 @@ public final class Session {
         if (!future.isSuccess()) {
           IntaveLogger.logger().info("Failure connecting to cloud");
 //          future.cause().printStackTrace();
+          onFinal.accept(false);
           return;
         }
         channel = ((ChannelFuture) future).channel();
         channel.closeFuture().addListener(future2 -> {
-//          System.out.println("Connection closed forcefully");
+          System.out.println("Connection closed forcefully");
           shutdownSubscribers.forEach(subscriber -> subscriber.accept(this));
           group.shutdownGracefully();
+          onFinal.accept(false);
         });
         onFinal.accept(true);
       }).await(10, SECONDS);
       if (!connected) {
         System.out.println("Failed to connect to cloud service");
+        onFinal.accept(false);
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -132,6 +133,10 @@ public final class Session {
 
   public void serveStorageRequest(Identity id, ByteBuffer buffer) {
     cloud.serveStorageRequest(id, buffer);
+  }
+
+  public void onShardsAddition(List<? extends Shard> shards) {
+    shards.forEach(shard -> cloud.openSession(shard));;
   }
 
   public void receivePacketLater(Packet<Clientbound> packet) {

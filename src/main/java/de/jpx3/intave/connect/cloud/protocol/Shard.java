@@ -1,5 +1,6 @@
 package de.jpx3.intave.connect.cloud.protocol;
 
+import de.jpx3.intave.IntaveControl;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataInput;
@@ -65,9 +66,14 @@ public class Shard implements Serializable, Comparable<Shard> {
   public boolean equals(Object obj) {
     if (obj instanceof Shard) {
       Shard other = (Shard) obj;
-      return name.equals(other.name) && domain.equals(other.domain) && port == other.port && token.equals(other.token);
+      return name.equals(other.name) && domain.equals(other.domain) && port == other.port;
     }
     return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return name.hashCode() ^ domain.hashCode() ^ port; //^ token.hashCode();
   }
 
   @Override
@@ -77,7 +83,11 @@ public class Shard implements Serializable, Comparable<Shard> {
 
   @Override
   public String toString() {
-    return "Shard{" + name + "@" + domain + ":" + port + "}";
+    if (IntaveControl.DISABLE_LICENSE_CHECK) {
+      return "Shard{" + name + "@" + domain + ":" + port + "}";
+    } else {
+      return "cloud";
+    }
   }
 
   public static Shard from(DataInput buffer) {

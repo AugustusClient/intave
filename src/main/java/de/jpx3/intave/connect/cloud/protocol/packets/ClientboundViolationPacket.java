@@ -73,4 +73,24 @@ public final class ClientboundViolationPacket extends JsonPacket<Clientbound> {
       e.printStackTrace();
     }
   }
+
+  public Identity id() {
+    return id;
+  }
+
+  public String check() {
+    return check;
+  }
+
+  public String message() {
+    return message;
+  }
+
+  public String details() {
+    return details;
+  }
+
+  public int vl() {
+    return vl;
+  }
 }

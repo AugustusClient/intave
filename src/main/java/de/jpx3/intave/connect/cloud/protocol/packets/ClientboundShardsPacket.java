@@ -34,6 +34,9 @@ public final class ClientboundShardsPacket extends BinaryPacket<Clientbound> {
   public void deserialize(DataInput buffer) {
     try {
       int shardCount = buffer.readInt();
+      if (shardCount > 128) {
+        throw new RuntimeException("Too many shards");
+      }
       for (int i = 0; i < shardCount; i++) {
         shards.add(Shard.from(buffer));
       }
@@ -42,4 +45,7 @@ public final class ClientboundShardsPacket extends BinaryPacket<Clientbound> {
     }
   }
 
+  public List<Shard> shards() {
+    return shards;
+  }
 }

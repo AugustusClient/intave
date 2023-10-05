@@ -20,6 +20,7 @@ import de.jpx3.intave.connect.cloud.request.CloudStorageGateaway;
 import de.jpx3.intave.connect.cloud.request.CloudTrustfactorResolver;
 import de.jpx3.intave.connect.cloud.request.Request;
 import de.jpx3.intave.executor.BackgroundExecutors;
+import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.executor.TaskTracker;
 import de.jpx3.intave.resource.Resource;
 import de.jpx3.intave.resource.Resources;
@@ -29,6 +30,7 @@ import org.bukkit.entity.Player;
 
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -39,11 +41,13 @@ public final class Cloud {
   private static final Resource SHARD_STORAGE_RESOURCE = Resources.fileCache("shardStorage");
   private static final ShardCache shardCache = SHARD_STORAGE_RESOURCE.collectLines(ShardCache.resourceCollector());
 
-  private final List<Session> sessions = new ArrayList<>();
+  private final Map<Shard, Session> sessions = new HashMap<>();
   private final Map<UUID, Request<TrustFactor>> trustfactorRequests = new HashMap<>();
   private final Map<UUID, Request<ByteBuffer>> storageRequests = new HashMap<>();
   private CloudConfig cloudConfig;
   private int taskId;
+
+  private final Map<Shard, Integer> reconnectAttempts = new ConcurrentHashMap<>();
 
   public void init() {
     setupKeepAliveTick();
@@ -65,16 +69,24 @@ public final class Cloud {
       throw new IllegalArgumentException("Shard cannot be null");
     }
     IntaveLogger.logger().info("Connecting to " + shard);
-    Session masterSession = new Session(shard, this);
-    masterSession.init(success -> {
+    Session session = new Session(shard, this);
+    session.init(success -> {
       if (success) {
         IntaveLogger.logger().info("Connected to " + shard);
         setTrustAndStorage();
       } else {
-        IntaveLogger.logger().warning("Unable to connect to " + shard);
+        // called on failure or connection closure
+        int attempts = reconnectAttempts.getOrDefault(shard, 0);
+        IntaveLogger.logger().warning("Unable to connect to " + shard + ", retrying in 5 seconds, attempt " + attempts + "/3");
+        if (attempts < 3) {
+          reconnectAttempts.put(shard, attempts + 1);
+          Synchronizer.synchronizeDelayed(() -> openSession(shard), 20 * 5);
+        } else {
+          IntaveLogger.logger().warning("Unable to connect to " + shard + " after 3 attempts");
+        }
       }
     });
-    sessions.add(masterSession);
+    sessions.put(shard, session);
   }
 
   private void setupKeepAliveTick() {
@@ -93,7 +105,7 @@ public final class Cloud {
   }
 
   private void disable() {
-    sessions.forEach(Session::close);
+    sessions.values().forEach(Session::close);
     Bukkit.getScheduler().cancelTask(taskId);
     TaskTracker.stopped(taskId);
   }
@@ -111,7 +123,7 @@ public final class Cloud {
 
   private void sendPacket(Packet<Serverbound> packet) {
     BackgroundExecutors.execute(() -> {
-      for (Session session : sessions) {
+      for (Session session : sessions.values()) {
         if (session.canSend(packet)) {
           session.send(packet);
           break;
@@ -121,7 +133,7 @@ public final class Cloud {
   }
 
   private void keepAliveTick() {
-    for (Session session : sessions) {
+    for (Session session : sessions.values()) {
       session.keepAliveTick();
     }
   }
