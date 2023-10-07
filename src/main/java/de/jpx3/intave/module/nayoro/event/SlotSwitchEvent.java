@@ -1,6 +1,5 @@
 package de.jpx3.intave.module.nayoro.event;
 
-import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.module.nayoro.Environment;
 import de.jpx3.intave.module.nayoro.event.sink.EventSink;
 
@@ -10,22 +9,36 @@ import java.io.IOException;
 
 public final class SlotSwitchEvent extends Event {
   private int slot;
+  private String material;
+  private int amount;
 
   public SlotSwitchEvent() {
   }
 
-  public SlotSwitchEvent(int slot) {
+  public SlotSwitchEvent(int slot, String material, int amount) {
     this.slot = slot;
+    this.material = material;
+    this.amount = amount;
   }
 
   @Override
   public void serialize(Environment environment, DataOutput out) throws IOException {
+    if (material == null) {
+      material = "";
+    }
+    if (amount < 0) {
+      amount = 0;
+    }
     out.writeInt(slot);
+    out.writeUTF(material);
+    out.writeInt(amount);
   }
 
   @Override
   public void deserialize(Environment environment, DataInput in) throws IOException {
     slot = in.readInt();
+    material = in.readUTF();
+    amount = in.readInt();
   }
 
   @Override
@@ -33,7 +46,7 @@ public final class SlotSwitchEvent extends Event {
     sink.visit(this);
   }
 
-  public static SlotSwitchEvent create(int slot) {
-    return new SlotSwitchEvent(slot);
+  public static SlotSwitchEvent create(int slot, String type, int amount) {
+    return new SlotSwitchEvent(slot, type, amount);
   }
 }

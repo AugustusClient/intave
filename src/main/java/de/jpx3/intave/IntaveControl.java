@@ -1,5 +1,11 @@
 package de.jpx3.intave;
 
+import de.jpx3.intave.module.nayoro.OperationalMode;
+
+import static de.jpx3.intave.IntaveBuildConfig.*;
+import static de.jpx3.intave.module.nayoro.OperationalMode.*;
+import static de.jpx3.intave.module.nayoro.OperationalMode.DISABLE;
+
 public final class IntaveControl {
   public static final boolean APPLY_GLOBAL_LOW_TRUSTFACTOR = false;
   public static final boolean DEBUG_MOVEMENT = false;
@@ -48,13 +54,15 @@ public final class IntaveControl {
   public static final boolean DEBUG_VELOCITY_RECEIVE = false;
   public static final boolean DEBUG_PLACE_AND_BREAK_PERMISSIONS = false;
   public static final boolean DEBUG_SERVER_VERSION = false;
-  public static final boolean CLOUD_LOCALHOST_MASTER_SHARD = !IntaveBuildConfig.PRODUCTION;
+  public static final boolean CLOUD_LOCALHOST_MASTER_SHARD = !PRODUCTION;
   public static final boolean REPLACE_JOAP_SETBACK_WITH_CM = true;
   public static final boolean DISALLOW_ALL_BLOCK_PLACEMENTS = false;
   public static final boolean ENABLE_MOVEMENT_DEBUGGER_COLLECTOR = false;
   public static final boolean MOVEMENT_DEBUGGER_COLLECTOR_POSTTICK_OUTPUT = false;
 
-  public static final boolean USE_EXTERNAL_CONFIGURATION_FILE = !IntaveBuildConfig.PRODUCTION;
-  public static final boolean GOMME_MODE = IntaveBuildConfig.GOMME;
-  public static final boolean DISABLE_LICENSE_CHECK = !IntaveBuildConfig.PRODUCTION;
+  public static final OperationalMode SAMPLE_OPERATIONAL_MODE = GOMME ? DISABLE : (PRODUCTION ? CLOUD_STORAGE : LOCAL_STORAGE);
+
+  public static final boolean USE_EXTERNAL_CONFIGURATION_FILE = !PRODUCTION;
+  public static final boolean GOMME_MODE = GOMME;
+  public static final boolean DISABLE_LICENSE_CHECK = !PRODUCTION;
 }

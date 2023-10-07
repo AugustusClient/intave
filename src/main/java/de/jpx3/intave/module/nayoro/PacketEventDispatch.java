@@ -20,6 +20,7 @@ import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.InventoryMetadata;
 import de.jpx3.intave.user.meta.MovementMetadata;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -109,7 +110,10 @@ public final class PacketEventDispatch implements PacketEventSubscriber {
     Player player = event.getPlayer();
     User user = UserRepository.userOf(player);
     int slot = event.getPacket().getIntegers().read(0);
-    SlotSwitchEvent slotSwitchEvent = SlotSwitchEvent.create(slot);
+    ItemStack item = player.getInventory().getItem(slot);
+    SlotSwitchEvent slotSwitchEvent = SlotSwitchEvent.create(
+      slot, item.getType().name(), item.getAmount()
+    );
     reverseSink.accept(user, slotSwitchEvent::accept);
   }
 

@@ -14,6 +14,8 @@ import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static de.jpx3.intave.module.nayoro.SampleFlags.*;
+
 class RecordEventSink extends EventSink {
   private long last = System.currentTimeMillis();
   private final Environment environment;
@@ -21,6 +23,7 @@ class RecordEventSink extends EventSink {
   private final Set<Integer> entities = new HashSet<>();
   private boolean setup = false;
   private final Lock writeLock = new ReentrantLock();
+  private final boolean checkFullEventRead = true;
 
   public RecordEventSink(Environment environment, DataOutput dataOutput) {
     this.environment = environment;
@@ -38,6 +41,12 @@ class RecordEventSink extends EventSink {
         dataOutput.writeLong(id.getMostSignificantBits());
         dataOutput.writeLong(id.getLeastSignificantBits());
         dataOutput.writeLong(System.currentTimeMillis());
+        int flags = 0;
+        if (checkFullEventRead) {
+          flags |= EVENT_ZERO_BYTE_APPEND;
+        }
+        flags |= MARKED_UNKNOWN;
+        dataOutput.writeInt(flags);
       } catch (IOException exception) {
         throw new RuntimeException(exception);
       } finally {
@@ -94,6 +103,9 @@ class RecordEventSink extends EventSink {
       dataOutput.writeShort(duration);
       dataOutput.writeByte(EventRegistry.idOf(event));
       event.serialize(environment, dataOutput);
+      if (checkFullEventRead) {
+        dataOutput.writeByte(0xa);
+      }
     } catch (IOException exception) {
       throw new IllegalStateException("Could not serialize event " + event.getClass().getName(), exception);
     } finally {

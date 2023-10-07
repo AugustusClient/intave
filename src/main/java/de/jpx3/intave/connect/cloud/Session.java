@@ -187,7 +187,9 @@ public final class Session {
   }
 
   public void close() {
-    channel.close();
+    if (channel != null) {
+      channel.close();
+    }
   }
 
   public boolean canSend(Packet<Serverbound> packet) {
