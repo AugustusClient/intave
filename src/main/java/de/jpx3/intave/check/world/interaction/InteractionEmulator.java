@@ -409,7 +409,7 @@ public final class InteractionEmulator implements EventProcessor {
         Material placementType = VolatileBlockAccess.typeAccess(user, placementLocation); // placementLocation.getBlock().getType();
 
         // remove liquid on location if exists
-        if (MaterialMagic.isLiquid(placementType) && type == InteractionType.INTERACT) {
+        if (MaterialMagic.isLavaOrWater(placementType) && type == InteractionType.INTERACT) {
           // emulate
           if (WorldPermission.bukkitActionPermission(
             player,
@@ -471,9 +471,9 @@ public final class InteractionEmulator implements EventProcessor {
       BlockVariant properties = BlockVariantRegister.variantOf(type, variant);
       String propertyString = "{"+properties.propertyNames().stream().map(s -> s + ": " + properties.propertyOf(s)).collect(Collectors.joining(", ")) +"}";
 
+//      Fluid fluid = Fluids.fluidAt(userOf(player), block.getX(), block.getY(), block.getZ());
       Fluid fluid = Fluids.fluidAt(userOf(player), block.getX(), block.getY(), block.getZ());
-
-      player.sendMessage(type + "/" + variant + "."+propertyString+" f"+fluid+" -> " + blockStateAccess.collisionShapeAt(block.getX(), block.getY(), block.getZ()));
+      player.sendMessage(type + "/" + variant + "."+propertyString+" f"+ fluid +" -> " + blockStateAccess.collisionShapeAt(block.getX(), block.getY(), block.getZ()));
     }
 
     switch (clickedType) {

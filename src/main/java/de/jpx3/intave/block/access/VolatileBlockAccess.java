@@ -7,12 +7,14 @@ import de.jpx3.intave.cleanup.GarbageCollector;
 import de.jpx3.intave.share.BlockPosition;
 import de.jpx3.intave.share.Position;
 import de.jpx3.intave.user.User;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.metadata.MetadataValue;
 
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,6 +132,10 @@ public final class VolatileBlockAccess {
     return typeAccess(user, location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
   }
 
+  public static Material typeAccess(User user, BlockPosition position) {
+    return typeAccess(user, user.player().getWorld(), position.getBlockX(), position.getBlockY(), position.getBlockZ());
+  }
+
   public static Material typeAccess(User user, World world, Position position) {
     return typeAccess(user, world, position.getBlockX(), position.getBlockY(), position.getBlockZ());
   }
@@ -154,6 +160,10 @@ public final class VolatileBlockAccess {
     return variantAccess(user, location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
   }
 
+  public static BlockVariant variantAccess(User user, BlockPosition position) {
+    return variantAccess(user, user.player().getWorld(), position.getBlockX(), position.getBlockY(), position.getBlockZ());
+  }
+
   public static BlockVariant variantAccess(User user, World blockAccess, double x, double y, double z) {
     return variantAccess(user, blockAccess, floor(x), floor(y), floor(z));
   }
@@ -174,6 +184,10 @@ public final class VolatileBlockAccess {
 
   public static int variantIndexAccess(User user, Location location) {
     return variantIndexAccess(user, location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+  }
+
+  public static int variantIndexAccess(User user, BlockPosition position) {
+    return variantIndexAccess(user, user.player().getWorld(), position.getBlockX(), position.getBlockY(), position.getBlockZ());
   }
 
   public static int variantIndexAccess(User user, World blockAccess, double x, double y, double z) {

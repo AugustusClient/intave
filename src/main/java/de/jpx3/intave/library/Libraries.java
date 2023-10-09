@@ -3,9 +3,7 @@ package de.jpx3.intave.library;
 import de.jpx3.intave.IntaveLogger;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public final class Libraries {
   public static void setupLibraries() {

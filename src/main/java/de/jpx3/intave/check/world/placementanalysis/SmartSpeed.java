@@ -30,7 +30,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
-import static de.jpx3.intave.share.Direction.Axis.Y_AXIS;
 
 @Reserved
 public class SmartSpeed extends MetaCheckPart<PlacementAnalysis, SmartSpeed.SmartSpeedMeta> {

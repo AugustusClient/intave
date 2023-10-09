@@ -1,7 +1,6 @@
 package de.jpx3.intave.block.shape.resolve.patch;
 
 import de.jpx3.intave.block.shape.BlockShape;
-import de.jpx3.intave.block.shape.BlockShapes;
 import de.jpx3.intave.share.BoundingBox;
 import org.bukkit.Material;
 import org.bukkit.World;

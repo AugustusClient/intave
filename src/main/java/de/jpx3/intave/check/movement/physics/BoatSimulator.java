@@ -77,7 +77,9 @@ public final class BoatSimulator extends Simulator {
     for (int x = minX; x < maxX; ++x) {
       for (int y = minY; y < maxY; ++y) {
         for (int z = minZ; z < maxZ; ++z) {
+//          Fluid fluid = Fluids.fluidAt(user, x, y, z);
           Fluid fluid = Fluids.fluidAt(user, x, y, z);
+//          if (fluid.isOfWater()) {
           if (fluid.isOfWater()) {
             float f = y + fluid.height();
             movement.waterLevel = Math.max(f, movement.waterLevel);
@@ -106,7 +108,7 @@ public final class BoatSimulator extends Simulator {
         for (int z = minZ; z < maxZ; ++z) {
           Fluid fluid = Fluids.fluidAt(user, x, y, z);
           if (fluid.isOfWater() && d0 < (double) ((float) y + fluid.height())) {
-            if (!fluid.source()) {
+            if (!fluid.isSource()) {
               return Status.UNDER_FLOWING_WATER;
             }
             flag = true;

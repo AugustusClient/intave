@@ -1,7 +1,6 @@
 package de.jpx3.intave.resource;
 
 import de.jpx3.intave.annotate.Native;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

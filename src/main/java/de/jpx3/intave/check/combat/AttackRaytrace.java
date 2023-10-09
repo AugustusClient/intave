@@ -39,7 +39,8 @@ import java.util.function.Function;
 
 import static com.comphenix.protocol.wrappers.EnumWrappers.EntityUseAction.ATTACK;
 import static de.jpx3.intave.math.MathHelper.formatDouble;
-import static de.jpx3.intave.module.linker.packet.ListenerPriority.*;
+import static de.jpx3.intave.module.linker.packet.ListenerPriority.LOW;
+import static de.jpx3.intave.module.linker.packet.ListenerPriority.NORMAL;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
 import static de.jpx3.intave.module.violation.Violation.ViolationFlags.DISPLAY_IN_ALL_VERBOSE_MODES;
 import static de.jpx3.intave.module.violation.Violation.ViolationFlags.DONT_PROCESS_VIOSTAT;

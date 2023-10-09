@@ -1,7 +1,5 @@
 package de.jpx3.intave.module.linker.packet;
 
-import com.comphenix.protocol.PacketType;
-
 public final class PacketId {
   public enum Client {
     @Deprecated

@@ -1,9 +1,8 @@
 package de.jpx3.intave.block.fluid;
 
-import de.jpx3.intave.block.variant.BlockVariantRegister;
 import org.bukkit.Material;
 
-final class v12FluidResolver implements FluidResolver {
+final class v8FluidResolver implements FluidResolver {
   private static final Material STATIONARY_WATER = Material.getMaterial("STATIONARY_WATER");
   private static final Material STATIONARY_LAVA = Material.getMaterial("STATIONARY_LAVA");
 
@@ -14,18 +13,11 @@ final class v12FluidResolver implements FluidResolver {
     if (!isWater && !isLava) {
       return Dry.of();
     }
-    int level = levelOf(type, variantIndex);
-    float height = heightFromLegacyLevel(level);
+    float height = heightFromLegacyLevel(variantIndex);
     if (isWater) {
-      return Water.ofHeight(height, level, level >= 8);
+      return Water.ofHeight(height, variantIndex >= 8 ? 0 : variantIndex, variantIndex >= 8);
     } else {
-      return Lava.ofHeight(height, level, level >= 8);
+      return Lava.ofHeight(height, variantIndex >= 8 ? 0 : variantIndex, variantIndex >= 8);
     }
-  }
-
-  private static int levelOf(Material material, int variantIndex) {
-    return BlockVariantRegister
-      .variantOf(material, variantIndex)
-      .propertyOf("level");
   }
 }

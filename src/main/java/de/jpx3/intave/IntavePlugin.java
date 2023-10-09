@@ -662,6 +662,7 @@ public final class IntavePlugin extends JavaPlugin {
       WrapperConverter.setup();
       Raytracing.setup();
       Fluids.setup();
+
       VolatileBlockAccess.setup();
       BlockAccess.setup();
       BlockInteractionAccess.setup();

@@ -26,10 +26,13 @@ public final class Modules {
     ShutdownTasks.add(Modules::shutdown);
   }
 
+  private static long lastBootSegment = 0L;
+
   @Native
   public static void proceedBoot(BootSegment bootSegment) {
     loader.loadRequests(bootSegment).forEach(pool::loadModule);
     pool.bootRequests(bootSegment).forEach(pool::enableModule);
+    lastBootSegment = System.currentTimeMillis();
   }
 
   public static void shutdown() {
