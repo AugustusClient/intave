@@ -6,6 +6,7 @@ import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.adapter.MinecraftVersions;
+import de.jpx3.intave.annotate.DoNotFlowObfuscate;
 import de.jpx3.intave.annotate.Native;
 import de.jpx3.intave.annotate.Reserved;
 import de.jpx3.intave.block.access.BlockInteractionAccess;
@@ -40,6 +41,7 @@ import static de.jpx3.intave.check.combat.heuristics.Anomaly.AnomalyOption.*;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
 
 @Reserved
+@DoNotFlowObfuscate
 public final class RotationSnapHeuristic extends MetaCheckPart<Heuristics, RotationSnapHeuristic.RotationSnapHeuristicMeta> {
 
   public RotationSnapHeuristic(Heuristics parentCheck) {

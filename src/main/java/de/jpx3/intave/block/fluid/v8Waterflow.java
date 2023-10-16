@@ -9,7 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-public final class v8Waterflow implements FluidFlow {
+final class v8Waterflow implements FluidFlow {
   @Override
   public boolean applyFlowTo(User user, BoundingBox boundingBox) {
     Player player = user.player();

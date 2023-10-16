@@ -9,7 +9,7 @@ import net.minecraft.server.v1_15_R1.TagsFluid;
 import org.bukkit.Material;
 
 @PatchyAutoTranslation
-public final class v15FluidResolver implements FluidResolver {
+final class v15FluidResolver implements FluidResolver {
   @Override
   @PatchyAutoTranslation
   public Fluid liquidFrom(Material type, int variantIndex) {

@@ -10,7 +10,7 @@ import org.bukkit.World;
 
 import static de.jpx3.intave.share.ClientMath.*;
 
-public final class v13Waterflow implements FluidFlow {
+final class v13Waterflow implements FluidFlow {
   @Override
   public boolean applyFlowTo(User user, BoundingBox boundingBox) {
     World world = user.player().getWorld();

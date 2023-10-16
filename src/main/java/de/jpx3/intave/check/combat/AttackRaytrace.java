@@ -154,7 +154,8 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
       // Once again ignore invalid entity states to make sure nothing is processed wrongly
       if (entityHealth <= 0
         || attackedEntity == null
-        || attackedEntity instanceof Entity.Destroyed) {
+        || attackedEntity instanceof Entity.Destroyed
+        || (attackedEntity.hasTypeData() && attackedEntity.typeData().fireball())) {
         return;
       }
 
@@ -182,6 +183,10 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
     MetadataBundle meta = user.meta();
     ViolationMetadata violations = meta.violationLevel();
     ConnectionMetadata connection = meta.connection();
+
+    if (!attackedEntity.typeData().isLivingEntity()) {
+      return false;
+    }
 
     int maximumPendingFeedbackPackets = trustFactorSetting("pending-allowance", player) + (int) MathHelper.minmax(1, LatencyStudy.cachedAverage(), 20);
 //    long pendingFeedbacks = attackedEntity.pendingFeedbackPackets();

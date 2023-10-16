@@ -12,6 +12,7 @@ public final class EntityTypeData {
   public final int creationId;
   private boolean boat;
   private boolean shulker;
+  private boolean fireball;
 
   public EntityTypeData(String entityName, HitboxSize hitBoxSize, int entityTypeId, boolean isLivingEntity, int creationId) {
     this.entityName = entityName;
@@ -29,6 +30,10 @@ public final class EntityTypeData {
       case "shulker":
         this.shulker = true;
         break;
+      case "largefireball":
+      case "smallfireball":
+        this.fireball = true;
+        break;
     }
   }
 
@@ -42,6 +47,10 @@ public final class EntityTypeData {
 
   public boolean isShulker() {
     return shulker;
+  }
+
+  public boolean fireball() {
+    return fireball;
   }
 
   public String name() {

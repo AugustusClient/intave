@@ -4,6 +4,7 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.*;
 import com.comphenix.protocol.utility.MinecraftVersion;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import de.jpx3.intave.IntaveControl;
@@ -414,7 +415,7 @@ public final class DiagnosticsStage extends CommandStage {
     description = "Create and save packet logs"
   )
   public void startPacketLog(CommandSender sender, Player target) {
-    File logsFolder = new File(plugin.dataFolder(), "packetlogs");
+    File logsFolder = IntaveControl.GOMME_MODE ? new File("logs") : new File(plugin.dataFolder(), "packetlogs");
     File packetLogFile = new File(logsFolder, packetLogFileName(target.getName()));
 
     UUID userId = target.getUniqueId();
@@ -447,7 +448,7 @@ public final class DiagnosticsStage extends CommandStage {
 
       PacketAdapter adapter = new PacketAdapter(
         IntavePlugin.singletonInstance(),
-        ListenerPriority.LOWEST,
+        ListenerPriority.MONITOR,
         PacketType.values(),
         ListenerOptions.SKIP_PLUGIN_VERIFIER
       ) {
@@ -484,16 +485,144 @@ public final class DiagnosticsStage extends CommandStage {
 
   private static String packetContent(PacketContainer packet) {
     if (packet == null) return "null";
-    if (packet.getType().name().contains("CHAT") || packet.getType().name().contains("TAB_COMPLETE")) {
-      return "REDACTED";
-    }
-
+//    if (packet.getType().name().contains("CHAT") || packet.getType().name().contains("TAB_COMPLETE")) {
+//      return "REDACTED";
+//    }
     String contents = packet.getModifier()
       .getValues().stream()
-      .map(o -> o == null ? "null" : o.toString())
+      .map(DiagnosticsStage::stringFromType)
       .filter(s -> !s.isEmpty())
       .collect(Collectors.joining(", "));
     return "{" + contents + "}";
+  }
+
+  private static String stringFromType(Object object) {
+    if (object == null) {
+      return "null";
+    } else if (object instanceof Number) {
+      return object.toString();
+    } else if (object instanceof String) {
+      return "\"" + object + "\"";
+    } else if (object instanceof Boolean) {
+      return object.toString();
+    } else if (object instanceof byte[]) {
+      byte[] bytes = (byte[]) object;
+      if (bytes.length == 0) {
+        return "[]";
+      } else {
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        int limit = Math.min(bytes.length, 40);
+        for (int i = 0; i < limit; i++) {
+          builder.append(bytes[i]);
+          if (i != limit - 1) {
+            builder.append(", ");
+          }
+        }
+        if (bytes.length > 40) {
+          builder.append("...");
+        }
+        builder.append("]");
+        return builder.toString();
+      }
+    } else if (object instanceof int[]) {
+      int[] ints = (int[]) object;
+      if (ints.length == 0) {
+        return "[]";
+      } else {
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        int limit = Math.min(ints.length, 40);
+        for (int i = 0; i < limit; i++) {
+          builder.append(ints[i]);
+          if (i != limit - 1) {
+            builder.append(", ");
+          }
+        }
+        if (ints.length > 40) {
+          builder.append("...");
+        }
+        builder.append("]");
+        return builder.toString();
+      }
+    } else if (object instanceof Object[]) {
+      Object[] objects = (Object[]) object;
+      if (objects.length == 0) {
+        return "[]";
+      } else {
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        int limit = Math.min(objects.length, 40);
+        for (int i = 0; i < limit; i++) {
+          builder.append(stringFromType(objects[i]));
+          if (i != limit - 1) {
+            builder.append(", ");
+          }
+        }
+        if (objects.length > 40) {
+          builder.append("...");
+        }
+        builder.append("]");
+        return builder.toString();
+      }
+    } else if (object instanceof Collection) {
+      Collection<?> collection = (Collection<?>) object;
+      if (collection.isEmpty()) {
+        return "[]";
+      } else {
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        int limit = Math.min(collection.size(), 40);
+        int i = 0;
+        for (Object o : collection) {
+          builder.append(stringFromType(o));
+          if (i != limit - 1) {
+            builder.append(", ");
+          }
+          i++;
+        }
+        if (collection.size() > 40) {
+          builder.append("...");
+        }
+        builder.append("]");
+        return builder.toString();
+      }
+    } else if (object instanceof Map) {
+      Map<?, ?> map = (Map<?, ?>) object;
+      if (map.isEmpty()) {
+        return "{}";
+      } else {
+        StringBuilder builder = new StringBuilder();
+        builder.append("{");
+        int limit = Math.min(map.size(), 40);
+        int i = 0;
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+          builder.append(stringFromType(entry.getKey()));
+          builder.append("=");
+          builder.append(stringFromType(entry.getValue()));
+          if (i != limit - 1) {
+            builder.append(", ");
+          }
+          i++;
+        }
+        if (map.size() > 40) {
+          builder.append("...");
+        }
+        builder.append("}");
+        return builder.toString();
+      }
+    } else if (object.toString().contains("DataWatcher@")) {
+      WrappedDataWatcher watcher = new WrappedDataWatcher(object);
+      return "DataWatcher{" + watcher.getWatchableObjects().stream().map(watchableObject -> {
+        String value = stringFromType(watchableObject.getValue());
+        return watchableObject.getIndex() + "=" + value;
+      }).collect(Collectors.joining(", ")) + "}";
+    } else if (object.toString().contains("WatchableObject@")) {
+      WrappedDataWatcher.WrappedDataWatcherObject watcherObject = new WrappedDataWatcher.WrappedDataWatcherObject(object);
+      return "WatchableObject{" + watcherObject.getIndex() + "=" + stringFromType(watcherObject.getHandle()) + "}";
+    } else {
+      return object.toString();
+    }
   }
 
   private static final DateTimeFormatter FILE_MESSAGE_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm-ss");
