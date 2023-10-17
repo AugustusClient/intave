@@ -238,7 +238,7 @@ public final class PacketSubscriptionLinker extends Module {
   }
 
   private boolean matches(PacketType packetType, String name) {
-    return packetType.name().equalsIgnoreCase(name);
+    return packetType.name() != null && packetType.name().equalsIgnoreCase(name);
   }
 
   private static final ThreadLocal<Map<Integer, Object[]>> argumentCache = ThreadLocal.withInitial(HashMap::new);

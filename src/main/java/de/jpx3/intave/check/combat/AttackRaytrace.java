@@ -198,7 +198,7 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
     long transactionPingAverage = connection.transactionPingAverage();
     double transactionTickAverage = transactionPingAverage / 50d;
     int absoluteLimit = zeroNetworkTolerance ? 3 : 12;
-    int historyBasedLimit = Math.min((int) ((LatencyStudy.cachedAverage() + transactionTickAverage + 0.5) * 0.6), absoluteLimit);
+    int historyBasedLimit = Math.min((int) ((LatencyStudy.cachedAverage() + transactionTickAverage + 0.5) * 0.6) + 2, absoluteLimit);
     boolean pendingOverAverage = transactionPingAverage > 0 && pendingFeedbacks > historyBasedLimit;
     double trustfactorBaseDistanceLimit = trustFactorSetting("pending-distance", player);
     double actualDistance = attackedEntity.immediateDistanceToClientPosition();
@@ -258,7 +258,7 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
           ViolationContext violationContext = Modules.violationProcessor().processViolation(violation);
           double after = violationContext.violationLevelAfter();
           if (after > 10) {
-            user.nerf(AttackNerfStrategy.HT_SPOOF, "internal");
+//            user.nerf(AttackNerfStrategy.HT_SPOOF, "internal");
           }
         }
       }
@@ -272,7 +272,6 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
       }
       violations.backtrackVL -= 0.05;
     }
-
     return entityHasTimedOut;
   }
 

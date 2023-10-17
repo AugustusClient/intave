@@ -103,7 +103,7 @@ public final class PacketReaders {
   }
 
   private static boolean matches(PacketType packetType, String name) {
-    return packetType.name().equalsIgnoreCase(name);
+    return packetType != null && packetType.name() != null && packetType.name().equalsIgnoreCase(name);
   }
 
   public static <T extends PacketReader> T readerOf(PacketContainer container) {

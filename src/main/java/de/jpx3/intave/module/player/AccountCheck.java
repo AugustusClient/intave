@@ -122,9 +122,9 @@ public final class AccountCheck extends Module {
       SibylBroadcast.broadcast(ChatColor.RED + player.getName() + " is a newly created account");
       User user = UserRepository.userOf(player);
       if (!user.meta().protocol().combatUpdate()) {
-        user.nerfPermanently(AttackNerfStrategy.BLOCKING, "86");
-        user.nerfPermanently(AttackNerfStrategy.GARBAGE_HITS, "86");
-        user.nerfPermanently(AttackNerfStrategy.BURN_LONGER, "86");
+//        user.nerfPermanently(AttackNerfStrategy.BLOCKING, "86");
+//        user.nerfPermanently(AttackNerfStrategy.GARBAGE_HITS, "86");
+//        user.nerfPermanently(AttackNerfStrategy.BURN_LONGER, "86");
       }
     }
   }

@@ -92,11 +92,12 @@ public final class FeedbackReceiver extends Module {
     if (clientTransactionId == null) {
       return;
     }
-    ConnectionMetadata connection = user.meta().connection();
-    connection.windowClickId++;
-    connection.windowClickId %= 1000;
-    int start = Short.MAX_VALUE - 1000;
-    packet.getShorts().writeSafely(0, (short) (connection.windowClickId + start));
+//    ConnectionMetadata connection = user.meta().connection();
+//    connection.
+//    connection.windowClickId++;
+//    connection.windowClickId %= 1000;
+//    int start = Short.MAX_VALUE - 1000;
+//    packet.getShorts().writeSafely(0, (short) (connection.windowClickId + start));
   }
 
   @PacketSubscription(
@@ -179,6 +180,11 @@ public final class FeedbackReceiver extends Module {
       return (short) (inputInteger & 0xffff);
     } else {
       short shortInput = packet.getShorts().readSafely(0);
+      if (shortInput < 0) {
+        shortInput *= -1;
+      } else {
+        return -1;
+      }
       if (shortInput > MAX_USER_KEY || shortInput < MIN_USER_KEY) {
         return -1;
       }

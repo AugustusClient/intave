@@ -55,8 +55,8 @@ public final class Facing extends CheckPart<PlacementAnalysis> {
         .withVL(5).build();
       Modules.violationProcessor().processViolation(violation);
       //dmc14
-      user.nerf(AttackNerfStrategy.CANCEL_FIRST_HIT, "14");
-      user.nerf(AttackNerfStrategy.DMG_LIGHT, "14");
+//      user.nerf(AttackNerfStrategy.CANCEL_FIRST_HIT, "14");
+//      user.nerf(AttackNerfStrategy.DMG_LIGHT, "14");
     }
   }
 

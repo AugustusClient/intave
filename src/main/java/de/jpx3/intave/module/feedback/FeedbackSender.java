@@ -26,7 +26,7 @@ import static com.comphenix.protocol.PacketType.Play.Server.TRANSACTION;
 import static de.jpx3.intave.module.feedback.FeedbackOptions.*;
 
 public final class FeedbackSender extends Module {
-  public static final short MIN_USER_KEY = 0;
+  public static final short MIN_USER_KEY = 1;
   public static final short MAX_USER_KEY = 24000;
   public static final int PING_MASK = 0xf5550000;
   private static final boolean USE_PING_PONG_PACKETS = MinecraftVersions.VER1_17_0.atOrAbove();
@@ -283,7 +283,7 @@ public final class FeedbackSender extends Module {
         } else {
           packet = protocol.createPacket(TRANSACTION);
           packet.getIntegers().write(0, 0);
-          packet.getShorts().write(0, id);
+          packet.getShorts().write(0, (short) -id);
           packet.getBooleans().write(0, false);
         }
       } catch (Exception exception) {

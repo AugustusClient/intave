@@ -178,10 +178,10 @@ public final class PunishmentMetadata {
       this.attackNerfersMap.put(attackNerfer.type, attackNerfer);
     }
     if (isRedlistedPlayer(player)) {
-      nerferOfType(AttackNerfStrategy.BURN_LONGER).activatePermanently();
-      nerferOfType(AttackNerfStrategy.CRITICALS).activatePermanently();
-      nerferOfType(AttackNerfStrategy.GARBAGE_HITS).activatePermanently();
-      nerferOfType(AttackNerfStrategy.BLOCKING).activatePermanently();
+//      nerferOfType(AttackNerfStrategy.BURN_LONGER).activatePermanently();
+//      nerferOfType(AttackNerfStrategy.CRITICALS).activatePermanently();
+//      nerferOfType(AttackNerfStrategy.GARBAGE_HITS).activatePermanently();
+//      nerferOfType(AttackNerfStrategy.BLOCKING).activatePermanently();
     }
   }
 

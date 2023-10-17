@@ -780,8 +780,8 @@ public final class IntavePlugin extends JavaPlugin {
     Plugin viaBackwards = Bukkit.getPluginManager().getPlugin("ViaBackwards");
     if (viaBackwards != null) {
       if (!viaBackwards.getConfig().getBoolean("handle-pings-as-inv-acknowledgements", false)) {
-        logger.warn("ViaBackwards is not configured to replace ping packets with inventory acknowledgement packets");
-        logger.warn("This will lead to incorrect, feedback-related disconnects");
+        logger.warn("ViaBackwards is misconfigured, causing false-positives and fault kicks");
+        logger.warn("Go to plugins/ViaBackwards/config.yml and set \"handle-pings-as-inv-acknowledgements\" to TRUE");
       }
     }
 

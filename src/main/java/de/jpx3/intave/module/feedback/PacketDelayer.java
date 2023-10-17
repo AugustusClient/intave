@@ -136,6 +136,7 @@ public final class PacketDelayer extends Module {
     boolean idAddressed = packetType == PacketType.Play.Server.ANIMATION ||
       packetType == PacketType.Play.Server.ENTITY_STATUS ||
       packetType == PacketType.Play.Server.ENTITY_METADATA ||
+      packetType == PacketType.Play.Server.ENTITY_TELEPORT ||
       packetType == PacketType.Play.Server.ENTITY_VELOCITY;
 
     if (idAddressed) {
