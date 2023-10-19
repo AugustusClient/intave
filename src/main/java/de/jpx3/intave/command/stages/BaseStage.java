@@ -12,6 +12,7 @@ import de.jpx3.intave.module.actionbar.ActionBarDisplayer;
 import de.jpx3.intave.module.actionbar.DisplayType;
 import de.jpx3.intave.module.nayoro.Classifier;
 import de.jpx3.intave.module.nayoro.Nayoro;
+import de.jpx3.intave.module.nayoro.OperationalMode;
 import de.jpx3.intave.module.violation.ViolationVerboseMode;
 import de.jpx3.intave.player.ProfileLookup;
 import de.jpx3.intave.security.LicenseAccess;
@@ -129,7 +130,7 @@ public final class BaseStage extends CommandStage {
         nayoro.disableRecordingFor(user);
         player.sendMessage(ChatColor.RED + "Recording disabled.");
       } else {
-        nayoro.enableRecordingFor(user, classifier);
+        nayoro.enableRecordingFor(user, classifier, OperationalMode.LOCAL_STORAGE);
         player.sendMessage(ChatColor.GREEN + "Recording with label \"" + classifier + "\" enabled.");
       }
     } else {

@@ -72,6 +72,7 @@ public final class Cloud {
     Session session = new Session(shard, this);
     session.init(success -> {
       if (success) {
+        reconnectAttempts.put(shard, 0);
         IntaveLogger.logger().info("Connected to " + shard);
         setTrustAndStorage();
       } else {
@@ -84,6 +85,7 @@ public final class Cloud {
         } else {
           IntaveLogger.logger().warning("Unable to connect to " + shard + " after 3 attempts");
         }
+        sessions.remove(shard);
       }
     });
     sessions.put(shard, session);
