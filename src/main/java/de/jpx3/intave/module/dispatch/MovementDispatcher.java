@@ -465,7 +465,7 @@ public final class MovementDispatcher extends Module {
       interactionRaytraceCheck.receiveMovement(event);
 
       movementData.compileSpecialBlocks();
-      movementData.recheckWebStateFromLastTick();
+//      movementData.recheckWebStateFromLastTick();
 
       if (hasMovement || hasRotation) {
         physicsCheck.receiveMovement(user, hasMovement, hasRotation);

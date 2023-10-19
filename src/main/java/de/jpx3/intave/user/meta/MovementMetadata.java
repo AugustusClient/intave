@@ -536,14 +536,14 @@ public final class MovementMetadata implements SimulationEnvironment {
   }
 
   public void recheckWebStateFromLastTick() {
-//    if (!checkWebStateAgainNextTick) {
-//      return;
-//    }
-//    checkWebStateAgainNextTick = false;
-//    // only check if we missed ticks
-//    if (!receivedFlyingPacketIn(6)) {
-//      return;
-//    }
+    if (!checkWebStateAgainNextTick) {
+      return;
+    }
+    checkWebStateAgainNextTick = false;
+    // only check if we missed ticks
+    if (!receivedFlyingPacketIn(6)) {
+      return;
+    }
     // boundingbox from last tick!
     int blockPositionStartX = floor(boundingBox.minX + 0.001);
     int blockPositionStartY = floor(boundingBox.minY + 0.001);

@@ -827,7 +827,7 @@ public final class IntavePlugin extends JavaPlugin {
     for (Map.Entry<String, Boolean> entry : enforceDisabled.entrySet()) {
       if (entry.getValue()) {
         logger.warn(entry.getKey());
-        if (!DISABLE_LICENSE_CHECK || GOMME_MODE) {
+        if (!DISABLE_LICENSE_CHECK /*|| GOMME_MODE*/) {
           throw new IllegalStateException(entry.getKey() + ", but license check is disabled");
         }
       }

@@ -9,6 +9,7 @@ import de.jpx3.intave.block.shape.ShapeResolverPipeline;
 import de.jpx3.intave.block.type.BlockTypeAccess;
 import de.jpx3.intave.block.variant.BlockVariantNativeAccess;
 import de.jpx3.intave.diagnostic.ShapeAccessFlowStudy;
+import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.math.Hypot;
 import de.jpx3.intave.share.Position;
 import de.jpx3.intave.world.WorldHeight;
@@ -241,7 +242,9 @@ final class MultiChunkKeyExtendedBlockStateCache implements ExtendedBlockStateCa
     Position position = new Position(posX, posY, posZ);
     replacementCache.insert(position, blockState);
     if (IntaveControl.BLOCK_CACHE_DEBUG) {
-      player.sendMessage(ChatColor.LIGHT_PURPLE + "OVERRIDE " + ChatColor.AQUA  + type + ChatColor.LIGHT_PURPLE + " at " + ChatColor.GRAY + position + ChatColor.LIGHT_PURPLE + " for " + ChatColor.RED + reason);
+      Synchronizer.synchronize(() -> {
+        player.sendMessage(ChatColor.LIGHT_PURPLE + "OVERRIDE " + ChatColor.AQUA  + type + ChatColor.LIGHT_PURPLE + " at " + ChatColor.GRAY + position + ChatColor.LIGHT_PURPLE + " for " + ChatColor.RED + reason);
+      });
     }
   }
 
@@ -266,7 +269,9 @@ final class MultiChunkKeyExtendedBlockStateCache implements ExtendedBlockStateCa
   public void lockOverride(int posX, int posY, int posZ) {
     replacementCache.lock(Position.of(posX, posY, posZ));
     if (IntaveControl.BLOCK_CACHE_DEBUG) {
-      player.sendMessage(ChatColor.LIGHT_PURPLE + "LOCK " + ChatColor.GRAY + Position.of(posX, posY, posZ));
+      Synchronizer.synchronize(() -> {
+        player.sendMessage(ChatColor.LIGHT_PURPLE + "LOCK " + ChatColor.GRAY + Position.of(posX, posY, posZ));
+      });
     }
   }
 
@@ -274,7 +279,9 @@ final class MultiChunkKeyExtendedBlockStateCache implements ExtendedBlockStateCa
   public void unlockOverride(int posX, int posY, int posZ) {
     if (replacementCache.unlock(Position.of(posX, posY, posZ))) {
       if (IntaveControl.BLOCK_CACHE_DEBUG) {
-        player.sendMessage(ChatColor.LIGHT_PURPLE + "UNLOCK " + ChatColor.GRAY + Position.of(posX, posY, posZ));
+        Synchronizer.synchronize(() -> {
+          player.sendMessage(ChatColor.LIGHT_PURPLE + "UNLOCK " + ChatColor.GRAY + Position.of(posX, posY, posZ));
+        });
       }
     }
   }

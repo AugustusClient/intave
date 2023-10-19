@@ -95,7 +95,6 @@ class BaseSimulator extends Simulator {
         Position lastPosition = environment.lastPosition();
         double fluidHeight = 0.0d;
 
-
         float heightPercentage = resolveLiquidHeightPercentage(levelOfLiquidAt(user, lastPosition));
         double convertedPositionY = environment.positionY() + Math.abs(WorldHeight.LOWER_WORLD_LIMIT);
         heightPercentage += convertedPositionY % 1;
@@ -415,10 +414,10 @@ class BaseSimulator extends Simulator {
     double slipperiness;
 
     if (environment.lastOnGround()) {
-//      double blockPositionX = floor(environment.verifiedPositionX());
-//      double blockPositionY = floor(environment.verifiedPositionY() - environment.frictionPosSubtraction());
-//      double blockPositionZ = floor(environment.verifiedPositionZ());
-      slipperiness = BlockProperties.of(environment.frictionMaterial()).slipperiness() * 0.91f;
+      double blockPositionX = floor(environment.verifiedPositionX());
+      double blockPositionY = floor(environment.verifiedPositionY() - environment.frictionPosSubtraction());
+      double blockPositionZ = floor(environment.verifiedPositionZ());
+      slipperiness = MovementCharacteristics.currentSlipperiness(user, player.getWorld(), blockPositionX, blockPositionY, blockPositionZ);
     } else {
       slipperiness = 0.91f;
     }
