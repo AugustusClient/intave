@@ -113,7 +113,7 @@ public interface SimulationEnvironment {
   boolean collidedHorizontally();
   boolean collidedVertically();
 
-  void checkSupportingBlock();
+  void checkSupportingBlock(Motion motion);
 
   boolean collidedWithBoat();
   double frictionPosSubtraction();
