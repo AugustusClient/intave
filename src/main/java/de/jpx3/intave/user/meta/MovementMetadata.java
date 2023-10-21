@@ -165,7 +165,7 @@ public final class MovementMetadata implements SimulationEnvironment {
   public float boatGlide, momentum;
   public double waterLevel;
   public BoatSimulator.Status boatStatus = BoatSimulator.Status.ON_LAND,
-  previousBoatStatus = BoatSimulator.Status.ON_LAND;
+      previousBoatStatus = BoatSimulator.Status.ON_LAND;
   public boolean isTeleportConfirmationPacket;
   public boolean dropPostTickMotionProcessing;
   public boolean willReceiveSetbackVelocity;
@@ -229,14 +229,14 @@ public final class MovementMetadata implements SimulationEnvironment {
     this.player = player;
     this.user = user;
     this.velocitySuperposition = Superposition
-      .builderFor(Motion.class)
-      .apply(MovementDispatcher::applyVelocitySuperposition)
-      .collapse(MovementDispatcher::collapseVelocitySuperposition)
-      .reset(MovementDispatcher::resetVelocitySuperposition)
-      .overrideMerge()
-      .user(user)
-      .timeout(2)
-      .build();
+        .builderFor(Motion.class)
+        .apply(MovementDispatcher::applyVelocitySuperposition)
+        .collapse(MovementDispatcher::collapseVelocitySuperposition)
+        .reset(MovementDispatcher::resetVelocitySuperposition)
+        .overrideMerge()
+        .user(user)
+        .timeout(2)
+        .build();
     if (Physics.USE_SUPERPOSITIONS) {
       superpositions = ImmutableList.of(velocitySuperposition);
     } else {
@@ -305,8 +305,8 @@ public final class MovementMetadata implements SimulationEnvironment {
 
   @DispatchTarget
   public void updateMovement(
-    PacketContainer packet,
-    boolean hasMovement, boolean hasRotation
+      PacketContainer packet,
+      boolean hasMovement, boolean hasRotation
   ) {
     if (!boundingBoxSetup) {
       setupDefaults();
@@ -346,8 +346,9 @@ public final class MovementMetadata implements SimulationEnvironment {
         updateMovementMetaData();
       }
     }
-    checkSupportingBlock();
-    compileSpecialBlocks();
+    if (!user.meta().protocol().trailsAndTailsUpdate()) {
+      compileSpecialBlocks();
+    }
     lastRotationYaw = rotationYaw;
     lastRotationPitch = rotationPitch;
     if (hasRotation) {
@@ -367,19 +368,19 @@ public final class MovementMetadata implements SimulationEnvironment {
   }
 
   @Override
-  public void checkSupportingBlock() {
+  public void checkSupportingBlock(Motion motion) {
     MetadataBundle meta = user.meta();
     ProtocolMetadata clientData = meta.protocol();
     if (clientData.trailsAndTailsUpdate()) {
       Position block;
-      BoundingBox boundingBox = BoundingBox.fromPosition(user, this, verifiedPositionX, verifiedPositionY, verifiedPositionZ);
+      BoundingBox boundingBox = BoundingBox.fromPosition(user, this, positionX, positionY, positionZ);
       BoundingBox secondBoundingBox = new BoundingBox(
-        boundingBox.minX, boundingBox.minY - 0.000001, boundingBox.minZ,
-        boundingBox.maxX, boundingBox.minY, boundingBox.maxZ
+          boundingBox.minX, boundingBox.minY - 0.000001, boundingBox.minZ,
+          boundingBox.maxX, boundingBox.minY, boundingBox.maxZ
       );
       block = findSupportingBlock(user, secondBoundingBox);
       if (block == null) {
-        BoundingBox thirdBoundingBox = secondBoundingBox.move(-motionX, 0.0, -motionZ);
+        BoundingBox thirdBoundingBox = secondBoundingBox.move(-motion.motionX, 0.0, -motion.motionZ);
         block = findSupportingBlock(user, thirdBoundingBox);
       }
       mainSupportingBlockPos = block;
@@ -410,7 +411,7 @@ public final class MovementMetadata implements SimulationEnvironment {
     if (mainSupportingBlockPos != null) {
       // 1.20
       Material blockType = VolatileBlockAccess.typeAccess(
-        user, player.getWorld(), mainSupportingBlockPos
+          user, player.getWorld(), mainSupportingBlockPos
       );
       if (reduction > 0.00001f) {
         String typeName = blockType.name();
@@ -421,10 +422,10 @@ public final class MovementMetadata implements SimulationEnvironment {
           return blockType;
         }
         return VolatileBlockAccess.typeAccess(
-          user, player.getWorld(),
-          mainSupportingBlockPos.getBlockX(),
-          blockCollisionPosY,
-          mainSupportingBlockPos.getBlockZ()
+            user, player.getWorld(),
+            mainSupportingBlockPos.getBlockX(),
+            blockCollisionPosY,
+            mainSupportingBlockPos.getBlockZ()
         );
       } else {
         return blockType;
@@ -432,10 +433,11 @@ public final class MovementMetadata implements SimulationEnvironment {
     } else {
       // 1.8 - 1.19
       Material blockType = VolatileBlockAccess.typeAccess(
-        user, player.getWorld(),
-        positionX, positionY - reduction, positionZ
+          user, player.getWorld(),
+          positionX, positionY - reduction, positionZ
       );
-      if (blockType == Material.AIR) {
+      ProtocolMetadata clientData = user.meta().protocol();
+      if (blockType == Material.AIR && !clientData.trailsAndTailsUpdate()) {
         Material blockBelow = VolatileBlockAccess.typeAccess(user, world, blockCollisionPosX, blockCollisionPosY, blockCollisionPosZ);
         if (blockBelow.name().contains("FENCE") || blockBelow.name().contains("WALL")) {
           blockType = blockBelow;
@@ -447,7 +449,7 @@ public final class MovementMetadata implements SimulationEnvironment {
 
   @Nullable
   private Position findSupportingBlock(
-    User user, BoundingBox box
+      User user, BoundingBox box
   ) {
     Position block = null;
     int blockX = 0, blockY = 0, blockZ = 0;
@@ -474,7 +476,7 @@ public final class MovementMetadata implements SimulationEnvironment {
         continue;
       }
       BlockShape shape = user.blockStates().collisionShapeAt(x, y, z);
-      if (shape.isEmpty() || !shape.intersectsWith(box)) {
+      if (shape.isEmpty() || !box.intersectsWith(BoundingBox.fromBounds(x, y, z, x + 1, y + 1, z + 1))) {
         continue;
       }
       double distanceToCenter = distanceToCenter(x, y, z, positionX, positionY, positionZ);
@@ -491,8 +493,8 @@ public final class MovementMetadata implements SimulationEnvironment {
   }
 
   private int compare(
-    int alphaX, int alphaY, int alphaZ,
-    int betaX, int betaY, int betaZ
+      int alphaX, int alphaY, int alphaZ,
+      int betaX, int betaY, int betaZ
   ) {
     if (alphaY == betaY) {
       return alphaZ == betaZ ? alphaX - betaX : alphaZ - betaZ;
@@ -502,8 +504,8 @@ public final class MovementMetadata implements SimulationEnvironment {
   }
 
   private double distanceToCenter(
-    int blockX, int blockY, int blockZ,
-    double entityX, double entityY, double entityZ
+      int blockX, int blockY, int blockZ,
+      double entityX, double entityY, double entityZ
   ) {
     double d0 = blockX + 0.5 - entityX;
     double d1 = blockY + 0.5 - entityY;
@@ -828,9 +830,9 @@ public final class MovementMetadata implements SimulationEnvironment {
       return aquaticUpdateInLava;
     } else {
       BoundingBox lavaBoundingBox = boundingBox.grow(
-        -0.1f,
-        -0.4000000059604645D,
-        -0.1f
+          -0.1f,
+          -0.4000000059604645D,
+          -0.1f
       );
       return Collision.rasterizedLiquidSearch(user, lavaBoundingBox, Fluid::isOfLava);
     }

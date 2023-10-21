@@ -406,7 +406,7 @@ public final class TestSimulationEnvironment implements SimulationEnvironment {
   }
 
   @Override
-  public void checkSupportingBlock() {
+  public void checkSupportingBlock(Motion motion) {
 
   }
 
