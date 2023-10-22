@@ -101,7 +101,6 @@ public final class EntityTracker extends Module {
   public void sendAttachEntityPacket(PacketEvent event) {
     PacketContainer packet = event.getPacket();
     Player player = event.getPlayer();
-
     if (event.getPacketType() == PacketType.Play.Server.MOUNT) {
       //1.9+ servers
       int[] entityIDs = event.getPacket().getIntegerArrays().read(0);
@@ -117,7 +116,6 @@ public final class EntityTracker extends Module {
       if (type == 0) {
         int entityID = packet.getIntegers().read(1);
         int vehicleEntityID = packet.getIntegers().read(2);
-
         processAttachEntity(player, entityID, vehicleEntityID);
       }
     }

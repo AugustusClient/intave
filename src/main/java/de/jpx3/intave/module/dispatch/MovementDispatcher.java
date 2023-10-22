@@ -25,6 +25,7 @@ import de.jpx3.intave.check.movement.Timer;
 import de.jpx3.intave.check.movement.physics.Pose;
 import de.jpx3.intave.check.world.InteractionRaytrace;
 import de.jpx3.intave.executor.Synchronizer;
+import de.jpx3.intave.klass.Lookup;
 import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.module.Module;
 import de.jpx3.intave.module.Modules;
@@ -37,10 +38,7 @@ import de.jpx3.intave.module.linker.packet.PrioritySlot;
 import de.jpx3.intave.module.tracker.entity.Entity;
 import de.jpx3.intave.module.violation.Violation;
 import de.jpx3.intave.packet.PacketSender;
-import de.jpx3.intave.packet.reader.BlockActionReader;
-import de.jpx3.intave.packet.reader.EntityMetadataReader;
-import de.jpx3.intave.packet.reader.PacketReaders;
-import de.jpx3.intave.packet.reader.PlayerActionReader;
+import de.jpx3.intave.packet.reader.*;
 import de.jpx3.intave.player.FaultKicks;
 import de.jpx3.intave.player.ItemProperties;
 import de.jpx3.intave.player.fake.FakePlayer;
@@ -66,6 +64,7 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 
+import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -323,7 +322,7 @@ public final class MovementDispatcher extends Module {
     if (hasMovement) {
       StructureModifier<Double> modifier = packet.getDoubles();
       for (int i = 0; i < 3; i++) {
-        if (Double.isInfinite(modifier.read(i)) && FaultKicks.POSITION_FAULTS) {
+        if (modifier.read(i) == null || Double.isInfinite(modifier.read(i)) && FaultKicks.POSITION_FAULTS) {
           user.kick("Intolerable position fault");
           return;
         }
@@ -333,7 +332,7 @@ public final class MovementDispatcher extends Module {
     if (hasRotation) {
       StructureModifier<Float> modifier = packet.getFloat();
       for (int i = 0; i < 2; i++) {
-        if (Double.isInfinite(modifier.read(i)) && FaultKicks.POSITION_FAULTS) {
+        if (modifier.read(i) == null || Double.isInfinite(modifier.read(i)) && FaultKicks.POSITION_FAULTS) {
           user.kick("Intolerable position fault");
           return;
         }
@@ -358,7 +357,7 @@ public final class MovementDispatcher extends Module {
       }
     }
 
-    // garbage fix for sending POSITION_LOOK packets on newer client versions when rightclicking
+    // see MultiPlayerGameMode#useItem
     if (protocol.cavesAndCliffsUpdate() && !movementData.awaitTeleport
       && !movementData.awaitOutgoingTeleport
       && packet.getType() == PacketType.Play.Client.POSITION_LOOK
@@ -371,15 +370,34 @@ public final class MovementDispatcher extends Module {
       double motionY = positionY - movementData.verifiedPositionY;
       double motionZ = positionZ - movementData.verifiedPositionZ;
       double distance = MathHelper.hypot3d(motionX, motionY, motionZ);
+
       if (distance < 0.00001) {
         movementData.dropPostTickMotionProcessing = true;
-        movementData.awaitClickMovementSkip = false;
+        Float yaw = packet.getFloat().read(0);
+        Float pitch = packet.getFloat().read(1);
+        movementData.rotationYaw = yaw;
+        movementData.rotationPitch = pitch;
         if (DEBUG_MOVEMENT_IGNORE) {
-          player.sendMessage("Click movement ignore distance: " + distance);
+          Synchronizer.synchronize(() -> {
+            player.sendMessage("Click movement ignore distance: " + distance);
+          });
         }
+        Synchronizer.synchronize(() -> {
+          try {
+            Object playerHandle = user.playerHandle();
+            Field yawField = Lookup.serverField("Entity", "yaw");
+            Field pitchField = Lookup.serverField("Entity", "pitch");
+            yawField.set(playerHandle, yaw % 360.0F);
+            pitchField.set(playerHandle, MathHelper.minmax(-90.0F, pitch, 90.0F) % 360.0F);
+          } catch (Exception exception) {
+            exception.printStackTrace();
+          }
+        });
+        event.setCancelled(true);
         return;
       }
     }
+    movementData.awaitClickMovementSkip = false;
 
     connectionData.receiveMovement();
     movementData.updateMovement(packet, hasMovement, hasRotation);
@@ -1099,6 +1117,26 @@ public final class MovementDispatcher extends Module {
               }
             }
           }
+        });
+      }
+    }
+  }
+
+  @PacketSubscription(
+    packetsIn = {
+      USE_ITEM, BLOCK_DIG
+    }
+  )
+  public void receiveUseItem(
+    User user, BlockPositionReader reader
+  ) {
+    Material heldType = user.meta().inventory().heldItemType();
+    Material offhandType = user.meta().inventory().offhandItemType();
+    if (heldType != Material.AIR || offhandType != Material.AIR) {
+      user.meta().movement().awaitClickMovementSkip = true;
+      if (DEBUG_MOVEMENT_IGNORE) {
+        Synchronizer.synchronize(() -> {
+          user.player().sendMessage("Item Usage Tick");
         });
       }
     }
