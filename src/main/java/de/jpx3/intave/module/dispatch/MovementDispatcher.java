@@ -25,7 +25,6 @@ import de.jpx3.intave.check.movement.Timer;
 import de.jpx3.intave.check.movement.physics.Pose;
 import de.jpx3.intave.check.world.InteractionRaytrace;
 import de.jpx3.intave.executor.Synchronizer;
-import de.jpx3.intave.klass.Lookup;
 import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.module.Module;
 import de.jpx3.intave.module.Modules;
@@ -64,7 +63,6 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 
-import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -385,18 +383,21 @@ public final class MovementDispatcher extends Module {
             player.sendMessage("Click movement ignore distance: " + distance + " yaw: " + yawDifference + " pitch: " + pitchDifference);
           });
         }
-        Synchronizer.synchronize(() -> {
-          try {
-            Object playerHandle = user.playerHandle();
-            Field yawField = Lookup.serverField("Entity", "yaw");
-            Field pitchField = Lookup.serverField("Entity", "pitch");
-            yawField.set(playerHandle, (float)yaw % 360.0F);
-            pitchField.set(playerHandle, (float)MathHelper.minmax(-90.0F, pitch, 90.0F) % 360.0F);
-          } catch (Exception exception) {
-            exception.printStackTrace();
-          }
-        });
-        event.setCancelled(true);
+
+        if (!MinecraftVersions.VER1_9_0.atOrAbove()) {
+//          Synchronizer.synchronize(() -> {
+//            try {
+//              Object playerHandle = user.playerHandle();
+//              Field yawField = Lookup.serverField("Entity", "yaw");
+//              Field pitchField = Lookup.serverField("Entity", "pitch");
+//              yawField.set(playerHandle, (float)yaw % 360.0F);
+//              pitchField.set(playerHandle, (float)MathHelper.minmax(-90.0F, pitch, 90.0F) % 360.0F);
+//            } catch (Exception exception) {
+//              exception.printStackTrace();
+//            }
+//          });
+          event.setCancelled(true);
+        }
         return;
       }
     }
