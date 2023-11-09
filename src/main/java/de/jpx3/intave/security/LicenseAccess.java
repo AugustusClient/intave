@@ -7,6 +7,8 @@ import de.jpx3.intave.annotate.Native;
 import java.io.InputStream;
 import java.util.Scanner;
 
+import static de.jpx3.intave.IntaveControl.AUTHENTICATION_INSPECTION_MODE;
+import static de.jpx3.intave.IntaveControl.DISABLE_LICENSE_CHECK;
 import static de.jpx3.intave.library.asm.ClassVisitor.LICENSE_NAME;
 
 public final class LicenseAccess {
@@ -27,7 +29,7 @@ public final class LicenseAccess {
   @Native
   public static String rawLicense() {
     if (licenseName == null) {
-      if (IntaveControl.DISABLE_LICENSE_CHECK) {
+      if (DISABLE_LICENSE_CHECK || AUTHENTICATION_INSPECTION_MODE) {
         if (IntaveControl.GOMME_MODE) {
           licenseName = "srXcRrWOW9kO0edEdrtUsxPkWYFbTcWf55mKk4KHAfxK7P0k0tOTOxBnMDMCO33GMcABC2eAHuNSBYe0wnYTkWUvQrptoBsTZenAIIIIIYTE4ZmE4MjQyYmU3YzIyNDd"; // GommeHDnet
         } else {

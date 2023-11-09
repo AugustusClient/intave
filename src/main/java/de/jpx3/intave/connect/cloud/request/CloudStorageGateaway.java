@@ -23,4 +23,9 @@ public final class CloudStorageGateaway implements StorageGateway {
   public void saveStorage(UUID id, ByteBuffer storage) {
     cloud.saveStorage(id, storage);
   }
+
+  @Override
+  public String toString() {
+    return "CloudStorageGateaway";
+  }
 }

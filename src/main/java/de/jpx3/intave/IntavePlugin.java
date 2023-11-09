@@ -320,12 +320,24 @@ public final class IntavePlugin extends JavaPlugin {
          * this is our new protection against proxy-based attacks
          */
 
+        String licenseInfo;
+        String hashOfJarFile;
+        String secretKey;
+
+        if (AUTHENTICATION_DEBUG_MODE) {
+          licenseInfo = "a3EMRACNAGwThSKc4N8TyORPR92NHZHpZOC4WsF00Q3hd0xYWWPtRdEvwknHoAAunqEEHtYZeg7nfQs4PHcs6cdhKYCWqwszmO9oIIIIIMWRkMjRlZDI3YWIzYThiZTZ";
+          hashOfJarFile = "802b805a15b21959fe18c3cc82e01bdcceeff34977c3009f524e52e9fcf20344";
+          secretKey = "e5d66e52";
+        } else {
+          licenseInfo = LicenseAccess.rawLicense();
+          hashOfJarFile = HashAccess.hashOf(currentJavaJarFile);
+          secretKey = identificationKey > 0 ? new String(bytes) : "aaaaaaaa";
+        }
+
         long nanoTime = System.nanoTime();
-        String hashOfJarFile = HashAccess.hashOf(currentJavaJarFile);
         long longOne = ThreadLocalRandom.current().nextLong(0x4000000000000000L, Long.MAX_VALUE);
         long longTwo = ThreadLocalRandom.current().nextLong(0x4000000000000000L, Long.MAX_VALUE);
         String requestedId = String.valueOf(new UUID(longOne, longTwo)).replace("-", "").toUpperCase(Locale.ROOT);
-        String secretKey = identificationKey > 0 ? new String(bytes) : "aaaaaaaa";
         String processString = secretKey + configurationKey + requestedId;
         // randomize the process string with a given seed
         long seed = (longOne + (hashOfJarFile.hashCode() * 1337L)) ^ nanoTime;
@@ -393,7 +405,7 @@ public final class IntavePlugin extends JavaPlugin {
           connection.addRequestProperty("B", secretKey);
           connection.addRequestProperty("C", HWIDVerification.publicHardwareIdentifier());
           connection.addRequestProperty("D", configurationKey);
-          connection.addRequestProperty("E", LicenseAccess.rawLicense());
+          connection.addRequestProperty("E", licenseInfo);
           connection.addRequestProperty("F", "X9-" + requestedId + "-" + nanoBuilder.toString().toUpperCase(Locale.ROOT));
           connection.addRequestProperty("G", blackListService.encryptedGrayKnowledgeData());
           connection.addRequestProperty("H", blackListService.encryptedBlueKnowledgeData());
@@ -542,14 +554,17 @@ public final class IntavePlugin extends JavaPlugin {
             byte[] textDecoded = Base64.getUrlDecoder().decode(properties.get("master-cloud-shard"));
             String text = new String(textDecoded, UTF_8);
             String[] split1 = text.split(";");
-            if (split1.length != 4) {
+            if (split1.length != 3) {
               logger.error("Invalid master shard response: " + text);
             }
             String domain = split1[0];
             int port = Integer.parseInt(split1[1]);
             String token = split1[2];
-            long validUntil = Long.parseLong(split1[3]);
-            byte[] tokenBytes = Base64.getDecoder().decode(token);
+
+            String[] tokenSplit = token.split("\\.");
+
+            byte[] tokenBytes = Base64.getUrlDecoder().decode(tokenSplit[0]);
+            long validUntil = Long.parseLong(tokenSplit[1]);
             cloud.setMasterShard(
               domain, port,
               tokenBytes, validUntil
@@ -930,6 +945,9 @@ public final class IntavePlugin extends JavaPlugin {
           break;
         case OUTDATED:
           infoMessage = "A newer version of Intave is available (this version is " + durationAsString + " old)";
+          break;
+        case TEST:
+          infoMessage = "Running a test version of Intave";
           break;
         case DISABLED:
         case INVALID:

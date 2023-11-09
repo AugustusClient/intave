@@ -2,11 +2,11 @@ package de.jpx3.intave;
 
 import de.jpx3.intave.module.nayoro.OperationalMode;
 
-import static de.jpx3.intave.IntaveBuildConfig.*;
-import static de.jpx3.intave.module.nayoro.OperationalMode.*;
-import static de.jpx3.intave.module.nayoro.OperationalMode.DISABLE;
 import java.util.Arrays;
 import java.util.List;
+
+import static de.jpx3.intave.IntaveBuildConfig.*;
+import static de.jpx3.intave.module.nayoro.OperationalMode.*;
 
 public final class IntaveControl {
   public static final boolean APPLY_GLOBAL_LOW_TRUSTFACTOR = false;
@@ -65,11 +65,12 @@ public final class IntaveControl {
   public static final boolean DISALLOW_ALL_BLOCK_PLACEMENTS = false;
   public static final boolean ENABLE_MOVEMENT_DEBUGGER_COLLECTOR = false;
   public static final boolean MOVEMENT_DEBUGGER_COLLECTOR_POSTTICK_OUTPUT = false;
-  public static final boolean AUTHENTICATION_DEBUG_MODE = false;
+  public static final boolean AUTHENTICATION_DEBUG_MODE = AUTHTEST;
 
   public static final OperationalMode SAMPLE_OPERATIONAL_MODE = GOMME ? DISABLE : (PRODUCTION ? CLOUD_STORAGE : LOCAL_STORAGE);
 
   public static final boolean USE_EXTERNAL_CONFIGURATION_FILE = !PRODUCTION;
   public static final boolean GOMME_MODE = GOMME;
   public static final boolean DISABLE_LICENSE_CHECK = !PRODUCTION;
+  public static final boolean AUTHENTICATION_INSPECTION_MODE = AUTHTEST;
 }

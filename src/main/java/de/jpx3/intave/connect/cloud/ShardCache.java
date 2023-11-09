@@ -81,6 +81,10 @@ public final class ShardCache {
     });
   }
 
+  public boolean wasModified() {
+    return wasUpdated;
+  }
+
   public static Collector<String, ?, ShardCache> resourceCollector() {
     return Collector.of(ShardCache::new, ShardCache::parseLine, ShardCache::merge);
   }

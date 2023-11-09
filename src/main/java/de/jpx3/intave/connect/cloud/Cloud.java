@@ -1,6 +1,7 @@
 package de.jpx3.intave.connect.cloud;
 
 import de.jpx3.intave.IntaveAccessor;
+import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntaveLogger;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.IntaveAccess;
@@ -71,11 +72,20 @@ public final class Cloud {
     }
   }
 
+  private void disable() {
+    sessions.values().forEach(Session::close);
+    Bukkit.getScheduler().cancelTask(taskId);
+    TaskTracker.stopped(taskId);
+    if (shardCache.wasModified() && !IntaveControl.CLOUD_LOCALHOST_MASTER_SHARD) {
+      SHARD_STORAGE_RESOURCE.write(shardCache.compiledLines());
+    }
+  }
+
   public void openSession(Shard shard) {
     if (shard == null) {
       throw new IllegalArgumentException("Shard cannot be null");
     }
-    IntaveLogger.logger().info("Connecting to " + shard);
+//    IntaveLogger.logger().info("Connecting to " + shard);
     Session session = new Session(shard, this);
     session.init(success -> {
       if (success) {
@@ -87,9 +97,14 @@ public final class Cloud {
         int attempts = reconnectAttempts.getOrDefault(shard, 0);
         int retryingIn = (int) (Math.pow(2, attempts) * 2);
 
-        Nayoro nayoro = Modules.nayoro();
-        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-          nayoro.disableRecordingFor(UserRepository.userOf(onlinePlayer));
+        try {
+          Nayoro nayoro = Modules.nayoro();
+          for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            nayoro.disableRecordingFor(UserRepository.userOf(onlinePlayer));
+          }
+        } catch (Exception exception) {
+          // just return
+          return;
         }
 
         IntaveLogger.logger().warning("Unable to connect to " + shard + ", retrying in " + retryingIn + " seconds, attempt " + attempts + "/10");
@@ -120,12 +135,6 @@ public final class Cloud {
       unsafe.setTrustFactorResolver(new DefaultForwardingPermissionTrustFactorResolver(new CloudTrustfactorResolver(this)));
     if (cloudConfig.features().cloudStorageEnabled())
       unsafe.setStorageGateway(new CloudStorageGateaway(this));
-  }
-
-  private void disable() {
-    sessions.values().forEach(Session::close);
-    Bukkit.getScheduler().cancelTask(taskId);
-    TaskTracker.stopped(taskId);
   }
 
   public void setMasterShard(
