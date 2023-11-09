@@ -132,10 +132,15 @@ public final class BlockUpdateTracker extends Module {
         if (distance(verifiedLocation, blockPosition) < 2) {
           user.meta().movement().pastNearbyCollisionInaccuracy = 0;
         }
+//        player.sendMessage("");
         Material material = blockData.getType();
         int variant = BlockVariantNativeAccess.variantAccess(blockData);
-        blockStateAccess.override(world, blockPosition.getX(), blockPosition.getY(), blockPosition.getZ(), material, variant);
-        blockStateAccess.invalidateCacheAt(blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
+        int positionX = blockPosition.getX();
+        int positionY = blockPosition.getY();
+        int positionZ = blockPosition.getZ();
+        blockStateAccess.unlockOverride(positionX, positionY, positionZ);
+        blockStateAccess.override(world, positionX, positionY, positionZ, material, variant, "UPDATE");
+        blockStateAccess.invalidateCacheAt(positionX, positionY, positionZ);
       }
     };
 

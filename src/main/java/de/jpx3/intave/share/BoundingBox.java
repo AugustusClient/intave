@@ -241,7 +241,7 @@ public final class BoundingBox extends MemoryTraced implements BlockShape {
     double d4 = this.maxY + y;
     double d5 = this.maxZ + z;
     BoundingBox resulting = new BoundingBox(d0, d1, d2, d3, d4, d5);
-    if (isOriginBox()) {
+    if (this.isOriginBox()) {
       resulting.makeOriginBox();
     }
     return resulting;
@@ -570,6 +570,14 @@ public final class BoundingBox extends MemoryTraced implements BlockShape {
 
   public boolean func_181656_b() {
     return Double.isNaN(this.minX) || Double.isNaN(this.minY) || Double.isNaN(this.minZ) || Double.isNaN(this.maxX) || Double.isNaN(this.maxY) || Double.isNaN(this.maxZ);
+  }
+
+  public float width() {
+    return (float) (maxX - minX);
+  }
+
+  public float height() {
+    return (float) (maxY - minY);
   }
 
   public boolean isOriginBox() {

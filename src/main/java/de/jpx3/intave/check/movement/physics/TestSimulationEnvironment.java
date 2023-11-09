@@ -2,6 +2,7 @@ package de.jpx3.intave.check.movement.physics;
 
 import de.jpx3.intave.share.BoundingBox;
 import de.jpx3.intave.share.Motion;
+import org.bukkit.Material;
 import org.bukkit.util.Vector;
 
 import static de.jpx3.intave.share.ClientMath.cos;
@@ -405,6 +406,11 @@ public final class TestSimulationEnvironment implements SimulationEnvironment {
   }
 
   @Override
+  public void checkSupportingBlock(Motion motion) {
+
+  }
+
+  @Override
   public double frictionPosSubtraction() {
     return frictionPosSubtraction;
   }
@@ -412,6 +418,26 @@ public final class TestSimulationEnvironment implements SimulationEnvironment {
   @Override
   public boolean receivedFlyingPacketIn(int ticks) {
     return false;
+  }
+
+  @Override
+  public Material collideMaterial() {
+    return Material.AIR;
+  }
+
+  @Override
+  public Material frictionMaterial() {
+    return Material.AIR;
+  }
+
+  @Override
+  public Material previousCollideMaterial() {
+    return Material.AIR;
+  }
+
+  @Override
+  public Material previousFrictionMaterial() {
+    return Material.AIR;
   }
 
   @Override
@@ -485,6 +511,11 @@ public final class TestSimulationEnvironment implements SimulationEnvironment {
   }
 
   @Override
+  public void resetPushedByWaterFlowTicks() {
+
+  }
+
+  @Override
   public void resetPhysicsPacketRelinkFlyVL() {
 
   }
@@ -501,6 +532,11 @@ public final class TestSimulationEnvironment implements SimulationEnvironment {
 
   @Override
   public void increaseEdgeSneakTickGrants() {
+
+  }
+
+  @Override
+  public void increaseVehicleTicks() {
 
   }
 

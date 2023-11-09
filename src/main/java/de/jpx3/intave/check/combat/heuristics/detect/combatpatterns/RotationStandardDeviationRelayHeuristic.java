@@ -13,8 +13,6 @@ import de.jpx3.intave.module.nayoro.PlayerContainer;
 import de.jpx3.intave.module.nayoro.event.EntityMoveEvent;
 import de.jpx3.intave.module.nayoro.event.PlayerMoveEvent;
 import de.jpx3.intave.user.meta.CheckCustomMetadata;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 
 import java.util.List;
 

@@ -25,6 +25,11 @@ import de.jpx3.intave.resource.Resource;
 import de.jpx3.intave.resource.ResourceRegistry;
 import de.jpx3.intave.security.HashAccess;
 import de.jpx3.intave.user.User;
+import de.jpx3.intave.user.UserRepository;
+import de.jpx3.intave.user.meta.ConnectionMetadata;
+import de.jpx3.intave.user.meta.ProtocolMetadata;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -44,6 +49,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.bukkit.attribute.Attribute.GENERIC_MOVEMENT_SPEED;
+
 public final class DiagnosticsStage extends CommandStage {
   private static DiagnosticsStage singletonInstance;
   private final IntavePlugin plugin;
@@ -51,6 +58,57 @@ public final class DiagnosticsStage extends CommandStage {
   private DiagnosticsStage() {
     super(BaseStage.singletonInstance(), "diagnostics");
     plugin = IntavePlugin.singletonInstance();
+  }
+
+  @SubCommand(
+    selectors = "environment",
+    usage = "",
+    description = "Dumps environment infos to a players chat",
+    permission = "intave.command.diagnostics.performance"
+  )
+  public void environment(CommandSender sender) {
+    Player player = null;
+    String playerVersion = "";
+    if (sender instanceof Player) {
+      player = ((Player) sender);
+      User user = UserRepository.userOf(player);
+      ProtocolMetadata protocol = user.meta().protocol();
+      playerVersion = protocol.versionString() + "@" + protocol.protocolVersion();
+      sender.sendMessage(ChatColor.GRAY + "Player is " + ChatColor.WHITE + playerVersion);
+    } else {
+      sender.sendMessage(ChatColor.GRAY + "Run this command in-game to display client version");
+    }
+    String intaveVersion = IntavePlugin.version();
+    String serverVersion = Bukkit.getName() + "@" + Bukkit.getVersion();
+    String protocolLibVersion = ProtocolLibrary.getPlugin().getDescription().getVersion();
+    sender.sendMessage(ChatColor.GRAY + "Spigot is " + ChatColor.WHITE + serverVersion);
+    sender.sendMessage(ChatColor.GRAY + "ProtocolLib is " + ChatColor.WHITE + protocolLibVersion);
+    sender.sendMessage(ChatColor.GRAY + "Intave is " + ChatColor.WHITE + intaveVersion);
+
+    TextComponent message = new TextComponent("[Copy report message to chat]");
+    message.setColor(net.md_5.bungee.api.ChatColor.GRAY);
+    message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "Environment: `" +playerVersion + "`,`" + serverVersion + "`,`" + protocolLibVersion + "`,`" + intaveVersion + "`"));
+
+    if (player != null) {
+      // Send the message to the player
+      player.spigot().sendMessage(message);
+    }
+  }
+
+  @SubCommand(
+    selectors = "entities",
+    usage = "",
+    description = "Output entity data",
+    permission = "intave.command.diagnostics.performance"
+  )
+  public void entityCommand(User user) {
+    Player player = user.player();
+
+    ConnectionMetadata connection = user.meta().connection();
+    int totalEntities = connection.entities().size();
+//    int tickedEntities = connection.tickedEntities().size();
+    int tracedEntities = connection.tracedEntities().size();
+    player.sendMessage(IntavePlugin.prefix() + "Monitoring " + ChatColor.RED + totalEntities + IntavePlugin.defaultColor() + " entities, tracing " + ChatColor.RED + tracedEntities + IntavePlugin.defaultColor() + " entities");
   }
 
   @SubCommand(
@@ -134,13 +192,40 @@ public final class DiagnosticsStage extends CommandStage {
     player.sendMessage(ChatColor.RED + "Logout to stop");
 
     int[] id = {0};
-    id [0] = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+    id[0] = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
       if (!player.isOnline()) {
         Bukkit.getScheduler().cancelTask(id[0]);
         return;
       }
       player.teleport(player.getLocation().add(0, 0, 0));
     }, 20, 3);
+  }
+
+  @SubCommand(
+    selectors = "walkspeed",
+    usage = "",
+    description = "Set your walkspeed",
+    permission = "intave.command.diagnostics.performance"
+  )
+  public void walkSpeed(User user, @Optional Double speed, @Optional WalkSpeedMethod method) {
+    if (speed == null) {
+      speed = 0.1d;
+    }
+    if (method == null) {
+      method = WalkSpeedMethod.ATTRIBUTE;
+    }
+    Player player = user.player();
+
+    if (method == WalkSpeedMethod.ATTRIBUTE) {
+      player.getAttribute(GENERIC_MOVEMENT_SPEED).setBaseValue(speed);
+    } else {
+      player.setWalkSpeed(speed.floatValue());
+    }
+  }
+
+  public static enum WalkSpeedMethod {
+    DIRECT,
+    ATTRIBUTE
   }
 
   @SubCommand(
@@ -164,7 +249,7 @@ public final class DiagnosticsStage extends CommandStage {
   @SubCommand(
     selectors = "simnofeedback",
     usage = "",
-    description = "Spam teleport yourself",
+    description = "Temporarily ignore feedback packets",
     permission = "intave.command.diagnostics.performance"
   )
   public void simulateNoFeedback(User user) {
@@ -345,7 +430,7 @@ public final class DiagnosticsStage extends CommandStage {
     description = "Create and save packet logs"
   )
   public void startPacketLog(CommandSender sender, Player target) {
-    File logsFolder = new File(plugin.dataFolder(), "packetlogs");
+    File logsFolder = IntaveControl.GOMME_MODE ? new File("logs") : new File(plugin.dataFolder(), "packetlogs");
     File packetLogFile = new File(logsFolder, packetLogFileName(target.getName()));
 
     UUID userId = target.getUniqueId();
@@ -378,7 +463,7 @@ public final class DiagnosticsStage extends CommandStage {
 
       PacketAdapter adapter = new PacketAdapter(
         IntavePlugin.singletonInstance(),
-        ListenerPriority.LOWEST,
+        ListenerPriority.MONITOR,
         PacketType.values(),
         ListenerOptions.SKIP_PLUGIN_VERIFIER
       ) {
@@ -415,16 +500,146 @@ public final class DiagnosticsStage extends CommandStage {
 
   private static String packetContent(PacketContainer packet) {
     if (packet == null) return "null";
-    if (packet.getType().name().contains("CHAT") || packet.getType().name().contains("TAB_COMPLETE")) {
-      return "REDACTED";
-    }
-
+//    if (packet.getType().name().contains("CHAT") || packet.getType().name().contains("TAB_COMPLETE")) {
+//      return "REDACTED";
+//    }
     String contents = packet.getModifier()
       .getValues().stream()
-      .map(o -> o == null ? "null" : o.toString())
+      .map(DiagnosticsStage::stringFromType)
       .filter(s -> !s.isEmpty())
       .collect(Collectors.joining(", "));
-    return "{"+ contents + "}";
+    return "{" + contents + "}";
+  }
+
+  private static String stringFromType(Object object) {
+    if (object == null) {
+      return "null";
+    } else if (object instanceof Number) {
+      return object.toString();
+    } else if (object instanceof String) {
+      return "\"" + object + "\"";
+    } else if (object instanceof Boolean) {
+      return object.toString();
+    } else if (object instanceof byte[]) {
+      byte[] bytes = (byte[]) object;
+      if (bytes.length == 0) {
+        return "[]";
+      } else {
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        int limit = Math.min(bytes.length, 40);
+        for (int i = 0; i < limit; i++) {
+          builder.append(bytes[i]);
+          if (i != limit - 1) {
+            builder.append(", ");
+          }
+        }
+        if (bytes.length > 40) {
+          builder.append("...");
+        }
+        builder.append("]");
+        return builder.toString();
+      }
+    } else if (object instanceof int[]) {
+      int[] ints = (int[]) object;
+      if (ints.length == 0) {
+        return "[]";
+      } else {
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        int limit = Math.min(ints.length, 40);
+        for (int i = 0; i < limit; i++) {
+          builder.append(ints[i]);
+          if (i != limit - 1) {
+            builder.append(", ");
+          }
+        }
+        if (ints.length > 40) {
+          builder.append("...");
+        }
+        builder.append("]");
+        return builder.toString();
+      }
+    } else if (object instanceof Object[]) {
+      Object[] objects = (Object[]) object;
+      if (objects.length == 0) {
+        return "[]";
+      } else {
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        int limit = Math.min(objects.length, 40);
+        for (int i = 0; i < limit; i++) {
+          builder.append(stringFromType(objects[i]));
+          if (i != limit - 1) {
+            builder.append(", ");
+          }
+        }
+        if (objects.length > 40) {
+          builder.append("...");
+        }
+        builder.append("]");
+        return builder.toString();
+      }
+    } else if (object instanceof Collection) {
+      Collection<?> collection = (Collection<?>) object;
+      if (collection.isEmpty()) {
+        return "[]";
+      } else {
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        int limit = Math.min(collection.size(), 40);
+        int i = 0;
+        for (Object o : collection) {
+          builder.append(stringFromType(o));
+          if (i != limit - 1) {
+            builder.append(", ");
+          }
+          i++;
+        }
+        if (collection.size() > 40) {
+          builder.append("...");
+        }
+        builder.append("]");
+        return builder.toString();
+      }
+    } else if (object instanceof Map) {
+      Map<?, ?> map = (Map<?, ?>) object;
+      if (map.isEmpty()) {
+        return "{}";
+      } else {
+        StringBuilder builder = new StringBuilder();
+        builder.append("{");
+        int limit = Math.min(map.size(), 40);
+        int i = 0;
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+          builder.append(stringFromType(entry.getKey()));
+          builder.append("=");
+          builder.append(stringFromType(entry.getValue()));
+          if (i != limit - 1) {
+            builder.append(", ");
+          }
+          i++;
+        }
+        if (map.size() > 40) {
+          builder.append("...");
+        }
+        builder.append("}");
+        return builder.toString();
+      }
+    } else if (object.toString().contains("DataWatcher@")) {
+//      WrappedDataWatcher watcher = new WrappedDataWatcher(object);
+//      return "DataWatcher{" + watcher.getWatchableObjects().stream().map(watchableObject -> {
+//        String value = stringFromType(watchableObject.getValue());
+//        return watchableObject.getIndex() + "=" + value;
+//      }).collect(Collectors.joining(", ")) + "}";
+      return "DataWatcher{...}";
+    } else if (object.toString().contains("WatchableObject@")) {
+//      WrappedDataWatcher.WrappedDataWatcherObject watcherObject = new WrappedDataWatcher.WrappedDataWatcherObject(object);
+//      return "WatchableObject{" + watcherObject.getIndex() + "=" + stringFromType(watcherObject.getHandle()) + "}";
+      return "WatchableObject{...}";
+    } else {
+      return object.toString();
+    }
   }
 
   private static final DateTimeFormatter FILE_MESSAGE_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy-HH-mm-ss");

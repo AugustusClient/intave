@@ -1,6 +1,5 @@
 package de.jpx3.intave.check.world;
 
-import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.annotate.Native;
 import de.jpx3.intave.check.Check;
@@ -24,7 +23,7 @@ public final class PlacementAnalysis extends Check {
 
   @Native
   public void setupSubChecks() {
-    boolean useTimings = configuration().settings().boolBy("check_timings", true);
+    boolean useTimings = configuration().settings().boolBy("check-timings", configuration().settings().boolBy("check_timings", true));
 
     if (DISABLE_LICENSE_CHECK && !GOMME_MODE) {
       appendCheckPart(new Constraint(this));
@@ -54,7 +53,7 @@ public final class PlacementAnalysis extends Check {
   }
 
   public void applyPlacementAnalysisDamageCancel(User user, String checkId) {
-    user.nerf(AttackNerfStrategy.CANCEL_FIRST_HIT, checkId);
-    user.nerf(AttackNerfStrategy.DMG_LIGHT, checkId);
+//    user.nerf(AttackNerfStrategy.CANCEL_FIRST_HIT, checkId);
+//    user.nerf(AttackNerfStrategy.DMG_LIGHT, checkId);
   }
 }

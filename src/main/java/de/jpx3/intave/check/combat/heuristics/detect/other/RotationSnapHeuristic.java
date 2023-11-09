@@ -6,6 +6,7 @@ import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.adapter.MinecraftVersions;
+import de.jpx3.intave.annotate.DoNotFlowObfuscate;
 import de.jpx3.intave.annotate.Native;
 import de.jpx3.intave.annotate.Reserved;
 import de.jpx3.intave.block.access.BlockInteractionAccess;
@@ -40,6 +41,7 @@ import static de.jpx3.intave.check.combat.heuristics.Anomaly.AnomalyOption.*;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
 
 @Reserved
+@DoNotFlowObfuscate
 public final class RotationSnapHeuristic extends MetaCheckPart<Heuristics, RotationSnapHeuristic.RotationSnapHeuristicMeta> {
 
   public RotationSnapHeuristic(Heuristics parentCheck) {
@@ -189,10 +191,21 @@ public final class RotationSnapHeuristic extends MetaCheckPart<Heuristics, Rotat
       );
       meta.movementAtTick[0] = tick;
 
-      for (Map.Entry<Integer, Entity> entry : user.meta().connection().entitiesById().entrySet()) {
-        Entity value = entry.getValue();
-        if (value != null && !(value instanceof Entity.Destroyed)) {
-          meta.entityPositions.put(entry.getKey(), value.positionHistory.get(Math.max(value.positionHistory.size() - 1, 0)));
+//      for (Map.Entry<Integer, Entity> entry : user.meta().connection().entitiesById().entrySet()) {
+//        Entity value = entry.getValue();
+//        if (value != null && !(value instanceof Entity.Destroyed)) {
+//          meta.entityPositions.put(entry.getKey(), value.positionHistory.get(Math.max(value.positionHistory.size() - 1, 0)));
+//        }
+//      }
+
+      for (Entity tracedEntity : user.meta().connection().tracedEntities()) {
+        if (tracedEntity != null && !(tracedEntity instanceof Entity.Destroyed)) {
+//          try {
+//            tracedEntity.positionHistoryLock.lock();
+            meta.entityPositions.put(tracedEntity.entityId(), tracedEntity.positionHistory.get(Math.max(tracedEntity.positionHistory.size() - 1, 0)));
+//          } finally {
+//            tracedEntity.positionHistoryLock.unlock();
+//          }
         }
       }
     }

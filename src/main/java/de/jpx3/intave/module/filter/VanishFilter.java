@@ -8,7 +8,9 @@ import com.comphenix.protocol.wrappers.WrappedGameProfile;
 import com.google.common.collect.Lists;
 import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntavePlugin;
+import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
+import de.jpx3.intave.module.linker.packet.PrioritySlot;
 import de.jpx3.intave.packet.reader.PacketReaders;
 import de.jpx3.intave.packet.reader.PlayerInfoReader;
 import de.jpx3.intave.packet.reader.PlayerInfoRemoveReader;
@@ -44,6 +46,7 @@ public final class VanishFilter extends Filter {
   );
 
   @PacketSubscription(
+    prioritySlot = PrioritySlot.INTERNAL,
     packetsOut = {
       PLAYER_INFO
     }
@@ -68,6 +71,9 @@ public final class VanishFilter extends Filter {
             if (shownPlayers.contains(uuid)) {
               return;
             }
+//            Synchronizer.synchronize(() -> {
+//              player.sendMessage("Showing " + data.getProfile().getName() + " to you.");
+//            });
             shownPlayers.add(uuid);
           });
           break;
@@ -81,13 +87,22 @@ public final class VanishFilter extends Filter {
           }
           break;
         case REMOVE_PLAYER:
-          playerInfos.forEach(playerInfoData -> {
+          playerInfos.removeIf(playerInfoData -> {
             UUID uuid = playerInfoData.getProfile().getUUID();
-            shownPlayers.remove(uuid);
+            boolean wasVisible = shownPlayers.remove(uuid);
+//            Synchronizer.synchronize(() -> {
+//              player.sendMessage("Hiding " + playerInfoData.getProfile().getName() + " from you (was visible: "+wasVisible +")");
+//            });
+            return !wasVisible;
           });
           break;
       }
     }
+
+    if (playerInfos.isEmpty()) {
+      event.setCancelled(true);
+    }
+
     Collections.shuffle(playerInfos);
 //    lists.write(0, playerInfos);
     reader.release();
@@ -95,6 +110,8 @@ public final class VanishFilter extends Filter {
 
   @PacketSubscription(
 //    engine = Engine.ASYNC_INTERNAL,
+    prioritySlot = PrioritySlot.EXTERNAL,
+    priority = ListenerPriority.MONITOR,
     packetsOut = {
       TAB_COMPLETE_OUT
     }
@@ -114,6 +131,9 @@ public final class VanishFilter extends Filter {
       for (String name : playerNames) {
         Player target = Bukkit.getPlayerExact(name);
         if (target == null) {
+          if (IntaveControl.GOMME_MODE) {
+            hiddenPlayers.add(name);
+          }
           continue;
         }
         if (!shownPlayers.contains(target.getUniqueId())) {
@@ -124,7 +144,13 @@ public final class VanishFilter extends Filter {
       Arrays.stream(stuff).filter(string -> !hiddenPlayers.contains(string)).forEach(newTabCompletions::add);
       if (newTabCompletions.size() != stuff.length) {
         packet.getStringArrays().writeSafely(0, newTabCompletions.toArray(new String[0]));
+//        Synchronizer.synchronize(() -> {
+//          player.sendMessage("Removed " + (stuff.length - newTabCompletions.size()) + " hidden players from tab complete");
+//        });
       }
+//      Synchronizer.synchronize(() -> {
+//        player.sendMessage("Tab: " + Arrays.toString(stuff) + " -> " + newTabCompletions);
+//      });
     }
   }
 

@@ -64,6 +64,7 @@ public final class IntaveVersion {
   }
 
   public enum Status {
+    TEST("TEST"),
     OUTDATED("OUTDATED"),
     LATEST("LATEST"),
     STABLE("STABLE"),

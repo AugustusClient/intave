@@ -5,18 +5,22 @@ import de.jpx3.intave.module.nayoro.OperationalMode;
 import static de.jpx3.intave.IntaveBuildConfig.*;
 import static de.jpx3.intave.module.nayoro.OperationalMode.*;
 import static de.jpx3.intave.module.nayoro.OperationalMode.DISABLE;
+import java.util.Arrays;
+import java.util.List;
 
 public final class IntaveControl {
   public static final boolean APPLY_GLOBAL_LOW_TRUSTFACTOR = false;
   public static final boolean DEBUG_MOVEMENT = false;
   public static final boolean DEBUG_EMULATION = false;
   public static final boolean DEBUG_HEURISTICS = false;
+  public static final boolean DEBUG_INTERACTION = false;
+  public static final boolean DEBUG_INTERACTION_DISCREET = true;
+  public static final List<String> INTERACTION_DEBUG_NAMES = Arrays.asList("Jpx3", "aesthatic");
   public static final boolean DEBUG_STUCK_REVIVAL = false;
   public static final boolean LATENCY_PING_AS_XP_LEVEL = false;
   public static final boolean DEBUG_MOVEMENT_IGNORE = false;
   public static final boolean DEBUG_MOUNTING = false;
   public static final boolean DEBUG_ELYTRA = false;
-  public static final boolean DEBUG_INTERACTION = false;
   public static final boolean DEBUG_PLAYER_ACTIONS = false;
   public static final boolean DEBUG_TELEPORT_LOCKS = false;
   public static final boolean DEBUG_TELEPORT_CAUSE_AND_CAUSER = false;
@@ -24,6 +28,7 @@ public final class IntaveControl {
   public static final boolean TELEPORT_FAR_AWAY_ON_Q_PRESS = false;
   public static final boolean DEBUG_INTAVE_TELEPORT_EVENT_CANCELS = false;
   public static final boolean DISABLE_BLOCK_CACHING_ENTIRELY = false;
+  public static final boolean BLOCK_CACHE_DEBUG = false;
   public static final boolean IGNORE_CHUNK_PACKETS = false;
   public static final boolean USE_MINING_STRATEGIES = false;
   public static final boolean DISABLE_AUTOCLICKER_CHECK = true;
@@ -40,6 +45,7 @@ public final class IntaveControl {
   public static final boolean CLICKPATTERNS_OUTPUT = false;
   public static final boolean DEBUG_GRAYLIST = false;
   public static final boolean DEBUG_BLUELIST = false;
+  public static final boolean DEBUG_CMS = false;
   public static final boolean USE_DEBUG_LOCATE_RESOURCE = false;
   public static final boolean USE_DEBUG_TRUSTFACTOR_RESOURCE = false;
   public static final boolean USE_DEBUG_SCRIPT_RESOURCES = false;
@@ -59,6 +65,7 @@ public final class IntaveControl {
   public static final boolean DISALLOW_ALL_BLOCK_PLACEMENTS = false;
   public static final boolean ENABLE_MOVEMENT_DEBUGGER_COLLECTOR = false;
   public static final boolean MOVEMENT_DEBUGGER_COLLECTOR_POSTTICK_OUTPUT = false;
+  public static final boolean AUTHENTICATION_DEBUG_MODE = false;
 
   public static final OperationalMode SAMPLE_OPERATIONAL_MODE = GOMME ? DISABLE : (PRODUCTION ? CLOUD_STORAGE : LOCAL_STORAGE);
 

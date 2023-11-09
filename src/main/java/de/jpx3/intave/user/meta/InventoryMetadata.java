@@ -39,6 +39,7 @@ public final class InventoryMetadata {
   private volatile boolean handActive;
   private final Lock handActiveLock = new ReentrantLock();
   private Material activeItemType;
+  private List<String> items = new ArrayList<>();
   private boolean foodItem;
 
   public InventoryMetadata(Player player) {
@@ -86,6 +87,10 @@ public final class InventoryMetadata {
     return item == null || item.getAmount() == 0 ? Material.AIR : item.getType();
   }
 
+  public boolean offhandItemPrimary() {
+    return ItemProperties.canItemBeUsed(player, offhandItem()) && !ItemProperties.canItemBeUsed(player, heldItem());
+  }
+
   public int handSlot() {
     return handSlot;
   }
@@ -106,16 +111,22 @@ public final class InventoryMetadata {
         return;
       }
       this.handActive = true;
-      this.foodItem = ItemProperties.foodConsumable(player, heldItemType());
+
+      if (offhandItemPrimary()) {
+        this.foodItem = ItemProperties.foodConsumable(player, offhandItemType());
+        this.activeItemType = offhandItemType();
+      } else {
+        this.foodItem = ItemProperties.foodConsumable(player, heldItemType());
+        this.activeItemType = heldItemType();
+      }
       this.pastItemUsageTransition = 0;
       this.handActiveTicks = 0;
-      this.activeItemType = heldItemType();
+
       if (IntaveControl.DEBUG_ITEM_USAGE) {
         Material activeItem = this.activeItemType;
         Synchronizer.synchronize(() -> {
           player.sendMessage("Item usage started: " + activeItem);
         });
-        Thread.dumpStack();
         System.out.println("Item usage started: " + this.activeItemType);
       }
     } finally {
@@ -164,6 +175,9 @@ public final class InventoryMetadata {
   }
 
   public void releaseItemNextTick() {
+    if (IntaveControl.DEBUG_ITEM_USAGE) {
+      player.sendMessage("Forceful item release next tick");
+    }
     releaseItemNextTick = true;
     releaseItemType = heldItemType();
   }
@@ -183,7 +197,10 @@ public final class InventoryMetadata {
     if (!inventoryOpen && clientData.supportsInventoryAchievementPacket()) {
       this.forceInventoryOnClickOpen = true;
     }
-    deactivateHand();
+//    player.sendMessage("Inventory is now " + (inventoryOpen ? "open" : "closed"));
+
+//    deactivateHand();
+    releaseItemNextTick();
     this.inventoryOpen = inventoryOpen;
   }
 
@@ -211,6 +228,14 @@ public final class InventoryMetadata {
       }
     }
     return false;
+  }
+
+  public List<String> items() {
+    return items;
+  }
+
+  public void setItems(List<String> items) {
+    this.items = items;
   }
 
   public static class SlotSwitchData {

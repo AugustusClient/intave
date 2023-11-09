@@ -1,18 +1,22 @@
 package de.jpx3.intave.block.access;
 
 import de.jpx3.intave.annotate.Relocate;
+import de.jpx3.intave.block.fluid.Fluid;
+import de.jpx3.intave.block.fluid.Fluids;
 import de.jpx3.intave.block.variant.BlockVariant;
 import de.jpx3.intave.block.variant.BlockVariantRegister;
 import de.jpx3.intave.cleanup.GarbageCollector;
 import de.jpx3.intave.share.BlockPosition;
 import de.jpx3.intave.share.Position;
 import de.jpx3.intave.user.User;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.metadata.MetadataValue;
 
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -126,8 +130,35 @@ public final class VolatileBlockAccess {
     return world.getBlockAt(spawnLocation.getBlockX(), LOWER_WORLD_LIMIT - 1, spawnLocation.getBlockZ());
   }
 
+
+  public static Fluid fluidAccess(User user, Location location) {
+    return fluidAccess(user, location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+  }
+
+  public static Fluid fluidAccess(User user, BlockPosition position) {
+    return fluidAccess(user, user.player().getWorld(), position.getBlockX(), position.getBlockY(), position.getBlockZ());
+  }
+
+  public static Fluid fluidAccess(User user, World blockAccess, double x, double y, double z) {
+    return fluidAccess(user, blockAccess, floor(x), floor(y), floor(z));
+  }
+
+  public static Fluid fluidAccess(User user, Position lastPosition) {
+    return fluidAccess(user, user.player().getWorld(), lastPosition.getBlockX(), lastPosition.getBlockY(), lastPosition.getBlockZ());
+  }
+
+  public static Fluid fluidAccess(User user, World world, int blockX, int blockY, int blockZ) {
+    Material type = typeAccess(user, world, blockX, blockY, blockZ);
+    int variantIndex = variantIndexAccess(user, world, blockX, blockY, blockZ);
+    return Fluids.fluidStateOf(type, variantIndex);
+  }
+
   public static Material typeAccess(User user, Location location) {
     return typeAccess(user, location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+  }
+
+  public static Material typeAccess(User user, BlockPosition position) {
+    return typeAccess(user, user.player().getWorld(), position.getBlockX(), position.getBlockY(), position.getBlockZ());
   }
 
   public static Material typeAccess(User user, World world, Position position) {
@@ -154,6 +185,10 @@ public final class VolatileBlockAccess {
     return variantAccess(user, location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
   }
 
+  public static BlockVariant variantAccess(User user, BlockPosition position) {
+    return variantAccess(user, user.player().getWorld(), position.getBlockX(), position.getBlockY(), position.getBlockZ());
+  }
+
   public static BlockVariant variantAccess(User user, World blockAccess, double x, double y, double z) {
     return variantAccess(user, blockAccess, floor(x), floor(y), floor(z));
   }
@@ -174,6 +209,10 @@ public final class VolatileBlockAccess {
 
   public static int variantIndexAccess(User user, Location location) {
     return variantIndexAccess(user, location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+  }
+
+  public static int variantIndexAccess(User user, BlockPosition position) {
+    return variantIndexAccess(user, user.player().getWorld(), position.getBlockX(), position.getBlockY(), position.getBlockZ());
   }
 
   public static int variantIndexAccess(User user, World blockAccess, double x, double y, double z) {

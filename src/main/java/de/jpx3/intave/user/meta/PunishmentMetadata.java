@@ -67,6 +67,10 @@ public final class PunishmentMetadata {
         event -> {}
       ),
       new AttackNerfer(AttackNerfStrategy.CRITICALS, NO_CRITICAL_HITS_DURATION, event -> {
+        User target = UserRepository.userOf(player);
+        if (target.meta().protocol().combatUpdate()) {
+          return;
+        }
         double attackDamage = DamageModify.attackDamageOf((Player) event.getDamager());
         ItemStack heldItem = UserRepository.userOf((Player) event.getDamager()).meta().inventory().heldItem();
         attackDamage += DamageModify.sharpnessDamageOf(heldItem);
@@ -102,6 +106,10 @@ public final class PunishmentMetadata {
 //        performEntityHurtTimeChange(event.getEntity());
 //      }),
       new AttackNerfer(AttackNerfStrategy.HT_LIGHT, DAMAGE_CANCEL_LIGHT_DURATION, event -> {
+        User target = UserRepository.userOf(player);
+        if (target.meta().protocol().combatUpdate()) {
+          return;
+        }
         // Perform hurt-time change
         int ticks = -ThreadLocalRandom.current().nextInt(0, 1);
         HurttimeModifier.applyHurtTimeChangeTo(player, (int) (DAMAGE_CANCEL_LIGHT_DURATION / 50), ticks);
@@ -115,6 +123,7 @@ public final class PunishmentMetadata {
           ItemStack offHandItem = target.meta().inventory().offhandItem();
           if ((heldItem != null && heldItem.getType().name().toUpperCase().contains("SHIELD"))
             || (offHandItem != null && offHandItem.getType().name().toUpperCase().contains("SHIELD"))
+            || target.meta().protocol().combatUpdate()
           ) {
             return;
           }
@@ -131,7 +140,7 @@ public final class PunishmentMetadata {
           return armor;
         });
       }),
-      new AttackNerfer(AttackNerfStrategy.  DMG_ARMOR_INEFFECTIVE, DAMAGE_CANCEL_MEDIUM_DURATION, event -> {
+      new AttackNerfer(AttackNerfStrategy.DMG_ARMOR_INEFFECTIVE, DAMAGE_CANCEL_MEDIUM_DURATION, event -> {
         DamageModify.modifyDamageApplier(event, ARMOR, (damage, armor) -> {
           if (armor < -2) {
             double actualDamage = damage + armor; // armor is negative
@@ -142,6 +151,10 @@ public final class PunishmentMetadata {
         });
       }, true),
       new AttackNerfer(AttackNerfStrategy.GARBAGE_HITS, GARBAGE_HITS_DURATION, event -> {
+        User target = UserRepository.userOf(player);
+        if (target.meta().protocol().combatUpdate()) {
+          return;
+        }
         int entityId = event.getEntity().getEntityId();
         long lastValidAttack = System.currentTimeMillis() - lastTimeValidHurttimeAttack.computeIfAbsent(entityId, x -> 0L);
         if (lastValidAttack < delay) {
@@ -165,17 +178,17 @@ public final class PunishmentMetadata {
       this.attackNerfersMap.put(attackNerfer.type, attackNerfer);
     }
     if (isRedlistedPlayer(player)) {
-      nerferOfType(AttackNerfStrategy.BURN_LONGER).activatePermanently();
-      nerferOfType(AttackNerfStrategy.CRITICALS).activatePermanently();
-      nerferOfType(AttackNerfStrategy.BLOCKING).activatePermanently();
+//      nerferOfType(AttackNerfStrategy.BURN_LONGER).activatePermanently();
+//      nerferOfType(AttackNerfStrategy.CRITICALS).activatePermanently();
+//      nerferOfType(AttackNerfStrategy.GARBAGE_HITS).activatePermanently();
+//      nerferOfType(AttackNerfStrategy.BLOCKING).activatePermanently();
     }
-
-//    nerferOfType(AttackNerfStrategy.BLOCKING).activatePermanently();
   }
 
   public static class EncapsulationClass {
     private static final Pattern JUSTIN_PATTERN = Pattern.compile("[ji].*s.*t.*[nm]", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
-    private static final Pattern SCHNUPPI_PATTERN = Pattern.compile("s+.*[nh]*.*[unx]+.*[bpx]+.*[iy]+", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+    private static final Pattern SCHNUPPI_PATTERN = Pattern.compile("s+.*[nuh]+.*[unx]+.*[bpx]+.*[lijy]+", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+    private static final Pattern DKDKDK_PATTERN = Pattern.compile("(dk){3}", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 
     @Native
     public static boolean isRedlistedPlayer(Player player) {
@@ -183,7 +196,7 @@ public final class PunishmentMetadata {
         return false;
       }
       List<String> contains = Arrays.asList(
-        "beschuss", "eject", "icarus", "ryu", "_hyxz", "vierzwei", "augustus", "intave", "auf180", "solumbus", "istdie1", "aufdie1"
+        "beschuss", "eject", "icarus", "ryu", "vitja", "_hyxz", "vierzwei", "augustus", "intave", "auf180", "solumbus", "istdie1", "aufdie1"
       );
       String playerName = player.getName();
       for (String contain : contains) {
@@ -191,7 +204,11 @@ public final class PunishmentMetadata {
           return true;
         }
       }
-      return IntaveControl.GOMME_MODE && (JUSTIN_PATTERN.matcher(playerName).find() || SCHNUPPI_PATTERN.matcher(playerName).find());
+      return IntaveControl.GOMME_MODE && (
+        JUSTIN_PATTERN.matcher(playerName).find() ||
+          SCHNUPPI_PATTERN.matcher(playerName).find() ||
+          DKDKDK_PATTERN.matcher(playerName).find()
+      );
     }
   }
 

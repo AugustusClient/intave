@@ -11,16 +11,18 @@ import de.jpx3.intave.module.Modules;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketId;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
+import de.jpx3.intave.packet.reader.WindowItemsReader;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.InventoryMetadata;
 import de.jpx3.intave.user.meta.MovementMetadata;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.CLIENT_COMMAND;
-import static de.jpx3.intave.module.linker.packet.PacketId.Server.OPEN_WINDOW;
-import static de.jpx3.intave.module.linker.packet.PacketId.Server.RESPAWN;
+import static de.jpx3.intave.module.linker.packet.PacketId.Server.*;
 
 public final class InventoryTracker extends Module {
 
@@ -103,9 +105,8 @@ public final class InventoryTracker extends Module {
    * @return whether the user is inside a nether portal
    */
   private boolean inNetherPortal(User user) {
-    World world = user.player().getWorld();
     MovementMetadata movementData = user.meta().movement();
-    return Collision.containsBlockInBB(world, movementData.boundingBox(), BlockTypeAccess.NETHER_PORTAL);
+    return Collision.rasterizedTypeSearch(user, movementData.boundingBox(), BlockTypeAccess.NETHER_PORTAL);
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -172,5 +173,18 @@ public final class InventoryTracker extends Module {
     User user = UserRepository.userOf(player);
     InventoryMetadata inventoryData = user.meta().inventory();
     inventoryData.updateInventoryOpenState(false);
+  }
+
+  @PacketSubscription(
+    packetsOut = {WINDOW_ITEMS}
+  )
+  public void on(
+    User user, WindowItemsReader reader
+  ) {
+    if (reader.container() == 0) {
+      List<String> collect = reader.items().stream().map(itemStack -> itemStack.getType().name()).collect(Collectors.toList());
+      user.tickFeedback(() -> user.meta().inventory().setItems(collect));
+//      System.out.println(collect);
+    }
   }
 }

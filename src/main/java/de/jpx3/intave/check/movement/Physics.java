@@ -16,8 +16,8 @@ import de.jpx3.intave.annotate.refactoring.IdoNotBelongHere;
 import de.jpx3.intave.annotate.refactoring.SplitMeUp;
 import de.jpx3.intave.block.access.VolatileBlockAccess;
 import de.jpx3.intave.block.collision.Collision;
+import de.jpx3.intave.block.fluid.Fluid;
 import de.jpx3.intave.block.fluid.Fluids;
-import de.jpx3.intave.block.fluid.LegacyWaterflow;
 import de.jpx3.intave.block.state.ExtendedBlockStateCache;
 import de.jpx3.intave.block.type.BlockTypeAccess;
 import de.jpx3.intave.block.variant.BlockVariantNativeAccess;
@@ -35,6 +35,7 @@ import de.jpx3.intave.math.Hypot;
 import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.module.Modules;
 import de.jpx3.intave.module.feedback.Superposition;
+import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.module.mitigate.AttackNerfStrategy;
 import de.jpx3.intave.module.tracker.entity.Entity;
 import de.jpx3.intave.module.violation.Violation;
@@ -47,6 +48,7 @@ import de.jpx3.intave.share.BoundingBox;
 import de.jpx3.intave.share.Motion;
 import de.jpx3.intave.share.Position;
 import de.jpx3.intave.user.User;
+import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.*;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -54,6 +56,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.util.Vector;
 
 import java.util.List;
@@ -64,6 +67,7 @@ import static de.jpx3.intave.diagnostic.message.MessageCategory.SIMFLT;
 import static de.jpx3.intave.diagnostic.message.MessageCategory.SIMFUL;
 import static de.jpx3.intave.math.MathHelper.*;
 import static de.jpx3.intave.share.ClientMath.floor;
+import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.ENDER_PEARL;
 
 @Relocate
 public final class Physics extends Check {
@@ -310,14 +314,12 @@ public final class Physics extends Check {
     MetadataBundle meta = user.meta();
     ProtocolMetadata clientData = meta.protocol();
     MovementMetadata movementData = meta.movement();
-    if (clientData.waterUpdate()) {
-      movementData.inWater = Fluids.handleFluidAcceleration(user, movementData.boundingBox());
-    } else {
-      BoundingBox boundingBox = movementData.boundingBox()
-        .grow(0.0D, -0.4000000059604645D, 0.0D)
-        .contract(0.001D, 0.001D, 0.001D);
-      movementData.inWater = LegacyWaterflow.handleMaterialAcceleration(user, boundingBox);
+    BoundingBox boundingBox = movementData.boundingBox();
+    if (!clientData.waterUpdate()) {
+      boundingBox = boundingBox.grow(0.0D, -0.4000000059604645D, 0.0D);
     }
+    boundingBox = boundingBox.shrink(0.001D);
+    movementData.inWater = user.waterflow().applyFlowTo(user, boundingBox);
     if (movementData.inWater) {
       movementData.pastWaterMovement = 0;
       movementData.artificialFallDistance = 0;
@@ -437,7 +439,7 @@ public final class Physics extends Check {
     }
 
     double violationLevelIncrease = horizontalViolationIncrease + verticalViolationIncrease;
-    if (movementData.simulator() == Simulators.HORSE && !IntaveControl.GOMME_MODE) {
+    if (movementData.simulator() == Simulators.HORSE) {
       violationLevelIncrease = 0;
     }
     if (distance > 1e-3) {
@@ -665,7 +667,7 @@ public final class Physics extends Check {
     }
 
     if (movementData.inLava()) {
-      movementData.artificialFallDistance *= 0.5;
+      movementData.artificialFallDistance *= 0.5F;
     }
 
     GlobalStatisticsRecorder recorder = plugin.analytics().recorderOf(GlobalStatisticsRecorder.class);
@@ -774,9 +776,16 @@ public final class Physics extends Check {
       if (movementData.step) {
         debug += ChatColor.ITALIC + " stp:" + formatDouble(movementData.stepHeightThisMove, 5) + chatColor;
       }
-      if (movementData.inWater) {
-        debug += ChatColor.ITALIC + " wtr" + chatColor;
+      if (movementData.inWeb) {
+        debug += ChatColor.ITALIC + " web" + chatColor;
       }
+      if (movementData.inWater) {
+        Fluid fluid = Fluids.fluidAt(user, positionX, positionY, positionZ);
+        debug += ChatColor.ITALIC + " "+(fluid.falling() ? "falling" : "")+"water@" + MathHelper.formatDouble(fluid.height(),2) + "/"+fluid.level() + chatColor;
+
+      }
+//      debug += " fric:" + formatDouble(movementData.friction(), 2) + "@" + movementData.frictionMaterial();
+
 //      if (Math.abs(movementData.motionY()) > 0.01) {
 //        debug += simulation.configuration() + " ";
 //      }
@@ -944,6 +953,20 @@ public final class Physics extends Check {
         movementData.allowFallDamage = false;
       });
       movementData.artificialFallDistance = 0F;
+    }
+  }
+
+  @BukkitEventSubscription
+  public void onEnderpearlTeleport(PlayerTeleportEvent teleport) {
+    Player player = teleport.getPlayer();
+    User user = UserRepository.userOf(player);
+    MovementMetadata movementData = user.meta().movement();
+    if (teleport.getCause() == ENDER_PEARL) {
+      Synchronizer.synchronize(() -> {
+        movementData.allowFallDamage = true;
+        fallDamageApplier.dealFallDamage(player, 8);
+        movementData.allowFallDamage = false;
+      });
     }
   }
 

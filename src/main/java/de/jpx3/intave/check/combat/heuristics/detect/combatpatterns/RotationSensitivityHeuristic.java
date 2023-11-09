@@ -151,7 +151,7 @@ public final class RotationSensitivityHeuristic extends MetaCheckPart<Heuristics
         );
         if (heuristicMeta.sensitivityVL > 300) {
           //dmc22
-          user.nerf(AttackNerfStrategy.DMG_LIGHT, "22");
+//          user.nerf(AttackNerfStrategy.DMG_LIGHT, "22");
           heuristicMeta.sensitivityVL = 300;
         }
       }

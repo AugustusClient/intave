@@ -1,21 +1,18 @@
 package de.jpx3.intave.block.fluid;
 
+import de.jpx3.intave.block.physics.MaterialMagic;
+import de.jpx3.intave.block.variant.BlockVariant;
+import de.jpx3.intave.block.variant.BlockVariantRegister;
 import de.jpx3.intave.klass.Lookup;
 import de.jpx3.intave.klass.locate.MethodSearchBySignature;
 import de.jpx3.intave.klass.rewrite.PatchyAutoTranslation;
-import de.jpx3.intave.klass.rewrite.PatchyTranslateParameters;
-import de.jpx3.intave.share.NativeVector;
-import de.jpx3.intave.share.link.WrapperConverter;
-import de.jpx3.intave.user.User;
-import de.jpx3.intave.user.meta.MovementMetadata;
-import net.minecraft.core.BlockPosition;
-import net.minecraft.world.level.IBlockAccess;
-import net.minecraft.world.level.World;
+import net.minecraft.world.level.block.state.IBlockData;
+import org.bukkit.Material;
 
 import java.lang.invoke.MethodHandle;
 
 @PatchyAutoTranslation
-final class v18b2FluidResolver extends FluidResolver {
+final class v18b2FluidResolver implements FluidResolver {
   private static Object TAG_KEY_WATER = null;
   private static Object TAG_KEY_LAVA = null;
 
@@ -36,54 +33,28 @@ final class v18b2FluidResolver extends FluidResolver {
 
   @Override
   @PatchyAutoTranslation
-  protected Fluid fluidAt(User user, int x, int y, int z) {
-    MovementMetadata movementData = user.meta().movement();
-    World world = (World) movementData.nmsWorld();
-    if (world == null) {
-      return Fluid.empty();
+  public Fluid liquidFrom(Material type, int variantIndex) {
+    IBlockData blockData = (IBlockData) BlockVariantRegister.rawVariantOf(type, variantIndex);
+    if (blockData == null) {
+      return Dry.of();
     }
-    IBlockAccess blockAccess = world.getChunkProvider().c(x >> 4, z >> 4);
-    if (blockAccess == null) {
-      return Fluid.empty();
-    }
-    net.minecraft.world.level.material.Fluid fluid = blockAccess.getFluid(new BlockPosition(x, y, z));
-    FluidTag fluidTag = resolveFluidTagOf(fluid);
-    if (fluidTag == FluidTag.EMPTY) {
-      return Fluid.empty();
-    }
-    float height = fluid.d();
-    return Fluid.of(fluidTag, fluid.isSource(), height);
-  }
-
-  @PatchyAutoTranslation
-  @PatchyTranslateParameters
-  private FluidTag resolveFluidTagOf(net.minecraft.world.level.material.Fluid fluid) {
-    return fluid.isEmpty() ? FluidTag.EMPTY : tagKeyResolve(fluid);
-  }
-
-  @PatchyAutoTranslation
-  @PatchyTranslateParameters
-  private FluidTag tagKeyResolve(Object fluid) {
     try {
-      boolean water = (boolean) resolveTagKey.invoke(fluid, TAG_KEY_WATER);
-      boolean lava = !water && (boolean) resolveTagKey.invoke(fluid, TAG_KEY_LAVA);
-      return FluidTag.select(water, lava);
-    } catch (Throwable exception) {
-      exception.printStackTrace();
+      net.minecraft.world.level.material.Fluid fluid = blockData.getBlock().c_(blockData);
+      boolean dry = fluid.isEmpty();
+      boolean isWater = !dry && (boolean) resolveTagKey.invoke(fluid, TAG_KEY_WATER);
+      boolean isLava = !dry && (boolean) resolveTagKey.invoke(fluid, TAG_KEY_LAVA);
+      boolean source = fluid.isSource();
+      float height = fluid.d();
+      BlockVariant variant = BlockVariantRegister.variantOf(type, variantIndex);
+      Boolean fallingProperty = dry ? null : variant.propertyOf("falling");
+      if (fallingProperty == null) {
+        fallingProperty = false;
+      }
+      int level = MaterialMagic.isLavaOrWater(type) ? variant.propertyOf("level") : 8;
+      return select(isWater, isLava, dry, fallingProperty, height, level);
+    } catch (Throwable throwable) {
+      throwable.printStackTrace();
+      return Dry.of();
     }
-    return FluidTag.EMPTY;
-  }
-
-  @Override
-  @PatchyAutoTranslation
-  protected NativeVector flowVectorAt(User user, int x, int y, int z) {
-    MovementMetadata movementData = user.meta().movement();
-    World world = (World) movementData.nmsWorld();
-    IBlockAccess blockAccess = world.getChunkProvider().c(x >> 4, z >> 4);
-    if (blockAccess == null) {
-      return NativeVector.ZERO;
-    }
-    BlockPosition blockPosition = new BlockPosition(x, y, z);
-    return WrapperConverter.vectorFromVec3D(blockAccess.getFluid(blockPosition).c(blockAccess, blockPosition));
   }
 }

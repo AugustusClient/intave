@@ -3,6 +3,7 @@ package de.jpx3.intave.check.movement.physics;
 import de.jpx3.intave.share.BoundingBox;
 import de.jpx3.intave.share.Motion;
 import de.jpx3.intave.share.Position;
+import org.bukkit.Material;
 import org.bukkit.util.Vector;
 
 public interface SimulationEnvironment {
@@ -111,10 +112,17 @@ public interface SimulationEnvironment {
   boolean lastOnGround();
   boolean collidedHorizontally();
   boolean collidedVertically();
+
+  void checkSupportingBlock(Motion motion);
+
   boolean collidedWithBoat();
   double frictionPosSubtraction();
   boolean receivedFlyingPacketIn(int ticks);
 
+  Material collideMaterial();
+  Material frictionMaterial();
+  Material previousCollideMaterial();
+  Material previousFrictionMaterial();
   boolean blockOnPositionSoulSpeedAffected();
 
   double fallDistance();
@@ -140,6 +148,8 @@ public interface SimulationEnvironment {
   void resetPowderSnowTicks();
 
   void increaseEdgeSneakTickGrants();
+  void increaseVehicleTicks();
+  void resetPushedByWaterFlowTicks();
 
   void aquaticUpdateLavaReset();
 

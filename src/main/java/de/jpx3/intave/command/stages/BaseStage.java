@@ -151,7 +151,7 @@ public final class BaseStage extends CommandStage {
     selectors = {"cps", "clicks"},
     permission = "intave.command.cps",
     usage = "[<player...>]",
-    description = "Show a click visualizer"
+    description = "Display click visualizer"
   )
   public void cpsCommand(User user, @Optional Player selectedPlayer) {
     Player player = user.player();
@@ -248,7 +248,7 @@ public final class BaseStage extends CommandStage {
   @SubCommand(
     selectors = {"history", "logs"},
     usage = "<player>",
-    description = "View a player's violation history",
+    description = "Show violation history",
     permission = "intave.command.history"
   )
   public void historyCommand(CommandSender sender, String playerName) {
@@ -393,15 +393,15 @@ public final class BaseStage extends CommandStage {
     sendVersionMessage(commandSender);
   }
 
-  @SubCommand(
-    selectors = "ui",
-    usage = "",
-    permission = "intave.command",
-    description = "Open the Intave UI"
-  )
-  public void openUICommand(CommandSender commandSender) {
-
-  }
+//  @SubCommand(
+//    selectors = "ui",
+//    usage = "",
+//    permission = "intave.command",
+//    description = "Open the Intave UI"
+//  )
+//  public void openUICommand(CommandSender commandSender) {
+//
+//  }
 
   @SubCommand(
     selectors = "proxy",

@@ -74,6 +74,16 @@ public final class Motion {
     return this;
   }
 
+  public Motion normalize() {
+    double length = length();
+    if (length != 0.0) {
+      motionX /= length;
+      motionY /= length;
+      motionZ /= length;
+    }
+    return this;
+  }
+
   public Motion copy() {
     return copyFrom(this);
   }

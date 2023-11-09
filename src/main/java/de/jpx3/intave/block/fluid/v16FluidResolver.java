@@ -1,58 +1,37 @@
 package de.jpx3.intave.block.fluid;
 
+import de.jpx3.intave.block.variant.BlockVariant;
+import de.jpx3.intave.block.variant.BlockVariantRegister;
 import de.jpx3.intave.klass.rewrite.PatchyAutoTranslation;
-import de.jpx3.intave.klass.rewrite.PatchyTranslateParameters;
-import de.jpx3.intave.share.NativeVector;
-import de.jpx3.intave.share.link.WrapperConverter;
-import de.jpx3.intave.user.User;
-import de.jpx3.intave.user.meta.MovementMetadata;
-import net.minecraft.server.v1_16_R3.BlockPosition;
-import net.minecraft.server.v1_16_R3.IBlockAccess;
+import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.TagsFluid;
-import net.minecraft.server.v1_16_R3.World;
+import org.bukkit.Material;
 
 @PatchyAutoTranslation
-final class v16FluidResolver extends FluidResolver {
-
+final class v16FluidResolver implements FluidResolver {
   @Override
   @PatchyAutoTranslation
-  protected Fluid fluidAt(User user, int x, int y, int z) {
-    MovementMetadata movementData = user.meta().movement();
-    World world = (World) movementData.nmsWorld();
-    IBlockAccess blockAccess = world.getChunkProvider().c(x >> 4, z >> 4);
-    if (blockAccess == null) {
-      return Fluid.empty();
+  public Fluid liquidFrom(Material type, int variantIndex) {
+    IBlockData blockData = (IBlockData) BlockVariantRegister.rawVariantOf(type, variantIndex);
+    if (blockData == null) {
+      return Dry.of();
     }
-    net.minecraft.server.v1_16_R3.Fluid fluid = blockAccess.getFluid(new BlockPosition(x, y, z));
-    FluidTag fluidTag = resolveFluidTagOf(fluid);
-    if (fluidTag == FluidTag.EMPTY) {
-      return Fluid.empty();
+    net.minecraft.server.v1_16_R3.Fluid fluid = blockData.getFluid();
+    if (fluid == null) {
+      return Dry.of();
     }
-    float height = fluid.d();
-    return Fluid.of(fluidTag, fluid.isSource(), height);
-  }
-
-  @PatchyAutoTranslation
-  @PatchyTranslateParameters
-  private FluidTag resolveFluidTagOf(net.minecraft.server.v1_16_R3.Fluid fluid) {
-    if (fluid.isEmpty()) {
-      return FluidTag.EMPTY;
+    BlockVariant variant = BlockVariantRegister.variantOf(type, variantIndex);
+    boolean dry = fluid.isEmpty();
+    boolean isWater = fluid.a(TagsFluid.WATER);
+    boolean isLava = fluid.a(TagsFluid.LAVA);
+    boolean source = fluid.isSource();
+    Boolean fallingProperty = dry ? null : variant.propertyOf("falling");
+    if (fallingProperty == null) {
+      fallingProperty = false;
     }
-    boolean water = fluid.a(TagsFluid.WATER);
-    boolean lava = !water && fluid.a(TagsFluid.LAVA);
-    return FluidTag.select(water, lava);
-  }
-
-  @Override
-  @PatchyAutoTranslation
-  protected NativeVector flowVectorAt(User user, int x, int y, int z) {
-    MovementMetadata movementData = user.meta().movement();
-    World world = (World) movementData.nmsWorld();
-    IBlockAccess blockAccess = world.getChunkProvider().c(x >> 4, z >> 4);
-    if (blockAccess == null) {
-      return NativeVector.ZERO;
-    }
-    BlockPosition blockPosition = new BlockPosition(x, y, z);
-    return WrapperConverter.vectorFromVec3D(blockAccess.getFluid(blockPosition).c(blockAccess, blockPosition));
+    int level = fluid.e();
+    float height = level / 9f;
+    return select(isWater, isLava, dry, fallingProperty, height, level);
   }
 }
+

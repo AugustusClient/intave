@@ -3,6 +3,7 @@ package de.jpx3.intave.check.combat;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers.EntityUseAction;
+import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntaveLogger;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.player.trust.TrustFactor;
@@ -39,8 +40,8 @@ import java.util.function.Function;
 
 import static com.comphenix.protocol.wrappers.EnumWrappers.EntityUseAction.ATTACK;
 import static de.jpx3.intave.math.MathHelper.formatDouble;
-import static de.jpx3.intave.module.linker.packet.ListenerPriority.HIGH;
 import static de.jpx3.intave.module.linker.packet.ListenerPriority.LOW;
+import static de.jpx3.intave.module.linker.packet.ListenerPriority.NORMAL;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
 import static de.jpx3.intave.module.violation.Violation.ViolationFlags.DISPLAY_IN_ALL_VERBOSE_MODES;
 import static de.jpx3.intave.module.violation.Violation.ViolationFlags.DONT_PROCESS_VIOSTAT;
@@ -68,14 +69,16 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
   }
 
   @PacketSubscription(
-    priority = LOW,
-    packetsIn = USE_ENTITY
+      priority = LOW,
+      packetsIn = USE_ENTITY
   )
   public void receiveUseEntityPacket(PacketEvent event) {
     Player player = event.getPlayer();
     User user = userOf(player);
     AttackRaytraceMeta meta = metaOf(user);
     AbilityMetadata abilities = user.meta().abilities();
+    MovementMetadata movement = user.meta().movement();
+    ViolationMetadata violationMeta = user.meta().violationLevel();
 
     PacketContainer packet = event.getPacket();
     EntityUseReader reader = PacketReaders.readerOf(packet);
@@ -88,15 +91,18 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
       Entity entity = EntityTracker.entityByIdentifier(user, entityId);
       // Allow attacks on invalid entity states
       if (entity == null
-        || entity instanceof Entity.Destroyed
-        || abilities.unsynchronizedHealth <= 0) {
+          || entity instanceof Entity.Destroyed
+          || !entity.isEntityAlive()
+          || abilities.unsynchronizedHealth <= 0) {
+        // check again?
         reader.release();
         return;
       }
+      boolean inTeleport = movement.lastTeleport == 0 || violationMeta.isInActiveTeleportBundle;
       boolean firstRaytraceSuccessful = false;
-      if (!entityInTimeout(user, entity, entity.pendingFeedbackPackets())) {
+      if (!inTeleport && !entityInTimeout(user, entity, entity.pendingFeedbackPackets())) {
         // Make a first attempt at ray-tracing to reduce compute time
-        Raytrace raytrace = fireRaytraceFor(user, entity, computeExpansionFor(user), false);
+        Raytrace raytrace = fireRaytraceFor(user, entity, computeExpansionFor(user), true);
         double blockReachDistance = Raytracing.reachDistanceOf(user);
         if (raytrace.reach() <= blockReachDistance) {
           firstRaytraceSuccessful = true;
@@ -121,8 +127,8 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
   }
 
   @PacketSubscription(
-    priority = HIGH,
-    packetsIn = {FLYING, LOOK, POSITION, POSITION_LOOK}
+      priority = NORMAL,
+      packetsIn = {FLYING, LOOK, POSITION, POSITION_LOOK}
   )
   public void receiveMovementPacket(PacketEvent event) {
     Player player = event.getPlayer();
@@ -134,7 +140,7 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
     List<Attack> pendingAttacks = meta.pendingAttacks;
     PacketContainer packet = event.getPacket();
     // Clear attacks if recently teleported
-    if (movement.lastTeleport == 0) {
+    if (movement.lastTeleport <= 1 || movement.awaitTeleport) {
       pendingAttacks.clear();
     }
     // Apply flying packets (first boolean)
@@ -149,15 +155,15 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
       Entity attackedEntity = EntityTracker.entityByIdentifier(user, pendingAttack.entityId);
       // Once again ignore invalid entity states to make sure nothing is processed wrongly
       if (entityHealth <= 0
-        || attackedEntity == null
-        || attackedEntity instanceof Entity.Destroyed) {
+          || attackedEntity == null
+          || attackedEntity instanceof Entity.Destroyed
+          || (attackedEntity.hasTypeData() && attackedEntity.typeData().fireball())) {
         return;
       }
 
       boolean hasNotTimedOut = !entityInTimeout(user, attackedEntity, pendingAttack.pendingFeedbackPackets());
       boolean unsafeSynchronization = movement.dropPostTickMotionProcessing && protocol.protocolVersion() >= 755;
-      boolean entityOutOfSync =
-        (!protocol.flyingPacketsAreSent() && movement.receivedFlyingPacketIn(2))
+      boolean entityOutOfSync = (!protocol.flyingPacketsAreSent() && movement.receivedFlyingPacketIn(2))
           || !attackedEntity.clientSynchronized || unsafeSynchronization;
       // As entity attack redirections are processed inside this, we don't need to do anything extra to block hits besides
       // just not raytracing
@@ -180,7 +186,11 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
     ViolationMetadata violations = meta.violationLevel();
     ConnectionMetadata connection = meta.connection();
 
-    int maximumPendingFeedbackPackets = trustFactorSetting("pending-allowance", player) + (int) MathHelper.minmax(0, LatencyStudy.cachedAverage(), 20);
+    if (!attackedEntity.typeData().isLivingEntity()) {
+      return false;
+    }
+
+    int maximumPendingFeedbackPackets = trustFactorSetting("pending-allowance", player) + (int) MathHelper.minmax(1, LatencyStudy.cachedAverage(), 20);
 //    long pendingFeedbacks = attackedEntity.pendingFeedbackPackets();
     LatencyStudy.enterHit((short) pendingFeedbacks);
 
@@ -189,18 +199,18 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
 
     long transactionPingAverage = connection.transactionPingAverage();
     double transactionTickAverage = transactionPingAverage / 50d;
-    int absoluteLimit = zeroNetworkTolerance ? 2 : 12;
-    int historyBasedLimit = Math.min((int) ((LatencyStudy.cachedAverage() + transactionTickAverage + 0.5) * 0.6), absoluteLimit);
+    int absoluteLimit = zeroNetworkTolerance ? 3 : 12;
+    int historyBasedLimit = Math.min((int) ((LatencyStudy.cachedAverage() + transactionTickAverage + 0.5) * 0.6) + 2, absoluteLimit);
     boolean pendingOverAverage = transactionPingAverage > 0 && pendingFeedbacks > historyBasedLimit;
-    double trustfactorBaseDistanceLimit = trustFactorSetting("pending-distance", player) * 0.8;
+    double trustfactorBaseDistanceLimit = trustFactorSetting("pending-distance", player);
     double actualDistance = attackedEntity.immediateDistanceToClientPosition();
     boolean distanceOverLimit = actualDistance > trustfactorBaseDistanceLimit;
     // If something malicious was detected, block the attack
     if (pendingOverAverage || distanceOverLimit) {
       boolean needsToBeBlocked = user.trustFactor().atOrBelow(TrustFactor.RED);
       String message = player.getName() + " attack latency (" + (needsToBeBlocked ? "blocked, " : "") + pendingFeedbacks + "/"
-        + historyBasedLimit + "p @" + transactionPingAverage + "ms, " + formatDouble(actualDistance, 2) + "/"
-        + formatDouble(trustfactorBaseDistanceLimit, 2) + "blocks)";
+          + historyBasedLimit + "p @" + transactionPingAverage + "ms, " + formatDouble(actualDistance, 2) + "/"
+          + formatDouble(trustfactorBaseDistanceLimit, 2) + "blocks)";
       String shortMessage = player.getName() + " attacked " + pendingFeedbacks + " > " + historyBasedLimit + " @ " + transactionPingAverage + "ms";
       MessageSeverity severity = Math.abs(pendingFeedbacks - historyBasedLimit) < 4 ? MessageSeverity.LOW : MessageSeverity.MEDIUM;
       DebugBroadcast.broadcast(player, MessageCategory.ATLALI, severity, message, shortMessage);
@@ -232,7 +242,6 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
       } else {
         violations.backtrackVL += Math.min(3, unroundedTicksOverLimit) / 3d;
       }
-
       if (violations.backtrackVL >= 10 || unroundedTicksOverLimit >= 3) {
         //entityHasTimedOut = true;
       }
@@ -242,16 +251,16 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
         if (recentlyIncreased) {
           String entityName = attackedEntity.entityName();
           Violation violation = Violation.builderFor(AttackRaytrace.class)
-            .forPlayer(player).withCustomThreshold("timeout")
-            .withVL(0)
-            .withMessage("attacked expired position of " + resolveArticle(entityName) + " " + entityName.toLowerCase(Locale.ROOT))
-            .withDetails(pendingFeedbacks + "t attack, " + formatDouble(shortTransactionPingAverage, 2) + "*" + formatDouble(multiplier, 2) + "t latency")
-            .appendFlags(DISPLAY_IN_ALL_VERBOSE_MODES)
-            .build();
+              .forPlayer(player).withCustomThreshold("timeout")
+              .withVL(0)
+              .withMessage("attacked expired position of " + resolveArticle(entityName) + " " + entityName.toLowerCase(Locale.ROOT))
+              .withDetails(pendingFeedbacks + "t attack, " + formatDouble(shortTransactionPingAverage, 2) + "*" + formatDouble(multiplier, 2) + "t latency")
+              .appendFlags(DISPLAY_IN_ALL_VERBOSE_MODES)
+              .build();
           ViolationContext violationContext = Modules.violationProcessor().processViolation(violation);
           double after = violationContext.violationLevelAfter();
           if (after > 10) {
-            user.nerf(AttackNerfStrategy.HT_SPOOF, "internal");
+//            user.nerf(AttackNerfStrategy.HT_SPOOF, "internal");
           }
         }
       }
@@ -264,6 +273,12 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
         violations.lastIncreaseBacktrackVL = System.currentTimeMillis();
       }
       violations.backtrackVL -= 0.05;
+    }
+
+    if (entityHasTimedOut) {
+      if (IntaveControl.DEBUG_INTERACTION_DISCREET && IntaveControl.INTERACTION_DEBUG_NAMES.contains(player.getName())) {
+        System.out.println("TIMEOUT: " + player.getName() + " attacked " + attackedEntity.entityName() + " with " + pendingFeedbacks + " pending feedbacks (" +pendingOverAverage + "|" + distanceOverLimit + ")");
+      }
     }
 
     return entityHasTimedOut;
@@ -334,45 +349,50 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
    * @since 14.6.0
    */
   private double findLowestPossibleReachIterative(
-    User user, Entity entity, boolean currentPosition) {
+      User user, Entity entity, boolean currentPosition) {
     Player player = user.player();
     MetadataBundle meta = user.meta();
-    List<Entity.EntityPositionContext> history = entity.positionHistory;
-    int maximumPendingFeedbackPackets =
-      trustFactorSetting("pending-allowance", player)
-        + (int) MathHelper.minmax(0, LatencyStudy.cachedAverage(), 20);
-    double blockReachDistance = Raytracing.reachDistanceOf(meta);
     double minReach = 10;
-    boolean livingEntity = entity.typeData().isLivingEntity();
-    int from = history.size() - 1;
-    for (int i = from; i >= 0; i--) {
-      // If current position exceeds maximum pending packets skip this entity tick
-      if (from - i > maximumPendingFeedbackPackets) {
-        continue;
-      }
-      Entity.EntityPositionContext possiblePosition = history.get(i);
-      entity.position = possiblePosition.clone();
-      Raytrace resultWithoutIncrement = fireRaytraceFor(user, entity, 0.13f, currentPosition);
-      // Stop if a valid reach was found
-      if (resultWithoutIncrement.reach() < blockReachDistance) {
-        return resultWithoutIncrement.reach();
-      }
-      double minReachInItr = resultWithoutIncrement.reach();
-      int limit = 5;
-      while (entity.position.newPosRotationIncrements > 0 && livingEntity) {
-        // If limit exceeded stop to save performance
-        if (limit-- <= 0) {
-          break;
+    try {
+//      entity.positionHistoryLock.lock();
+      List<Entity.EntityPositionContext> history = entity.positionHistory;
+      int maximumPendingFeedbackPackets =
+          trustFactorSetting("pending-allowance", player)
+              + (int) MathHelper.minmax(0, LatencyStudy.cachedAverage(), 20);
+      double blockReachDistance = Raytracing.reachDistanceOf(meta);
+      boolean livingEntity = entity.typeData().isLivingEntity();
+      int from = history.size() - 1;
+      for (int i = from; i >= 0; i--) {
+        // If current position exceeds maximum pending packets skip this entity tick
+        if (from - i > maximumPendingFeedbackPackets) {
+          continue;
         }
-        entity.onUpdate();
-        Raytrace result = fireRaytraceFor(user, entity, 0.13f, currentPosition);
+        Entity.EntityPositionContext possiblePosition = history.get(i);
+        entity.position = possiblePosition.clone();
+        Raytrace resultWithoutIncrement = fireRaytraceFor(user, entity, 0.13f, currentPosition);
         // Stop if a valid reach was found
-        if (result.reach() < blockReachDistance) {
-          return result.reach();
+        if (resultWithoutIncrement.reach() < blockReachDistance) {
+          return resultWithoutIncrement.reach();
         }
-        minReachInItr = Math.min(minReachInItr, result.reach());
+        double minReachInItr = resultWithoutIncrement.reach();
+        int limit = 5;
+        while (entity.position.newPosRotationIncrements > 0 && livingEntity) {
+          // If limit exceeded stop to save performance
+          if (limit-- <= 0) {
+            break;
+          }
+          entity.onUpdate();
+          Raytrace result = fireRaytraceFor(user, entity, 0.13f, currentPosition);
+          // Stop if a valid reach was found
+          if (result.reach() < blockReachDistance) {
+            return result.reach();
+          }
+          minReachInItr = Math.min(minReachInItr, result.reach());
+        }
+        minReach = Math.min(minReach, minReachInItr);
       }
-      minReach = Math.min(minReach, minReachInItr);
+    } finally {
+//      entity.positionHistoryLock.unlock();
     }
     return minReach;
   }
@@ -405,9 +425,9 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
    * @since 14.5.8
    */
   private void processResult(
-    User user, Raytrace raytrace,
-    Entity attacked, Attack attack,
-    float expansion, boolean estimated
+      User user, Raytrace raytrace,
+      Entity attacked, Attack attack,
+      float expansion, boolean estimated
   ) {
     Player player = user.player();
     MetadataBundle meta = user.meta();
@@ -423,14 +443,14 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
     switch (result) {
       case MISS: {
         message = String.format(
-          "attacked %s %s out of sight %s",
-          resolveArticle(entityName), entityName.toLowerCase(), estimationSuffix
+            "attacked %s %s out of sight %s",
+            resolveArticle(entityName), entityName.toLowerCase(), estimationSuffix
         );
         details = "";
         thresholdKey = "applicable-thresholds.hitbox";
         sibyl = String.format(
-          "%s/%d missed hit on %s",
-          player.getName(), user.protocolVersion(), entityName.toLowerCase()
+            "%s/%d missed hit on %s",
+            player.getName(), user.protocolVersion(), entityName.toLowerCase()
         );
         reach = 10;
         break;
@@ -438,14 +458,14 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
       case REACH: {
         String displayReach = formatDouble(raytrace.reach(), 4);
         message = String.format(
-          "attacked %s %s from too far away %s",
-          resolveArticle(entityName), entityName.toLowerCase(), estimationSuffix
+            "attacked %s %s from too far away %s",
+            resolveArticle(entityName), entityName.toLowerCase(), estimationSuffix
         );
         details = displayReach + " blocks";
         thresholdKey = "applicable-thresholds.reach";
         sibyl = String.format(
-          "%s/%d attacked %s from %s",
-          player.getName(), user.protocolVersion(), entityName.toLowerCase(), displayReach
+            "%s/%d attacked %s from %s",
+            player.getName(), user.protocolVersion(), entityName.toLowerCase(), displayReach
         );
         reach = raytrace.reach();
         break;
@@ -465,11 +485,11 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
     }
     DebugBroadcast.broadcast(player, MessageCategory.ATRAFLT, MessageSeverity.HIGH, sibyl, sibyl);
     Violation violation = Violation.builderFor(AttackRaytrace.class)
-      .forPlayer(player).withMessage(message).withDetails(details)
-      .withCustomThreshold(thresholdKey).withVL(vl)
-      .withPlaceholder("reach", formatDouble(reach, 4))
-      .appendFlags(estimated ? DONT_PROCESS_VIOSTAT : 0)
-      .build();
+        .forPlayer(player).withMessage(message).withDetails(details)
+        .withCustomThreshold(thresholdKey).withVL(vl)
+        .withPlaceholder("reach", formatDouble(reach, 4))
+        .appendFlags(estimated ? DONT_PROCESS_VIOSTAT : 0)
+        .build();
     ViolationContext violationContext = Modules.violationProcessor().processViolation(violation);
     // Apply damage cancel after 50 VL
     if (violationContext.violationLevelAfter() > 50 && !estimated) {
@@ -513,15 +533,15 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
    * @since 14.5.8
    */
   private int calculateVlFor(
-    User user, Raytrace raytrace,
-    RaytraceResult result, Entity attacked,
-    float expansion, boolean estimated
+      User user, Raytrace raytrace,
+      RaytraceResult result, Entity attacked,
+      float expansion, boolean estimated
   ) {
     AttackRaytraceMeta attackRaytraceMeta = metaOf(user);
     Position targetPosition = raytrace.targetPosition();
     boolean invalidRaytrace = targetPosition != null
-      && attackRaytraceMeta.lastPosition != null
-      && targetPosition.distance(attackRaytraceMeta.lastPosition) == 0;
+        && attackRaytraceMeta.lastPosition != null
+        && targetPosition.distance(attackRaytraceMeta.lastPosition) == 0;
     if (user.meta().movement().isInVehicle()) {
       invalidRaytrace = true;
     }
@@ -549,7 +569,7 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
    * @since 14.5.8
    */
   private Raytrace fireRaytraceFor(
-    User user, Entity entity, float expansion, boolean currentPosition
+      User user, Entity entity, float expansion, boolean currentPosition
   ) {
     MetadataBundle meta = user.meta();
     MovementMetadata movementData = meta.movement();
@@ -564,13 +584,13 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
     float lastYaw = movementData.lastRotationYaw % 360f;
 
     return Raytracing.doubleMDFBlockConstraintEntityRaytrace(
-      user.player(),
-      entity,
-      requiresAlternativeY,
-      x, y, z,
-      lastYaw, yaw,
-      movementData.rotationPitch,
-      expansion, !fixedMouseDelay
+        user.player(),
+        entity,
+        requiresAlternativeY,
+        x, y, z,
+        lastYaw, yaw,
+        movementData.rotationPitch,
+        expansion, !fixedMouseDelay
     );
   }
 

@@ -18,7 +18,8 @@ import java.net.URL;
 import java.util.Locale;
 import java.util.Scanner;
 import java.util.UUID;
-import java.util.zip.*;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterInputStream;
 
 import static de.jpx3.intave.IntaveControl.GOMME_MODE;
 

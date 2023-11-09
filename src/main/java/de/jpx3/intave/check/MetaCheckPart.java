@@ -1,7 +1,6 @@
 package de.jpx3.intave.check;
 
 import de.jpx3.intave.user.User;
-import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.CheckCustomMetadata;
 import de.jpx3.intave.user.meta.MetadataBundle;
 import org.bukkit.entity.Player;

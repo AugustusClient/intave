@@ -26,7 +26,7 @@ import static com.comphenix.protocol.PacketType.Play.Server.TRANSACTION;
 import static de.jpx3.intave.module.feedback.FeedbackOptions.*;
 
 public final class FeedbackSender extends Module {
-  public static final short MIN_USER_KEY = 0;
+  public static final short MIN_USER_KEY = 1;
   public static final short MAX_USER_KEY = 24000;
   public static final int PING_MASK = 0xf5550000;
   private static final boolean USE_PING_PONG_PACKETS = MinecraftVersions.VER1_17_0.atOrAbove();
@@ -217,7 +217,7 @@ public final class FeedbackSender extends Module {
     int attempts = 1000;
     short counter = MIN_USER_KEY;
     int pending = feedbackQueue.size();
-    if (pending > 500) {
+    if (pending > 500 && counter + pending < MAX_USER_KEY) {
       counter += pending;
     }
     while (feedbackQueue.hasUserKey(counter) && counter >= MIN_USER_KEY && counter < MAX_USER_KEY && attempts-- > 0) {
@@ -272,20 +272,24 @@ public final class FeedbackSender extends Module {
     PacketContainer[] packetCache = noPingMask ? PACKET_CACHE_NO_PING_MASK : PACKET_CACHE;
     packet = index >= packetCache.length || index < 0 ? null : packetCache[index];
     if (packet == null) {
-      if (USE_PING_PONG_PACKETS) {
-        packet = protocol.createPacket(PING);
-        int sentId = id;
-        if (!noPingMask) {
-          sentId = sentId | PING_MASK;
+      try {
+        if (USE_PING_PONG_PACKETS) {
+          packet = protocol.createPacket(PING);
+          int sentId = id;
+          if (!noPingMask) {
+            sentId = sentId | PING_MASK;
+          }
+          packet.getIntegers().write(0, sentId);
+        } else {
+          packet = protocol.createPacket(TRANSACTION);
+          packet.getIntegers().write(0, 0);
+          packet.getShorts().write(0, (short) -id);
+          packet.getBooleans().write(0, false);
         }
-        packet.getIntegers().write(0, sentId);
-      } else {
-        packet = protocol.createPacket(TRANSACTION);
-        packet.getIntegers().write(0, 0);
-        packet.getShorts().write(0, id);
-        packet.getBooleans().write(0, false);
+      } catch (Exception exception) {
+        throw new IllegalStateException("Unable to create feedback packet", exception);
       }
-      if (index < packetCache.length) {
+      if (index >= 0 && index < packetCache.length) {
         packetCache[index] = packet;
       }
     }

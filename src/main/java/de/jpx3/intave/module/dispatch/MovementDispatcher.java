@@ -37,10 +37,7 @@ import de.jpx3.intave.module.linker.packet.PrioritySlot;
 import de.jpx3.intave.module.tracker.entity.Entity;
 import de.jpx3.intave.module.violation.Violation;
 import de.jpx3.intave.packet.PacketSender;
-import de.jpx3.intave.packet.reader.BlockActionReader;
-import de.jpx3.intave.packet.reader.EntityMetadataReader;
-import de.jpx3.intave.packet.reader.PacketReaders;
-import de.jpx3.intave.packet.reader.PlayerActionReader;
+import de.jpx3.intave.packet.reader.*;
 import de.jpx3.intave.player.FaultKicks;
 import de.jpx3.intave.player.ItemProperties;
 import de.jpx3.intave.player.fake.FakePlayer;
@@ -89,65 +86,6 @@ public final class MovementDispatcher extends Module {
   private Physics physicsCheck;
   private InteractionRaytrace interactionRaytraceCheck;
   private Timer timerCheck;
-
-  public static void applyVelocitySuperposition(User user, Motion velocity) {
-    MetadataBundle meta = user.meta();
-    MovementMetadata movementData = meta.movement();
-    ViolationMetadata violationLevelData = meta.violationLevel();
-
-    movementData.pastExternalVelocityResetCache = movementData.pastExternalVelocity;
-    movementData.baseMotionXBeforeVelocityResetCache = movementData.baseMotionXBeforeVelocity;
-    movementData.baseMotionYBeforeVelocityResetCache = movementData.baseMotionYBeforeVelocity;
-    movementData.baseMotionZBeforeVelocityResetCache = movementData.baseMotionZBeforeVelocity;
-    movementData.baseMotionXResetCache = movementData.baseMotionX;
-    movementData.baseMotionYResetCache = movementData.baseMotionY;
-    movementData.baseMotionZResetCache = movementData.baseMotionZ;
-    movementData.willReceiveSetbackVelocityResetCache = movementData.willReceiveSetbackVelocity;
-
-    if (!violationLevelData.isInActiveTeleportBundle) {
-      movementData.baseMotionXBeforeVelocity = movementData.baseMotionX;
-      movementData.baseMotionYBeforeVelocity = movementData.baseMotionY;
-      movementData.baseMotionZBeforeVelocity = movementData.baseMotionZ;
-      movementData.baseMotionX = velocity.motionX();
-      movementData.baseMotionY = velocity.motionY();
-      movementData.baseMotionZ = velocity.motionZ();
-//      user.player().sendMessage("Applied velocity " + velocity);
-      movementData.lastVelocity = new Vector(velocity.motionX(), velocity.motionY(), velocity.motionZ());
-    }
-  }
-
-  public static void collapseVelocitySuperposition(User user, @Nullable Motion velocity) {
-    if (velocity != null) {
-      MetadataBundle meta = user.meta();
-      MovementMetadata movementData = meta.movement();
-      Synchronizer.synchronize(() -> movementData.emulationVelocity = null);
-      movementData.pastVelocity = 0;
-      movementData.pendingVelocityPackets.decrementAndGet();
-      if (!movementData.willReceiveSetbackVelocity) {
-        movementData.pastExternalVelocity = 0;
-      }
-      movementData.willReceiveSetbackVelocity = false;
-//      user.player().sendMessage("Collapsed velocity " + velocity);
-//      if (!movementData.willReceiveSetbackVelocity) {
-//        movementData.pastExternalVelocity = 0;
-//      }
-//      movementData.willReceiveSetbackVelocity = false;
-    }
-  }
-
-  public static void resetVelocitySuperposition(User user) {
-    MetadataBundle meta = user.meta();
-    MovementMetadata movementData = meta.movement();
-
-    movementData.pastExternalVelocity = movementData.pastExternalVelocityResetCache;
-    movementData.baseMotionXBeforeVelocity = movementData.baseMotionXBeforeVelocityResetCache;
-    movementData.baseMotionYBeforeVelocity = movementData.baseMotionYBeforeVelocityResetCache;
-    movementData.baseMotionZBeforeVelocity = movementData.baseMotionZBeforeVelocityResetCache;
-    movementData.baseMotionX = movementData.baseMotionXResetCache;
-    movementData.baseMotionY = movementData.baseMotionYResetCache;
-    movementData.baseMotionZ = movementData.baseMotionZResetCache;
-    movementData.willReceiveSetbackVelocity = movementData.willReceiveSetbackVelocityResetCache;
-  }
 
   @Override
   public void enable() {
@@ -271,10 +209,10 @@ public final class MovementDispatcher extends Module {
   }
 
   @PacketSubscription(
-      priority = ListenerPriority.HIGH,
-      packetsOut = {
-          RESPAWN
-      }
+    priority = ListenerPriority.HIGH,
+    packetsOut = {
+      RESPAWN
+    }
   )
   public void sentRespawn(PacketEvent event) {
     Player player = event.getPlayer();
@@ -308,10 +246,10 @@ public final class MovementDispatcher extends Module {
   }
 
   @PacketSubscription(
-      priority = ListenerPriority.HIGH,
-      packetsOut = {
-          EXPLOSION
-      }
+    priority = ListenerPriority.HIGH,
+    packetsOut = {
+      EXPLOSION
+    }
   )
   public void sentExplosion(PacketEvent event) {
     Player player = event.getPlayer();
@@ -373,10 +311,16 @@ public final class MovementDispatcher extends Module {
       movementData.dismountRidingEntity("Client vehicle movement");
     }
 
+    if (movementData.isInRidingVehicle() && !vehicleMove && hasMovement) {
+      if (movementData.invalidVehiclePositionTicks++ > 10) {
+        movementData.dismountRidingEntity("Lower client vehicle movement");
+      }
+    }
+
     if (hasMovement) {
       StructureModifier<Double> modifier = packet.getDoubles();
       for (int i = 0; i < 3; i++) {
-        if (Double.isInfinite(modifier.read(i)) && FaultKicks.POSITION_FAULTS) {
+        if (modifier.read(i) == null || Double.isInfinite(modifier.read(i)) && FaultKicks.POSITION_FAULTS) {
           user.kick("Intolerable position fault");
           return;
         }
@@ -386,7 +330,7 @@ public final class MovementDispatcher extends Module {
     if (hasRotation) {
       StructureModifier<Float> modifier = packet.getFloat();
       for (int i = 0; i < 2; i++) {
-        if (Double.isInfinite(modifier.read(i)) && FaultKicks.POSITION_FAULTS) {
+        if (modifier.read(i) == null || Double.isInfinite(modifier.read(i)) && FaultKicks.POSITION_FAULTS) {
           user.kick("Intolerable position fault");
           return;
         }
@@ -411,7 +355,7 @@ public final class MovementDispatcher extends Module {
       }
     }
 
-    // garbage fix for sending POSITION_LOOK packets on newer client versions when rightclicking
+    // see MultiPlayerGameMode#useItem
     if (protocol.cavesAndCliffsUpdate() && !movementData.awaitTeleport
       && !movementData.awaitOutgoingTeleport
       && packet.getType() == PacketType.Play.Client.POSITION_LOOK
@@ -424,15 +368,40 @@ public final class MovementDispatcher extends Module {
       double motionY = positionY - movementData.verifiedPositionY;
       double motionZ = positionZ - movementData.verifiedPositionZ;
       double distance = MathHelper.hypot3d(motionX, motionY, motionZ);
+
       if (distance < 0.00001) {
         movementData.dropPostTickMotionProcessing = true;
-        movementData.awaitClickMovementSkip = false;
+        Float yaw = packet.getFloat().read(0);
+        Float pitch = packet.getFloat().read(1);
+        movementData.rotationYaw = yaw;
+        movementData.rotationPitch = pitch;
+
+        double yawDifference = MathHelper.noAbsDistanceInDegrees(movementData.lastRotationYaw, yaw);
+        double pitchDifference = MathHelper.noAbsDistanceInDegrees(movementData.lastRotationPitch, pitch);
         if (DEBUG_MOVEMENT_IGNORE) {
-          player.sendMessage("Click movement ignore distance: " + distance);
+          Synchronizer.synchronize(() -> {
+            player.sendMessage("Click movement ignore distance: " + distance + " yaw: " + yawDifference + " pitch: " + pitchDifference);
+          });
+        }
+
+        if (!MinecraftVersions.VER1_9_0.atOrAbove()) {
+//          Synchronizer.synchronize(() -> {
+//            try {
+//              Object playerHandle = user.playerHandle();
+//              Field yawField = Lookup.serverField("Entity", "yaw");
+//              Field pitchField = Lookup.serverField("Entity", "pitch");
+//              yawField.set(playerHandle, (float)yaw % 360.0F);
+//              pitchField.set(playerHandle, (float)MathHelper.minmax(-90.0F, pitch, 90.0F) % 360.0F);
+//            } catch (Exception exception) {
+//              exception.printStackTrace();
+//            }
+//          });
+          event.setCancelled(true);
         }
         return;
       }
     }
+    movementData.awaitClickMovementSkip = false;
 
     connectionData.receiveMovement();
     movementData.updateMovement(packet, hasMovement, hasRotation);
@@ -514,7 +483,11 @@ public final class MovementDispatcher extends Module {
     connectionData.movementPassedForNFS = true;
 
     if (!movementData.isTeleportConfirmationPacket) {
-      interactionRaytraceCheck.receiveMovement(event);
+      timerCheck.receiveMovement(event);
+      if (interactionRaytraceCheck.receiveMovement(event)) {
+        movementData.compileSpecialBlocks();
+        movementData.recheckWebStateFromLastTick();
+      }
 
       if (hasMovement || hasRotation) {
         physicsCheck.receiveMovement(user, hasMovement, hasRotation);
@@ -522,13 +495,11 @@ public final class MovementDispatcher extends Module {
         physicsCheck.updateOnGroundIfFlying(user);
       }
 
-      timerCheck.receiveMovement(event);
-
       boolean clientOnGround = vehicleMove ? player.isOnGround() : packet.getBooleans().read(0);
       boolean collidedWithBoat = movementData.collidedWithBoat();
 
       if (!vehicleMove && !collidedWithBoat) {
-        movementData.applyGroundInformationToPacket(packet);
+//        movementData.applyGroundInformationToPacket(packet);
       }
 
       if (movementData.onGround && !clientOnGround && movementData.step) {
@@ -608,6 +579,9 @@ public final class MovementDispatcher extends Module {
     PacketSender.receiveClientPacketFrom(player, packet);
     updatePlayerHandItem(player);
     Synchronizer.synchronize(player::updateInventory);
+    if (IntaveControl.DEBUG_ITEM_USAGE) {
+      player.sendMessage(ChatColor.DARK_PURPLE + "Release item");
+    }
   }
 
   private void updatePlayerHandItem(Player player) {
@@ -617,10 +591,10 @@ public final class MovementDispatcher extends Module {
   }
 
   @PacketSubscription(
-      priority = ListenerPriority.HIGH,
-      packetsIn = {
-          FLYING, LOOK, POSITION, POSITION_LOOK, VEHICLE_MOVE
-      }
+    priority = ListenerPriority.HIGH,
+    packetsIn = {
+      FLYING, LOOK, POSITION, POSITION_LOOK, VEHICLE_MOVE
+    }
   )
   public void receiveFinalMovement(PacketEvent event) {
     Player player = event.getPlayer();
@@ -831,9 +805,9 @@ public final class MovementDispatcher extends Module {
   }
 
   @PacketSubscription(
-      packetsIn = {
-          STEER_VEHICLE
-      }
+    packetsIn = {
+      STEER_VEHICLE
+    }
   )
   public void receiveClientKeys(PacketEvent event) {
     Player player = event.getPlayer();
@@ -854,10 +828,10 @@ public final class MovementDispatcher extends Module {
   }
 
   @PacketSubscription(
-      engine = Engine.ASYNC_INTERNAL,
-      packetsOut = {
-          UPDATE_HEALTH
-      }
+    engine = Engine.ASYNC_INTERNAL,
+    packetsOut = {
+      UPDATE_HEALTH
+    }
   )
   public void catchFoodUpdate(PacketEvent event) {
     Player player = event.getPlayer();
@@ -873,10 +847,10 @@ public final class MovementDispatcher extends Module {
   }
 
   @PacketSubscription(
-      priority = ListenerPriority.LOWEST,
-      packetsOut = {
-          ENTITY_METADATA
-      }
+    priority = ListenerPriority.LOWEST,
+    packetsOut = {
+      ENTITY_METADATA
+    }
   )
   public void receiveElytraUpdate(PacketEvent event) {
     Player player = event.getPlayer();
@@ -891,10 +865,10 @@ public final class MovementDispatcher extends Module {
     List<WrappedWatchableObject> watchableObjects = reader.metadataObjects();
 
     WrappedWatchableObject elytraObject = watchableObjects
-        .stream()
-        .filter(wrappedWatchableObject -> wrappedWatchableObject.getIndex() == 0)
-        .findFirst()
-        .orElse(null);
+      .stream()
+      .filter(wrappedWatchableObject -> wrappedWatchableObject.getIndex() == 0)
+      .findFirst()
+      .orElse(null);
 
     if (elytraObject == null) {
       reader.release();
@@ -946,11 +920,11 @@ public final class MovementDispatcher extends Module {
   }
 
   @PacketSubscription(
-      priority = ListenerPriority.MONITOR,
-      prioritySlot = PrioritySlot.EXTERNAL,
-      packetsOut = {
-          ENTITY_VELOCITY
-      }
+    priority = ListenerPriority.MONITOR,
+    prioritySlot = PrioritySlot.EXTERNAL,
+    packetsOut = {
+      ENTITY_VELOCITY
+    }
   )
   public void sentVelocityPacket(PacketEvent event) {
     Player player = event.getPlayer();
@@ -959,9 +933,9 @@ public final class MovementDispatcher extends Module {
 
     if (packet.getIntegers().readSafely(0) == player.getEntityId()) {
       Vector velocity = new Vector(
-          integers.readSafely(1) / 8000d,
-          integers.readSafely(2) / 8000d,
-          integers.readSafely(3) / 8000d
+        integers.readSafely(1) / 8000d,
+        integers.readSafely(2) / 8000d,
+        integers.readSafely(3) / 8000d
       );
       if (IntaveControl.DEBUG_VELOCITY_RECEIVE) {
         player.sendMessage("§a" + MathHelper.formatMotion(velocity));
@@ -1071,8 +1045,8 @@ public final class MovementDispatcher extends Module {
           movement.shulkerDataHashCodeAccess.putIfAbsent(positionHash, box);
         }
         double distanceToShulker = MathHelper.distanceOf(
-            movement.positionX, movement.positionY, movement.positionZ,
-            blockPosition.getX() + 0.5, blockPosition.getY() + 0.5, blockPosition.getZ() + 0.5
+          movement.positionX, movement.positionY, movement.positionZ,
+          blockPosition.getX() + 0.5, blockPosition.getY() + 0.5, blockPosition.getZ() + 0.5
         );
         if (distanceToShulker <= 4) {
           movement.lowestShulkerY = Math.min(movement.lowestShulkerY, blockPosition.getY());
@@ -1153,6 +1127,26 @@ public final class MovementDispatcher extends Module {
   }
 
   @PacketSubscription(
+    packetsIn = {
+      USE_ITEM, BLOCK_DIG
+    }
+  )
+  public void receiveUseItem(
+    User user, BlockPositionReader reader
+  ) {
+    Material heldType = user.meta().inventory().heldItemType();
+    Material offhandType = user.meta().inventory().offhandItemType();
+    if (heldType != Material.AIR || offhandType != Material.AIR) {
+      user.meta().movement().awaitClickMovementSkip = true;
+      if (DEBUG_MOVEMENT_IGNORE) {
+        Synchronizer.synchronize(() -> {
+          user.player().sendMessage("Item Usage Tick");
+        });
+      }
+    }
+  }
+
+  @PacketSubscription(
     priority = ListenerPriority.HIGH,
     packetsIn = {
       ENTITY_ACTION_IN
@@ -1185,6 +1179,7 @@ public final class MovementDispatcher extends Module {
         if (System.currentTimeMillis() - punishmentData.timeLastSneakToggleCancel < 2000) {
           cancelable.setCancelled(true);
         }
+        movementData.pastVehicleExitTicks = 0;
         if (movementData.isInVehicle()) {
           movementData.dismountRidingEntity("Sneak exit");
           movementData.sneaking = false;
@@ -1221,5 +1216,64 @@ public final class MovementDispatcher extends Module {
 
   private boolean allowSprinting(User user) {
     return !user.meta().inventory().inventoryOpen();
+  }
+
+  public static void applyVelocitySuperposition(User user, Motion velocity) {
+    MetadataBundle meta = user.meta();
+    MovementMetadata movementData = meta.movement();
+    ViolationMetadata violationLevelData = meta.violationLevel();
+
+    movementData.pastExternalVelocityResetCache = movementData.pastExternalVelocity;
+    movementData.baseMotionXBeforeVelocityResetCache = movementData.baseMotionXBeforeVelocity;
+    movementData.baseMotionYBeforeVelocityResetCache = movementData.baseMotionYBeforeVelocity;
+    movementData.baseMotionZBeforeVelocityResetCache = movementData.baseMotionZBeforeVelocity;
+    movementData.baseMotionXResetCache = movementData.baseMotionX;
+    movementData.baseMotionYResetCache = movementData.baseMotionY;
+    movementData.baseMotionZResetCache = movementData.baseMotionZ;
+    movementData.willReceiveSetbackVelocityResetCache = movementData.willReceiveSetbackVelocity;
+
+    if (!violationLevelData.isInActiveTeleportBundle) {
+      movementData.baseMotionXBeforeVelocity = movementData.baseMotionX;
+      movementData.baseMotionYBeforeVelocity = movementData.baseMotionY;
+      movementData.baseMotionZBeforeVelocity = movementData.baseMotionZ;
+      movementData.baseMotionX = velocity.motionX();
+      movementData.baseMotionY = velocity.motionY();
+      movementData.baseMotionZ = velocity.motionZ();
+//      user.player().sendMessage("Applied velocity " + velocity);
+      movementData.lastVelocity = new Vector(velocity.motionX(), velocity.motionY(), velocity.motionZ());
+    }
+  }
+
+  public static void collapseVelocitySuperposition(User user, @Nullable Motion velocity) {
+    if (velocity != null) {
+      MetadataBundle meta = user.meta();
+      MovementMetadata movementData = meta.movement();
+      Synchronizer.synchronize(() -> movementData.emulationVelocity = null);
+      movementData.pastVelocity = 0;
+      movementData.pendingVelocityPackets.decrementAndGet();
+      if (!movementData.willReceiveSetbackVelocity) {
+        movementData.pastExternalVelocity = 0;
+      }
+      movementData.willReceiveSetbackVelocity = false;
+//      user.player().sendMessage("Collapsed velocity " + velocity);
+//      if (!movementData.willReceiveSetbackVelocity) {
+//        movementData.pastExternalVelocity = 0;
+//      }
+//      movementData.willReceiveSetbackVelocity = false;
+    }
+  }
+
+  public static void resetVelocitySuperposition(User user) {
+    MetadataBundle meta = user.meta();
+    MovementMetadata movementData = meta.movement();
+
+    movementData.pastExternalVelocity = movementData.pastExternalVelocityResetCache;
+    movementData.baseMotionXBeforeVelocity = movementData.baseMotionXBeforeVelocityResetCache;
+    movementData.baseMotionYBeforeVelocity = movementData.baseMotionYBeforeVelocityResetCache;
+    movementData.baseMotionZBeforeVelocity = movementData.baseMotionZBeforeVelocityResetCache;
+    movementData.baseMotionX = movementData.baseMotionXResetCache;
+    movementData.baseMotionY = movementData.baseMotionYResetCache;
+    movementData.baseMotionZ = movementData.baseMotionZResetCache;
+    movementData.willReceiveSetbackVelocity = movementData.willReceiveSetbackVelocityResetCache;
   }
 }

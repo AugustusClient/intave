@@ -14,6 +14,7 @@ public final class BlockPositionConverter {
 
   private static Constructor<?> blockPositionConstructor;
   private static StructureModifier<Integer> intModifier;
+  private static StructureModifier<Long> longModifier;
 
   public static EquivalentConverter<BlockPosition> threadConverter() {
     return internalConverter.get();

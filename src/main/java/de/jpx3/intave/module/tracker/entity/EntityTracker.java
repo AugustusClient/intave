@@ -51,6 +51,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import static de.jpx3.intave.module.feedback.FeedbackOptions.APPEND_ON_OVERFLOW;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.POSITION;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
 import static de.jpx3.intave.module.linker.packet.PacketId.Server.*;
@@ -66,6 +67,7 @@ public final class EntityTracker extends Module {
    */
   private final EntityTypeResolver entityTypeResolver;
   private final PeriodicEntityCoverageSelector coverageSelector;
+//  private final PeriodicTickedEntitySelector tickedEntitySelector;
 
   private final boolean NEW_POSITION_PROCESSING_1_9 = MinecraftVersions.VER1_9_0.atOrAbove();
 
@@ -80,16 +82,19 @@ public final class EntityTracker extends Module {
       .withEntityAdditionListener(this::nayoroEntitySpawn)
       .withEntityRemovalListener(this::nayoroEntityDespawn)
       .build();
+//    this.tickedEntitySelector = new PeriodicTickedEntitySelector(50);
   }
 
   @Override
   public void enable() {
     coverageSelector.enableTask();
+//    tickedEntitySelector.enableTask();
   }
 
   @Override
   public void disable() {
     coverageSelector.disableTask();
+//    tickedEntitySelector.disableTask();
   }
 
   @PacketSubscription(
@@ -101,7 +106,6 @@ public final class EntityTracker extends Module {
   public void sendAttachEntityPacket(PacketEvent event) {
     PacketContainer packet = event.getPacket();
     Player player = event.getPlayer();
-
     if (event.getPacketType() == PacketType.Play.Server.MOUNT) {
       //1.9+ servers
       int[] entityIDs = event.getPacket().getIntegerArrays().read(0);
@@ -117,7 +121,6 @@ public final class EntityTracker extends Module {
       if (type == 0) {
         int entityID = packet.getIntegers().read(1);
         int vehicleEntityID = packet.getIntegers().read(2);
-
         processAttachEntity(player, entityID, vehicleEntityID);
       }
     }
@@ -135,12 +138,18 @@ public final class EntityTracker extends Module {
       // Another entity
       if (vehicleEntityID == -1) {
         // when an entity dismounts
-        user.tickFeedback(sittingEntity::unmountFromEntity);
+        user.tickFeedback(() -> {
+          sittingEntity.unmountFromEntity();
+          connection.noteDismount(entityID);
+        });
       } else {
         // mounts on entity
         Entity sittingOnEntity = connection.entityBy(vehicleEntityID);
         if (sittingOnEntity != null) {
-          user.tickFeedback(() -> sittingEntity.mountToEntity(sittingOnEntity));
+          user.tickFeedback(() -> {
+            sittingEntity.mountToEntity(sittingOnEntity);
+            connection.noteMount(entityID, vehicleEntityID);
+          });
         } else {
           if (IntaveControl.DISABLE_LICENSE_CHECK) {
             IntaveLogger.logger().error(String.format("mounted On Entity with id %d could not be found", vehicleEntityID));
@@ -158,7 +167,7 @@ public final class EntityTracker extends Module {
       Entity finalTarget = target;
       user.tickFeedback(() -> {
         if (movementData.isInVehicle()) {
-          movementData.dismountRidingEntity("Override");
+          movementData.dismountRidingEntity("Override", false);
         }
         if (finalTarget != null && !(finalTarget instanceof Entity.Destroyed)) {
           movementData.setVehicle(finalTarget);
@@ -384,7 +393,17 @@ public final class EntityTracker extends Module {
       PacketSender.sendServerPacket(player, packet);
     }
 
-    connection.destroyEntity(entityId);
+    connection.markForDeletion(entityId);
+
+    Synchronizer.synchronize(() -> {
+      user.tickFeedback(() -> {
+        Synchronizer.synchronize(() -> {
+          user.tickFeedback(() -> {
+            connection.removeEntityIfMarked(entityId);
+          }, APPEND_ON_OVERFLOW);
+        });
+      }, APPEND_ON_OVERFLOW);
+    });
 
     if (entity != null) {
       StaticEntityCollisions.enterEntityDespawn(user, entity);
@@ -393,15 +412,17 @@ public final class EntityTracker extends Module {
     if (attackData.lastAttackedEntity() != null && attackData.lastAttackedEntityID() == entityId) {
       attackData.nullifyLastAttackedEntity();
     }
+
     if (NEW_POSITION_PROCESSING_1_9) {
-      for (Entity entityShade : connection.entities()) {
-        if (entityShade.mountedEntity() != null) {
-          if (entityShade.mountedEntity().entityId() == entityId) {
-            entityShade.unmountFromEntity();
-          }
+      Integer sitter = connection.sittingOn(entityId);
+      if (sitter != null) {
+        Entity sitterEntity = connection.entityBy(sitter);
+        if (sitterEntity != null) {
+          sitterEntity.unmountFromEntity();
         }
       }
     }
+
     if (IntaveControl.DEBUG_ENTITY_TRACKING) {
       Synchronizer.synchronize(() -> {
         Player target = user.player();
@@ -428,11 +449,11 @@ public final class EntityTracker extends Module {
     if (movementData.lastTeleport == 0) {
       return;
     }
-    for (Entity value : synchronizeData.entities()) {
-      int ticksAfterPositionChange = value.position.newPosRotationIncrements;
-      value.onUpdate();
-      if (value.tracingEnabled() && ticksAfterPositionChange > 0) {
-        nayoroEntityPositionUpdate(player, value);
+    for (Entity entity : synchronizeData.entities()) {
+      int ticksAfterPositionChange = entity.position.newPosRotationIncrements;
+      entity.onUpdate();
+      if (entity.tracingEnabled() && ticksAfterPositionChange > 0) {
+        nayoroEntityPositionUpdate(player, entity);
       }
     }
   }

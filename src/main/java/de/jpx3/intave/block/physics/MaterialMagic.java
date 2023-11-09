@@ -1,6 +1,7 @@
 package de.jpx3.intave.block.physics;
 
 import de.jpx3.intave.annotate.refactoring.IdoNotBelongHere;
+import de.jpx3.intave.block.fluid.Fluids;
 import de.jpx3.intave.block.type.BlockTypeAccess;
 import org.bukkit.Material;
 
@@ -8,7 +9,7 @@ import org.bukkit.Material;
 public final class MaterialMagic {
   public static boolean blocksMovement(Material material) {
     // Liquids don't block movement
-    if (isLiquid(material)) {
+    if (isLavaOrWater(material)) {
       return false;
     }
     if (material == BlockTypeAccess.WEB) {
@@ -20,7 +21,7 @@ public final class MaterialMagic {
 
   public static boolean blockSolid(Material material) {
     // Liquids aren't solid
-    if (isLiquid(material) || material.isTransparent()) {
+    if (isLavaOrWater(material) || material.isTransparent()) {
       return false;
     }
     // Materials of MaterialLogic and MaterialTransparent override isSolid() with "false"
@@ -84,20 +85,26 @@ public final class MaterialMagic {
 
   private static final Material STATIONARY_WATER = Material.getMaterial("STATIONARY_WATER");
   private static final Material STATIONARY_LAVA = Material.getMaterial("STATIONARY_LAVA");
-  private static final Material TALL_SEAGRASS = Material.getMaterial("TALL_SEAGRASS");
-  private static final Material SEA_GRASS = Material.getMaterial("SEA_GRASS");
-  private static final Material KELP_PLANT = Material.getMaterial("KELP_PLANT");
+//  private static final Material TALL_SEAGRASS = Material.getMaterial("TALL_SEAGRASS");
+//  private static final Material SEA_GRASS = Material.getMaterial("SEA_GRASS");
+//  private static final Material KELP_PLANT = Material.getMaterial("KELP_PLANT");
 
-  @Deprecated
-  public static boolean isLiquid(Material material) {
+  public static boolean isLavaOrWater(Material material) {
     return isLava(material) || isWater(material);
   }
 
-  public static boolean isLiquidOrSeaBlock(Material material) {
+  public static boolean couldContainLiquid(Material material) {
     if (material == null) {
       return false;
     }
-    return isLiquid(material) || material == TALL_SEAGRASS || material == SEA_GRASS || material == KELP_PLANT;
+    return isLavaOrWater(material) || Fluids.canContainFluid(material);
+  }
+
+  public static boolean couldContainLiquid(Material material, int variantIndex) {
+    if (material == null) {
+      return false;
+    }
+    return isLavaOrWater(material) || Fluids.isFluid(material, variantIndex);
   }
 
   public static boolean isLava(Material material) {

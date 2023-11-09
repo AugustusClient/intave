@@ -9,7 +9,6 @@ import de.jpx3.intave.block.collision.Collision;
 import de.jpx3.intave.block.shape.BlockShape;
 import de.jpx3.intave.block.type.BlockTypeAccess;
 import de.jpx3.intave.check.movement.Physics;
-import de.jpx3.intave.check.movement.physics.MovementCharacteristics;
 import de.jpx3.intave.check.movement.physics.Pose;
 import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.klass.Lookup;
@@ -27,10 +26,7 @@ import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.MetadataBundle;
 import de.jpx3.intave.user.meta.MovementMetadata;
 import de.jpx3.intave.user.meta.ViolationMetadata;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -42,6 +38,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static de.jpx3.intave.math.MathHelper.minmax;
+import static de.jpx3.intave.share.ClientMath.floor;
 import static de.jpx3.intave.share.Direction.Axis.*;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.NETHER_PORTAL;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.UNKNOWN;
@@ -403,8 +400,28 @@ public final class SetbackSimulator extends Module {
     }
     motionX *= multiplier;
     motionZ *= multiplier;
+
     if (applyPhysics) {
-      if (movementData.inWeb || /* manual check */ VolatileBlockAccess.typeAccess(user, movementData.position().toLocation(player.getWorld())) == BlockTypeAccess.WEB) {
+      int blockPositionStartX = floor(boundingBox.minX + 0.001);
+      int blockPositionStartY = floor(boundingBox.minY + 0.001);
+      int blockPositionStartZ = floor(boundingBox.minZ + 0.001);
+      int blockPositionEndX = floor(boundingBox.maxX - 0.001);
+      int blockPositionEndY = floor(boundingBox.maxY - 0.001);
+      int blockPositionEndZ = floor(boundingBox.maxZ - 0.001);
+
+      boolean manualWebCheck = false;
+      for (int x = blockPositionStartX; x <= blockPositionEndX; x++) {
+        for (int y = blockPositionStartY; y <= blockPositionEndY; y++) {
+          for (int z = blockPositionStartZ; z <= blockPositionEndZ; z++) {
+            Material material = VolatileBlockAccess.typeAccess(user, x, y, z);
+            if (material == BlockTypeAccess.WEB) {
+              manualWebCheck = true;
+            }
+          }
+        }
+      }
+
+      if (movementData.inWeb || /* manual check */ manualWebCheck) {
         motionX *= 0.25D;
         motionY *= 0.25f;
         motionZ *= 0.25D;
@@ -448,7 +465,7 @@ public final class SetbackSimulator extends Module {
     Player player = user.player();
     World world = player.getWorld();
     MovementMetadata movementData = user.meta().movement();
-    movementData.inWater = MovementCharacteristics.isAnyLiquid(world, user, movementData.boundingBox());
+    movementData.inWater = Collision.rasterizedLiquidPresentSearch(user, movementData.boundingBox());
   }
 
   private synchronized void rotationlessTeleport(Player player, Location to, float nativeYaw, float nativePitch) {

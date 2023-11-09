@@ -210,6 +210,20 @@ public final class PacketSubscriptionLinker extends Module {
       return packetType == PacketType.Play.Server.MAP_CHUNK ||
         packetType == PacketType.Play.Server.MAP_CHUNK_BULK;
     }
+
+//    if (
+//      packetType == PacketType.Play.Client.WINDOW_CLICK ||
+//        packetType == PacketType.Play.Client.CUSTOM_PAYLOAD ||
+//        packetType == PacketType.Play.Client.CLOSE_WINDOW ||
+//        packetType == PacketType.Play.Client.CLIENT_COMMAND ||
+////        packetType == PacketType.Play.Server.WINDOW_DATA ||
+//        packetType == PacketType.Play.Server.WINDOW_ITEMS ||
+//        packetType == PacketType.Play.Server.OPEN_WINDOW ||
+//        packetType == PacketType.Play.Server.CLOSE_WINDOW
+//    ) {
+//      return true;
+//    }
+
     return false;
   }
 
@@ -238,8 +252,11 @@ public final class PacketSubscriptionLinker extends Module {
   }
 
   private boolean matches(PacketType packetType, String name) {
-    return packetType.name().equalsIgnoreCase(name);
+    return packetType.name() != null && packetType.name().equalsIgnoreCase(name);
   }
+
+  private static final ThreadLocal<Map<Integer, Object[]>> argumentCache = ThreadLocal.withInitial(HashMap::new);
+  private static final ThreadLocal<Map<Integer, Boolean>> argumentLocks = ThreadLocal.withInitial(HashMap::new);
 
   private PacketSubscriptionMethodExecutor assembleSubscriptionMethodCaller(
     PacketEventSubscriber target,
@@ -276,13 +293,18 @@ public final class PacketSubscriptionLinker extends Module {
       int packetEventParameterPosition = findParameterPosition(parameterTypes, PacketEvent.class);
       int packetTypeParameterPosition = findParameterPosition(parameterTypes, PacketType.class);
 
-//      System.out.println(target.getClass().getSimpleName() + " " +calledMethod.getName());
-//      System.out.println(playerParameterIndex + " " + userParameterPosition + " " + cancelableParameterPosition + " " + packetContainerParameterPosition + " " + packetReaderParameterPosition + " " + packetEventParameterPosition + " " + packetTypeParameterPosition);
-
       return (subscriber, event) -> {
         Player player = event.getPlayer();
 
-        Object[] arguments = new Object[length];
+        Map<Integer, Boolean> locks = argumentLocks.get();
+        Boolean isLocked = locks.get(length);
+        if (isLocked == null) {
+          locks.put(length, true);
+          isLocked = false;
+        }
+
+        Object[] arguments = isLocked ? new Object[length] : argumentCache.get().computeIfAbsent(length, x -> new Object[length]);
+
         if (playerParameterIndex != -1) {
           arguments[playerParameterIndex] = player;
         }
@@ -315,6 +337,11 @@ public final class PacketSubscriptionLinker extends Module {
 
         if (packetReader != null) {
           packetReader.releaseSafe();
+        }
+
+        if (!isLocked) {
+          locks.put(length, false);
+          Arrays.fill(arguments, null);
         }
       };
     }

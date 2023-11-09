@@ -131,7 +131,7 @@ public final class RotationAccuracyYawHeuristic extends MetaCheckPart<Heuristics
           parentCheck().saveAnomaly(player, anomaly);
           heuristicMeta.balanceYawAccuracyOther = 0;
           //dmc19
-          user.nerf(AttackNerfStrategy.HT_LIGHT, "19");
+//          user.nerf(AttackNerfStrategy.HT_LIGHT, "19");
         }
       }
     }

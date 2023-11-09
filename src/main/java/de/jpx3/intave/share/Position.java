@@ -15,6 +15,10 @@ public final class Position extends Vector implements Serializable {
     super(xCoordinate, yCoordinate, zCoordinate);
   }
 
+  public static Position of(int blockX, int blockY, int blockZ) {
+    return new Position(blockX, blockY, blockZ);
+  }
+
   public boolean hasNaNCoordinate() {
     return Double.isNaN(x) || Double.isNaN(y) || Double.isNaN(z);
   }
@@ -36,6 +40,11 @@ public final class Position extends Vector implements Serializable {
     double deltaY = this.y - y;
     double deltaZ = this.z - z;
     return Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+  }
+
+  @Override
+  public String toString() {
+    return "(" + x + ", " + y + ", " + z + ")";
   }
 
   @Override

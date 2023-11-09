@@ -400,11 +400,19 @@ public final class IntavePlugin extends JavaPlugin {
           connection.setConnectTimeout(2000);
           connection.setReadTimeout(2000);
           connection.connect();
+
+          if (IntaveControl.AUTHENTICATION_DEBUG_MODE) {
+            System.out.println("Requesting authentication from " + path);
+          }
+
           Scanner scanner2 = new Scanner(connection.getInputStream(), "UTF-8");
           StringBuilder raw2 = new StringBuilder();
           while (scanner2.hasNext())
             raw2.append(scanner2.next());
           response = raw2.toString();
+          if (IntaveControl.AUTHENTICATION_DEBUG_MODE) {
+            System.out.println("Response: " + response);
+          }
           if ("timeout".equalsIgnoreCase(response)) {
             response += "_";
           }
@@ -691,6 +699,7 @@ public final class IntavePlugin extends JavaPlugin {
       WrapperConverter.setup();
       Raytracing.setup();
       Fluids.setup();
+
       VolatileBlockAccess.setup();
       BlockAccess.setup();
       BlockInteractionAccess.setup();
@@ -816,8 +825,8 @@ public final class IntavePlugin extends JavaPlugin {
     Plugin viaBackwards = Bukkit.getPluginManager().getPlugin("ViaBackwards");
     if (viaBackwards != null) {
       if (!viaBackwards.getConfig().getBoolean("handle-pings-as-inv-acknowledgements", false)) {
-        logger.warn("ViaBackwards is not configured to replace ping packets with inventory acknowledgement packets");
-        logger.warn("This will lead to incorrect, feedback-related disconnects");
+        logger.warn("ViaBackwards is misconfigured, causing false-positives and fault kicks");
+        logger.warn("Go to plugins/ViaBackwards/config.yml and set \"handle-pings-as-inv-acknowledgements\" to TRUE");
       }
     }
 
@@ -846,13 +855,16 @@ public final class IntavePlugin extends JavaPlugin {
     enforceDisabled.put("Debug SK is enabled", SIBYL_ALLOW_ALL);
     enforceDisabled.put("Heuristic debugging is enabled", DEBUG_HEURISTICS);
     enforceDisabled.put("Movement debugging is enabled", DEBUG_MOVEMENT);
+    enforceDisabled.put("Interaction debugging is enabled", DEBUG_INTERACTION);
+    enforceDisabled.put("CM debugging is enabled", DEBUG_CMS);
     enforceDisabled.put("Red trustfactor is enabled globally", APPLY_GLOBAL_LOW_TRUSTFACTOR);
-    enforceDisabled.put("Blockplacements are deactivated", DISALLOW_ALL_BLOCK_PLACEMENTS);
+    enforceDisabled.put("Block-placements are deactivated", DISALLOW_ALL_BLOCK_PLACEMENTS);
+    enforceDisabled.put("Hitboxes are dumped on right-click", DUMP_BLOCK_HITBOX_ON_RIGHT_CLICK);
 
     for (Map.Entry<String, Boolean> entry : enforceDisabled.entrySet()) {
       if (entry.getValue()) {
         logger.warn(entry.getKey());
-        if (!DISABLE_LICENSE_CHECK || GOMME_MODE) {
+        if (!DISABLE_LICENSE_CHECK /*|| GOMME_MODE*/) {
           throw new IllegalStateException(entry.getKey() + ", but license check is disabled");
         }
       }

@@ -62,6 +62,7 @@ public final class PacketReaders {
     setup(UPDATE_ATTRIBUTES, EntityReader::new);
     setup(UPDATE_ENTITY_NBT, EntityReader::new);
     setup(USE_BED, EntityReader::new);
+    setup(WINDOW_ITEMS, WindowItemsReader::new);
 
     setup(ABILITIES_IN, AbilityInReader::new);
     setup(BLOCK_DIG, BlockPositionReader::new);
@@ -71,8 +72,8 @@ public final class PacketReaders {
     setup(USE_ITEM, BlockInteractionReader::new);
     setup(USE_ENTITY, EntityUseReader::new);
     setup(WINDOW_ITEMS, WindowBulkItemReader::new);
-    setup(SET_SLOT, WindowSingleItemReader::new);
     setup(WINDOW_CLICK, WindowClickReader::new);
+    setup(SET_SLOT, WindowSingleItemReader::new);
 
     // for some
   }
@@ -106,7 +107,7 @@ public final class PacketReaders {
   }
 
   private static boolean matches(PacketType packetType, String name) {
-    return packetType.name().equalsIgnoreCase(name);
+    return packetType != null && packetType.name() != null && packetType.name().equalsIgnoreCase(name);
   }
 
   public static <T extends PacketReader> T readerOf(PacketContainer container) {
