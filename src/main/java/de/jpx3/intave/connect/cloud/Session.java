@@ -39,6 +39,7 @@ public final class Session {
   private ProtocolSpecification protocol = new ProtocolSpecification();
   private final Queue<Packet<Serverbound>> pendingOutgoing = new ArrayDeque<>();
   private final Queue<Packet<Clientbound>> pendingIncoming = new ArrayDeque<>();
+  private final List<Consumer<Void>> startupSubscribers = new ArrayList<>();
   private final List<Consumer<Session>> shutdownSubscribers = new ArrayList<>();
 
   private PublicKey serverPublicKey;
@@ -47,6 +48,8 @@ public final class Session {
   private Key primaryKey;
   private byte[] verifyBytes;
 //  private Key aesKey;
+
+  private boolean started;
 
   private final LongAdder receivedBytes = new LongAdder();
   private final LongAdder sentBytes = new LongAdder();
@@ -222,6 +225,20 @@ public final class Session {
   public boolean canSend(Class<? extends Packet<Serverbound>> packetClass) {
     return channel != null && channel.isActive() &&
       protocol.packetAvailable(SERVERBOUND, PacketRegistry.serverboundName(packetClass));
+  }
+
+  public void subscribeToStarted(Consumer<Void> consumer) {
+    if (started) {
+      consumer.accept(null);
+    } else {
+      startupSubscribers.add(consumer);
+    }
+  }
+
+  public void markStarted() {
+    started = true;
+    startupSubscribers.forEach(subscriber -> subscriber.accept(null));
+    startupSubscribers.clear();
   }
 
   public void subscribeToShutdown(Consumer<Session> consumer) {

@@ -135,7 +135,7 @@ tasks.register<RunServer>("authtest") {
   minecraftVersion("1.8.8")
   runDirectory(File("runs/authtest"))
   jvmArgs("-Dcom.mojang.eula.agree=true")
-  jvmArgs("-Dintave.test.success=shutdown")
+//  jvmArgs("-Dintave.test.success=shutdown")
   javaLauncher.set(
     project.javaToolchains.launcherFor {
       // Sets the JDK version for the Minecraft server, Intave is still built using Java

@@ -68,6 +68,7 @@ public final class HandshakeReceiver extends ChannelInboundHandlerAdapter implem
       session.setEncryption(downDecryptCipher, upEncryptCipher);
 
       session.setProcessor(new StandardClientRetriever(session));
+      session.markStarted();
     });
   }
 

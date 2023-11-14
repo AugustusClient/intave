@@ -560,10 +560,10 @@ public final class IntavePlugin extends JavaPlugin {
             String domain = split1[0];
             int port = Integer.parseInt(split1[1]);
             String token = split1[2];
-
             String[] tokenSplit = token.split("\\.");
-
             byte[] tokenBytes = Base64.getUrlDecoder().decode(tokenSplit[0]);
+//            System.out.println("Token: " + tokenSplit[0]);
+//            System.out.println("Token bytes: " + Arrays.toString(tokenBytes));
             long validUntil = Long.parseLong(tokenSplit[1]);
             cloud.setMasterShard(
               domain, port,

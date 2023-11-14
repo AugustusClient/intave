@@ -328,15 +328,19 @@ public final class ViolationProcessor extends Module {
       LogTransmittor logTransmittor = IntavePlugin.singletonInstance().logTransmittor();
       logTransmittor.addPlayerLog(player, "(EXE) " + command);
 
-      plugin.logger().commandExecution(command);
-
       if (command.contains("{log-id}")) {
         logTransmittor.awaitLogIdOf(player, logId -> {
           String commandWithLogId = command.replace("{log-id}", logId);
-          Bukkit.dispatchCommand(Bukkit.getConsoleSender(), commandWithLogId);
+          Synchronizer.synchronize(() -> {
+            plugin.logger().commandExecution(commandWithLogId);
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), commandWithLogId);
+          });
         });
+      } else {
+
+        plugin.logger().commandExecution(command);
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
       }
-      Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
     });
   }
 

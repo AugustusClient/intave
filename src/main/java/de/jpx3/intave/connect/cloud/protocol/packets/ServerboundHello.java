@@ -1,9 +1,9 @@
 package de.jpx3.intave.connect.cloud.protocol.packets;
 
-import de.jpx3.intave.connect.cloud.protocol.listener.Serverbound;
 import de.jpx3.intave.connect.cloud.protocol.BinaryPacket;
 import de.jpx3.intave.connect.cloud.protocol.PacketSpecification;
 import de.jpx3.intave.connect.cloud.protocol.Token;
+import de.jpx3.intave.connect.cloud.protocol.listener.Serverbound;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -33,7 +33,7 @@ public final class ServerboundHello extends BinaryPacket<Serverbound> {
     Map<String, ? extends PacketSpecification> serverboundProtocol
   ) {
     super(SERVERBOUND, "HELLO", "0");
-    this.shardToken = new Token();
+    this.shardToken = token;
     this.supportedEncryptionAlgorithms = supportedEncryptionAlgorithms;
     this.supportedEncryptionKeySizes = supportedEncryptionKeySizes;
     this.supportedCompressionAlgorithms = supportedCompressionAlgorithms;

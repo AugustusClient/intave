@@ -69,6 +69,8 @@ public final class Cloud {
     if (cloudConfig.isEnabled()) {
       openSession(shardCache.masterShard());
       ShutdownTasks.add(this::disable);
+    } else {
+      IntaveLogger.logger().info("Cloud is disabled");
     }
   }
 
@@ -89,9 +91,12 @@ public final class Cloud {
     Session session = new Session(shard, this);
     session.init(success -> {
       if (success) {
-        reconnectAttempts.put(shard, 0);
-        IntaveLogger.logger().info("Connected to " + shard);
-        setTrustAndStorage();
+        IntaveLogger.logger().info("Authenticating with " + shard + "..");
+        session.subscribeToStarted(unused -> {
+          reconnectAttempts.remove(shard);
+          IntaveLogger.logger().info("Connected to " + shard);
+          setTrustAndStorage();
+        });
       } else {
         // called on failure or connection closure
         int attempts = reconnectAttempts.getOrDefault(shard, 0);
@@ -269,6 +274,9 @@ public final class Cloud {
   }
 
   public void trustfactorRequest(Player player, Consumer<TrustFactor> callback) {
+    if (!available()) {
+      return;
+    }
     UUID key = player.getUniqueId();
     Request<TrustFactor> request = trustfactorRequests.get(key);
     if (request == null) {
@@ -287,6 +295,9 @@ public final class Cloud {
   }
 
   public void storageRequest(UUID id, Consumer<ByteBuffer> callback) {
+    if (!available()) {
+      return;
+    }
     Request<ByteBuffer> request = storageRequests.get(id);
     if (request == null) {
       request = new Request<>();

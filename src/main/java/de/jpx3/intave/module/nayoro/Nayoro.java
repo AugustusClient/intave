@@ -151,6 +151,22 @@ public final class Nayoro extends Module {
     }
   }
 
+  public synchronized void pushSink(User user, EventSink sink) {
+    localRecordingLock.lock();
+    try {
+      if (!Bukkit.isPrimaryThread()) {
+        Synchronizer.synchronize(() -> pushSink(user, sink));
+        return;
+      }
+      if (!COMBAT_SAMPLING || !recordingActiveFor(user)) {
+        return;
+      }
+      eventSinks.get(user).add(sink);
+    } finally {
+      localRecordingLock.unlock();
+    }
+  }
+
   public synchronized void disableRecordingFor(User user) {
     localRecordingLock.lock();
     try {

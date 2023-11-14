@@ -3,7 +3,6 @@ package de.jpx3.intave.module.nayoro;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import de.jpx3.intave.check.movement.physics.Pose;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketEventSubscriber;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
@@ -18,7 +17,6 @@ import de.jpx3.intave.packet.reader.WindowClickReader;
 import de.jpx3.intave.packet.reader.WindowItemReader;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
-import de.jpx3.intave.user.meta.InventoryMetadata;
 import de.jpx3.intave.user.meta.MovementMetadata;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -27,7 +25,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static de.jpx3.intave.check.movement.physics.Simulators.ELYTRA;
+import static de.jpx3.intave.module.linker.packet.ListenerPriority.LOWEST;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
 import static de.jpx3.intave.module.linker.packet.PacketId.Server.SET_SLOT;
 import static de.jpx3.intave.module.linker.packet.PacketId.Server.WINDOW_ITEMS;
@@ -52,6 +50,7 @@ public final class PacketEventDispatch implements PacketEventSubscriber {
   }
 
   @PacketSubscription(
+    priority = LOWEST,
     packetsIn = {
       USE_ENTITY
     }
