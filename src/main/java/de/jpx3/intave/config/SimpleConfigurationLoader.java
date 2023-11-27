@@ -32,7 +32,6 @@ public final class SimpleConfigurationLoader implements ConfigurationLoader {
       simpleConfig, cache, conversionData
     );
     converter.convert();
-    YamlConfiguration config = YamlConfiguration.loadConfiguration(new InputStreamReader(cache.read()));
-    return config;
+    return YamlConfiguration.loadConfiguration(new InputStreamReader(cache.read()));
   }
 }

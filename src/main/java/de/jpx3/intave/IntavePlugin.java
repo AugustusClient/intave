@@ -1165,6 +1165,9 @@ public final class IntavePlugin extends JavaPlugin {
   @Native
   public void performShutdown() {
     logger.info("Stopping Intave");
+    try {
+      configService.shutdown();
+    } catch (Exception ignored) {}
     Bukkit.getScheduler().cancelTasks(this);
     ShutdownTasks.runAll();
     BackgroundExecutors.stopAllBlocking();

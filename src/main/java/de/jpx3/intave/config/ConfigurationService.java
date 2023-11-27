@@ -3,7 +3,7 @@ package de.jpx3.intave.config;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 public class ConfigurationService {
-  private ConfigSelectionResolver resolver = new ConfigSelectionResolver();
+  private final ConfigSelectionResolver resolver = new ConfigSelectionResolver();
   private ConfigurationLoader loader;
   private YamlConfiguration configuration;
 

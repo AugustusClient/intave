@@ -75,8 +75,7 @@ public final class SimpleToAdvancedConfigConverter {
         }
         keys.put(height, key);
         return Collections.singletonList(s);
-      }
-      else if (s.trim().startsWith("-")) {
+      } else if (s.trim().startsWith("-")) {
         int height = 0;
         for (int i = 0; i < s.length(); i+=2) {
           if (s.charAt(i) == ' ') {
@@ -121,7 +120,7 @@ public final class SimpleToAdvancedConfigConverter {
           }
         }
         StringBuilder fullPath = new StringBuilder();
-        for (int i = 0; i < height + 1; i++) {
+        for (int i = 0; i < height; i++) {
           fullPath.append(keys.get(i)).append(".");
         }
         fullPath.append(key.trim());
@@ -135,7 +134,7 @@ public final class SimpleToAdvancedConfigConverter {
           }
         }
         StringBuilder indentation = new StringBuilder();
-        for (int i = 0; i < height - 1; i++) {
+        for (int i = 0; i < height; i++) {
           indentation.append("  ");
         }
         if (replacement == null) {

@@ -127,7 +127,7 @@ public interface Resource extends LegacyResource {
     return collectLines(Collectors.toList());
   }
 
-  default void replaceLines(Function<String, List<String>> lineReplacer) {
+  default void replaceLines(Function<? super String, ? extends List<String>> lineReplacer) {
     List<String> lines = readLines();
     List<String> newLines = new ArrayList<>();
     for (String line : lines) {
