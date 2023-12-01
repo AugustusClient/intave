@@ -60,7 +60,8 @@ public final class PacketEventDispatch implements PacketEventSubscriber {
     User user = UserRepository.userOf(player);
     PacketContainer packet = event.getPacket();
     EntityUseReader packetReader = PacketReaders.readerOf(packet);
-    if (packetReader.useAction() == EnumWrappers.EntityUseAction.ATTACK) {
+    EnumWrappers.EntityUseAction useAction = packetReader.useAction();
+    if (useAction == EnumWrappers.EntityUseAction.ATTACK) {
       int attackerId = player.getEntityId();
       int targetId = packetReader.entityId();
       AttackEvent attackEvent = AttackEvent.create(attackerId, targetId);

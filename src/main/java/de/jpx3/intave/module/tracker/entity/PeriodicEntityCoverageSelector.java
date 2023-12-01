@@ -89,12 +89,13 @@ public final class PeriodicEntityCoverageSelector {
     }
     validEntities.sort(Comparator.comparingDouble(entity -> entity.distanceToPlayerCache * (entity.isPlayer ? 0.5 : 1)));
     int count = 0;
-    List<Entity> lastTraced = new ArrayList<>(connection.tracedEntities());
-    connection.tracedEntities().clear();
+    List<Entity> traced = connection.tracedEntities();
+    List<Entity> lastTraced = new ArrayList<>(traced);
+    traced.clear();
     for (Entity entity : validEntities) {
       boolean trace = count < maxTracedEntities;
       if (trace) {
-        connection.tracedEntities().add(entity);
+        traced.add(entity);
       }
       entity.setResponseTracingEnabled(trace);
       entity.doubleVerification = trace && count < maxDoubleTracedEntities;
@@ -102,18 +103,20 @@ public final class PeriodicEntityCoverageSelector {
     }
 
     for (Entity entity : lastTraced) {
-      if (!connection.tracedEntities().contains(entity)) {
+      if (!traced.contains(entity)) {
         entityRemovalListener.accept(user, entity);
-        if (user.meta().connection().debugEntityTracking) {
-          player.sendMessage(ChatColor.LIGHT_PURPLE + "Removed " + entity.entityName()+"/"+entity.entityId() + " from " + user.player().getName());
+        if (user.meta().connection().debugEntityTracing) {
+          player.sendMessage(ChatColor.LIGHT_PURPLE + "Removed " + entity.entityName()+"/"+entity.entityId() + " " + entity.boundingBox() + " from " + user.player().getName());
         }
       }
     }
 
-    for (Entity entity : connection.tracedEntities()) {
+    for (Entity entity : traced) {
       if (!lastTraced.contains(entity)) {
         entityAdditionListener.accept(user, entity);
-        player.sendMessage(ChatColor.LIGHT_PURPLE + "Added " + entity.entityName()+"/"+entity.entityId() + " to " + user.player().getName());
+        if (user.meta().connection().debugEntityTracing) {
+          player.sendMessage(ChatColor.LIGHT_PURPLE + "Added " + entity.entityName()+"/"+entity.entityId() + " " + entity.boundingBox() + " to " + user.player().getName());
+        }
       }
     }
   }

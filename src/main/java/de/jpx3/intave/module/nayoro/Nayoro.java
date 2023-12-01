@@ -196,6 +196,10 @@ public final class Nayoro extends Module {
     return recording.containsKey(user.id()) && recording.get(user.id());
   }
 
+  public synchronized boolean hasRecordSink(User user) {
+    return eventSinks.get(user).stream().anyMatch(eventSink -> eventSink instanceof RecordEventSink);
+  }
+
   public void instantPlayback(User user) {
     File samplesFolder = new File(plugin.dataFolder(), "samples");
     samplesFolder.mkdirs();

@@ -132,7 +132,10 @@ public final class Cloud {
 
   private void setupKeepAliveTick() {
     taskId = Bukkit.getScheduler().scheduleAsyncRepeatingTask(
-      IntavePlugin.singletonInstance(), this::keepAliveTick, 20 * 10, 20 * 30
+      IntavePlugin.singletonInstance(), () -> {
+        keepAliveTick();
+        removeUnansweredRequests();
+      }, 20 * 10, 20 * 30
     );
     TaskTracker.begun(taskId);
   }
@@ -226,6 +229,15 @@ public final class Cloud {
     for (Session session : sessions.values()) {
       session.keepAliveTick();
     }
+  }
+
+  private void removeUnansweredRequests() {
+    long now = System.currentTimeMillis();
+    long timeout = 1000 * 60 * 5;
+    sampleTransmissionRequests.entrySet().removeIf(entry -> now - entry.getValue().lastUpdate() > timeout);
+    trustfactorRequests.entrySet().removeIf(entry -> now - entry.getValue().lastUpdate() > timeout);
+    uploadLogRequests.entrySet().removeIf(entry -> now - entry.getValue().lastUpdate() > timeout);
+    storageRequests.entrySet().removeIf(entry -> now - entry.getValue().lastUpdate() > timeout);
   }
 
   public void requestSampleTransmission(Player player,  Consumer<Classifier> callbackIfAccepted) {

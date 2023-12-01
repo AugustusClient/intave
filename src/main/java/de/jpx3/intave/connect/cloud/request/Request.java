@@ -5,22 +5,24 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public final class Request<TARGET> {
-  private final long created;
+  private long lastUpdate;
   private final List<Consumer<TARGET>> subscribers = new ArrayList<>();
 
   public Request() {
-    this.created = System.currentTimeMillis();
+    this.lastUpdate = System.currentTimeMillis();
   }
 
   public void subscribe(Consumer<TARGET> consumer) {
     subscribers.add(consumer);
+    lastUpdate = System.currentTimeMillis();
   }
 
   public void publish(TARGET target) {
     subscribers.forEach(consumer -> consumer.accept(target));
+    lastUpdate = System.currentTimeMillis();
   }
 
-  public long duration() {
-    return System.currentTimeMillis() - created;
+  public long lastUpdate() {
+    return lastUpdate;
   }
 }

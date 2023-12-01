@@ -64,9 +64,13 @@ public final class LogTransmittor implements BukkitEventSubscriber {
   @BukkitEventSubscription
   public void onPlayerQuit(PlayerQuitEvent quit) {
     Player player = quit.getPlayer();
+    UUID uuid = player.getUniqueId();
     uploadLogOf(player, logId -> {
       if (ConsoleOutput.CLOUD_LOG_IDS) {
-        IntaveLogger.logger().info(player.getName() + " was assigned log-id " + logId);
+        Player player1 = Bukkit.getPlayer(uuid);
+        if (player1 != null &&player1.isOnline()) {
+          IntaveLogger.logger().info(player1.getName() + " was assigned log-id " + logId);
+        }
       }
     });
   }

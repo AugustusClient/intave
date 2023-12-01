@@ -158,7 +158,7 @@ public final class DiagnosticsStage extends CommandStage {
   public void etxTraceCommand(User user) {
     Player player = user.player();
     player.sendMessage(ChatColor.DARK_PURPLE + "Toggled tracing entity trackings");
-    user.meta().connection().debugEntityTracking = !user.meta().connection().debugEntityTracking;
+    user.meta().connection().debugEntityTracing = !user.meta().connection().debugEntityTracing;
   }
 
   @SubCommand(

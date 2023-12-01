@@ -928,9 +928,9 @@ public final class IntavePlugin extends JavaPlugin {
   }
 
   public void checkClassLoaderAvailability() {
-    if (!IntaveControl.DISABLE_LICENSE_CHECK) {
-      return;
-    }
+//    if (!IntaveControl.DISABLE_LICENSE_CHECK) {
+//      return;
+//    }
     if (de.jpx3.classloader.ClassLoader.usesNativeAccess() && !de.jpx3.classloader.ClassLoader.loaded()) {
       try {
         de.jpx3.classloader.ClassLoader.setupEnvironment(Files.createTempDirectory("intave-debug").toFile());

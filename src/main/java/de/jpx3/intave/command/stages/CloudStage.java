@@ -7,6 +7,7 @@ import de.jpx3.intave.connect.cloud.Cloud;
 import de.jpx3.intave.connect.cloud.protocol.Shard;
 import de.jpx3.intave.module.Modules;
 import de.jpx3.intave.module.nayoro.Nayoro;
+import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -66,11 +67,21 @@ public final class CloudStage extends CommandStage {
 
     Nayoro nayoro = Modules.nayoro();
     for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-      if (nayoro.recordingActiveFor(UserRepository.userOf(onlinePlayer))) {
-        commandSender.sendMessage(IntavePlugin.prefix() + ChatColor.GRAY + "Player " + ChatColor.RED + onlinePlayer.getName() + ChatColor.GRAY + " is " + ChatColor.GREEN + "transmitting");
+      String mainBase = IntavePlugin.prefix() + ChatColor.GRAY + "Player " + ChatColor.RED + onlinePlayer.getName() + ChatColor.GRAY;
+      User user = UserRepository.userOf(onlinePlayer);
+      if (nayoro.recordingActiveFor(user)) {
+        mainBase += " is " + ChatColor.GREEN + "transmitting";
       } else {
-        commandSender.sendMessage(IntavePlugin.prefix() + ChatColor.GRAY + "Player " + ChatColor.RED + onlinePlayer.getName() + ChatColor.GRAY + " is " + ChatColor.RED + "not transmitting");
+        mainBase += " is " + ChatColor.RED + "not transmitting";
       }
+
+      if (nayoro.hasRecordSink(user)) {
+        mainBase += ChatColor.GRAY + " and " + ChatColor.GREEN + "recording";
+      } else {
+        mainBase += ChatColor.GRAY + " and " + ChatColor.RED + "not recording";
+      }
+
+      commandSender.sendMessage(mainBase);
     }
   }
 
