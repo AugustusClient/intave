@@ -24,10 +24,10 @@ public final class PlaytimeUpdater extends Module {
         }
         if (System.currentTimeMillis() - user.meta().movement().lastRotation > 1000 * 60 * 2) {
           playtimeStorage.incrementMinutesAfkBy(1);
-          recorder.incrementAfkMinutesBy(1);
+//          recorder.incrementAfkMinutesBy(1);
         } else {
           playtimeStorage.incrementMinutesPlayedBy(1);
-          recorder.incrementActiveMinutesBy(1);
+//          recorder.incrementActiveMinutesBy(1);
         }
       }
     ), 20 * 60, 20 * 60);

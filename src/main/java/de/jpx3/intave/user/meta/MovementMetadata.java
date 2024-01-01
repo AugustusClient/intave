@@ -113,6 +113,7 @@ public final class MovementMetadata implements SimulationEnvironment {
   public int pastEdgeSneak = 100;
   public int pastStep = 100;
   public int pastEntityUse = 100;
+  public int waterTicks = 0;
   public boolean onLadderLast;
   public boolean aquaticUpdateInLava;
   public boolean sprintResetNextTick;

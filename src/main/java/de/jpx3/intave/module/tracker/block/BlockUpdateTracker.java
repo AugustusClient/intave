@@ -143,7 +143,7 @@ public final class BlockUpdateTracker extends Module {
 
         blockStateAccess.unlockOverride(positionX, positionY, positionZ);
         blockStateAccess.override(world, positionX, positionY, positionZ, material, variant, "UPDATE");
-        blockStateAccess.invalidateCacheAt(positionX, positionY, positionZ);
+        blockStateAccess.invalidateCacheAround(positionX, positionY, positionZ);
       }
     };
 

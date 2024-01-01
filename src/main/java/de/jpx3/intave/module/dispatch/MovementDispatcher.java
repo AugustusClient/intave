@@ -583,6 +583,7 @@ public final class MovementDispatcher extends Module {
     ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
     InventoryMetadata inventory = user.meta().inventory();
     inventory.blockNextArrow = inventory.pastHotBarSlotChange < 4 && ItemProperties.isBow(inventory.releaseItemType) || ItemProperties.isBow(inventory.activeItemType());
+    inventory.lastFoodConsumptionBlockRequest = System.currentTimeMillis();
     PacketContainer packet = protocolManager.createPacket(PacketType.Play.Client.BLOCK_DIG);
     packet.getBlockPositionModifier().write(0, new BlockPosition(0, 0, 0));
     packet.getDirections().write(0, EnumWrappers.Direction.DOWN);
@@ -741,6 +742,11 @@ public final class MovementDispatcher extends Module {
     movement.pastVelocity++;
     movement.pastStep++;
     movement.pastEdgeSneak++;
+    if (movement.inWater) {
+      movement.waterTicks++;
+    } else {
+      movement.waterTicks = 0;
+    }
     movement.ignoredAttackReduce = false;
     if (hasMovement || hasRotation) {
       movement.pastExternalVelocity++;

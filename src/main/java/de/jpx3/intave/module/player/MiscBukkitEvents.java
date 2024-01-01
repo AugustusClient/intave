@@ -23,10 +23,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -125,6 +122,33 @@ public final class MiscBukkitEvents extends Module {
         event.setCancelled(true);
       }
       inventory.blockNextArrow = false;
+    }
+  }
+
+//  @BukkitEventSubscription
+//  public void on(EntityDamageByEntityEvent event) {
+//    if (!(event.getDamager() instanceof Player)) {
+//      return;
+//    }
+//    double predAttackDamage = DamageModify.attackDamageOf((Player) event.getDamager());
+//    ItemStack heldItem = UserRepository.userOf((Player) event.getDamager()).meta().inventory().heldItem();
+//    predAttackDamage += DamageModify.sharpnessDamageOf(heldItem);
+//    double actualAttackDamage = event.getDamage(EntityDamageEvent.DamageModifier.BASE);
+//    System.out.println("ATTACK " + event.getDamager() + " -> " + event.getEntity() + " " + predAttackDamage +"/"+actualAttackDamage);
+//  }
+
+//  @BukkitEventSubscription
+//  public void on(PlayerAttackEntityCooldownResetEvent event) {
+//    System.out.println("RESET " + event.getPlayer() + " " + event.getCooledAttackStrength());
+////    Thread.dumpStack();
+//  }
+
+  @BukkitEventSubscription
+  public void on(PlayerItemConsumeEvent consumption) {
+    User user = UserRepository.userOf(consumption.getPlayer());
+    InventoryMetadata inventory = user.meta().inventory();
+    if (System.currentTimeMillis() - inventory.lastFoodConsumptionBlockRequest < 800L) {
+      consumption.setCancelled(true);
     }
   }
 

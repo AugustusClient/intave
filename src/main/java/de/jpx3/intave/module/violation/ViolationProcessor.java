@@ -6,7 +6,6 @@ import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.check.event.IntaveCommandExecutionEvent;
 import de.jpx3.intave.access.check.event.IntaveViolationEvent;
 import de.jpx3.intave.access.player.trust.TrustFactor;
-import de.jpx3.intave.analytics.GlobalStatisticsRecorder;
 import de.jpx3.intave.check.Check;
 import de.jpx3.intave.check.CheckStatistics;
 import de.jpx3.intave.connect.cloud.LogTransmittor;
@@ -229,9 +228,9 @@ public final class ViolationProcessor extends Module {
     if (violationContext.completed()) {
       return;
     }
-    GlobalStatisticsRecorder recorder = plugin.analytics().recorderOf(GlobalStatisticsRecorder.class);
+//    GlobalStatisticsRecorder recorder = plugin.analytics().recorderOf(GlobalStatisticsRecorder.class);
     Violation violation = violationContext.violation();
-    recorder.recordViolation(violation.check().name());
+//    recorder.recordViolation(violation.check().name());
     Player player = violation.findPlayer().orElseThrow(IllegalStateException::new);
     User user = UserRepository.userOf(player);
     ViolationStorage violationStorage = user.storageOf(ViolationStorage.class);

@@ -455,17 +455,17 @@ public final class BaseStage extends CommandStage {
 //
 //  }
 
-  @SubCommand(
-    selectors = "proxy",
-    usage = "",
-    description = "Access proxy related features",
-    permission = "intave.command.proxy"
-  )
-  @Forward(
-    target = ProxyStage.class
-  )
-  public void proxyCommand(CommandSender sender) {
-  }
+//  @SubCommand(
+//    selectors = "proxy",
+//    usage = "",
+//    description = "Access proxy related features",
+//    permission = "intave.command.proxy"
+//  )
+//  @Forward(
+//    target = ProxyStage.class
+//  )
+//  public void proxyCommand(CommandSender sender) {
+//  }
 
   @SubCommand(
     selectors = "cloud",

@@ -10,7 +10,6 @@ import de.jpx3.intave.module.Modules;
 import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.module.violation.Violation;
-import de.jpx3.intave.module.violation.ViolationContext;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.MetadataBundle;
 import de.jpx3.intave.user.meta.ViolationMetadata;
@@ -84,7 +83,7 @@ public final class Facing extends CheckPart<PlacementAnalysis> {
         .withDetails("repeated placement faults")
         .withVL(0)
         .build();
-      ViolationContext context = Modules.violationProcessor().processViolation(violation);
+//      ViolationContext context = Modules.violationProcessor().processViolation(violation);
 //      if (context.shouldCounterThreat()) {
 //        place.setCancelled(true);
 //      }

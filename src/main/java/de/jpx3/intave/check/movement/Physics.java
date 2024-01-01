@@ -31,7 +31,6 @@ import de.jpx3.intave.diagnostic.message.DebugBroadcast;
 import de.jpx3.intave.diagnostic.message.MessageSeverity;
 import de.jpx3.intave.diagnostic.timings.Timings;
 import de.jpx3.intave.executor.Synchronizer;
-import de.jpx3.intave.math.Hypot;
 import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.module.Modules;
 import de.jpx3.intave.module.feedback.Superposition;
@@ -104,7 +103,7 @@ public final class Physics extends Check {
       this.refreshNearbyBlocks = settings.boolBy("refresh-nearby-blocks-on-detection", true);
     }
 
-    this.useSuperpositions = settings.boolBy("use-superpositions", false);
+    this.useSuperpositions = false;//settings.boolBy("use-superpositions", false);
     this.detectNoSlowdown = settings.boolBy("enforce-item-slowdown", true);
     Physics.USE_SUPERPOSITIONS = useSuperpositions;
 
@@ -539,8 +538,8 @@ public final class Physics extends Check {
     }
 
     if (violationLevelIncrease > 0) {
-      boolean uncommonArea = movementData.pastWaterMovement < 20
-        || movementData.collidedHorizontally
+      boolean uncommonArea = //movementData.pastWaterMovement < 20
+        movementData.collidedHorizontally
         || movementData.collidedWithBoat()
         || movementData.inWeb
         || movementData.pastElytraFlying < 20;
@@ -561,7 +560,9 @@ public final class Physics extends Check {
       // resend attributes
       statisticApply(user, CheckStatistics::increaseFails);
     } else {
-      violationLevelData.physicsInvalidMovementsInRow = 0;
+      if (violationLevelData.physicsInvalidMovementsInRow >= 0) {
+        violationLevelData.physicsInvalidMovementsInRow -= 0.3;
+      }
       statisticApply(user, CheckStatistics::increasePasses);
     }
 
@@ -684,7 +685,7 @@ public final class Physics extends Check {
 
     GlobalStatisticsRecorder recorder = plugin.analytics().recorderOf(GlobalStatisticsRecorder.class);
 //    recorder.recordMovement();
-    recorder.recordBlockMoved(Hypot.fast(movementData.motionX(), movementData.motionZ()));
+//    recorder.recordBlockMoved(Hypot.fast(movementData.motionX(), movementData.motionZ()));
 
     boolean faultDebugRequested = DebugBroadcast.anyoneListeningTo(SIMFLT, player);
     boolean fullDebugRequested = DebugBroadcast.anyoneListeningTo(SIMFUL, player);

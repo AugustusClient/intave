@@ -203,7 +203,6 @@ final class MultiChunkKeyExtendedBlockStateCache implements ExtendedBlockStateCa
   public void invalidateAll() {
     invalidateCache();
     replacementCache.clear();
-//    player.sendMessage(ChatColor.GOLD + "invalidateAll()");
   }
 
   @Override
@@ -212,22 +211,21 @@ final class MultiChunkKeyExtendedBlockStateCache implements ExtendedBlockStateCa
   }
 
   @Override
-  public void invalidateCacheAt0(int posX, int posY, int posZ) {
+  public void invalidateCacheAt(int posX, int posY, int posZ) {
     blockCache.remove(bigKey(posX, posY, posZ));
-//    player.sendMessage(ChatColor.GOLD + "invalidateCacheAt0("+posX+", "+posY+", "+posZ+")");
   }
 
   @Override
   public void override(World world, int posX, int posY, int posZ, Material type, int variant, String reason) {
-//    invalidateOverride(posX, posY, posZ);
     long key = bigKey(posX, posY, posZ);
     replacementCache.remove(key);
     BlockState blockState;
-    if (type == Material.AIR) {
+    if (type == Material.AIR || posY < WorldHeight.LOWER_WORLD_LIMIT) {
       blockState = BlockState.empty();
     } else {
-      BlockShape shape = shapeResolver.collisionShapeOf(world, player, type, variant, posX, posY, posZ);
-      blockState = new BlockState(shape, shape, type, variant);
+      BlockShape outlineShape = shapeResolver.outlineShapeOf(world, player, type, variant, posX, posY, posZ);
+      BlockShape collisionShape = shapeResolver.collisionShapeOf(world, player, type, variant, posX, posY, posZ);
+      blockState = new BlockState(outlineShape, collisionShape, type, variant);
     }
     Position position = new Position(posX, posY, posZ);
     replacementCache.insert(position, blockState);
@@ -280,7 +278,6 @@ final class MultiChunkKeyExtendedBlockStateCache implements ExtendedBlockStateCa
   public void invalidateOverride(int posX, int posY, int posZ) {
     long key = bigKey(posX, posY, posZ);
     replacementCache.remove(key);
-//    player.sendMessage(ChatColor.GOLD + "invalidateOverride("+posX+", "+posY+", "+posZ+")");
   }
 
   private long lastPurge = System.currentTimeMillis();

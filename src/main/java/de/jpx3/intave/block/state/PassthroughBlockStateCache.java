@@ -62,7 +62,7 @@ final class PassthroughBlockStateCache implements ExtendedBlockStateCache {
   }
 
   @Override
-  public void invalidateCacheAt0(int posX, int posY, int posZ) {
+  public void invalidateCacheAt(int posX, int posY, int posZ) {
 
   }
 

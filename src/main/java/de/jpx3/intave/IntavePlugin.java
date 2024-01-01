@@ -217,7 +217,7 @@ public final class IntavePlugin extends JavaPlugin {
       componentLoader.prepareComponents();
       componentLoader.loadComponents();
 
-      String configurationKey = "file";//configurationService.configurationKey();
+      String configurationKey = "file";
 
       ProtocolLibraryAdapter.checkIfOutdated();
 
@@ -792,7 +792,7 @@ public final class IntavePlugin extends JavaPlugin {
       checkService.setup();
       fakePlayerEventService.setup();
       blackListService.setup();
-      analytics.setup();
+//      analytics.setup();
 
       try {
         cloud.connectMasterShard();

@@ -27,14 +27,14 @@ public interface InvalidatableBlockStateCache {
    * @param posY the y coordinate of the selected block
    * @param posZ the z coordinate of the selected block
    */
-  default void invalidateCacheAt(int posX, int posY, int posZ) {
-    invalidateCacheAt0(posX + 1, posY, posZ);
-    invalidateCacheAt0(posX - 1, posY, posZ);
-    invalidateCacheAt0(posX, posY, posZ + 1);
-    invalidateCacheAt0(posX, posY, posZ - 1);
-    invalidateCacheAt0(posX, posY + 1, posZ);
-    invalidateCacheAt0(posX, posY - 1, posZ);
-    invalidateCacheAt0(posX, posY, posZ);
+  default void invalidateCacheAround(int posX, int posY, int posZ) {
+    invalidateCacheAt(posX + 1, posY, posZ);
+    invalidateCacheAt(posX - 1, posY, posZ);
+    invalidateCacheAt(posX, posY, posZ + 1);
+    invalidateCacheAt(posX, posY, posZ - 1);
+    invalidateCacheAt(posX, posY + 1, posZ);
+    invalidateCacheAt(posX, posY - 1, posZ);
+    invalidateCacheAt(posX, posY, posZ);
   }
 
   /**
@@ -44,5 +44,5 @@ public interface InvalidatableBlockStateCache {
    * @param posY the y coordinate of the selected block
    * @param posZ the z coordinate of the selected block
    */
-  void invalidateCacheAt0(int posX, int posY, int posZ);
+  void invalidateCacheAt(int posX, int posY, int posZ);
 }

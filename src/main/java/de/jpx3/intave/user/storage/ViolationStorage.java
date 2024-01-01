@@ -19,7 +19,7 @@ public final class ViolationStorage implements Storage {
   public static boolean USE_AUTO_STORAGE = false;
 
   public static void setup() {
-    USE_AUTO_STORAGE = (boolean) IntavePlugin.singletonInstance().settings().get("storage.auto-logs", true);
+//    USE_AUTO_STORAGE = false;//(boolean) IntavePlugin.singletonInstance().settings().get("storage.auto-logs", true);
   }
 
   private StorageViolationEvents interestingViolations = new StorageViolationEvents();

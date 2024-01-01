@@ -19,14 +19,14 @@ public final class CloudConfig {
     // enabled by default
     boolean enabled = section == null ? !IntaveControl.GOMME_MODE : section.getBoolean("enabled", !IntaveControl.GOMME_MODE);
     ConfigurationSection featuresSection = section == null ? null : section.getConfigurationSection("features");
-    boolean cloudStorage = featuresSection == null || featuresSection.getBoolean("cloud-storage", true);
-    boolean cloudTrustFactor = featuresSection == null || featuresSection.getBoolean("cloud-trustfactor", true);
-    boolean cloudHeuristics = featuresSection == null || featuresSection.getBoolean("cloud-heuristics", true);
-    boolean cloudLogs = featuresSection == null || featuresSection.getBoolean("cloud-logs", true);
+    boolean cloudStorage = featuresSection == null || featuresSection.getBoolean("storage", featuresSection.getBoolean("cloud-storage", true));
+    boolean cloudTrustFactor = featuresSection == null || featuresSection.getBoolean("trustfactor", featuresSection.getBoolean("cloud-trustfactor", true));
+    boolean cloudSamples = featuresSection == null || featuresSection.getBoolean("samples",  featuresSection.getBoolean("cloud-heuristics", true));
+    boolean cloudLogs = featuresSection == null || featuresSection.getBoolean("logs", featuresSection.getBoolean("cloud-logs", true));
     CloudFeatures features = new CloudFeatures();
     features.cloudStorage = cloudStorage;
     features.cloudTrustFactor = cloudTrustFactor;
-    features.cloudHeuristics = cloudHeuristics;
+    features.cloudSamples = cloudSamples;
     features.cloudLogs = cloudLogs;
     CloudConfig config = new CloudConfig();
     config.enabled = enabled;
@@ -37,7 +37,7 @@ public final class CloudConfig {
   public static class CloudFeatures {
     private boolean cloudStorage;
     private boolean cloudTrustFactor;
-    private boolean cloudHeuristics;
+    private boolean cloudSamples;
     private boolean cloudLogs;
 
     public boolean cloudStorageEnabled() {
@@ -49,7 +49,7 @@ public final class CloudConfig {
     }
 
     public boolean sampleTransmission() {
-      return this.cloudHeuristics;
+      return this.cloudSamples;
     }
 
     public boolean isCloudLogs() {

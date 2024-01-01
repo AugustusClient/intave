@@ -4,15 +4,13 @@
 # It is recommended not to change anything here unless you know exactly what you are doing.
 # When you experience false positives, report them to us, and we will fix them.
 # Before changing anything, please check the Intave console output for any warnings or instructions.
-# You can ban the following checks:
-#   - AttackRaytrace.reach at VL 200
-#   - Heuristics.! and Heuristics.!! at VL 100
-# If you have any questions, contact us on discord.
+# If you have any questions - contact us on discord, thank you!
 
-version: "14.0.0"
+version: "15.0.0"
 state: 0
 
 check:
+  # Detects and mitigates movement modifications
   physics:
     # Severely nerfs the physics check
     #   This option should not be necessary, and will allow players to cheat
@@ -22,7 +20,7 @@ check:
     # Mitigation mode
     #   Choose between AGGRESSIVE, CAREFUL, LENIENT, BARELY and SILENT
     #   FALSE POSITIVES -> REPORT THEM
-    mitigation: BARELY
+    mitigation: CAREFUL
 
     # Check for NoSlowdown cheats?
     enforce-item-slowdown: true
@@ -35,90 +33,97 @@ check:
       # Can help reduce ghost-block related false positives
       refresh-nearby-blocks: true
 
-    # DO NOT BAN
+    # Do not kick or ban
     thresholds:
       100: "intave internals sendnotify &c{player}&7/{trust-color}&7 is moving incorrectly"
       400: "intave internals sendnotify &c{player}&7/{trust-color}&7 is moving incorrectly #2"
       500: "intave internals storelog {player} {check} {vl}"
       999:
         - $kick$
+
+  # Detects and mitigates game-tick modifications
   timer:
-    # Disable if you have players abusing network lag
-    high-tolerance: true
     # Enable if you want to prevent players from using "Blink"
     reverse-blink: true
     # Enable if you know what you are doing
     reverse-lag: false
-    # Enable if you have even more players abusing network lag
-    low-tolerance: false
 
-    # DO NOT BAN
+    # Do not kick or ban
     thresholds:
       50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is moving too frequently / is lagging"
       100: "intave internals sendnotify &c{player}&7/{trust-color}&7 is moving too frequently / is lagging for a long period"
 
+  # Detects combat automations such as killaura and aimbot
   heuristics:
     enabled: true
-    # Enable to remove attack slowdowns
-    disable-reducing: false
-    confidence-thresholds:
-      # BAN
-      "!!":
-        25:
-          - "intave internals storelog {player} {check} {vl}"
-          - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for attacking suspiciously (!!) (heuristics)"
-          - $ban$
-      # BAN
-      "!":
-        25:
-          - "intave internals storelog {player} {check} {vl}"
-          - "intave internals sendnotify &c{player}&7/{trust-color}&7 is attacking suspiciously (!) (heuristics)"
-        50:
-          - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for attacking suspiciously (!) (heuristics)"
+
+    thresholds:
+      # Ban
+      on-premise:
+        50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is fighting killaura-like"
+        100:
+          - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been banned for using killaura"
           - $ban$
 
-      # DO NOT BAN
-      "?!":
-        50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is attacking suspiciously (?!) (heuristics)"
-        75: "intave internals sendnotify &c{player}&7/{trust-color}&7 is attacking suspiciously #2 (?!) (heuristics)"
+      # If you do not ban for cloud heuristics, the detection will be deactivated.
+      # Deactivation is checked with every ban, activations are issued automatically every midnight CEST.
+      # You can expect a false positive rate of one false ban for every 1000 correct bans.
+      cloud:
+        50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is fighting killaura-like"
+        100:
+          - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been banned for using killaura"
+          - $ban$
 
+  # Detects and blocks reach modifications
   attackraytrace:
     enabled: true
-    applicable-thresholds:
-      # BAN at high VL
+
+    thresholds:
+      # Ban at high VL
       reach:
-        50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is attacking suspiciously (reach)"
+        50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is attacking from too far away"
         150:
           - "intave internals storelog {player} {check} {vl}"
-          - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for attacking suspiciously (reach)"
+          - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been banned for using Reach"
           - $ban$
 
-      # BAN NOT NECESSARY
+      # Do not ban or kick
       hitbox:
-        50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is attacking suspiciously (hitbox)"
-        100: "intave internals sendnotify &c{player}&7/{trust-color}&7 is attacking suspiciously #2 (hitbox)"
+        50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is attacking entities out of sight"
+        100: "intave internals sendnotify &c{player}&7/{trust-color}&7 is attacking entities out of sight #2"
 
-      # BAN NOT NECESSARY
+      # Do not ban or kick
       timeout:
-        50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is attacking suspiciously (backtrack?)"
-        100: "intave internals sendnotify &c{player}&7/{trust-color}&7 is attacking suspiciously #2 (backtrack?)"
+        50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is attacking past entity positions"
+        100: "intave internals sendnotify &c{player}&7/{trust-color}&7 is attacking past entity positions #2"
 
+  # Detects and blocks illegal block interactions
   interactionraytrace:
     enabled: true
-    # BAN NOT NECESSARY
+    # Do not ban or kick
     thresholds:
       50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is interacting suspiciously"
       100: "intave internals sendnotify &c{player}&7/{trust-color}&7 is interacting suspiciously #2"
 
+  # Detects click automations
   clickpatterns:
     enabled: true
-    # DO NOT BAN
+    # Do not ban
     thresholds:
-      50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is clicking statistically anomalously (auto-clicker)"
-      100:
-        - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for clicking statistically anomalously (auto-clicker)"
-        - $kick$
+      on-premise:
+        50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is clicking suspiciously"
+        100:
+          - "intave internals storelog {player} {check} {vl}"
+          - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for clicking suspiciously"
+          - $kick$
+      cloud:
+        50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is clicking suspiciously"
+        100:
+          - "intave internals storelog {player} {check} {vl}"
+          - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for clicking suspiciously"
+          - $kick$
 
+  # Limits the amount of clicks per second
   clickspeedlimiter:
     enabled: true
     max-cps: 20
@@ -128,73 +133,81 @@ check:
         - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for attacking too quickly"
         - $kick$
 
+  # Prevents players from breaking blocks too quickly
   breakspeedlimiter:
     enabled: true
-    # BAN NOT NECESSARY
+    # Ban and kick not necessary
     thresholds:
       100: "intave internals sendnotify &c{player}&7/{trust-color}&7 is breaking blocks too quickly"
 
+  # Various checks for invalid packets
   protocolscanner:
     enabled: true
-    invokant: false
     check_sent_slot_twice_vl: 100
     thresholds:
       50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is sending invalid packets"
       100:
-        - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for sending invalid packets"
+        - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been banned for sending invalid packets"
         - $ban$
 
+  # Detects placement automations like scaffoldwalk
   placementanalysis:
     enabled: true
     check_timings: false
     thresholds:
-      100: "intave internals sendnotify &c{player}&7/{trust-color}&7 is placing blocks incorrectly"
-      200:
-        - "intave internals storelog {player} {check} {vl}"
-        - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for placing blocks incorrectly"
-        - $ban$
+      on-premise:
+        100: "intave internals sendnotify &c{player}&7/{trust-color}&7 is placing blocks incorrectly"
+        200:
+          - "intave internals storelog {player} {check} {vl}"
+          - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been banned for placing blocks incorrectly"
+          - $ban$
 
+      # If you do not ban for cloud placement-analysis, the detection will be deactivated.
+      # Deactivation is checked with every ban, activations are issued automatically every midnight CEST.
+      cloud:
+        100: "intave internals sendnotify &c{player}&7/{trust-color}&7 is using scaffoldwalk"
+        200:
+          - "intave internals storelog {player} {check} {vl}"
+          - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been banned for using scaffoldwalk"
+          - $ban$
+
+  # Detects invalid inventory interactions, looks for cheststealer
   inventoryclickanalysis:
     enabled: true
     high-tolerance: true
-    # DO NOT BAN
+    # Only ban cloud detections
     thresholds:
-      50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is performing invalid item-operations"
-      100:
-        - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for clicking suspiciously on items"
-        - $kick$
+      on-premise:
+        50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is clicking suspiciously on items"
+        100:
+          - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for clicking suspiciously on items"
+          - $kick$
+      # You can change this to a kick, and it will still work.
+      cloud:
+        50: "intave internals sendnotify &c{player}&7/{trust-color}&7 is performing invalid item-operations"
+        100:
+          - "intave internals sendnotify &c{player}&7/{trust-color}&7 has been removed for clicking suspiciously on items"
+          - $ban$
 
 cloud:
   # Should Intave connect to the cloud?
   enabled: true
 
   features:
-    # Should Intave use the cloud to store logs?
-    cloud-storage: true
-    # Should Intave use the cloud to store trustfactors?
-    cloud-trustfactor: true
-    # Should Intave use the cloud for player analysis?
-    cloud-heuristics: true
-    # Should Intave use the cloud for logs?
-    cloud-logs: true
-
-storage:
-  # Set to ignore the "intave internals storelog" command and auto-store suggested violations instead
-  auto-logs: false
-
-  # Set to let Intave find a suitable trustfactor when you don't specify one
-  auto-trustfactor: true
+    # Should Intave use the cloud...
+    # ...to store session information?
+    storage: true
+    # ...to resolve trustfactors?
+    trustfactor: true
+    # ...for additional checks?
+    samples: true
+    # ...for storing logs?
+    logs: true
 
 blacklist:
   apply: true
   message-in-chat: false
   message: "&cYou are on an anti-cheat blacklist and can't join this server"
-
-proxy:
-  enable: false
-
-clientwarning:
-  enable: true
 
 command:
   hide: true
@@ -207,7 +220,7 @@ command:
   fix-tab-kicks: false
 
 rejoin:
-  # DO NOT DISABLE IN PRODUCTION
+  # Do not disable this unless you know what you are doing
   delay: 3600
   refresh: true
   message: "&cYou were removed recently, wait before connecting again"
@@ -227,7 +240,6 @@ fault-kicks:
 
 # Remove some data from packets used to slightly improve cheats
 filter:
-  equipmentdata: false
   health: true
 
 logging:
@@ -249,10 +261,6 @@ logging:
 
   # debugging purposes, do not activate
   #feedback-dump: false
-
-analytics:
-  errorReporting: true
-  usageReporting: true
 
 layout:
   verbose: "{prefix} &c{player}&7/{trust-color}&7 {message} {details} (+{vladded} -> {vl})"

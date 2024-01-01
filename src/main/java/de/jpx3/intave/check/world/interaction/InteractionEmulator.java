@@ -6,7 +6,6 @@ import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.player.event.BucketAction;
 import de.jpx3.intave.adapter.MinecraftVersions;
-import de.jpx3.intave.analytics.GlobalStatisticsRecorder;
 import de.jpx3.intave.annotate.KeepEnumInternalNames;
 import de.jpx3.intave.annotate.Relocate;
 import de.jpx3.intave.block.access.BlockInteractionAccess;
@@ -70,7 +69,7 @@ public final class InteractionEmulator implements EventProcessor {
     if (place.getClass().equals(BlockPlaceEvent.class)) {
       Block block = place.getBlock();
       ExtendedBlockStateCache blockStateAccess = userOf(place.getPlayer()).blockStates();
-      blockStateAccess.invalidateCacheAt(block.getX(), block.getY(), block.getZ());
+      blockStateAccess.invalidateCacheAround(block.getX(), block.getY(), block.getZ());
       //      blockStateAccess.invalidateOverride(block.getX(), block.getY(), block.getZ());
     }
   }
@@ -80,7 +79,7 @@ public final class InteractionEmulator implements EventProcessor {
     Player player = fill.getPlayer();
     Block block = fill.getBlockClicked().getRelative(fill.getBlockFace());
     ExtendedBlockStateCache blockStateAccess = userOf(player).blockStates();
-    blockStateAccess.invalidateCacheAt(block.getX(), block.getY(), block.getZ());
+    blockStateAccess.invalidateCacheAround(block.getX(), block.getY(), block.getZ());
     blockStateAccess.invalidateOverride(block.getX(), block.getY(), block.getZ());
   }
 
@@ -89,7 +88,7 @@ public final class InteractionEmulator implements EventProcessor {
     Player player = empty.getPlayer();
     Block block = empty.getBlockClicked().getRelative(empty.getBlockFace());
     ExtendedBlockStateCache blockStateAccess = userOf(player).blockStates();
-    blockStateAccess.invalidateCacheAt(block.getX(), block.getY(), block.getZ());
+    blockStateAccess.invalidateCacheAround(block.getX(), block.getY(), block.getZ());
     blockStateAccess.invalidateOverride(block.getX(), block.getY(), block.getZ());
   }
 
@@ -98,7 +97,7 @@ public final class InteractionEmulator implements EventProcessor {
     if (breeak.getClass().equals(BlockBreakEvent.class)) {
       Block block = breeak.getBlock();
       ExtendedBlockStateCache blockStateAccess = userOf(breeak.getPlayer()).blockStates();
-      blockStateAccess.invalidateCacheAt(block.getX(), block.getY(), block.getZ());
+      blockStateAccess.invalidateCacheAround(block.getX(), block.getY(), block.getZ());
       //      blockStateAccess.invalidateOverride(block.getX(), block.getY(), block.getZ());
     }
   }
@@ -130,7 +129,6 @@ public final class InteractionEmulator implements EventProcessor {
   private EmulationResult emulateBreak(Player player, Interaction interaction) {
     User user = userOf(player);
     World world = interaction.world();
-    plugin.analytics().recorderOf(GlobalStatisticsRecorder.class).recordBlockDestroyed();
     BlockPosition blockPosition = interaction.targetBlock();
     Location blockBreakLocation = blockPosition.toLocation(world);
     boolean access =
@@ -159,7 +157,7 @@ public final class InteractionEmulator implements EventProcessor {
         }
       }
       blockStateAccess.override(world, blockX, blockY, blockZ, Material.AIR, 0, "BREAK");
-      blockStateAccess.invalidateCacheAt(blockX, blockY, blockZ);
+      blockStateAccess.invalidateCacheAround(blockX, blockY, blockZ);
     }
     return access ? EmulationResult.SUCCEEDED : EmulationResult.FAILED;
   }
@@ -178,7 +176,7 @@ public final class InteractionEmulator implements EventProcessor {
     User user = userOf(player);
     ExtendedBlockStateCache blockStates = user.blockStates();
     World world = interaction.world();
-    plugin.analytics().recorderOf(GlobalStatisticsRecorder.class).recordBlockPlaced();
+//    plugin.analytics().recorderOf(GlobalStatisticsRecorder.class).recordBlockPlaced();
     Location blockAgainstLocation = interaction.targetBlock().toLocation(world);
     Vector placementVector = Direction.getFront(interaction.targetDirectionIndex())
       .directionVector().convertToBukkitVec();
@@ -265,7 +263,7 @@ public final class InteractionEmulator implements EventProcessor {
       }
       movement.pastBlockPlacement = 0;
       blockStates.override(world, blockX, blockY, blockZ, placedBlockType, variant, "PLACE");
-      blockStates.invalidateCacheAt(blockX, blockY, blockZ);
+      blockStates.invalidateCacheAround(blockX, blockY, blockZ);
       blockStates.lockOverride(blockX, blockY, blockZ);
       // enforce block reset later
       //      Synchronizer.synchronize(() -> {

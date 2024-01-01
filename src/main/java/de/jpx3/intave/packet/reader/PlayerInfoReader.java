@@ -32,4 +32,10 @@ public final class PlayerInfoReader extends AbstractPacketReader {
     }
     return read;
   }
+
+  public void writePlayerInfoData(List<PlayerInfoData> playerInfos) {
+    if (!MinecraftVersions.VER1_20.atOrAbove()) {
+      packet().getPlayerInfoDataLists().write(0, playerInfos);
+    }
+  }
 }

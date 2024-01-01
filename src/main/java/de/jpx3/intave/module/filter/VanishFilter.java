@@ -105,6 +105,7 @@ public final class VanishFilter extends Filter {
 
     Collections.shuffle(playerInfos);
 //    lists.write(0, playerInfos);
+    reader.writePlayerInfoData(playerInfos);
     reader.release();
   }
 
