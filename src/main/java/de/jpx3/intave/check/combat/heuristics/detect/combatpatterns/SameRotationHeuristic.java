@@ -170,7 +170,7 @@ public final class SameRotationHeuristic extends MetaCheckPart<Heuristics, SameR
   }
 
   private void checkExactRotationMotionYaw(SameRotationHeuristicMeta meta, Player player) {
-    // Guckt ob die Rotation Bewegung des Spielers eine ganze Zahl war wenn er sich schnell rotiert hat.
+    // Checks whether the player's rotation movement was a whole number if he rotated quickly.
     boolean yawMotionExactNumber = meta.lastTick.yawMotion % 1 == 0;
 
     if (yawMotionExactNumber) {
@@ -182,7 +182,7 @@ public final class SameRotationHeuristic extends MetaCheckPart<Heuristics, SameR
   }
 
   private void checkExactRotationMotionPitch(SameRotationHeuristicMeta meta, Player player) {
-    // Guckt ob die Rotation Bewegung des Spielers eine ganze Zahl war wenn er sich schnell rotiert hat.
+    // Checks whether the player's rotation movement was a whole number if he rotated quickly.
     boolean pitchMotionExactNumber = meta.lastTick.pitchMotion % 1 == 0;
 
     if (pitchMotionExactNumber) {
