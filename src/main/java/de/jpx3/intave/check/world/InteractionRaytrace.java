@@ -333,7 +333,7 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
     Location playerLocationmdf = playerLocation.clone();
     playerLocationmdf.setYaw(movementData.lastRotationYaw);
     for (Interaction interaction : interactionList) {
-      processInteraction(interaction, playerLocation, playerLocationmdf);
+      processInteraction(interaction, playerLocation.clone(), playerLocationmdf.clone());
     }
     interactionList.clear();
     return true;
