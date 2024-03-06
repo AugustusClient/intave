@@ -17,12 +17,13 @@ final class PatcherReshaperPipe implements ShapeResolverPipeline {
   @Override
   public BlockShape collisionShapeOf(World world, Player player, Material type, int blockState, int posX, int posY, int posZ) {
     BlockShape original = forward.collisionShapeOf(world, player, type, blockState, posX, posY, posZ);
-    return player == null ? original : BoundingBoxPatcher.patch(world, player, posX, posY, posZ, type, blockState, original);
+    return player == null ? original : BoundingBoxPatcher.patchCollision(world, player, posX, posY, posZ, type, blockState, original);
   }
 
   @Override
   public BlockShape outlineShapeOf(World world, Player player, Material type, int blockState, int posX, int posY, int posZ) {
-    return forward.outlineShapeOf(world, player, type, blockState, posX, posY, posZ);
+    BlockShape original = forward.outlineShapeOf(world, player, type, blockState, posX, posY, posZ);
+    return player == null ? original : BoundingBoxPatcher.patchOutline(world, player, posX, posY, posZ, type, blockState, original);
   }
 
   @Override

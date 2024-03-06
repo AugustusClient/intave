@@ -1036,7 +1036,7 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
     if (user.meta().movement().awaitTeleport) {
       mustFlag = true;
     }
-    details += ", " + searches + " searches";
+    details += ", " + searches + " rays";
     Violation violation = Violation.builderFor(InteractionRaytrace.class)
       .forPlayer(player).withMessage(message).withDetails(details).withVL(vl)
       .build();

@@ -28,7 +28,7 @@ public final class BlockInteractionAccess {
 
   public static float blockDamage(@NotNull Player player, @Nullable ItemStack itemInHand, @NotNull BlockPosition blockPosition) {
     if (player == null || blockPosition == null) {
-      throw new IllegalArgumentException("Player and block position must not be null");
+      throw new IllegalArgumentException("Player and block position must not be null: " + player + ", " + blockPosition);
     }
     return BlockAccess.global().blockDamage(player.getWorld(), player, itemInHand, blockPosition);
   }
