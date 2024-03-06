@@ -29,12 +29,6 @@ public final class BackgroundExecutors {
     executorServices.put(NO_TIME_AND_EXECUTION_REQUIREMENT, executorServices.get(NO_TIME_REQUIREMENT));
   }
 
-  /*
-    Primary: Must execute in a maximum of 5 seconds
-    Seconardy: Might never return
-
-   */
-
   public static void execute(Runnable runnable) {
     execute(runnable, IN_TIME);
   }
