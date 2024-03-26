@@ -48,6 +48,8 @@ public final class PlacementAnalysis extends Check {
     appendCheckPart(new PacketOrder(this));
     appendCheckPart(new Facing(this));
     appendCheckPart(new RoundedRotation(this));
+
+    appendPlayerCheckPart(RotationFlick.class);
   }
 
   public void applyPlacementAnalysisDamageCancel(User user, String checkId) {

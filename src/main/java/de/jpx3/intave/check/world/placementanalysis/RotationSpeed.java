@@ -97,6 +97,7 @@ public final class RotationSpeed extends MetaCheckPart<PlacementAnalysis, Rotati
           .withDefaultThreshold().withVL(10).build();
         Modules.violationProcessor().processViolation(violation);
         meta.denyPlacementRequest = System.currentTimeMillis();
+        user.meta().violationLevel().lastBlockPlaceDenyRequest = System.currentTimeMillis();
         place.setCancelled(true);
       }
     }

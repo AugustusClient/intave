@@ -45,11 +45,13 @@ public class PlayerTime extends MetaCheckPart<Timer, PlayerTime.PlayerTimeMeta> 
   private final Map<UUID, Long> playerJoinTimeCache = GarbageCollector.watch(new HashMap<>());
   private final CheckViolationLevelDecrementer decrementer;
   private final int blinkLimitTicks;
+  private final int toleranceTicks;
 
   public PlayerTime(Timer parentCheck) {
     super(parentCheck, PlayerTimeMeta.class);
     decrementer = parentCheck.decrementer();
     blinkLimitTicks = parentCheck.blinkLimit();
+    toleranceTicks = parentCheck.timerTolerance();
   }
 
 
@@ -147,7 +149,7 @@ public class PlayerTime extends MetaCheckPart<Timer, PlayerTime.PlayerTimeMeta> 
 //      player.sendMessage("diff: " + diff);
 //    }
 
-    int limit = System.currentTimeMillis() - movementData.lastMovement > 30_000 ? 150_000_000 : 50_000_000;
+    int limit = System.currentTimeMillis() - movementData.lastMovement > 30_000 ? 150_000_000 : toleranceTicks * 50_000_000;
     if ((diff > limit) && !user.meta().movement().isInVehicle()) {
       double displayValue = diff / (50 * 1_000_000f);
       if (displayValue < 0.01) {
