@@ -38,7 +38,7 @@ public final class StorageTrustfactorResolver implements TrustFactorResolver {
         factor = TrustFactor.RED; // TrustFactor.DARK_RED;
       }
 
-      ViolationStorage violationStorage = playerStorage.storageOf(ViolationStorage.class);
+      LongTermViolationStorage violationStorage = playerStorage.storageOf(LongTermViolationStorage.class);
       StorageViolationEvents violations = violationStorage.violations();
       for (StorageViolationEvent violation : violations) {
         long timePassedSince = violation.timePassedSince();

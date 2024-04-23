@@ -202,6 +202,9 @@ storage:
   # This setting is ignored if cloud-trustfactor is enabled
   auto-trustfactor: true
 
+  # Should Intave try to transfer VLs when switching between servers?
+  recover-vl: true
+
 blacklist:
   apply: true
   message-in-chat: false
@@ -252,6 +255,8 @@ fault-kicks:
 filter:
   equipmentdata: false
   health: true
+  # Disable vanish if you have problems with weird proxy kicks
+  vanish: true
 
 logging:
   # Save logs to a file?

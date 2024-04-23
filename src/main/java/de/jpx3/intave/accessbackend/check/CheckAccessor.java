@@ -68,7 +68,7 @@ public final class CheckAccessor {
           throw new UnknownPlayerException("Player " + player.getName() + " couldn't be found");
         }
         Map<String, Map<String, Double>> violationLevel = UserRepository.userOf(player).meta().violationLevel().violationLevel;
-        return violationLevel.getOrDefault(check.name().toLowerCase(), DEFAULT_RETURN).getOrDefault(threshold, 0d);
+        return violationLevel.computeIfAbsent(check.name().toLowerCase(), k -> new HashMap<>()).getOrDefault(threshold, 0.0);
       }
 
       @Override
@@ -77,7 +77,7 @@ public final class CheckAccessor {
           throw new UnknownPlayerException("Player " + player.getName() + " couldn't be found");
         }
         Map<String, Map<String, Double>> violationLevel = UserRepository.userOf(player).meta().violationLevel().violationLevel;
-        violationLevel.getOrDefault(check.name().toLowerCase(), DEFAULT_RETURN).put(threshold, MathHelper.minmax(0, violationLevelOf(player, threshold) + amount, 1000));
+        violationLevel.computeIfAbsent(check.name().toLowerCase(), k -> new HashMap<>()).put(threshold, MathHelper.minmax(0, violationLevelOf(player, threshold) + amount, 1000));
       }
 
       @Override
@@ -86,7 +86,7 @@ public final class CheckAccessor {
           throw new UnknownPlayerException("Player " + player.getName() + " couldn't be found");
         }
         Map<String, Map<String, Double>> violationLevel = UserRepository.userOf(player).meta().violationLevel().violationLevel;
-        violationLevel.getOrDefault(check.name().toLowerCase(), DEFAULT_RETURN).remove(threshold);
+        violationLevel.computeIfAbsent(check.name().toLowerCase(), k -> new HashMap<>()).put(threshold, 0.0);
       }
 
       @Override

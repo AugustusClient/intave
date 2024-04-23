@@ -9,6 +9,8 @@ public enum MessageChannel {
   VERBOSE("intave.command.verbose", false),
   NOTIFY("intave.command.notify", true),
   COMBAT_MODIFIERS("intave.command.combatmodifiers", false),
+  DEBUG_TELEPORT("intave.command.verbose", false),
+  DEBUG_MOUNTS("intave.command.verbose", false),
 
   ;
 

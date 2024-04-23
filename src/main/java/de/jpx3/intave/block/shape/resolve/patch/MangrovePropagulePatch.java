@@ -28,7 +28,11 @@ public class MangrovePropagulePatch extends BlockShapePatch {
       return shape;
     }
     BlockVariant variant = BlockVariantRegister.variantOf(type, variantIndex);
-    boolean hanging = variant.propertyOf("hanging");
+    Boolean hanging = variant.propertyOf("hanging");
+    if (hanging == null) {
+      System.out.println("MangrovePropagulePatch: hanging is null");
+      return shape;
+    }
     int age = hanging ? variant.propertyOf("age") : 4;
     long randomCoordinate = coordinateRandom(posX, 0, posZ);
     int xOffsetKey = (int) (randomCoordinate & 15L);

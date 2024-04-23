@@ -125,6 +125,11 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
       Material clickedType = VolatileBlockAccess.typeAccess(user, blockPosition.toLocation(player.getWorld()));
       boolean clickedIsInteractable = BlockInteractionAccess.isClickable(clickedType);
 
+      if (clickedType == Material.WHEAT || clickedType == BlockTypeAccess.FARMLAND) {
+        // not important
+        return;
+      }
+
       EnumWrappers.Hand handSlot = packet.getHands().readSafely(0);
       handSlot = handSlot == null ? EnumWrappers.Hand.MAIN_HAND : handSlot;
 

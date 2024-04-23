@@ -2,6 +2,7 @@ package de.jpx3.intave.command.stages;
 
 import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntavePlugin;
+import de.jpx3.intave.annotate.KeepEnumInternalNames;
 import de.jpx3.intave.annotate.Native;
 import de.jpx3.intave.command.CommandStage;
 import de.jpx3.intave.command.Forward;
@@ -21,9 +22,9 @@ import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.ProtocolMetadata;
 import de.jpx3.intave.user.permission.BukkitPermissionCheck;
+import de.jpx3.intave.user.storage.LongTermViolationStorage;
 import de.jpx3.intave.user.storage.StorageViolationEvent;
 import de.jpx3.intave.user.storage.StorageViolationEvents;
-import de.jpx3.intave.user.storage.ViolationStorage;
 import de.jpx3.intave.version.DurationTranslator;
 import de.jpx3.intave.version.IntaveVersion;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -123,6 +124,41 @@ public final class BaseStage extends CommandStage {
       return elements.get(0);
     } else {
       return defaultColor + String.join(defaultColor + ", ", elements.subList(0, size - 1)) + defaultColor + " and " + elements.get(size - 1);
+    }
+  }
+
+  @SubCommand(
+    selectors = "debug",
+    usage = "<debug type>",
+    description = "Toggle debug messages",
+    permission = "intave.command.verbose"
+  )
+  public void debug(User user, DebugType type, @Optional Player target) {
+    Player player = user.player();
+    boolean receivesDebug = user.receives(type.channel);
+
+    user.toggleReceive(type.channel);
+    user.removeChannelConstraint(type.channel);
+
+    if (receivesDebug) {
+      player.sendMessage(IntavePlugin.prefix() + "You are " + ChatColor.RED + "no longer " + IntavePlugin.defaultColor() + "receiving " + type.name().toLowerCase() + " debug messages");
+    } else {
+      player.sendMessage(IntavePlugin.prefix() + "You are " + ChatColor.GREEN + "now " + IntavePlugin.defaultColor() + "receiving " + type.name().toLowerCase() + " debug messages");
+      user.setChannelConstraint(type.channel, target != null ? player1 -> player1.getUniqueId().equals(target.getUniqueId()) : player1 -> true);
+    }
+  }
+
+  @KeepEnumInternalNames
+  public enum DebugType {
+    TELEPORT(MessageChannel.DEBUG_TELEPORT),
+    MOUNTS(MessageChannel.DEBUG_MOUNTS)
+
+    ;
+
+    private final MessageChannel channel;
+
+    DebugType(MessageChannel channel) {
+      this.channel = channel;
     }
   }
 
@@ -309,7 +345,7 @@ public final class BaseStage extends CommandStage {
       User targetUser = UserRepository.userOf(player);
       String name = player.getName();
       UUID id = player.getUniqueId();
-      ViolationStorage violationStorage = targetUser.storageOf(ViolationStorage.class);
+      LongTermViolationStorage violationStorage = targetUser.storageOf(LongTermViolationStorage.class);
       outputHistory(sender, name, id, violationStorage);
     } else {
       sender.sendMessage(IntavePlugin.prefix() + ChatColor.YELLOW + "Loading history..");
@@ -321,7 +357,7 @@ public final class BaseStage extends CommandStage {
             if (playerStorage == null) {
               sender.sendMessage(IntavePlugin.prefix() + ChatColor.RED + playerName + " hasn't played yet");
             } else {
-              outputHistory(sender, playerName, uuid, playerStorage.storageOf(ViolationStorage.class));
+              outputHistory(sender, playerName, uuid, playerStorage.storageOf(LongTermViolationStorage.class));
             }
           });
         }
@@ -329,7 +365,7 @@ public final class BaseStage extends CommandStage {
     }
   }
 
-  private void outputHistory(CommandSender sender, String name, UUID id, ViolationStorage violationStorage) {
+  private void outputHistory(CommandSender sender, String name, UUID id, LongTermViolationStorage violationStorage) {
     StorageViolationEvents violations = violationStorage.violations();
     sender.sendMessage(String.format("%sHistory of " + ChatColor.RED + "%s%s:", IntavePlugin.prefix(), name, IntavePlugin.defaultColor()));
     if (violations.isEmpty()) {

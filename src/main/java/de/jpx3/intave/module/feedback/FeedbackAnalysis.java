@@ -278,7 +278,7 @@ public final class FeedbackAnalysis extends Module {
       }
       latencyOccurrences[(int) asDiscrete(latency)]++;
       size++;
-      if (size > 3_333) {
+      if (size > 9999) {
         // divide all by 2
         for (int i = 0; i < LATENCY_BUCKETS; i++) {
           latencyOccurrences[i] >>= 1;
@@ -289,7 +289,7 @@ public final class FeedbackAnalysis extends Module {
     }
 
     private long asDiscrete(long latency) {
-      return Math.min(latency, MAX_LATENCY) / (MAX_LATENCY / LATENCY_BUCKETS);
+      return Math.min(latency, MAX_LATENCY - 1) / (MAX_LATENCY / LATENCY_BUCKETS);
     }
 
     public double mean() {

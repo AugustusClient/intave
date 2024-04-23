@@ -128,6 +128,31 @@ public class Matrix {
   }
 
   public Matrix multiply(Matrix matrix) {
+    // column vector multiplication
+    if (rows() == 1 && columns() == matrix.rows()) {
+      Matrix result = new Matrix(1, matrix.columns());
+      for (int i = 0; i < matrix.columns(); i++) {
+        double sum = 0.0D;
+        for (int j = 0; j < columns(); j++) {
+          sum += get(0, j) * matrix.get(j, i);
+        }
+        result.set(0, i, sum);
+      }
+      return result;
+    }
+
+    // row vector multiplication
+    if (rows() == matrix.columns() && columns() == 1) {
+      Matrix result = new Matrix(matrix.rows(), 1);
+      for (int i = 0; i < matrix.rows(); i++) {
+        double sum = 0.0D;
+        for (int j = 0; j < columns(); j++) {
+          sum += get(i, 0) * matrix.get(j, 0);
+        }
+        result.set(i, 0, sum);
+      }
+      return result;
+    }
     if (columns() != matrix.rows()) {
       throw new IllegalArgumentException("Matrix dimensions must be equal");
     }

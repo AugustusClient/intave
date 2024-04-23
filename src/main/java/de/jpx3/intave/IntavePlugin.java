@@ -69,7 +69,7 @@ import de.jpx3.intave.share.link.WrapperConverter;
 import de.jpx3.intave.test.TestService;
 import de.jpx3.intave.trustfactor.TrustFactorService;
 import de.jpx3.intave.user.UserRepository;
-import de.jpx3.intave.user.storage.ViolationStorage;
+import de.jpx3.intave.user.storage.LongTermViolationStorage;
 import de.jpx3.intave.version.DurationTranslator;
 import de.jpx3.intave.version.IntaveVersion;
 import de.jpx3.intave.version.IntaveVersionList;
@@ -822,7 +822,7 @@ public final class IntavePlugin extends JavaPlugin {
 //    BackgroundExecutors.executeWhenever(this::clearUnusedSamples);
     logger.performCompression();
 
-    ViolationStorage.setup();
+    LongTermViolationStorage.setup();
 
     if (JavaVersion.current() < 12) {
 //      logger.warn(ChatColor.RED + "Upgrading Java has incredible performance benefits");
@@ -864,7 +864,7 @@ public final class IntavePlugin extends JavaPlugin {
     logger.info("Intave booted successfully");
 
     String network = LicenseAccess.network();
-    if ("Intavede".equalsIgnoreCase(network) || "Survivalgamescz".equalsIgnoreCase(network)) {
+    if (/*"Intavede".equalsIgnoreCase(network) ||*/ "dexlandru".equalsIgnoreCase(network)) {
       IntaveLogger.logger().info("Enabling Intave debug mode");
       DEBUG_TELEPORT_LOCKS = true;
       DEBUG_MOVEMENT_IGNORE = true;

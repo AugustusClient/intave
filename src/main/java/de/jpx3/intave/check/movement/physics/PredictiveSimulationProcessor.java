@@ -206,8 +206,8 @@ public final class PredictiveSimulationProcessor implements SimulationProcessor 
 
     if (!inventoryOpen && (directionPrediction < 0 || Math.abs(directionPrediction - direction) > REQUIRED_PREDICTION_ACCURACY_FOR_PRED_BIAS_PROCEED)) {
       movementData.physicsJumped = false;
-      movementData.keyForward = -2;
-      movementData.keyStrafe = -2;
+      movementData.keyForward = 0;
+      movementData.keyStrafe = 0;
       motion.setToBaseMotionFrom(movementData);
       Timings.CHECK_PHYSICS_PROC_BIA.stop();
       Timings.CHECK_PHYSICS_PROC_PRED_BIA.stop();

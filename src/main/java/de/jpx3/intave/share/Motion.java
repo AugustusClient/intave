@@ -31,6 +31,10 @@ public final class Motion {
     this.motionZ = z;
   }
 
+  public void setTo(Vector velocity) {
+    setTo(velocity.getX(), velocity.getY(), velocity.getZ());
+  }
+
   public void setNull() {
     this.motionX = 0.0;
     this.motionY = 0.0;

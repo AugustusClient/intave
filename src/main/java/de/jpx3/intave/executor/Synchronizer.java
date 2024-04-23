@@ -44,7 +44,7 @@ public final class Synchronizer {
       try {
         Timings.EXE_SERVER.start();
         runnable.run();
-      } catch (UnsupportedFallbackOperationException | IllegalArgumentException fallbackOp) {
+      } catch (UnsupportedFallbackOperationException fallbackOp) {
         IntaveLogger.logger().info("Task " + runnable + " failed because the associated player logged off already");
       } catch (Exception | Error throwable) {
         IntaveLogger.logger().error("Failed to execute server task " + runnable);

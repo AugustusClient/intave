@@ -176,7 +176,7 @@ public final class SimulationEvaluator {
         && movement.positionY % 1 > 0.1
         && movement.pastExternalVelocity != 0;
 
-    boolean movingUpwardsInWeb = movement.inWeb && movement.motionY() > 0.05 && (movement.positionY + movement.motionY()) % 1 < 0.1 && movement.positionY % 1 > 0.8;
+    boolean movingUpwardsInWeb = movement.webTicks > 2 && movement.motionY() >= 0 && !movement.onGround && movement.pastExternalVelocity > 3;
 
     if (movement.inWeb) {
       verticalLegitimateDeviation = Math.max(verticalLegitimateDeviation, movingUpwardsInWeb ? 0.00001 :/*criticalWeb ? 0.000001 : */0.13);
@@ -380,8 +380,9 @@ public final class SimulationEvaluator {
     double flyingLimit = movement.inWeb ? 0.008 : 0.05;
     if (movement.receivedFlyingPacketIn(2)) {
       if (movement.onGround) {
-        boolean lessThanExpected = /*distanceMoved <= predictedDistanceMoved + 0.02 ||*/ distanceMoved < 0.15;
-        horizontalLegitimateDeviation = Math.max(horizontalLegitimateDeviation, lessThanExpected ? 0.115 : flyingLimit);
+        boolean specialWeb = movement.inWeb;
+        boolean lessThanExpected = distanceMoved < 0.15;
+        horizontalLegitimateDeviation = Math.max(horizontalLegitimateDeviation, specialWeb ? 0.04 : (lessThanExpected ? 0.115 : flyingLimit));
         tags.add(EvaluationTag.FLYING_ON_GROUND);
       } else {
         horizontalLegitimateDeviation = Math.max(horizontalLegitimateDeviation, flyingLimit);

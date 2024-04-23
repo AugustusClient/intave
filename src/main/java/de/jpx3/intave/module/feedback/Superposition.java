@@ -188,36 +188,60 @@ public final class Superposition<T> {
     return value;
   }
 
-  public void stateSynchronize(PacketEvent event, T newState) {
-    statusChange(newState, Status.AWAIT_START);
-//    Modules.feedback().doubleSynchronize(
-//      user.player(),
-//      packet,
-//      newState,
-//      (player, target) -> statusChange(target, Status.RUNNING),
-//      (player, target) -> statusChange(target, Status.RECEIVE_CONFIRMED)
-//    );
+  public void stateSynchronize(
+    PacketEvent event, T newState
+  ) {
+    stateSynchronize(event, newState, x -> {}, x -> {});
+  }
+
+  public void stateSynchronize(
+    PacketEvent event, T newState,
+    Consumer<? super T> begin, Consumer<? super T> end
+  ) {
     user.doubleTickFeedback(
       event,
-      () -> statusChange(newState, Status.RUNNING),
-      () -> statusChange(newState, Status.RECEIVE_CONFIRMED)
+      () -> {
+        statusChange(newState, Status.AWAIT_START);
+        statusChange(newState, Status.RUNNING);
+        begin.accept(newState);
+      },
+      () -> {
+        statusChange(newState, Status.RECEIVE_CONFIRMED);
+        end.accept(newState);
+      }
     );
   }
 
   private void statusChange(T target, Status status) {
     Status lastStatus = statusFrom(target);
 
+    int diff = status.ordinal() - lastStatus.ordinal();
+
     // if the status is older than the last status, ignore it
-    if (status.ordinal() <= lastStatus.ordinal() && status != Status.AWAIT_START) {
+//    if (status.ordinal() <= lastStatus.ordinal() && status != Status.AWAIT_START) {
+////      System.out.println("Ignoring status change " + status + " for " + target + " because it is older than " + lastStatus);
+//      return;
+//    }
+//
+//    // if the status is too far, ignore it
+//    if (status.ordinal() > lastStatus.ordinal() + 1 && status != Status.COMPLETED) {
+////      System.out.println("Ignoring status change " + status + " for " + target + " because it is too far");
+//      return;
+//    }
+
+    // if the status is too far, ignore it
+    if (diff > 1 && status != Status.COMPLETED) {
+//      System.out.println("Ignoring status change " + status + " for " + target + " because it is too far");
+      return;
+    }
+
+    // if the status is older than the last status, ignore it
+    if (diff < 0 && status != Status.AWAIT_START) {
 //      System.out.println("Ignoring status change " + status + " for " + target + " because it is older than " + lastStatus);
       return;
     }
 
-    // if the status is too far, ignore it
-    if (status.ordinal() > lastStatus.ordinal() + 1 && status != Status.COMPLETED) {
-//      System.out.println("Ignoring status change " + status + " for " + target + " because it is too far");
-      return;
-    }
+//    System.out.println("Status change " + status + " for " + target + " from " + lastStatus + " (timeout: " + variationTimeout.get(target) + ")");
 
     switch (status) {
       case AWAIT_START:

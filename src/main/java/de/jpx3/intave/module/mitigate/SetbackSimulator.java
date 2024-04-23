@@ -2,6 +2,7 @@ package de.jpx3.intave.module.mitigate;
 
 import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntaveLogger;
+import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.IntaveBootFailureException;
 import de.jpx3.intave.access.IntaveInternalException;
 import de.jpx3.intave.block.access.VolatileBlockAccess;
@@ -21,6 +22,7 @@ import de.jpx3.intave.player.Effects;
 import de.jpx3.intave.share.BlockPosition;
 import de.jpx3.intave.share.BoundingBox;
 import de.jpx3.intave.share.ClientMath;
+import de.jpx3.intave.user.MessageChannel;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.MetadataBundle;
@@ -102,8 +104,14 @@ public final class SetbackSimulator extends Module {
       return;
     }
 
+    Vector originalMotion = motion.clone();
+    boolean isOriginal = true;
+
     if (movementData.emulationVelocity != null) {
-      motion = movementData.emulationVelocity;
+      if (movementData.pastReceiveVelocityPacket < 2) {
+        motion = movementData.emulationVelocity;
+        isOriginal = false;
+      }
       movementData.emulationVelocity = null;
     }
 
@@ -111,7 +119,7 @@ public final class SetbackSimulator extends Module {
 
     violationLevelData.isInActiveTeleportBundle = true;
     if (IntaveControl.DEBUG_EMULATION) {
-      player.sendMessage(ChatColor.DARK_PURPLE + "[E+] " + motion + " (" + ticks + " ticks)");
+      player.sendMessage(ChatColor.DARK_PURPLE + "[E+] " + motion  + " (" + ticks + " ticks, "+(!isOriginal ? "not ["+originalMotion+"] " : "")+" original)");
     }
 
     proceedEmulationTick(player, motion, ticks, ticks, delay, cancellable);
@@ -216,7 +224,7 @@ public final class SetbackSimulator extends Module {
     BoundingBox boundingBox = BoundingBox.fromPosition(user, movementData, futurePosition);
 
     Vector emulationVelocity = movementData.emulationVelocity;
-    if (emulationVelocity != null) {
+    if (emulationVelocity != null && movementData.pastReceiveVelocityPacket < 2) {
       motion = motionProceed(emulationVelocity, user, boundingBox, true);
       movementData.emulationVelocity = null;
     } else {
@@ -225,7 +233,7 @@ public final class SetbackSimulator extends Module {
 
     // add y-motion to fall distance
     if (motion.getY() < 0) {
-      movementData.artificialFallDistance += -motion.getY();
+      movementData.artificialFallDistance += (float) -motion.getY();
     }
 
     if (!Collision.present(player, BoundingBox.fromPosition(user, movementData, futurePosition.clone().add(motion)))) {
@@ -258,13 +266,15 @@ public final class SetbackSimulator extends Module {
 
       Vector futureMotion = motionProceed(motion, user, boundingBox, true);
 
-      movementData.willReceiveSetbackVelocity = true;
+      movementData.willReceiveFinalSetbackVelocity = true;
       player.setVelocity(futureMotion);
 
 //      player.sendMessage("Setback velocity: " + MathHelper.formatMotion(futureMotion));
-      movementData.baseMotionX = futureMotion.getX();
-      movementData.baseMotionY = futureMotion.getY();
-      movementData.baseMotionZ = futureMotion.getZ();
+//      movementData.baseMotionX = futureMotion.getX();
+//      movementData.baseMotionY = futureMotion.getY();
+//      movementData.baseMotionZ = futureMotion.getZ();
+//      movementData.motionProcessorContext.setTo(futureMotion);
+//      violationLevelData.physicsOffset -= 0.3f;
 
       if (movementData.onGround) {
         physicsCheck.applyFallDamageUpdate(user);
@@ -497,6 +507,10 @@ public final class SetbackSimulator extends Module {
           teleportMethodContainer.teleport(player, dest, motionY, 0, 0, true);
           yawField.set(playerHandle, yaw);
           pitchField.set(playerHandle, pitch);
+        }
+
+        if (user.receives(MessageChannel.DEBUG_TELEPORT)) {
+          player.sendMessage(IntavePlugin.prefix() + "Teleport to " + player.getLocation().getBlockX() + " " + player.getLocation().getBlockY() + " " + player.getLocation().getBlockZ() + " " + " per " + ChatColor.RED + " setback policy");
         }
       } catch (IllegalAccessException exception) {
         throw new IntaveInternalException(exception);

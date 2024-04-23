@@ -24,6 +24,10 @@ public class LatencyStorage implements Storage {
   @Override
   public void readFrom(ByteArrayDataInput input) {
     buckets = input.readInt();
+    if (buckets != 100) {
+      buckets = 100;
+      System.out.println("Invalid bucket size, resetting to 100");
+    }
     latencyBuckets = new long[buckets];
     for (int i = 0; i < buckets; i++) {
       latencyBuckets[i] = input.readLong();

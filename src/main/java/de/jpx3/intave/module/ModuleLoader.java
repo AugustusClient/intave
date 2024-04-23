@@ -69,10 +69,12 @@ final class ModuleLoader {
     prepareModule("de.jpx3.intave.module.patcher.PacketResynchronizer", defaultBoot);
     prepareModule("de.jpx3.intave.module.patcher.ChunkAccessPatcher", defaultBoot);
     prepareModule("de.jpx3.intave.module.violation.ViolationProcessor", lateBoot);
+    prepareModule("de.jpx3.intave.module.violation.ShortTermViolationRecovery", lateBoot);
     prepareModule("de.jpx3.intave.module.filter.Filters", lateBoot);
     prepareModule("de.jpx3.intave.module.player.UserLifetimeService", defaultBoot);
     prepareModule("de.jpx3.intave.module.player.StorageLoader", defaultBoot);
     prepareModule("de.jpx3.intave.module.player.PlaytimeUpdater", lateBoot);
+    prepareModule("de.jpx3.intave.module.testing.ChestLootProvider", lateBoot);
     prepareModule("de.jpx3.intave.module.player.MiscBukkitEvents", defaultBoot);
     prepareModule("de.jpx3.intave.module.actionbar.ActionBarDisplayer", defaultBoot);
   }

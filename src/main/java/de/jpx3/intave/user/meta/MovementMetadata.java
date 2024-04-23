@@ -7,6 +7,7 @@ import com.comphenix.protocol.wrappers.WrappedAttribute;
 import com.comphenix.protocol.wrappers.WrappedAttributeModifier;
 import com.google.common.collect.ImmutableList;
 import de.jpx3.intave.IntaveControl;
+import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.annotate.DispatchTarget;
 import de.jpx3.intave.annotate.Nullable;
@@ -33,6 +34,7 @@ import de.jpx3.intave.player.Effects;
 import de.jpx3.intave.player.ItemProperties;
 import de.jpx3.intave.share.Rotation;
 import de.jpx3.intave.share.*;
+import de.jpx3.intave.user.MessageChannel;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import org.bukkit.*;
@@ -119,7 +121,9 @@ public final class MovementMetadata implements SimulationEnvironment {
   public int pastStep = 100;
   public int pastEntityUse = 100;
   public int pastSprintChange = 100;
+  public int pastReceiveVelocityPacket = 100;
   public int waterTicks = 0;
+  public int webTicks = 0;
   public int reduceTicks = 0;
   public boolean onLadderLast;
   public boolean aquaticUpdateInLava;
@@ -177,6 +181,7 @@ public final class MovementMetadata implements SimulationEnvironment {
   public boolean isTeleportConfirmationPacket;
   public boolean dropPostTickMotionProcessing;
   public boolean willReceiveSetbackVelocity;
+  public boolean willReceiveFinalSetbackVelocity;
   public boolean willReceiveSetbackVelocityResetCache;
   public int lastTeleport = 100;
   public int teleportId;
@@ -245,7 +250,7 @@ public final class MovementMetadata implements SimulationEnvironment {
       .reset(MovementDispatcher::resetVelocitySuperposition)
       .overrideMerge()
       .user(user)
-      .timeout(2)
+      .timeout(1)
       .build();
     if (Physics.USE_SUPERPOSITIONS) {
       superpositions = ImmutableList.of(velocitySuperposition);
@@ -1429,6 +1434,10 @@ public final class MovementMetadata implements SimulationEnvironment {
     if (IntaveControl.DEBUG_MOUNTING) {
       player.sendMessage(ChatColor.RED + "Mounting " + ridingEntity.entityName() + " " + MathHelper.formatDouble(attachMoveDistance, 4) + " blocks away");
     }
+
+    if (user.receives(MessageChannel.DEBUG_MOUNTS)) {
+      player.sendMessage(IntavePlugin.prefix() + "Mounting " + ridingEntity.entityName() + " " + MathHelper.formatDouble(attachMoveDistance, 4) + " blocks away");
+    }
   }
 
   public void dismountRidingEntity() {
@@ -1453,7 +1462,13 @@ public final class MovementMetadata implements SimulationEnvironment {
       Synchronizer.synchronize(() -> {
         // player.getLocation() is assumed to be correct
         player.teleport(player.getLocation());
+        if (user.receives(MessageChannel.DEBUG_TELEPORT)) {
+          player.sendMessage(IntavePlugin.prefix() + "Teleport to " + player.getLocation().getBlockX() + " " + player.getLocation().getBlockY() + " " + player.getLocation().getBlockZ() + " " + " because " + ChatColor.RED + " you dismounted a vehicle");
+        }
       });
+    }
+    if (user.receives(MessageChannel.DEBUG_MOUNTS)) {
+      player.sendMessage(IntavePlugin.prefix() + "Unmounting " + vehicle.entityName() + " for " + reason.toLowerCase() + " " + (positionReset ? "(with position reset)" : ""));
     }
     this.vehicle = null;
   }

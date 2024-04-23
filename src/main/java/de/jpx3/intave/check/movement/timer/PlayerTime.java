@@ -8,11 +8,7 @@ import de.jpx3.intave.check.CheckViolationLevelDecrementer;
 import de.jpx3.intave.check.MetaCheckPart;
 import de.jpx3.intave.check.movement.Timer;
 import de.jpx3.intave.cleanup.GarbageCollector;
-import de.jpx3.intave.library.pledge.TickEnd;
 import de.jpx3.intave.module.Modules;
-import de.jpx3.intave.module.feedback.FeedbackObserver;
-import de.jpx3.intave.module.feedback.FeedbackOptions;
-import de.jpx3.intave.module.feedback.FeedbackRequest;
 import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
@@ -25,7 +21,6 @@ import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.*;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -133,6 +128,11 @@ public class PlayerTime extends MetaCheckPart<Timer, PlayerTime.PlayerTimeMeta> 
     checkMeta.limitToBeApplied = checkMeta.queuedLimit;
     long diff = checkMeta.time - System.nanoTime();
     statisticApply(user, CheckStatistics::increaseTotal);
+    double experimentalLimit = (-user.latency()) * 1_000_000f;
+
+    boolean bad = diff > experimentalLimit + 25_000_000;
+
+//    player.sendMessage((bad ? ChatColor.RED : ChatColor.GRAY) + " " + (diff / (50 * 1_000_000f)) + " / " + (experimentalLimit / (50 * 1_000_000f)));
 
     int limit = 20_000_000;
     if ((diff > limit) && !user.meta().movement().isInVehicle()) {
@@ -153,7 +153,9 @@ public class PlayerTime extends MetaCheckPart<Timer, PlayerTime.PlayerTimeMeta> 
         Vector setback = new Vector(0, 0, 0);
         statisticApply(user, CheckStatistics::increaseFails);
         Modules.mitigate().movement().emulationSetBack(player, setback, 3, 2, false);
-        user.nerf(AttackNerfStrategy.DMG_HIGH, "timer");
+        if (violationContext.violationLevelAfter() > 20) {
+          user.nerfPermanently(AttackNerfStrategy.DMG_HIGH, "timer");
+        }
       }
       checkMeta.time -= 10_000_000;
       return;

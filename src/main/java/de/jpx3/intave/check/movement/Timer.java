@@ -5,6 +5,7 @@ import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.check.Check;
 import de.jpx3.intave.check.CheckConfiguration.CheckSettings;
 import de.jpx3.intave.check.CheckViolationLevelDecrementer;
+import de.jpx3.intave.check.movement.timer.MicroBlink;
 import de.jpx3.intave.check.movement.timer.PlayerTime;
 
 public final class Timer extends Check {
@@ -18,6 +19,7 @@ public final class Timer extends Check {
   private final int timerTolerance;
   private final boolean detectPulseBlink;
   private final PlayerTime playerTime;
+  private final MicroBlink microBlink;
 
   public Timer() {
     super("Timer", "timer");
@@ -37,10 +39,14 @@ public final class Timer extends Check {
 
     this.playerTime = new PlayerTime(this);
     appendCheckPart(playerTime);
+
+    this.microBlink = new MicroBlink(this);
+    appendCheckPart(microBlink);
   }
 
   public void receiveMovement(PacketEvent event) {
     playerTime.receiveMovement(event);
+    microBlink.receiveMovement(event);
   }
 
   @Override

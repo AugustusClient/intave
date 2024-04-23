@@ -369,7 +369,7 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
       timeoutDecrementer.decrement(user, 0.01);
     }
 
-    if (System.currentTimeMillis() - violationLevel.lastBacktrackVLChange > 10_000) {
+    if (System.currentTimeMillis() - violationLevel.lastBacktrackVLChange > 7_500) {
       violationLevel.backtrackVL = Math.max(0, violationLevel.backtrackVL - 1);
       violationLevel.lastBacktrackVLChange = System.currentTimeMillis();
     }

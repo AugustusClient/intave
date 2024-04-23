@@ -25,6 +25,7 @@ public final class BlockTypeAccess {
   public static final Material WEB = resolveFrom("COBWEB", "WEB");
   public static final Material SNOW_LAYER = resolveFrom("SNOW", "SNOW_LAYER");
   public static final Material TRAP_DOOR = resolveFrom("TRAP_DOOR", "LEGACY_TRAP_DOOR");
+  public static final Material FARMLAND = resolveFrom("FARMLAND", "SOIL");
   public static final Material NETHER_PORTAL = resolveFrom("PORTAL", "NETHER_PORTAL");
   public static final Material END_PORTAL_FRAME = resolveFrom("END_PORTAL_FRAME", "ENDER_PORTAL_FRAME");
   public static final Material SKULL = resolveFrom("SKULL", "LEGACY_SKULL");

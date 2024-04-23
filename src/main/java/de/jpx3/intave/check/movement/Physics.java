@@ -80,7 +80,7 @@ public final class Physics extends Check {
   private static final long BURST_WINDOW = 8000;
   private static final long BURST_CONGESTION = 2;
 
-  public static boolean USE_SUPERPOSITIONS = false;
+  public static boolean USE_SUPERPOSITIONS = true;
 
   private final IntavePlugin plugin;
   private final CheckViolationLevelDecrementer decrementer;
@@ -126,7 +126,7 @@ public final class Physics extends Check {
       this.refreshNearbyBlocks = settings.boolBy("refresh-nearby-blocks-on-detection", true);
     }
 
-    this.useSuperpositions = false;//settings.boolBy("use-superpositions", false);
+    this.useSuperpositions = true;//settings.boolBy("use-superpositions", false);
     this.detectNoSlowdown = settings.boolBy("enforce-item-slowdown", true);
     Physics.USE_SUPERPOSITIONS = useSuperpositions;
 
@@ -419,8 +419,8 @@ public final class Physics extends Check {
 
     double biasedDistance = MathHelper.hypot3d(differenceX, differenceY * 2, differenceZ);
     violationLevelData.physicsOffset += biasedDistance;
-    violationLevelData.physicsOffset -= movementData.receivedFlyingPacketIn(2) ? Math.min(0.03, biasedDistance) : 0;
-    violationLevelData.physicsOffset -= violationLevelData.physicsOffset > 0.5 ? 0.003 : 0.001;
+    violationLevelData.physicsOffset -= movementData.receivedFlyingPacketIn(2) && movementData.motion().length() < 0.1 ? Math.min(0.03, biasedDistance) : 0;
+    violationLevelData.physicsOffset -= violationLevelData.physicsOffset > 0.6 ? 0.002 : 0.001;
     violationLevelData.physicsOffset -= movementData.pastElytraFlying < 3 ? 0.025 : 0;
 
     // clamp the offset

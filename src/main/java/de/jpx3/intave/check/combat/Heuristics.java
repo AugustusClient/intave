@@ -352,6 +352,9 @@ public final class Heuristics extends MetaCheck<Heuristics.HeuristicMeta> {
     if (NativeCheck.checkActive()) {
       return null;
     }
+    if (user.hasPlayer()) {
+      return Collections.emptyList();
+    }
     Player player = user.player();
     Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
     boolean isPartner = (ProtocolMetadata.VERSION_DETAILS & 0x100) != 0;
@@ -523,7 +526,7 @@ public final class Heuristics extends MetaCheck<Heuristics.HeuristicMeta> {
   @BukkitEventSubscription
   public void receiveQuit(PlayerQuitEvent quit) {
     Player player = quit.getPlayer();
-    evaluate(player, true);
+//    evaluate(player, true);
   }
 
   // encryption

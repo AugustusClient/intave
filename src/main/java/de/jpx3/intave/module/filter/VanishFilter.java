@@ -174,6 +174,6 @@ public final class VanishFilter extends Filter {
 
   @Override
   protected boolean enabled() {
-    return !disabled;
+    return !disabled && super.enabled();
   }
 }

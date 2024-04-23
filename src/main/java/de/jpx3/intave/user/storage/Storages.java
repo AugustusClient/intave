@@ -6,13 +6,14 @@ public final class Storages {
   public static PlayerStorage emptyPlayerStorageFor(UUID id) {
     PlayerStorage storage = new PlayerStorage(id);
     storage.append(PlaytimeStorage.class);
-    storage.append(ViolationStorage.class);
+    storage.append(LongTermViolationStorage.class);
     storage.append(HeuristicsStorage.class);
     storage.append(NerferStorage.class);
     storage.append(AccountDataStorage.class);
     storage.append(FeedbackAnalysisStorage.class);
     storage.append(ViolationBufferStorage.class);
     storage.append(LatencyStorage.class);
+    storage.append(ShortTermViolationStorage.class);
     return storage;
   }
 }

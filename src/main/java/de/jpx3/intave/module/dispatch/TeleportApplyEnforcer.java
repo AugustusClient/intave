@@ -18,10 +18,12 @@ import de.jpx3.intave.module.linker.packet.PacketEventSubscriber;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.packet.TeleportFlag;
 import de.jpx3.intave.share.BoundingBox;
+import de.jpx3.intave.user.MessageChannel;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.MovementMetadata;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -143,6 +145,10 @@ public final class TeleportApplyEnforcer implements PacketEventSubscriber {
       IntavePlugin.singletonInstance().logTransmittor().addPlayerLog(player, "(DEBUG/TELEPORT) Sent teleportation request to " + MathHelper.formatPosition(movementData.teleportLocation));
     }
 
+    if (user.receives(MessageChannel.DEBUG_TELEPORT)) {
+      player.sendMessage(IntavePlugin.prefix() + "You were instructed to teleport to " + MathHelper.formatPosition(movementData.teleportLocation));
+    }
+
     /*
      * ViaBackwards messes up the order of teleportation packets, so we need to account for that
      */
@@ -212,6 +218,10 @@ public final class TeleportApplyEnforcer implements PacketEventSubscriber {
         Block highestBlockAt = randomLocation.getWorld().getHighestBlockAt(randomLocation);
         randomLocation.setY(highestBlockAt.getY() + 1);
         player.teleport(randomLocation);
+
+        if (user.receives(MessageChannel.DEBUG_TELEPORT)) {
+          player.sendMessage(IntavePlugin.prefix() + "Teleport to random " + player.getLocation().getBlockX() + " " + player.getLocation().getBlockY() + " " + player.getLocation().getBlockZ() + " " + " as " + ChatColor.RED + " it was command-requested");
+        }
       });
     }
   }
@@ -236,6 +246,7 @@ public final class TeleportApplyEnforcer implements PacketEventSubscriber {
         IntaveLogger.logger().printLine("[Intave] Cancelled packet of " + player.getName() + " (Awaiting teleport accept)");
         IntavePlugin.singletonInstance().logTransmittor().addPlayerLog(player, "(DEBUG/TELEPORT) Cancelled packet of " + player.getName() + " (Awaiting teleport accept)");
       }
+
       if (movementData.teleportResendCountdown-- < 0) {
         movementData.teleportResendCountdown = 20;
         if (IntaveControl.DEBUG_TELEPORT_LOCKS) {
@@ -257,6 +268,10 @@ public final class TeleportApplyEnforcer implements PacketEventSubscriber {
           location.setYaw(movementData.rotationYaw());
           location.setPitch(movementData.rotationPitch());
           player.teleport(location, NETHER_PORTAL);
+
+          if (user.receives(MessageChannel.DEBUG_TELEPORT)) {
+            player.sendMessage(IntavePlugin.prefix() + "Teleport to " + player.getLocation().getBlockX() + " " + player.getLocation().getBlockY() + " " + player.getLocation().getBlockZ() + " " + " since " + ChatColor.RED + " you are not responding to teleport requests");
+          }
         });
       }
     }
@@ -282,6 +297,10 @@ public final class TeleportApplyEnforcer implements PacketEventSubscriber {
         location.setYaw(movementData.rotationYaw());
         location.setPitch(movementData.rotationPitch());
         player.teleport(location, NETHER_PORTAL);
+
+        if (user.receives(MessageChannel.DEBUG_TELEPORT)) {
+          player.sendMessage(IntavePlugin.prefix() + "Teleport to " + player.getLocation().getBlockX() + " " + player.getLocation().getBlockY() + " " + player.getLocation().getBlockZ() + " " + " to " + ChatColor.RED + " since you are not responding to outgoing teleport requests");
+        }
       });
     }
   }
@@ -305,6 +324,10 @@ public final class TeleportApplyEnforcer implements PacketEventSubscriber {
         System.out.println("[Intave] " + player.getName() + " accepted teleport");
         IntavePlugin.singletonInstance().logTransmittor().addPlayerLog(player, "(DEBUG/TELEPORT) " + player.getName() + " accepted teleport");
       }
+
+      if (user.receives(MessageChannel.DEBUG_TELEPORT)) {
+        player.sendMessage(IntavePlugin.prefix() + "Movement matched teleport request to " + MathHelper.formatPosition(teleportLocation));
+      }
     } else {
       double positionDeviation = MathHelper.distanceOf(
         positionX, positionY, positionZ,
@@ -324,7 +347,6 @@ public final class TeleportApplyEnforcer implements PacketEventSubscriber {
         float pitchDeviation = MathHelper.distanceInDegrees(pitch, teleportLocation.getPitch());
         validPosition = yawDeviation < 0.001 && pitchDeviation < 0.001;
         if (IntaveControl.DEBUG_TELEPORT_LOCKS) {
-//          Synchronizer.synchronize(() -> Bukkit.broadcastMessage("[Intave] Additional rotation check on " + player.getName() + ", difference is " + yawDeviation + "/" + pitchDeviation));
           System.out.println("[Intave] Additional rotation check on " + player.getName() + ", difference is " + yawDeviation + "/" + pitchDeviation);
           IntavePlugin.singletonInstance().logTransmittor().addPlayerLog(player, "(DEBUG/TELEPORT) Additional rotation check on " + player.getName() + ", difference is " + yawDeviation + "/" + pitchDeviation);
         }
@@ -345,6 +367,16 @@ public final class TeleportApplyEnforcer implements PacketEventSubscriber {
         }
       }
       isTeleport = validPosition;
+
+
+      if (user.receives(MessageChannel.DEBUG_TELEPORT)) {
+        player.sendMessage(
+          IntavePlugin.prefix() + "Movement " + (isTeleport ? "matched" : "did not match")
+            + " teleport request to " + MathHelper.formatPosition(teleportLocation) +
+            " (dev: " + positionDeviation + ", rrot: " + movementData.expectTeleportWithRotation +
+            ", tra: "+movementData.transactionTeleportAllow+")"
+        );
+      }
     }
     if (isTeleport) {
       releaseAwaitTeleportLock(player);

@@ -94,10 +94,13 @@ public class BlockTrustChain {
     lock.lock();
     try {
       Queue<BlockTrust> queue = pendingMap.get(position);
-      if (queue != null && !queue.isEmpty()) {
+      if (queue == null) {
+        return;
+      }
+      if (!queue.isEmpty()) {
         queue.remove();
       }
-      if (queue != null && queue.isEmpty()) {
+      if (queue.isEmpty()) {
         pendingMap.remove(position);
       }
     } finally {

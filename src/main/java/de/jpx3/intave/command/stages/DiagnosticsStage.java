@@ -32,10 +32,12 @@ import de.jpx3.intave.module.nayoro.Nayoro;
 import de.jpx3.intave.module.nayoro.event.AttackEvent;
 import de.jpx3.intave.module.nayoro.event.BlockPlaceEvent;
 import de.jpx3.intave.module.nayoro.event.sink.EventSink;
+import de.jpx3.intave.module.testing.ChestLootProvider;
 import de.jpx3.intave.player.DamageModify;
 import de.jpx3.intave.resource.Resource;
 import de.jpx3.intave.resource.ResourceRegistry;
 import de.jpx3.intave.security.HashAccess;
+import de.jpx3.intave.user.MessageChannel;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.ConnectionMetadata;
@@ -504,7 +506,11 @@ public final class DiagnosticsStage extends CommandStage {
         Bukkit.getScheduler().cancelTask(id[0]);
         return;
       }
+
       player.teleport(player.getLocation().add(0, 0, 0));
+      if (user.receives(MessageChannel.DEBUG_TELEPORT)) {
+        player.sendMessage(IntavePlugin.prefix() + "Teleport to " + player.getLocation().getBlockX() + " " + player.getLocation().getBlockY() + " " + player.getLocation().getBlockZ() + " " + " as " + ChatColor.RED + " it was command-requested");
+      }
     }, 20, 3);
   }
 
@@ -868,5 +874,24 @@ public final class DiagnosticsStage extends CommandStage {
     if (!output) {
       sender.sendMessage(IntavePlugin.prefix() + "No check statistics available");
     }
+  }
+
+  @SubCommand(
+    selectors = "lootchest",
+    usage = "",
+    description = "Open a loot chest",
+    permission = "intave.command.diagnostics.performance"
+  )
+  public void onLootChest(User user) {
+    ChestLootProvider provider = Modules.find(ChestLootProvider.class);
+    if (!user.player().isOp()) {
+      user.player().sendMessage(IntavePlugin.prefix() + ChatColor.RED + "You need to be op to use this command");
+      return;
+    }
+    if (!IntaveControl.DISABLE_LICENSE_CHECK) {
+      user.player().sendMessage(IntavePlugin.prefix() + ChatColor.RED + "Not available in production");
+      return;
+    }
+    provider.openLootChestCommand(user.player());
   }
 }

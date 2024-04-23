@@ -24,7 +24,7 @@ import de.jpx3.intave.user.MessageChannelSubscriptions;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.ViolationMetadata;
-import de.jpx3.intave.user.storage.ViolationStorage;
+import de.jpx3.intave.user.storage.LongTermViolationStorage;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -178,6 +178,9 @@ public final class ViolationProcessor extends Module {
     }
     Player player = violation.findPlayer().orElseThrow(IllegalStateException::new);
     User user = UserRepository.userOf(player);
+    if (user.justJoined()) {
+      return;
+    }
     Check check = violation.check();
     check.statisticApply(user, CheckStatistics::increaseViolations);
   }
@@ -237,7 +240,7 @@ public final class ViolationProcessor extends Module {
 //    recorder.recordViolation(violation.check().name());
     Player player = violation.findPlayer().orElseThrow(IllegalStateException::new);
     User user = UserRepository.userOf(player);
-    ViolationStorage violationStorage = user.storageOf(ViolationStorage.class);
+    LongTermViolationStorage violationStorage = user.storageOf(LongTermViolationStorage.class);
     violationStorage.noteViolation(violationContext);
   }
 

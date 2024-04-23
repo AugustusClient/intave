@@ -55,8 +55,8 @@ public final class FluidTests extends Tests {
   public void testWaterLevel() {
     World world = Bukkit.getWorlds().get(0);
     Block block = world.getBlockAt(0, 4, 0);
-    block.setType(WATER, false);
     blockStorage = BlockStorage.store(block);
+    block.setType(WATER, false);
 
     if (MinecraftVersions.VER1_13_0.atOrAbove()) {
       // set water level to 3

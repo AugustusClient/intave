@@ -311,7 +311,7 @@ public final class MovementDispatcher extends Module {
     }
 
     boolean clientVehicleMovement = MinecraftVersions.VER1_9_0.atOrAbove() && protocol.combatUpdate();
-    if (movementData.isInRidingVehicle() && !vehicleMove && clientVehicleMovement) {
+    if (movementData.isInRidingVehicle() && !vehicleMove && clientVehicleMovement && !movementData.awaitTeleport) {
       movementData.dismountRidingEntity("Client vehicle movement");
     }
 
@@ -452,6 +452,8 @@ public final class MovementDispatcher extends Module {
       if (violationLevelData.wrappedNoSlowdownVL++ > 5) {
         user.nerfPermanently(AttackNerfStrategy.DMG_HIGH, "No slowdown");
         user.nerfPermanently(AttackNerfStrategy.BLOCKING, "No slowdown");
+        inventoryData.blockNextArrow = true;
+        inventoryData.lastBlockArrowRequest = System.currentTimeMillis();
       }
     } else {
       violationLevelData.wrappedNoSlowdownVL = Math.max(0, violationLevelData.wrappedNoSlowdownVL - 0.08);
@@ -746,8 +748,10 @@ public final class MovementDispatcher extends Module {
 //    }
     if (movement.inWeb) {
       movement.pastInWeb = 0;
+      movement.webTicks++;
     } else {
       movement.pastInWeb++;
+      movement.webTicks = 0;
     }
     if (inventoryData.inventoryOpen()) {
       movement.pastInventoryOpen = 0;
@@ -772,6 +776,7 @@ public final class MovementDispatcher extends Module {
     movement.pastWaterMovement++;
     movement.pastLavaMovement++;
     movement.pastVelocity++;
+    movement.pastReceiveVelocityPacket++;
     movement.pastStep++;
     movement.pastEdgeSneak++;
     movement.pastSprintChange++;
@@ -998,6 +1003,7 @@ public final class MovementDispatcher extends Module {
       User user = UserRepository.userOf(player);
       MetadataBundle meta = user.meta();
       MovementMetadata movementData = meta.movement();
+      ViolationMetadata violationMetadata = meta.violationLevel();
       if (movementData.willReceiveSetbackVelocity && velocity.length() < 0.001) {
         movementData.willReceiveSetbackVelocity = false;
         velocity = movementData.setbackOverrideVelocity;
@@ -1008,38 +1014,53 @@ public final class MovementDispatcher extends Module {
       }
       /*
         Some players abuse "velocity buffering", giving them the ability to jump up to 40 - 50 blocks (provided they have external help).
-        This fix is an attempt to decrease this bugs effectiveness, neither perfect nor sustainable, but somewhat working
+        This fix is an attempt to decrease this bugs effectiveness, somewhat working
        */
       int pendingVelocityPackets = movementData.pendingVelocityPackets.get();
       if (pendingVelocityPackets > 1 && user.meta().attack().wasRecentlyAttackedByEntity()) {
-        if (pendingVelocityPackets < 6) {
-          velocity.setX(velocity.getX() / pendingVelocityPackets);
-          velocity.setY(Math.min(0, velocity.getY()));
-          velocity.setZ(velocity.getZ() / pendingVelocityPackets);
-          integers.writeSafely(1, (int) (velocity.getX() * 8000d));
-          integers.writeSafely(2, (int) (velocity.getY() * 8000d));
-          integers.writeSafely(3, (int) (velocity.getZ() * 8000d));
-        } else {
-          if (event.isReadOnly()) {
-            event.setReadOnly(false);
-          }
-          event.setCancelled(true);
-          return;
-        }
+        Violation violation = Violation.builderFor(Physics.class)
+          .forPlayer(player)
+          .withMessage("is queuing up velocity packets")
+          .withDetails("pending: " + pendingVelocityPackets)
+          .withVL(0.5)
+          .build();
+
+        Modules.violationProcessor().processViolation(violation);
+//        if (pendingVelocityPackets < 6) {
+//          velocity.setX(velocity.getX() / pendingVelocityPackets);
+//          velocity.setY(Math.min(0, velocity.getY()));
+//          velocity.setZ(velocity.getZ() / pendingVelocityPackets);
+//          integers.writeSafely(1, (int) (velocity.getX() * 8000d));
+//          integers.writeSafely(2, (int) (velocity.getY() * 8000d));
+//          integers.writeSafely(3, (int) (velocity.getZ() * 8000d));
+//        } else {
+//          if (event.isReadOnly()) {
+//            event.setReadOnly(false);
+//          }
+//          event.setCancelled(true);
+//          return;
+//        }
       }
+
       movementData.pendingVelocityPackets.incrementAndGet();
       movementData.emulationVelocity = velocity.clone();
       if (movementData.sneaking) {
         movementData.sneakPatchVelocity = velocity.clone();
       }
       Motion motion = Motion.fromVector(velocity);
-      if (Physics.USE_SUPERPOSITIONS) {
-        movementData.velocitySuperposition().stateSynchronize(event, motion);
+      if (Physics.USE_SUPERPOSITIONS && violationMetadata.physicsOffset < 0.5) {
+        movementData.velocitySuperposition().stateSynchronize(
+          event, motion, begin -> {},
+          end -> movementData.pendingVelocityPackets.decrementAndGet()
+        );
       } else {
-//        Modules.feedback().synchronize(player, velocity, this::receiveVelocity);
         Vector finalVelocity = velocity;
-        user.tickFeedback(() -> receiveVelocity(player, finalVelocity));
+        user.tickFeedback(() -> {
+          receiveVelocity(player, finalVelocity);
+          movementData.pendingVelocityPackets.decrementAndGet();
+        });
       }
+      movementData.pastReceiveVelocityPacket = 0;
     }
   }
 
@@ -1056,14 +1077,14 @@ public final class MovementDispatcher extends Module {
       movementData.baseMotionY = velocity.getY();
       movementData.baseMotionZ = velocity.getZ();
       movementData.lastVelocity = velocity.clone();
-      if (!movementData.willReceiveSetbackVelocity) {
+      if (!movementData.willReceiveSetbackVelocity && !movementData.willReceiveFinalSetbackVelocity) {
         movementData.pastExternalVelocity = 0;
       }
       movementData.willReceiveSetbackVelocity = false;
+      movementData.willReceiveFinalSetbackVelocity = false;
     }
-    Synchronizer.synchronize(() -> movementData.emulationVelocity = null);
     movementData.pastVelocity = 0;
-    movementData.pendingVelocityPackets.decrementAndGet();
+//    movementData.pendingVelocityPackets.decrementAndGet();
   }
 
   private static final Set<Material> SHULKER_BOX_MATERIALS = MaterialSearch.materialsThatContain("SHULKER_BOX");
@@ -1305,9 +1326,8 @@ public final class MovementDispatcher extends Module {
     if (velocity != null) {
       MetadataBundle meta = user.meta();
       MovementMetadata movementData = meta.movement();
-      Synchronizer.synchronize(() -> movementData.emulationVelocity = null);
       movementData.pastVelocity = 0;
-      movementData.pendingVelocityPackets.decrementAndGet();
+//      movementData.pendingVelocityPackets.decrementAndGet();
       if (!movementData.willReceiveSetbackVelocity) {
         movementData.pastExternalVelocity = 0;
       }
@@ -1317,6 +1337,7 @@ public final class MovementDispatcher extends Module {
 //        movementData.pastExternalVelocity = 0;
 //      }
 //      movementData.willReceiveSetbackVelocity = false;
+//      user.player().sendMessage("Collapsed velocity " + velocity + ", pending: " + movementData.pendingVelocityPackets.get());
     }
   }
 
