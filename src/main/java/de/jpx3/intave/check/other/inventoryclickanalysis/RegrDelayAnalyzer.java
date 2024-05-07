@@ -176,7 +176,7 @@ public class RegrDelayAnalyzer extends MetaCheckPart<InventoryClickAnalysis, Reg
 //      player.sendMessage(ChatColor.YELLOW + "CI | "+(meta.firstClickTimestamp-meta.lastWindowOpenTimestamp)+"ms fc | " + MathHelper.formatDouble(averageSpeed, 2) + " s/s avg" + " | " + formatDouble(slope[0], 2) + " distance/time correlation");
 //      player.sendMessage(ChatColor.YELLOW + Arrays.toString(variances));
 
-      if (slope[0] < 0.1 || pearson < 0.1) {
+      if ((slope[0] < 0.1 || pearson < 0.1) && meanDistance > 1.2) {
         Violation violation = Violation.builderFor(InventoryClickAnalysis.class)
           .forPlayer(player)
           .withVL(10)
@@ -230,7 +230,7 @@ public class RegrDelayAnalyzer extends MetaCheckPart<InventoryClickAnalysis, Reg
       if (averageSpeed > 20) {
         Violation violation = Violation.builderFor(InventoryClickAnalysis.class)
           .forPlayer(player)
-          .withVL(MathHelper.minmax(5, (averageSpeed/2) - 7.5, 50))
+          .withVL(MathHelper.minmax(1, (averageSpeed/2) - 15, 50))
 //          .withVL(1)
           .appendFlags(DISPLAY_IN_ALL_VERBOSE_MODES)
           .withMessage("is taking items too quickly")

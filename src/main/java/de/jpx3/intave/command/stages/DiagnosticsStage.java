@@ -49,7 +49,9 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -57,6 +59,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -335,6 +338,83 @@ public final class DiagnosticsStage extends CommandStage {
     //      sender.sendMessage(message);
     //    });
   }
+
+  @SubCommand(
+    selectors = "fireball",
+    usage = "",
+    description = "Fireball catapult",
+    permission = "intave.command.diagnostics.performance"
+  )
+  public void fireballCommand(User user) {
+    Player player = user.player();
+
+//    val gamer = Gamer.getGamer(player);
+
+//    if (gamer == null || gamer.isSpectator()) {
+//      return;
+//    }
+
+//    val damagerPlayer = game.getMetadata().<Player>get(damager, "owner");
+//    if (!game.getSetting(GameSetting.FIREBALL_FRIENDLY_FIRE, true)) {
+//      val team = game.getTeamManager().getTeam(gamer);
+//
+//      if (team != null) {
+//        val damagerGamer = Gamer.getGamer(damagerPlayer);
+//
+//        if (damagerGamer != null && !damagerGamer.equals(gamer) && team.contains(damagerGamer)) {
+//          return;
+//        }
+//      }
+//    }
+
+    player.damage(0);
+
+    double multiply = 1.5;
+    Vector vector = getPosition(player, player.getLocation(), player.getLocation().clone().add(0, 0.5, 0), 1.2);
+
+    vector.setX(vector.getX() * multiply);
+//    if (game.getSetting(GameSetting.MULTIPLY_Y_VELOCITY, false)) {
+      vector.setY(vector.getY() * multiply);
+//    }
+    vector.setZ(vector.getZ() * multiply);
+
+    player.setVelocity(vector);
+  }
+
+  private static Vector getPosition(Entity entity, Location location1, Location location2, double defaultY) {
+    double distance = location1.distance(location2);
+
+    double x = location1.getX() - location2.getX();
+    double y = (defaultY / distance);
+    double z = location1.getZ() - location2.getZ();
+
+    double distanceForce = Math.min(1.2, 0.9 / distance);
+
+    double finalX = x * distanceForce;
+    double finalY = entity.isOnGround() ? (distance <= 1.5 ? defaultY : (y * 1.2)) : defaultY;
+    double finalZ = z * distanceForce;
+
+    return new Vector(finalX, finalY, finalZ);
+  }
+
+  @SubCommand(
+    selectors = "resistance",
+    usage = "",
+    description = "Give everyone on the server resistance",
+    permission = "intave.command.diagnostics.performance"
+  )
+  public void resistanceCommand(User user) {
+    if (!IntaveControl.DISABLE_LICENSE_CHECK) {
+      user.player().sendMessage(IntavePlugin.prefix() + ChatColor.RED + "Currently unavailable");
+      return;
+    }
+    Bukkit.getOnlinePlayers().forEach(player -> {
+        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 9999, 100));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, 9999, 100));
+      }
+    );
+  }
+
 
   @SubCommand(
     selectors = "teleportspam",
