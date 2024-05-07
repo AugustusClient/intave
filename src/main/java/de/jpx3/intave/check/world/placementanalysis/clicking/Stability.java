@@ -73,7 +73,7 @@ public final class Stability extends MetaCheckPart<PlacementAnalysis, Stability.
 
             long length = System.currentTimeMillis() - meta.started;
 
-            if (std < 5 && length < 4000) {
+            if (std < 10 && length < 4000) {
                 int vlAdd = 1;
                 meta.vl += vlAdd;
                 if (meta.vl > 2) {
@@ -87,14 +87,13 @@ public final class Stability extends MetaCheckPart<PlacementAnalysis, Stability.
                             .withVL(0.1).build();
                     Modules.violationProcessor().processViolation(violation);
 
-                    /*
-                    if (meta.vl > 3) {
+                    if (meta.vl > 4) {
+                        //dmc45
                         user.nerf(AttackNerfStrategy.GARBAGE_HITS, "45");
                         user.nerf(AttackNerfStrategy.BURN_LONGER, "45");
                         meta.vl -= 0.2;
                         meta.vl *= 0.98;
                     }
-                     */
                 }
             } else if (meta.vl > 0) {
                 meta.vl -= 0.2;

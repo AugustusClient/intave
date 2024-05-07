@@ -13,6 +13,7 @@ import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.module.Modules;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
+import de.jpx3.intave.module.mitigate.AttackNerfStrategy;
 import de.jpx3.intave.module.violation.Violation;
 import de.jpx3.intave.packet.reader.BlockInteractionReader;
 import de.jpx3.intave.share.Direction;
@@ -145,6 +146,12 @@ public class RotationFlick extends PlayerCheckPart<PlacementAnalysis> {
           Modules.violationProcessor().processViolation(violation);
 //          user.meta().violationLevel().lastBlockPlaceDenyRequest = System.currentTimeMillis();
           vl -= 10;
+        }
+
+        if (vl > 250) {
+          //dmc35
+          user.nerf(AttackNerfStrategy.GARBAGE_HITS, "35");
+          user.nerf(AttackNerfStrategy.DMG_LIGHT, "35");
         }
       }
 //      player.sendMessage(ChatColor.RED + "Rotation flick " + movement.rotationYaw + " " + movement.rotationPitch + " +-" + pitchDiff + " " + verticalLineLength + " " + average + " " + rotationSum + " -> " + vl);
