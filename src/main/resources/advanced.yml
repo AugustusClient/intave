@@ -27,6 +27,9 @@ check:
     # Check for NoSlowdown cheats?
     enforce-item-slowdown: true
 
+    # Disable tick leniency for velocity packets
+    no-speculative-velocity: false
+
     on-detection:
       # Can help reduce item-related false positives
       reset-item-usage: true
@@ -49,14 +52,11 @@ check:
     # Very effective against blink in combat
     reverse-blink: true
 
-    # How many ticks should a player be allowed to exist ahead of the server tick?
-    tolerance: 1
-
     # The maximum ticks a player is allowed to exist behind server tick, aka. "blink", -1 to disable
-    # 200 = Allow 10 second lag
+    # An aggressive setting would be 3 seconds = 60 ticks
     blink-limit: -1
 
-    # Do you want to
+    # Do you want to block pulse-blinking?
     block-pulse-blink: true
 
     # DO NOT BAN
@@ -75,7 +75,7 @@ check:
           - $ban$
 
       # Executed if a player fails exactly one cloud check
-      # Banning this will catch cause almost all cheaters to be banned
+      # Banning this will catch almost all cheaters
       cloud-mixed:
         50:
           - "intave internals storelog {player} {check} {vl}"
@@ -83,7 +83,7 @@ check:
           - $ban$
 
       # Executed if a player fails two or more independent cloud checks
-      # Do not expect Intave to make errors here
+      # Expect Intave to make no errors here
       cloud-certain:
         50:
           - "intave internals storelog {player} {check} {vl}"

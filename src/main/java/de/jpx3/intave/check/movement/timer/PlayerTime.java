@@ -1,6 +1,7 @@
 package de.jpx3.intave.check.movement.timer;
 
 import com.comphenix.protocol.events.PacketEvent;
+import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.annotate.DispatchTarget;
 import de.jpx3.intave.check.CheckStatistics;
@@ -9,6 +10,7 @@ import de.jpx3.intave.check.MetaCheckPart;
 import de.jpx3.intave.check.movement.Timer;
 import de.jpx3.intave.cleanup.GarbageCollector;
 import de.jpx3.intave.module.Modules;
+import de.jpx3.intave.module.feedback.FeedbackOptions;
 import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
@@ -150,8 +152,8 @@ public class PlayerTime extends MetaCheckPart<Timer, PlayerTime.PlayerTimeMeta> 
       if (violationContext.shouldCounterThreat()) {
         checkMeta.lastTimerFlag = System.currentTimeMillis();
         movementData.invalidMovement = true;
-        Vector setback = new Vector(0, 0, 0);
         statisticApply(user, CheckStatistics::increaseFails);
+        Vector setback = new Vector(0, 0, 0);
         Modules.mitigate().movement().emulationSetBack(player, setback, 3, 2, false);
         if (violationContext.violationLevelAfter() > 20) {
           user.nerfPermanently(AttackNerfStrategy.DMG_HIGH, "timer");
@@ -161,6 +163,22 @@ public class PlayerTime extends MetaCheckPart<Timer, PlayerTime.PlayerTimeMeta> 
       return;
     } else if (System.currentTimeMillis() - checkMeta.lastTimerFlag > 10000) {
       decrementer.decrement(user, 0.005);
+    }
+    if ((IntaveControl.GOMME_MODE || IntaveControl.DISABLE_LICENSE_CHECK) && !checkMeta.inTeleport && diff < -2_500_000_000L) {
+      checkMeta.inTeleport = true;
+      user.tickFeedback(() -> {
+        checkMeta.inTeleport = false;
+      }, FeedbackOptions.SELF_SYNCHRONIZATION);
+      double displayValue = -diff / (50 * 1_000_000f);
+      String balanceAsString = formatDouble(displayValue, 2);
+      Violation violation = Violation.builderFor(Timer.class).forPlayer(player)
+        .withMessage("is halting game ticks")
+        .withDetails(balanceAsString + " ticks behind")
+        .withVL(10)
+        .build();
+      ViolationContext violationContext = Modules.violationProcessor().processViolation(violation);
+      Vector setback = new Vector(0, 0, 0);
+      Modules.mitigate().movement().emulationSetBack(player, setback, 1, 2, false);
     }
     statisticApply(user, CheckStatistics::increasePasses);
   }
@@ -234,5 +252,6 @@ public class PlayerTime extends MetaCheckPart<Timer, PlayerTime.PlayerTimeMeta> 
     public long limitToBeApplied = System.nanoTime();
     public boolean gameJoinReceived;
     public long lastTimerFlag;
+    public boolean inTeleport = false;
   }
 }
