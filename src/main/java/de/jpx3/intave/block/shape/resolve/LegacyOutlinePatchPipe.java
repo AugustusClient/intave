@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public class LegacyOutlinePatchPipe implements ShapeResolverPipeline {
+public final class LegacyOutlinePatchPipe implements ShapeResolverPipeline {
   private final ShapeResolverPipeline forward;
 
   public LegacyOutlinePatchPipe(ShapeResolverPipeline forward) {

@@ -235,7 +235,7 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
 
     boolean isPlayer = attackedEntity.isPlayer;
 
-    int maximumPendingFeedbackPackets = trustFactorSetting("pending-allowance", player) + (int) MathHelper.minmax(1, LatencyStudy.cachedAverage(), 20);
+    int maximumPendingFeedbackPackets = trustFactorSetting("pending-allowance", player) + (int) MathHelper.minmax(1, LatencyStudy.cachedAverage(), 20) + 2;
     LatencyStudy.enterHit((short) pendingFeedbacks);
 
     // protection 1: absolute limit
@@ -246,7 +246,7 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
         .forPlayer(player).withCustomThreshold("timeout")
         .withVL(0.5)
         .withMessage("attacked player position too old")
-        .withDetails("already " + pendingFeedbacks + " new packets")
+        .withDetails("already " + pendingFeedbacks + " new packets, latency: " +user.latency() + "ms")
         .appendFlags(DISPLAY_IN_ALL_VERBOSE_MODES)
         .build();
       Modules.violationProcessor().processViolation(violation);

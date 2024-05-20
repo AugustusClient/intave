@@ -104,7 +104,7 @@ public final class Cloud {
       } else {
         // called on failure or connection closure
         int attempts = reconnectAttempts.getOrDefault(shard, 0);
-        int retryingIn = (int) (Math.pow(2, attempts + 1) * 2);
+        int retryingIn = (int) (Math.pow(2, attempts + 1) * 2) + 10;
 
         // add random 25% jitter
         retryingIn += (int) (retryingIn * (Math.random() * 0.25));
@@ -308,11 +308,7 @@ public final class Cloud {
   }
 
   public void uploadPlayerLogs(Player player, int nonce, List<String> logs, Consumer<String> callback) {
-    Request<String> request = uploadLogRequests.get(nonce);
-    if (request == null) {
-      request = new Request<>();
-      uploadLogRequests.put(nonce, request);
-    }
+    Request<String> request = uploadLogRequests.computeIfAbsent(nonce, k -> new Request<>());
     request.subscribe(callback);
     sendPacket(new ServerboundUploadLogs(Identity.from(player), nonce, logs));
   }
