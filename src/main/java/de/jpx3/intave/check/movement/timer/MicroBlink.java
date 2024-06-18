@@ -19,6 +19,7 @@ import org.bukkit.event.Cancellable;
 
 import static com.comphenix.protocol.wrappers.EnumWrappers.EntityUseAction.ATTACK;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.USE_ENTITY;
+import static de.jpx3.intave.module.mitigate.AttackNerfStrategy.APPLY_LESS_KNOCKBACK;
 
 public class MicroBlink extends MetaCheckPart<Timer, MicroBlink.MicroBlinkMeta> {
   public MicroBlink(Timer parentCheck) {
@@ -61,9 +62,14 @@ public class MicroBlink extends MetaCheckPart<Timer, MicroBlink.MicroBlinkMeta> 
             .withDetails(MathHelper.formatDouble(probability * 100, 6) + "% likelihood of " + timeDifference + "ms")
             .withVL(meta.violationLevel - 5)
             .build();
+          meta.mitigationLevel++;
           Modules.violationProcessor().processViolation(violation);
           if (meta.violationLevel > 10) {
             meta.violationLevel = 10;
+          }
+
+          if (meta.mitigationLevel > 15) {
+            user.nerf(AttackNerfStrategy.DMG_MEDIUM, "5");
           }
         }
       } else {
@@ -80,6 +86,7 @@ public class MicroBlink extends MetaCheckPart<Timer, MicroBlink.MicroBlinkMeta> 
     private double lastHorizontalDistance = 0.0;
     private final Histogram timeHistogram = new Histogram(0, 500, 10, 20 * 60 * 2);
     private double violationLevel = 0.0;
+    private double mitigationLevel = 0.0;
 
     private long lastAttack = 0L;
   }

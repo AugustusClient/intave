@@ -7,6 +7,7 @@ import de.jpx3.intave.module.Modules;
 import de.jpx3.intave.module.linker.bukkit.BukkitEventSubscription;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
+import de.jpx3.intave.module.mitigate.AttackNerfStrategy;
 import de.jpx3.intave.module.violation.Violation;
 import de.jpx3.intave.module.violation.ViolationContext;
 import de.jpx3.intave.user.User;
@@ -132,6 +133,8 @@ public final class Snap extends MetaCheckPart<PlacementAnalysis, Snap.SnapMeta> 
     float yaw = location.getYaw();
     float pitch = location.getPitch();
 
+    double mitigationLevel = 0.0;
+
     if (System.currentTimeMillis() - meta.detectionTime < 2_500) {
       Violation violation = Violation.builderFor(PlacementAnalysis.class)
         .forPlayer(player)
@@ -140,11 +143,13 @@ public final class Snap extends MetaCheckPart<PlacementAnalysis, Snap.SnapMeta> 
         .withDetails(asWord(meta.degree) + "-tick block-aligned snap")
         .withVL(meta.degree == 1 ? 20 : 2.5)
         .build();
-      ViolationContext violationContext = Modules.violationProcessor().processViolation(violation);
-//      if (violationContext.shouldCounterThreat()) {
-//        place.setCancelled(true);
-//      }
+      mitigationLevel++;
+      if (mitigationLevel > 10) {
+        userOf(player).nerf(AttackNerfStrategy.GARBAGE_HITS, "123");
+      }
       return;
+    } else {
+      mitigationLevel = Math.ceil(mitigationLevel * (1.0 - 0.1));
     }
 
     if (meta.snapAge > 20) {
