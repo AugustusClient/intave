@@ -16,6 +16,7 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 
 import java.lang.invoke.MethodHandle;
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -111,6 +112,9 @@ public final class HitboxSizeAccess {
       Lookup.serverClass("EntitySize")
     ).findFirstOrThrow();
 
+    private static Method widthAccess;
+    private static Method heightAccess;
+
     @PatchyAutoTranslation
     @Override
     public HitboxSize sizeOf(Class<?> entityClass) {
@@ -128,7 +132,25 @@ public final class HitboxSizeAccess {
           throw new RuntimeException(e);
         }
         EntitySize k = (EntitySize) size;
-        return HitboxSize.of(k.width, k.height);
+        if (MinecraftVersions.VER1_21.atOrAbove()) {
+          if (widthAccess == null || heightAccess == null) {
+            try {
+              widthAccess = EntitySize.class.getMethod("width");
+              heightAccess = EntitySize.class.getMethod("height");
+            } catch (NoSuchMethodException e) {
+              throw new RuntimeException(e);
+            }
+          }
+          try {
+            float width = (float) widthAccess.invoke(k);
+            float height = (float) heightAccess.invoke(k);
+            return HitboxSize.of(width, height);
+          } catch (Throwable e) {
+            throw new RuntimeException(e);
+          }
+        } else {
+          return HitboxSize.of(k.width, k.height);
+        }
       } else {
         return HitboxSize.zero();
       }

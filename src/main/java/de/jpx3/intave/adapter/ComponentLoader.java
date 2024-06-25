@@ -1,5 +1,7 @@
 package de.jpx3.intave.adapter;
 
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.IntaveInternalException;
@@ -30,7 +32,7 @@ public final class ComponentLoader {
   }
 
   public void prepareComponents() {
-    if (Bukkit.getVersion().contains("MC: 1.19") || Bukkit.getVersion().contains("MC: 1.20")) {
+    if (Bukkit.getVersion().contains("MC: 1.19") || Bukkit.getVersion().contains("MC: 1.20") || Bukkit.getVersion().contains("MC: 1.21") || Bukkit.getVersion().contains("MC: 1.22")) {
       essentialComponents.put("ProtocolLib", "https://ci.dmulloy2.net/job/ProtocolLib/lastSuccessfulBuild/artifact/build/libs/ProtocolLib.jar");
     } else {
       essentialComponents.put("ProtocolLib", "https://" + IntaveDomains.primaryServiceDomain() + "/resource/ProtocolLib-4-8-0.jar");
@@ -80,12 +82,14 @@ public final class ComponentLoader {
       download(in, componentPluginFile.toPath());
       plugin.logger().info(ChatColor.GREEN + "Downloaded " + componentName);
       Plugin componentPlugin = this.plugin.getServer().getPluginManager().loadPlugin(componentPluginFile);
-      try {
-        componentPlugin.onLoad();
-      } catch (Throwable throwable) {
-        // ProtocolLib Moment
+      ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+      if (protocolManager == null) {
+        try {
+          componentPlugin.onLoad();
+        } catch (Throwable throwable) {
+          // ProtocolLib Moment
+        }
       }
-
       this.plugin.getServer().getPluginManager().enablePlugin(componentPlugin);
     }
   }

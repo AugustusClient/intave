@@ -4,7 +4,7 @@ import de.jpx3.intave.klass.rewrite.PatchyAutoTranslation;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.IBlockData;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_14_R1.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_14_R1.util.CraftMagicNumbers;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,8 +18,7 @@ class ModernIndexer implements Indexer {
   @Override
   @PatchyAutoTranslation
   public Map<Object, Integer> index(Material type) {
-    CraftBlockData blockData = CraftBlockData.newData(type, null);
-    Block block = blockData.getState().getBlock();
+    Block block = CraftMagicNumbers.getBlock(type);
     Map<Object, Integer> index = new HashMap<>();
     // issue with straight forward ids is the temptation to directly interpret them
     // as a legacy data value, which is not the case and will lead to issues.

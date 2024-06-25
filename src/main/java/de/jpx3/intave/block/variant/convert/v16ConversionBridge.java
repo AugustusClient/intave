@@ -1,18 +1,41 @@
 package de.jpx3.intave.block.variant.convert;
 
+import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.block.variant.Setting;
 import de.jpx3.intave.block.variant.Settings;
 import de.jpx3.intave.klass.rewrite.PatchyAutoTranslation;
 import net.minecraft.server.v1_16_R1.*;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 @PatchyAutoTranslation
 final class v16ConversionBridge implements ConversionBridge {
+  private static Method stateMapField;
+
   @PatchyAutoTranslation
   public Map<Setting<?>, Comparable<?>> settingsOf(Object blockData) {
     IBlockData data = (IBlockData) blockData;
-    Set<IBlockState<?>> states = data.getStateMap().keySet();
+    Set<IBlockState<?>> states;
+    if (MinecraftVersions.VER1_21.atOrAbove()) {
+      try {
+        if (stateMapField == null) {
+          stateMapField = IBlockData.class.getMethod("getValues");
+        }
+      } catch (NoSuchMethodException e) {
+        throw new RuntimeException(e);
+      }
+      try {
+        Map<?, ?> map = (Map<?, ?>) stateMapField.invoke(data);
+        //noinspection unchecked
+        states = (Set<IBlockState<?>>) map.keySet();
+      } catch (IllegalAccessException | InvocationTargetException e) {
+        throw new RuntimeException(e);
+      }
+    } else {
+      states = data.getStateMap().keySet();
+    }
     if (states.isEmpty()) {
       return Collections.emptyMap();
     }

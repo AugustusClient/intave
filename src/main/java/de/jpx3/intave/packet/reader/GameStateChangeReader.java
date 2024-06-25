@@ -23,7 +23,12 @@ public final class GameStateChangeReader extends AbstractPacketReader {
       try {
         Object wrapper = packet().getModifier().withType(GAME_STATE_CLASS).read(0);
         if (FIELD_CACHE == null) {
-          FIELD_CACHE = wrapper.getClass().getDeclaredField("b");
+          try {
+            FIELD_CACHE = wrapper.getClass().getDeclaredField("b");
+          } catch (NoSuchFieldException exception) {
+            // 1.21.0
+            FIELD_CACHE = wrapper.getClass().getDeclaredField("id");
+          }
           FIELD_CACHE.setAccessible(true);
         }
         return (int) FIELD_CACHE.get(wrapper);

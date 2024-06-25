@@ -11,6 +11,7 @@ import java.util.Arrays;
 
 public final class Lookup {
   private static final String VERSION;
+  private static boolean failedToGetVersion = false;
 
   static {
     String l;
@@ -18,7 +19,9 @@ public final class Lookup {
       l = Bukkit.getServer().getClass().getPackage().getName().substring(23);
     } catch (Exception exception) {
       l = "v1_8_R3";
-      System.out.println(Bukkit.getServer().getClass().getPackage().getName());
+//      System.out.println("Failed to get server version, defaulting to " + l);
+//      System.out.println(Bukkit.getServer().getClass().getPackage().getName());
+      failedToGetVersion = true;
     }
     VERSION = l;
   }
@@ -72,7 +75,7 @@ public final class Lookup {
   }
 
   private static String appendCraftBukkitPrefixToClass(String className) {
-    return CRAFT_BUKKIT_PREFIX + "." + className;
+    return failedToGetVersion ? "org.bukkit.craftbukkit." + className : CRAFT_BUKKIT_PREFIX + "." + className;
   }
 
   public static Field declaredFieldIn(Class<?> clazz, String name) {

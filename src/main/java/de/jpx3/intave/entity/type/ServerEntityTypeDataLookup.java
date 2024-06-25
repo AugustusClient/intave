@@ -33,6 +33,9 @@ final class ServerEntityTypeDataLookup implements EntityTypeDataResolver {
       if (MinecraftVersions.VER1_17_0.atOrAbove()) {
         methodName = "h";
       }
+      if (MinecraftVersions.VER1_21.atOrAbove()) {
+        methodName = "getDimensions";
+      }
       componentExtractionMethod = Lookup.serverClass("EntityTypes").getMethod(methodName);
       if (entitySizeField == null) {
         throw new IntaveInternalException("EntitySize field does not exist in " + entityTypesClass);

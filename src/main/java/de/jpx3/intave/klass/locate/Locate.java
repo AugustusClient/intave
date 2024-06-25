@@ -10,6 +10,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -35,6 +36,11 @@ public final class Locate {
     String output;
     if (input.startsWith("net.minecraft.server.v")) {
       output = classPathByKey(input.split("\\.")[4]);
+    } else if (input.startsWith("net.minecraft")) {
+      String[] split = input.split("\\.");
+      String searchTarget = split[split.length - 1];
+      Optional<ClassLocation> search = classLocations.filterByKey(searchTarget).reduceToCurrentVersion().findAny();
+      output = search.map(ClassLocation::compiledLocation).orElse(searchTarget);
     } else {
       output = input;
     }

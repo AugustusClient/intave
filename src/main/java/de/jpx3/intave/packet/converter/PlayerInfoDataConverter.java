@@ -67,11 +67,13 @@ public final class PlayerInfoDataConverter {
         StructureModifier<WrappedGameProfile> gameProfiles = modifier.withType(gameProfileClass, gameProfileConverter);
         WrappedGameProfile gameProfile = gameProfiles.readSafely(0);
         if (gameProfile == null) {
-          throw new RuntimeException("Cannot find game profile.");
+          return null;
+//          throw new RuntimeException("Cannot find game profile.");
         }
         StructureModifier<Integer> ints = modifier.withType(Integer.TYPE);
         if (ints.size() < 1) {
-          throw new RuntimeException("Cannot find latency.");
+//          throw new RuntimeException("Cannot find latency.");
+          return null;
         }
         int latency = ints.read(0);
         StructureModifier<EnumWrappers.NativeGameMode> gameModes = modifier.withType(gameModeClass, gameModeConverter);

@@ -33,12 +33,15 @@ public final class EntityMetadataReader extends EntityReader {
     WrappedDataWatcherObject dataWatcherObject = new WrappedDataWatcherObject(
       value.getIndex(), value.getSerializer()
     );
-    return new WrappedWatchableObject(dataWatcherObject, value.getValue()) {
-      @Override
-      public Object getRawValue() {
-        return value.getRawValue();
-      }
-    };
+    if (MinecraftVersions.VER1_21.atOrAbove()) {
+    }
+    return new WrappedWatchableObject(dataWatcherObject, value.getValue());
+//    return new WrappedWatchableObject(dataWatcherObject, value.getValue()) {
+//      @Override
+//      public Object getRawValue() {
+//        return value.getRawValue();
+//      }
+//    };
   }
 
   public void setMetadataObjects(List<WrappedWatchableObject> watchables) {

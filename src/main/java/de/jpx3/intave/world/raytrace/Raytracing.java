@@ -1,9 +1,7 @@
 package de.jpx3.intave.world.raytrace;
 
-import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.check.movement.physics.Pose;
 import de.jpx3.intave.diagnostic.timings.Timings;
-import de.jpx3.intave.klass.rewrite.PatchyLoadingInjector;
 import de.jpx3.intave.math.SinusCache;
 import de.jpx3.intave.module.tracker.entity.Entity;
 import de.jpx3.intave.share.BoundingBox;
@@ -22,18 +20,18 @@ public final class Raytracing {
   private static final boolean[] PESSIMISTIC_BOOLEAN_ORDER = new boolean[]{false, true};
 
   public static void setup() {
-    String className;
-    if (MinecraftVersions.VER1_14_0.atOrAbove()) {
-      className = "de.jpx3.intave.world.raytrace.v14Raytracer";
-    } else if (MinecraftVersions.VER1_13_0.atOrAbove()) {
-      className = "de.jpx3.intave.world.raytrace.v13Raytracer";
-    } else if (MinecraftVersions.VER1_9_0.atOrAbove()) {
-      className = "de.jpx3.intave.world.raytrace.v9Raytracer";
-    } else {
-      className = "de.jpx3.intave.world.raytrace.v8Raytracer";
-    }
-    PatchyLoadingInjector.loadUnloadedClassPatched(Raytracing.class.getClassLoader(), className);
-    raytracer = instanceOf(className);
+//    String className;
+//    if (MinecraftVersions.VER1_14_0.atOrAbove()) {
+//      className = "de.jpx3.intave.world.raytrace.v14Raytracer";
+//    } else if (MinecraftVersions.VER1_13_0.atOrAbove()) {
+//      className = "de.jpx3.intave.world.raytrace.v13Raytracer";
+//    } else if (MinecraftVersions.VER1_9_0.atOrAbove()) {
+//      className = "de.jpx3.intave.world.raytrace.v9Raytracer";
+//    } else {
+//      className = "de.jpx3.intave.world.raytrace.v8Raytracer";
+//    }
+//    PatchyLoadingInjector.loadUnloadedClassPatched(Raytracing.class.getClassLoader(), className);
+//    raytracer = instanceOf(className);
     universalRaytracer = new UniversalRaytracer();
 //    raytracer = new UnivRaytracer();
   }
@@ -227,7 +225,7 @@ public final class Raytracing {
   public static MovingObjectPosition blockShrinkRayTrace(World world, Player player, NativeVector eyeVector, NativeVector targetVector) {
     try {
       Timings.SERVICE_RAYTRACER_BLOCK.start();
-      return raytracer.raytrace(world, player, eyeVector, targetVector);
+      return universalRaytracer.raytrace(world, player, eyeVector, targetVector);
     } finally {
       Timings.SERVICE_RAYTRACER_BLOCK.stop();
     }

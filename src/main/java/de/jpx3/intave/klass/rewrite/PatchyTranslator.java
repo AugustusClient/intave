@@ -26,7 +26,11 @@ final class PatchyTranslator {
 
   static {
     String packageName = Bukkit.getServer().getClass().getPackage().getName();
-    CURRENT_SERVER_VERSION = packageName.substring(packageName.lastIndexOf(".") + 1);
+    if (packageName.contains(".v")) {
+      CURRENT_SERVER_VERSION = packageName.substring(packageName.lastIndexOf(".") + 1);
+    } else {
+      CURRENT_SERVER_VERSION = "";
+    }
   }
 
   public static byte[] translateClass(byte[] inputBytes) {
@@ -164,13 +168,20 @@ final class PatchyTranslator {
       output = Type.getMethodDescriptor(returnType, argumentTypes);
     } else {
       if (input.contains("craftbukkit")) {
-        int versionBeginIndex = input.indexOf("/v") + 1;
-        int versionEndIndex = input.indexOf("/", versionBeginIndex);
-        if (versionBeginIndex <= 0 || versionEndIndex <= 0) {
-          return input;
+        if (input.contains("/v")) {
+          int versionBeginIndex = input.indexOf("/v") + 1;
+          int versionEndIndex = input.indexOf("/", versionBeginIndex);
+          if (CURRENT_SERVER_VERSION.isEmpty()) {
+            versionBeginIndex--;
+          }
+          if (versionBeginIndex <= 0 || versionEndIndex <= 0) {
+            return input;
+          }
+          String extractedVersion = input.substring(versionBeginIndex, versionEndIndex);
+          output = input.replace(extractedVersion, CURRENT_SERVER_VERSION);
+        } else {
+          output = input;
         }
-        String extractedVersion = input.substring(versionBeginIndex, versionEndIndex);
-        output = input.replace(extractedVersion, CURRENT_SERVER_VERSION);
       } else {
         output = Locate.patchyConvert(input);
       }

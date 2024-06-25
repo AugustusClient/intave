@@ -35,17 +35,17 @@ public final class v20BlockAccessor implements BlockAccessor {
   private static final boolean INVENTORY_VIA_GETTER = MinecraftVersions.VER1_17_0.atOrAbove();
 
   static {
-    checkVersion();
+//    checkVersion();
   }
 
-  @PatchyAutoTranslation
-  public static void checkVersion() {
-    try {
-      ChunkProviderServer.class.getMethod("c", int.class, int.class);
-    } catch (NoSuchMethodException exception) {
-      throw new IllegalStateException("Please update your minecraft version", exception);
-    }
-  }
+//  @PatchyAutoTranslation
+//  public static void checkVersion() {
+//    try {
+//      ChunkProviderServer.class.getMethod("c", int.class, int.class);
+//    } catch (NoSuchMethodException exception) {
+//      throw new IllegalStateException("Please update your minecraft version", exception);
+//    }
+//  }
 
   @Override
   @PatchyAutoTranslation

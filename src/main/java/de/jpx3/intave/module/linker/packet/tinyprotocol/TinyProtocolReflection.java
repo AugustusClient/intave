@@ -255,6 +255,10 @@ final class TinyProtocolReflection {
    * @throws IllegalArgumentException If a variable or class could not be found.
    */
   public static Class<?> getClass(String lookupName) {
+    if (lookupName.startsWith("{nms}.")) {
+      String className = lookupName.substring("{nms}.".length());
+      return Lookup.serverClass(className);
+    }
     return getCanonicalClass(expandVariables(lookupName));
   }
 
@@ -313,7 +317,7 @@ final class TinyProtocolReflection {
         throw new IllegalArgumentException("Unknown variable: " + variable);
 
       // Assume the expanded variables are all packages, and append a dot
-      if (replacement.length() > 0 && matcher.end() < name.length() && name.charAt(matcher.end()) != '.')
+      if (!replacement.isEmpty() && matcher.end() < name.length() && name.charAt(matcher.end()) != '.')
         replacement += ".";
       matcher.appendReplacement(output, Matcher.quoteReplacement(replacement));
     }
