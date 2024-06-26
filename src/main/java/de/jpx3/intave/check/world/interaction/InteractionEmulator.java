@@ -601,6 +601,20 @@ public final class InteractionEmulator implements EventProcessor {
         }
         break;
       }
+      case FLINT_AND_STEEL:
+        Material underlyingType = VolatileBlockAccess.typeAccess(user, clickedBlock.getLocation());
+        if (underlyingType == Material.TNT) {
+          blockStateAccess.override(
+            world,
+            clickedBlock.getX(),
+            clickedBlock.getY(),
+            clickedBlock.getZ(),
+            Material.AIR,
+            0,
+            "TNT_REPLACE"
+          );
+        }
+        break;
     }
   }
 

@@ -12,6 +12,9 @@ import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.math.Hypot;
 import de.jpx3.intave.share.BlockPosition;
 import de.jpx3.intave.share.Position;
+import de.jpx3.intave.user.MessageChannel;
+import de.jpx3.intave.user.User;
+import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.world.WorldHeight;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -121,9 +124,10 @@ final class MultiChunkKeyBlockCache implements BlockCache {
     int newSequenceNumber = speculativeSequenceNumbers.compute(position, (key, old) -> old == null || seq > old ? seq : old);
     speculativeHeads.put(position, blockState);
     speculationKeys.add(bigKey(posX, posY, posZ));
-    if (IntaveControl.BLOCK_CACHE_DEBUG) {
+    User user = UserRepository.userOf(player);
+    if (IntaveControl.BLOCK_CACHE_DEBUG || user.receives(MessageChannel.DEBUG_BLOCK_CACHE)) {
       Synchronizer.synchronize(() -> {
-        player.sendMessage(ChatColor.LIGHT_PURPLE + "SPECULATING " + ChatColor.AQUA+ type + ChatColor.LIGHT_PURPLE + " at " + ChatColor.GRAY + position + " " + newSequenceNumber);
+        player.sendMessage(ChatColor.LIGHT_PURPLE + "SPECULATING " + ChatColor.AQUA+ type + ChatColor.LIGHT_PURPLE + " at " + ChatColor.GRAY + position);
       });
     }
   }
@@ -207,7 +211,8 @@ final class MultiChunkKeyBlockCache implements BlockCache {
     }
     Position position = new Position(posX, posY, posZ);
     replacementCache.insert(position, blockState);
-    if (IntaveControl.BLOCK_CACHE_DEBUG) {
+    User user = UserRepository.userOf(player);
+    if (IntaveControl.BLOCK_CACHE_DEBUG || user.receives(MessageChannel.DEBUG_BLOCK_CACHE)) {
       Synchronizer.synchronize(() -> {
         player.sendMessage(ChatColor.LIGHT_PURPLE + "OVERRIDE " + ChatColor.AQUA  + type + ChatColor.LIGHT_PURPLE + " at " + ChatColor.GRAY + position + ChatColor.LIGHT_PURPLE + " for " + ChatColor.RED + reason);
       });
@@ -239,7 +244,8 @@ final class MultiChunkKeyBlockCache implements BlockCache {
   @Override
   public void lockOverride(int posX, int posY, int posZ) {
     replacementCache.lock(Position.of(posX, posY, posZ));
-    if (IntaveControl.BLOCK_CACHE_DEBUG) {
+    User user = UserRepository.userOf(player);
+    if (IntaveControl.BLOCK_CACHE_DEBUG || user.receives(MessageChannel.DEBUG_BLOCK_CACHE)) {
       Synchronizer.synchronize(() -> {
         player.sendMessage(ChatColor.LIGHT_PURPLE + "LOCK " + ChatColor.GRAY + Position.of(posX, posY, posZ));
       });
@@ -249,7 +255,8 @@ final class MultiChunkKeyBlockCache implements BlockCache {
   @Override
   public void unlockOverride(int posX, int posY, int posZ) {
     if (replacementCache.unlock(Position.of(posX, posY, posZ))) {
-      if (IntaveControl.BLOCK_CACHE_DEBUG) {
+      User user = UserRepository.userOf(player);
+      if (IntaveControl.BLOCK_CACHE_DEBUG || user.receives(MessageChannel.DEBUG_BLOCK_CACHE)) {
         Synchronizer.synchronize(() -> {
           player.sendMessage(ChatColor.LIGHT_PURPLE + "UNLOCK " + ChatColor.GRAY + Position.of(posX, posY, posZ));
         });

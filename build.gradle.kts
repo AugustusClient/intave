@@ -12,7 +12,7 @@ plugins {
 
 val simpleName = "Intave"
 group = "de.jpx3"
-version = "14.8.3"
+version = "14.8.3-b1"
 description = "Automated cheat detection and prevention"
 
 /*
@@ -226,7 +226,7 @@ fun dumpBuildConfig() {
 }
 
 val serverVersions = mapOf(
-  Pair("1.8.8", 8),
+  Pair("1.8.8", 17),
   Pair("1.9.4", 8),
   Pair("1.10.2", 8),
   Pair("1.11.2", 8),
@@ -242,6 +242,7 @@ val serverVersions = mapOf(
   Pair("1.20.2", 17),
   Pair("1.20.4", 17),
   Pair("1.20.6", 21),
+  Pair("1.21", 21),
 )
 
 run {
@@ -314,6 +315,7 @@ tasks {
       attributes("Implementation-Title" to simpleName)
       attributes("Implementation-Version" to project.version)
       attributes("Implementation-Vendor" to "Jpx3")
+      attributes("paperweight-mappings-namespace" to "mojang")
       attributes("Main-Class" to "de.jpx3.intave.IntaveApplication")
     }
   }

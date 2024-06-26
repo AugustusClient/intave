@@ -709,7 +709,11 @@ class BaseSimulator extends Simulator {
     MovementMetadata movementData = user.meta().movement();
     movementData.pushedByEntity = false;
     for (Entity entity : entities) {
-      if (!entity.tracingEnabled() || !entity.clientSynchronized) {
+      if (
+        !entity.tracingEnabled() ||
+        !entity.clientSynchronized ||
+        (!entity.hasTypeData() || entity.typeData().isArmorStand())
+      ) {
         continue;
       }
       if (entity.boundingBox().intersectsWith(boundingBox)) {

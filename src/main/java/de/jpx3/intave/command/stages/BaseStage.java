@@ -203,6 +203,7 @@ public final class BaseStage extends CommandStage {
     TELEPORT(MessageChannel.DEBUG_TELEPORT),
     MOUNTS(MessageChannel.DEBUG_MOUNTS),
     ITEM_RESETS(MessageChannel.DEBUG_ITEM_RESETS),
+    BLOCK_CACHE(MessageChannel.DEBUG_BLOCK_CACHE),
 
     ;
 

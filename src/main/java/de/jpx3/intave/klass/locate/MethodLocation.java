@@ -59,6 +59,13 @@ final class MethodLocation extends Location {
       .toArray(Class[]::new);
     do {
       try {
+        Method declaredMethod = owningClass.getMethod(name, parameterTypes);
+        if (!declaredMethod.isAccessible()) {
+          declaredMethod.setAccessible(true);
+        }
+        return declaredMethod;
+      } catch (NoSuchMethodException ignored) {}
+      try {
         Method declaredMethod = owningClass.getDeclaredMethod(name, parameterTypes);
         if (!declaredMethod.isAccessible()) {
           declaredMethod.setAccessible(true);
