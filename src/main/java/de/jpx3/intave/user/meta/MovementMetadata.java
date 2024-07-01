@@ -25,6 +25,7 @@ import de.jpx3.intave.check.movement.physics.*;
 import de.jpx3.intave.check.world.interaction.BlockTrustChain;
 import de.jpx3.intave.cleanup.GarbageCollector;
 import de.jpx3.intave.entity.datawatcher.DataWatcherAccess;
+import de.jpx3.intave.executor.RateLimiter;
 import de.jpx3.intave.executor.Synchronizer;
 import de.jpx3.intave.math.MathHelper;
 import de.jpx3.intave.module.dispatch.MovementDispatcher;
@@ -44,6 +45,7 @@ import org.bukkit.util.Vector;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.comphenix.protocol.wrappers.WrappedAttributeModifier.Operation.ADD_PERCENTAGE;
@@ -243,6 +245,7 @@ public final class MovementMetadata implements SimulationEnvironment {
   public int criticalFlyingBlockMovementStacks;
   public boolean criticalFlyingDisallowWasTeleported;
   public double criticalEnterPosX, criticalEnterPosY, criticalEnterPosZ;
+  public final RateLimiter criticalTeleportRateLimiter = new RateLimiter(10, 2, TimeUnit.SECONDS);
   private volatile Location verifiedLocation;
 
   public MovementMetadata(Player player, User user) {

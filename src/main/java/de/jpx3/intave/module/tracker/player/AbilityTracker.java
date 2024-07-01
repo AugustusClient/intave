@@ -70,7 +70,7 @@ public final class AbilityTracker extends Module {
     float flyingSpeed = reader.flyingSpeed();
     float walkingSpeed = reader.walkingSpeed();
     boolean allowedFlight = reader.flyingAllowed();
-    boolean critical = abilityData.allowFlying() && !allowedFlight;
+    boolean critical = abilityData.allowFlying() && !allowedFlight && movement.criticalTeleportRateLimiter.tryAcquire();
     if (critical /*&& movement.lastTeleport < 20*/) {
       // Teleport again to force transaction synchronization
       Synchronizer.synchronizeDelayed(() -> {
@@ -117,12 +117,14 @@ public final class AbilityTracker extends Module {
   )
   public void incomingFlyingUpdate(User user, Player player) {
     MovementMetadata movementData = user.meta().movement();
-    if (movementData.criticalFlyingDisallowStacks > 0 && !movementData.criticalFlyingDisallowWasTeleported) {
+    if (movementData.criticalFlyingDisallowStacks > 0 &&
+      !movementData.criticalFlyingDisallowWasTeleported
+    ) {
       double deltaX = movementData.verifiedPositionX - movementData.criticalEnterPosX;
       double deltaY = movementData.verifiedPositionY - movementData.criticalEnterPosY;
       double deltaZ = movementData.verifiedPositionZ - movementData.criticalEnterPosZ;
       double distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
-      if (distance > 3) {
+      if (distance > 3 && movementData.criticalTeleportRateLimiter.tryAcquire()) {
         Vector setback = new Vector(0, 0, 0);
         Modules.mitigate().movement().emulationSetBack(player, setback, 3, 2, false);
         if (user.receives(MessageChannel.DEBUG_TELEPORT)) {
@@ -130,7 +132,7 @@ public final class AbilityTracker extends Module {
         }
         movementData.criticalFlyingDisallowStacks = 0;
       }
-    } else if (movementData.criticalFlyingBlockMovementStacks > 0) {
+    } else if (movementData.criticalFlyingBlockMovementStacks > 0 && movementData.criticalTeleportRateLimiter.tryAcquire()) {
       player.teleport(player.getLocation());
       if (user.receives(MessageChannel.DEBUG_TELEPORT)) {
         player.sendMessage(IntavePlugin.prefix() + "Teleport to " + player.getLocation().getBlockX() + " " + player.getLocation().getBlockY() + " " + player.getLocation().getBlockZ() + " " + " for " + ChatColor.RED + " critical flying disallow protection (movement block)");

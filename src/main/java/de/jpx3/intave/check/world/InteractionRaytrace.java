@@ -922,7 +922,7 @@ public final class InteractionRaytrace extends MetaCheck<InteractionRaytrace.Int
     User user = userOf(player);
     ConnectionMetadata connection = user.meta().connection();
     RateLimiter refreshBlockRatelimit = connection.refreshBlockRatelimit;
-    if (refreshBlockRatelimit.checkCooldownAndAcquire()) {
+    if (refreshBlockRatelimit.tryAcquire()) {
       Synchronizer.synchronize(() -> {
         if (IntaveControl.DEBUG_INTERACTION_REFRESHES) {
           player.sendMessage("Refreshed blocks around " + targetLocation);

@@ -27,18 +27,13 @@ public final class RateLimiter {
     }
   }
 
-  public boolean acquire() {
+  public boolean tryAcquire() {
     checkCooldown();
     if (counter < maxRequests) {
       counter++;
       return true;
     }
     return false;
-  }
-
-  public boolean checkCooldownAndAcquire() {
-    checkCooldown();
-    return acquire();
   }
 
   public int maxRequests() {
