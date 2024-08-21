@@ -50,7 +50,8 @@ public final class FeedbackSender extends Module {
       if (MinecraftVersions.VER1_17_1.atOrAbove()) {
         activeGenerator = IdGeneratorMode.RANDOM;
       } else {
-        activeGenerator = IdGeneratorMode.modeOfTheDay();
+//        activeGenerator = IdGeneratorMode.modeOfTheDay();
+        activeGenerator = IdGeneratorMode.RANDOM;
       }
     }
   }
@@ -349,11 +350,13 @@ public final class FeedbackSender extends Module {
       try {
         if (USE_PING_PONG_PACKETS) {
           packet = protocol.createPacket(PING);
-          int sentId = Short.toUnsignedInt(id);
-          if (!noPingMask) {
+          if (noPingMask) {
+            packet.getIntegers().write(0, (int) id);
+          } else {
+            int sentId = Short.toUnsignedInt(id);
             sentId = sentId | PING_MASK;
+            packet.getIntegers().write(0, sentId);
           }
-          packet.getIntegers().write(0, sentId);
         } else {
           packet = protocol.createPacket(TRANSACTION);
           packet.getIntegers().write(0, 0);

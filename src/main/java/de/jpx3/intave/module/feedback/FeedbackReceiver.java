@@ -109,8 +109,10 @@ public final class FeedbackReceiver extends Module {
   public void outgoingTransaction(PacketEvent event) {
     Player player = event.getPlayer();
     PacketContainer packet = event.getPacket();
-    if (!hasValidUserKey(packet) && activeGenerator != IdGeneratorMode.highestCompatibility()) {
-      short userKey = userKeyFrom(packet);
+    User user = UserRepository.userOf(player);
+    boolean noPingMask = user.meta().protocol().noPingMask();
+    if (!hasValidUserKey(packet, noPingMask) && activeGenerator != IdGeneratorMode.highestCompatibility()) {
+      short userKey = userKeyFrom(packet, noPingMask);
       boolean couldBeWindowClick = userKey >= Short.MAX_VALUE - 250;
       if (couldBeWindowClick) {
         return;
@@ -141,15 +143,16 @@ public final class FeedbackReceiver extends Module {
     ConnectionMetadata connection = meta.connection();
     FeedbackQueue feedbackQueue = connection.feedbackQueue();
     PacketContainer packet = event.getPacket();
+    boolean noPingMask = user.meta().protocol().noPingMask();
 
-    if (!hasValidUserKey(packet)) {
+    if (!hasValidUserKey(packet, noPingMask)) {
       if (IntaveControl.DEBUG_FEEDBACK_PACKETS) {
         System.out.println("Received " + packet.getIntegers().readSafely(0) + " from " + player.getName() + " but no user key was found");
       }
       return;
     }
 
-    short userKey = userKeyFrom(packet);
+    short userKey = userKeyFrom(packet, noPingMask);
     FeedbackRequest<?> response = feedbackQueue.peek(userKey);
     if (response == null) {
       if (IntaveControl.DEBUG_FEEDBACK_PACKETS) {
@@ -204,7 +207,7 @@ public final class FeedbackReceiver extends Module {
     event.setCancelled(true);
   }
 
-  private short userKeyFrom(PacketContainer packet) {
+  private short userKeyFrom(PacketContainer packet, boolean noPingMask) {
     if (USE_PING_PACKETS) {
       int inputInteger = packet.getIntegers().readSafely(0);
       return (short) (inputInteger & 0xffff);
@@ -213,11 +216,11 @@ public final class FeedbackReceiver extends Module {
     }
   }
 
-  private boolean hasValidUserKey(PacketContainer packet) {
+  private boolean hasValidUserKey(PacketContainer packet, boolean noPingMask) {
     short shortInput;
     if (USE_PING_PACKETS) {
       int inputInteger = packet.getIntegers().readSafely(0);
-      if ((inputInteger & 0xffff0000) != PING_MASK) {
+      if ((inputInteger & 0xffff0000) != PING_MASK && !noPingMask) {
         return false;
       }
       shortInput = (short) (inputInteger & 0xffff);

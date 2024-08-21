@@ -405,6 +405,10 @@ public final class MovementDispatcher extends Module {
     }
     movementData.awaitClickMovementSkip = false;
 
+    if (user.receives(MessageChannel.DEBUG_POSITION)) {
+      player.sendMessage("intave:" + formatDouble(movementData.positionY, 2) + " server:" + formatDouble(player.getLocation().getY(),2) );
+    }
+
     connectionData.receiveMovement();
     movementData.updateMovement(packet, hasMovement, hasRotation);
     teleportApplyEnforcer.receiveMovement(event);

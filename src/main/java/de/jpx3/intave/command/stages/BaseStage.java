@@ -204,6 +204,7 @@ public final class BaseStage extends CommandStage {
     MOUNTS(MessageChannel.DEBUG_MOUNTS),
     ITEM_RESETS(MessageChannel.DEBUG_ITEM_RESETS),
     BLOCK_CACHE(MessageChannel.DEBUG_BLOCK_CACHE),
+    POSITION(MessageChannel.DEBUG_POSITION),
 
     ;
 
