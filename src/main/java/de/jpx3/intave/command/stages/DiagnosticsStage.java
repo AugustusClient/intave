@@ -12,6 +12,7 @@ import com.google.gson.JsonParser;
 import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.player.trust.TrustFactor;
+import de.jpx3.intave.adapter.MinecraftVersions;
 import de.jpx3.intave.annotate.Native;
 import de.jpx3.intave.check.Check;
 import de.jpx3.intave.check.CheckStatistics;
@@ -53,6 +54,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Turtle;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -251,6 +253,25 @@ public final class DiagnosticsStage extends CommandStage {
     int tracedEntities = connection.tracedEntities().size();
     player.sendMessage(IntavePlugin.prefix() + "Monitoring " + ChatColor.RED + totalEntities + IntavePlugin.defaultColor() + " entities, tracing " + ChatColor.RED + tracedEntities + IntavePlugin.defaultColor() + " entities");
     player.sendMessage(IntavePlugin.prefix() + connection.tracedEntities().stream().map(entity -> entity.entityName() + "/" + entity.entityId()).collect(Collectors.toList()));
+  }
+
+  @SubCommand(
+    selectors = "turtle",
+    usage = "",
+    description = "Spawn a turtle",
+    permission = "intave.command.diagnostics.performance"
+  )
+  public void turtleCommand(User user) {
+    Player player = user.player();
+    if (MinecraftVersions.VER1_20.atOrAbove()) {
+      Bukkit.getScheduler().runTask(IntavePlugin.singletonInstance(), () -> {
+        Turtle turtle = player.getWorld().spawn(player.getLocation(), Turtle.class);
+        turtle.setPassenger(player);
+      });
+      player.sendMessage(IntavePlugin.prefix() + ChatColor.RED + "Turtle spawned");
+    } else {
+      player.sendMessage(IntavePlugin.prefix() + ChatColor.RED + "Nah");
+    }
   }
 
   @SubCommand(selectors = "ntrace", usage = "", description = "Sample click/attack trace", permission = "intave.command.diagnostics.performance")
@@ -790,7 +811,9 @@ public final class DiagnosticsStage extends CommandStage {
 
   @SubCommand(selectors = {"packetlog", "pl"}, usage = "[<target>]", permission = "intave.command.diagnostics.statistics", description = "Create and save packet logs")
   public void startPacketLog(CommandSender sender, Player target) {
-    Modules.find(PacketLogging.class).togglePacketLogging(sender, target);
+    Synchronizer.synchronize(() -> {
+      Modules.find(PacketLogging.class).togglePacketLogging(sender, target);
+    });
   }
 
 //  @SubCommand(selectors = "packetlogupload", usage = "", permission = "intave.command.diagnostics.statistics", description = "Upload packet logs")

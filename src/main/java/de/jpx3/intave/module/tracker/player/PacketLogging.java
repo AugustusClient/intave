@@ -85,7 +85,13 @@ public class PacketLogging extends Module {
       PrintStream printStream = new PrintStream(stream);
 
       UUID finalUserId = userId;
-      PacketAdapter adapter = new PacketAdapter(IntavePlugin.singletonInstance(), ListenerPriority.MONITOR, PacketType.values(), ListenerOptions.SKIP_PLUGIN_VERIFIER) {
+      List<PacketType> listenerTypes = new ArrayList<>();
+      for (PacketType value : PacketType.values()) {
+        if (value.isSupported()) {
+          listenerTypes.add(value);
+        }
+      }
+      PacketAdapter adapter = new PacketAdapter(IntavePlugin.singletonInstance(), ListenerPriority.MONITOR, listenerTypes, ListenerOptions.SKIP_PLUGIN_VERIFIER) {
         @Override
         public void onPacketSending(PacketEvent event) {
           if (isTemporary(event)) {
