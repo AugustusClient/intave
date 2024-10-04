@@ -71,13 +71,18 @@ public final class VanishFilter extends Filter {
 //            Synchronizer.synchronize(() -> {
 //              player.sendMessage("Showing " + data.getProfile().getName() + " to you.");
 //            });
+//            System.out.println("Showing " + data.getProfile().getName() + " to you.");
             shownPlayers.add(uuid);
           });
           break;
         case UPDATE_LATENCY:
           playerInfos.removeIf(playerInfo -> {
             UUID infoId = playerInfo.getProfile().getUUID();
-            return !shownPlayers.contains(infoId);
+            boolean toBeRemoved = !shownPlayers.contains(infoId);
+            if (toBeRemoved) {
+//              System.out.println("Hiding " + playerInfo.getProfile().getName() + " from you");
+            }
+            return toBeRemoved;
           });
           if (IntaveControl.GOMME_MODE && ThreadLocalRandom.current().nextInt(100) == 0) {
             playerInfos.add(FAKE_JPX3_DATA);
@@ -87,6 +92,7 @@ public final class VanishFilter extends Filter {
           playerInfos.removeIf(playerInfoData -> {
             UUID uuid = playerInfoData.getProfile().getUUID();
             boolean wasVisible = shownPlayers.remove(uuid);
+//            System.out.println("Hiding " + playerInfoData.getProfile().getName() + " from you (was visible: "+wasVisible +")");
 //            Synchronizer.synchronize(() -> {
 //              player.sendMessage("Hiding " + playerInfoData.getProfile().getName() + " from you (was visible: "+wasVisible +")");
 //            });
@@ -98,6 +104,7 @@ public final class VanishFilter extends Filter {
 
     if (playerInfos.isEmpty()) {
       event.setCancelled(true);
+//      System.out.println("Cancelled empty player info packet");
     }
 
     Collections.shuffle(playerInfos);

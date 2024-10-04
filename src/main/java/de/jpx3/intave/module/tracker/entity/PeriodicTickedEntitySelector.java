@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+@Deprecated
 public final class PeriodicTickedEntitySelector {
   private final int ticks;
   private int taskId;
@@ -59,7 +60,6 @@ public final class PeriodicTickedEntitySelector {
     for (Entity entity : entities) {
       entity.setTicked(true);
     }
-//    System.out.println("Selected " + entities.size() + " entities for " + player.getName() + " (" + player.getUniqueId() + ")");
     connection.setTickedEntities(entities);
   }
 }

@@ -77,7 +77,6 @@ public final class AttackDispatcher extends Module {
     AttackMetadata attackData = meta.attack();
     ConnectionMetadata connectionData = meta.connection();
     MovementMetadata movementData = meta.movement();
-    ProtocolMetadata protocol = meta.protocol();
     PacketContainer packet = event.getPacket();
     Integer entityId = packet.getIntegers().read(0);
     EnumWrappers.EntityUseAction action = packet.getEntityUseActions().readSafely(0);
@@ -108,8 +107,6 @@ public final class AttackDispatcher extends Module {
       attackData.setLastAttackedEntityID(entityId);
       // Sprinting will be set to zero after the first reduce in the tick, does not apply to knockback
       boolean limitedToOneAttack = itemKnockback == 0;
-
-      //player.sendMessage(entity.isPlayer + " " + f + " " + f1 + " " + isSprinting + " " + itemKnockback + " " + limitedToOneAttack);
       if (entity.isPlayer && (f > 0 || f1 > 0) && (isSprinting || itemKnockback > 0)) {
         movementData.pastPlayerReduceAttackPhysics = 0;
         if (movementData.reduceTicks == 0 || !limitedToOneAttack) {

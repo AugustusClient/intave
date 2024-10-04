@@ -708,7 +708,7 @@ public final class Physics extends Check {
       granularDebugs.put("vehicle", movementData.isInVehicle() ? (movementData.isInRidingVehicle() ? "riding" : "passive") : "none");
       granularDebugs.put("insig", formatDouble(violationLevelData.physicsInsignificantBufferVL, 1));
       granularDebugs.put("acc/off", formatDouble(violationLevelData.physicsOffset, 2));
-      granularDebugs.put("s/c v:", MinecraftVersion.getCurrentVersion().getVersion() + " / " + user.protocolVersion());
+      granularDebugs.put("s/c v", MinecraftVersion.getCurrentVersion().getVersion() + " / " + user.protocolVersion());
       granularDebugs.put("v/tags", verticalTags.stream().map(EvaluationTag::toString).map(String::toUpperCase).distinct().collect(Collectors.joining(",")));
       granularDebugs.put("h/tags", horizontalTags.stream().map(EvaluationTag::toString).map(String::toUpperCase).distinct().collect(Collectors.joining(",")));
 
