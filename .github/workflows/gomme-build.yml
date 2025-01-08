@@ -45,4 +45,5 @@ jobs:
       - name: Run ZKM
         shell: sh
         run: |
+          ls -la
           ./start.sh
