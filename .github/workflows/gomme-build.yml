@@ -50,3 +50,8 @@ jobs:
         run: |
           mv io/Intave.jar io/input.jar
           ./start.sh
+      - name: Save artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: obfuscated-jar
+          path: files/output.jar
