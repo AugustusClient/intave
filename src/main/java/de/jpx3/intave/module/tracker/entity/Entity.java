@@ -1,5 +1,6 @@
 package de.jpx3.intave.module.tracker.entity;
 
+import com.comphenix.protocol.events.InternalStructure;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.reflect.StructureModifier;
 import de.jpx3.intave.access.IntaveInternalException;
@@ -200,9 +201,9 @@ public class Entity {
     }
     // Always set on 1.16+ as they removed the threshold
     boolean samePosition =
-        Math.abs(immediateServerPosition.getX() - newPosX) < 0.03125d &&
-            Math.abs(immediateServerPosition.getY() - newPosY) < 0.015625d &&
-            Math.abs(immediateServerPosition.getZ() - newPosZ) < 0.03125d;
+      Math.abs(immediateServerPosition.getX() - newPosX) < 0.03125d &&
+        Math.abs(immediateServerPosition.getY() - newPosY) < 0.015625d &&
+        Math.abs(immediateServerPosition.getZ() - newPosZ) < 0.03125d;
     if (samePosition && user.protocolVersion() < 735 /* 1.16 protocol version */) {
       return;
     }
@@ -214,10 +215,11 @@ public class Entity {
   /**
    * Handles a teleportation. Packets: ENTITY_TELEPORT
    *
-   * @param user user which received the packet
+   * @param user   user which received the packet
    * @param packet contains information about the entity teleportation
    */
   public void handleEntityTeleport(User user, PacketContainer packet) {
+    user.player().sendMessage("received teleport");
     double newPosX;
     double newPosY;
     double newPosZ;
@@ -240,9 +242,9 @@ public class Entity {
 
     // Always set on 1.16+ as they removed the threshold
     boolean samePosition =
-        Math.abs(position.posX - newPosX) < 0.03125d
-            && Math.abs(position.posY - newPosY) < 0.015625d
-            && Math.abs(position.posZ - newPosZ) < 0.03125d;
+      Math.abs(position.posX - newPosX) < 0.03125d
+        && Math.abs(position.posY - newPosY) < 0.015625d
+        && Math.abs(position.posZ - newPosZ) < 0.03125d;
     if (samePosition && user.protocolVersion() < 735 /* 1.16 protocol version */) {
       setPositionAndRotationEntityLiving(position.posX, position.posY, position.posZ, 3);
     } else {
@@ -258,6 +260,54 @@ public class Entity {
     } else {
       setAlternativeYPosition(alternativeNewPosY);
     }
+  }
+
+  public void handleEntityPositionSync(PacketContainer packet) {
+    double newPosX;
+    double newPosY;
+    double newPosZ;
+
+    InternalStructure playerPosition = packet.getStructures().read(0);
+    Vector position = playerPosition.getVectors().read(0);
+    newPosX = position.getX();
+    newPosY = position.getY();
+    newPosZ = position.getZ();
+    serverPosX = ClientMath.positionLong(newPosX);
+    serverPosY = ClientMath.positionLong(newPosY);
+    serverPosZ = ClientMath.positionLong(newPosZ);
+
+    boolean instantTeleport = squaredDistanceTo(newPosX, newPosY, newPosZ) > 4096;
+    if (instantTeleport) {
+      setPosition(newPosX, newPosY, newPosZ);
+    } else {
+      setPositionAndRotationEntityLiving(newPosX, newPosY, newPosZ, 3);
+    }
+  }
+
+  public void immediateEntityPositionSync(PacketContainer packet) {
+    double newPosX;
+    double newPosY;
+    double newPosZ;
+
+    InternalStructure playerPosition = packet.getStructures().read(0);
+    Vector position = playerPosition.getVectors().read(0);
+    newPosX = position.getX();
+    newPosY = position.getY();
+    newPosZ = position.getZ();
+    immServerPosX = ClientMath.positionLong(newPosX);
+    immServerPosY = ClientMath.positionLong(newPosY);
+    immServerPosZ = ClientMath.positionLong(newPosZ);
+
+    immediateServerPosition.setX(newPosX);
+    immediateServerPosition.setY(newPosY);
+    immediateServerPosition.setZ(newPosZ);
+  }
+
+  private double squaredDistanceTo(double newX, double newY, double newZ) {
+    double d = newX - position.posX;
+    double e = newY - position.posY;
+    double f = newZ - position.posZ;
+    return d * d + e * e + f * f;
   }
 
   public void immediateEntityMovement(PacketContainer packet) {
@@ -300,6 +350,7 @@ public class Entity {
    * @param packet contains information about the entity movement
    */
   public void handleEntityMovement(PacketContainer packet) {
+
     double newPosX;
     double newPosY;
     double alternativeNewPosY;

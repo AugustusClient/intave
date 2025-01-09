@@ -519,6 +519,51 @@ public final class EntityTracker extends Module {
   @PacketSubscription(
     priority = ListenerPriority.HIGH,
     packetsOut = {
+      ENTITY_POSITION_SYNC
+    }
+  )
+  public void receivePositionSync(PacketEvent event) {
+    Player player = event.getPlayer();
+    User user = UserRepository.userOf(player);
+    PacketContainer packet = event.getPacket();
+    Entity entity = wrappedEntityByEntityTeleportPacket(event);
+    if (entity == null) {
+      return;
+    }
+
+    if (entity.duplicationId != 0) {
+      PacketContainer newPacket = packet.deepClone();
+      newPacket.getIntegers().write(0, entity.duplicationId);
+      PacketSender.sendServerPacket(player, newPacket);
+    }
+
+    MovementMetadata movement = user.meta().movement();
+    double distanceBefore = entity.distanceToPlayerCache > 8 ? 10 : entity.immediateServerPosition.distance(movement.positionX, movement.positionY, movement.positionZ);
+    entity.immediateEntityPositionSync(packet);
+    double distanceAfter = distanceBefore > 8 ? 10 : entity.immediateServerPosition.distance(movement.positionX, movement.positionY, movement.positionZ);
+
+    if (entity.typeData().isLivingEntity() && entity.tracingEnabled()) {
+      EmptyFeedbackCallback task = () -> {
+        entity.verifiedPosition = false;
+        entity.handleEntityPositionSync(packet);
+        entity.clientSynchronized = true;
+        nayoroEntityPositionUpdate(player, entity);
+      };
+      FeedbackObserver observer = entity.feedbackTracker();
+      int options = entity.distanceToPlayerCache < 6 ? TRACER_ENTITY_IS_NEAR : TRACER_ENTITY_IS_FAR;
+      if (distanceBefore < 8 && distanceAfter < 8 && distanceBefore != distanceAfter) {
+        options |= distanceAfter < distanceBefore ? TRACER_ENTITY_MOVED_CLOSER : TRACER_ENTITY_MOVED_FARTHER;
+      }
+      user.tracedPacketTickFeedback(event, task, observer, options);
+    } else {
+      entity.handleEntityPositionSync(packet);
+      entity.clientSynchronized = false;
+    }
+  }
+
+  @PacketSubscription(
+    priority = ListenerPriority.HIGH,
+    packetsOut = {
       ENTITY_TELEPORT
     },
     ignoreCancelled = false
@@ -956,18 +1001,18 @@ public final class EntityTracker extends Module {
 //    int targetId = duplicationOwners.get(entityId);
 
 //    if (duplicationOwners.containsKey(entityId)) {
-      if (entity.duplicationId != 0) {
-        // Rule #3151235: When editing metadata, do a deepClone().
-        reader.release();
-        event.setPacket(packet = event.getPacket().deepClone());
-        reader = PacketReaders.readerOf(packet);
+    if (entity.duplicationId != 0) {
+      // Rule #3151235: When editing metadata, do a deepClone().
+      reader.release();
+      event.setPacket(packet = event.getPacket().deepClone());
+      reader = PacketReaders.readerOf(packet);
 
-        PacketContainer packetCopy = packet.deepClone();
-        ConnectionMetadata.DecoySide decoySide = decoySides.get(entityId);
-        modifyWatchablesOf((decoySide == SECOND_IS_DECOY ? packet : packetCopy));
-        packetCopy.getIntegers().write(0, entity.duplicationId);
-        PacketSender.sendServerPacket(player, packetCopy);
-      }
+      PacketContainer packetCopy = packet.deepClone();
+      ConnectionMetadata.DecoySide decoySide = decoySides.get(entityId);
+      modifyWatchablesOf((decoySide == SECOND_IS_DECOY ? packet : packetCopy));
+      packetCopy.getIntegers().write(0, entity.duplicationId);
+      PacketSender.sendServerPacket(player, packetCopy);
+    }
 //    }
 
     EntityTypeData type = entity.typeData();
