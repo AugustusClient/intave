@@ -332,7 +332,7 @@ public final class MovementDispatcher extends Module {
 
     if (hasMovement) {
       StructureModifier<Double> modifier = packet.getDoubles();
-      if (containsCollision && vehicleMove) {
+      if (MinecraftVersions.VER1_21_4.atOrAbove() && vehicleMove) {
         modifier = packet.getStructures().read(0).getDoubles();
       }
       for (int i = 0; i < 3; i++) {
@@ -375,11 +375,10 @@ public final class MovementDispatcher extends Module {
 
     // see MultiPlayerGameMode#useItem
     if (protocol.cavesAndCliffsUpdate() && !movementData.awaitTeleport
-//      && !movementData.awaitOutgoingTeleport
       && packet.getType() == PacketType.Play.Client.POSITION_LOOK
     ) {
       StructureModifier<Double> modifier = packet.getDoubles();
-      if (containsCollision && vehicleMove) {
+      if (MinecraftVersions.VER1_21_4.atOrAbove() && vehicleMove) {
         modifier = packet.getStructures().read(0).getDoubles();
       }
       double positionX = modifier.read(0);
@@ -994,7 +993,6 @@ public final class MovementDispatcher extends Module {
         user.kick("Invalid key input");
         return;
       }
-//    System.out.println("Steering the vehicle: " + strafeKey + " " + forwardKey);
       Boolean jumping = packet.getBooleans().read(0);
       movementData.externalKeyApply = true;
       movementData.clientStrafeKey = strafeKey;
