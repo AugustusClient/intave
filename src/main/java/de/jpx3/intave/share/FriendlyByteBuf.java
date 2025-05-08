@@ -2,6 +2,7 @@ package de.jpx3.intave.share;
 
 import com.comphenix.protocol.utility.MinecraftMethods;
 import com.comphenix.protocol.utility.MinecraftReflection;
+import de.jpx3.intave.klass.locate.Locate;
 import de.jpx3.intave.klass.locate.MethodSearchBySignature;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -37,23 +38,16 @@ public final class FriendlyByteBuf {
 
   static {
     MethodHandle method;
-    Class<?> rfbbclassoptional = null;
+    Class<?> rfbbclassoptional = Locate.classByKey("PacketDataSerializer");
     try {
-      rfbbclassoptional = Class.forName("net.minecraft.network.RegistryFriendlyByteBuf");
-    } catch (ClassNotFoundException ignored) {}
-    if (rfbbclassoptional != null) {
-      try {
-        method = MethodHandles.lookup().unreflect(rfbbclassoptional.getDeclaredMethod("readUtf", int.class));
-      } catch (NoSuchMethodException e) {
-        method = MethodSearchBySignature.ofClass(MinecraftReflection.getPacketDataSerializerClass())
-          .withReturnType(String.class)
-          .withParameters(new Class[]{int.class})
-          .search().findFirst().get();
-      } catch (IllegalAccessException e) {
-        throw new RuntimeException(e);
-      }
-    } else {
-      method = null;
+      method = MethodHandles.lookup().unreflect(rfbbclassoptional.getDeclaredMethod("readUtf", int.class));
+    } catch (NoSuchMethodException e) {
+      method = MethodSearchBySignature.ofClass(MinecraftReflection.getPacketDataSerializerClass())
+        .withReturnType(String.class)
+        .withParameters(new Class[]{int.class})
+        .search().findFirst().get();
+    } catch (IllegalAccessException e) {
+      throw new RuntimeException(e);
     }
     readUtfMethod = method;
   }

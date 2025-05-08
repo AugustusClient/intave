@@ -31,7 +31,7 @@ public class MovementConfiguration {
 
   private static final MovementConfiguration[] UNIVERSE = new MovementConfiguration[
     1 << (states.stream().mapToInt(State::bitLength).reduce(1, Integer::sum) + 1)
-    ];
+  ];
 
   static {
     Arrays.setAll(UNIVERSE, MovementConfiguration::new);

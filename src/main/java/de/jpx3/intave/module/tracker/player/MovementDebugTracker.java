@@ -1,8 +1,11 @@
 package de.jpx3.intave.module.tracker.player;
 
 import com.comphenix.protocol.events.PacketContainer;
+import de.jpx3.intave.connect.sibyl.LabyModChannelHelper;
 import de.jpx3.intave.module.Module;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
+import de.jpx3.intave.packet.reader.PacketReaders;
+import de.jpx3.intave.packet.reader.PayloadInReader;
 import de.jpx3.intave.share.Position;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
@@ -19,6 +22,7 @@ import java.util.Base64;
 import java.util.Map;
 
 import static de.jpx3.intave.IntaveControl.ENABLE_MOVEMENT_DEBUGGER_COLLECTOR;
+import static de.jpx3.intave.module.linker.packet.PacketId.Client.CUSTOM_PAYLOAD_IN;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.SET_COMMAND_MINECART;
 
 public final class MovementDebugTracker extends Module implements PluginMessageListener {
@@ -67,6 +71,48 @@ public final class MovementDebugTracker extends Module implements PluginMessageL
   private final static String PREFIX = "$intave/";
 
   @PacketSubscription(
+    packetsIn = {CUSTOM_PAYLOAD_IN}
+  )
+  public void onCustomPayloadIn(
+    User user, PacketContainer packet,
+    Cancellable cancellable
+  ) {
+    if (!ENABLE_MOVEMENT_DEBUGGER_COLLECTOR) {
+      return;
+    }
+    try(
+      PayloadInReader reader = PacketReaders.readerOf(packet);
+    ) {
+      if (reader.tag().equalsIgnoreCase("MC|AdvCdm")) {
+        ByteBuf bytes = reader.readBytes();
+        int type = bytes.readByte();
+        if (type != 1) {
+          return;
+        }
+        int entityId = bytes.readInt();
+        if (entityId != -1) {
+          return;
+        }
+        String command = LabyModChannelHelper.readString(bytes, bytes.readableBytes());
+        String subCommand = command.substring(PREFIX.length());
+        String[] split = subCommand.split(":");
+        if (split.length != 2) {
+          System.out.println("Invalid command format: " + command);
+          cancellable.setCancelled(true);
+          return;
+        }
+        String key = split[0];
+        String value = split[1];
+        ProtocolMetadata protocol = user.meta().protocol();
+        protocol.debugStates.put(key, value);
+        cancellable.setCancelled(true);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @PacketSubscription(
     packetsIn = {SET_COMMAND_MINECART},
     debug = true
   )
@@ -74,6 +120,9 @@ public final class MovementDebugTracker extends Module implements PluginMessageL
     User user, PacketContainer packet,
     Cancellable cancellable
   ) {
+    if (!ENABLE_MOVEMENT_DEBUGGER_COLLECTOR) {
+      return;
+    }
     Integer id = packet.getIntegers().readSafely(0);
     if (id == null || id != -1) {
       return;

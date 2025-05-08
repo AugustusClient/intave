@@ -228,7 +228,7 @@ public final class ProtocolMetadata {
   }
 
   public boolean sendsClientTickEnd() {
-    return protocolVersion >= VER_1_20_2;
+    return protocolVersion >= VER_1_20_2 && MinecraftVersions.VER1_20_2.atOrAbove();
   }
 
   public void setLocale(String locale) {
