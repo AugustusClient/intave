@@ -31,10 +31,14 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
+      - name: Set Short SHA
+        id: vars
+        run: echo "sha_short=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Intave-${{ github.workflow_sha }}
+          name: Intave-${{ steps.vars.outputs.sha_short }}
           path: build/libs/*.jar
           retention-days: 7
 
