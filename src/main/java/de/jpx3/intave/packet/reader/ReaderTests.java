@@ -959,7 +959,7 @@ public final class ReaderTests extends IntegrationTests {
       .newInstance(7, path, 90F, -45F, true);
     PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_POSITION_SYNC, handle);
     Entity entity = testEntity();
-    entity.immediateEntityPositionSync(packet);
+    entity.immediateEntityPositionSync(EntityMovementReader.readPositionSync(packet, ServerProtocolVersion.current()).position());
     assertEquals(1.25D, entity.immediateServerPosition.getX());
     assertEquals(64.125D, entity.immediateServerPosition.getY());
     assertEquals(-2.5D, entity.immediateServerPosition.getZ());

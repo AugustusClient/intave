@@ -322,9 +322,7 @@ public class Entity {
     }
   }
 
-  public void handleEntityPositionSync(User user, PacketContainer packet) {
-    PositionMoveRotation posMoveRot = EntityMovementReader.readPositionSync(packet, ServerProtocolVersion.current());
-    Position position = posMoveRot.position();
+  public void handleEntityPositionSync(User user, Position position) {
     handleEntityPositionSync(position);
     if (entityName().toLowerCase().contains("chicken")) {
       ProtocolMetadata protocol = user.meta().protocol();
@@ -356,12 +354,10 @@ public class Entity {
     }
   }
 
-  public void immediateEntityPositionSync(PacketContainer packet) {
+  public void immediateEntityPositionSync(Position position) {
     double newPosX;
     double newPosY;
     double newPosZ;
-    PositionMoveRotation posMoveRot = EntityMovementReader.readPositionSync(packet, ServerProtocolVersion.current());
-    Position position = posMoveRot.position();
     newPosX = position.getX();
     newPosY = position.getY();
     newPosZ = position.getZ();
