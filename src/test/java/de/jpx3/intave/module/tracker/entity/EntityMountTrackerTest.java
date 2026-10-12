@@ -174,6 +174,19 @@ class EntityMountTrackerTest {
   }
 
   @Test
+  void batchedRemovalOnlyDropsEntitiesThatAreStillMarked() {
+    Entity destroyed = entity(11);
+    entity(12);
+    var connection = user.meta().connection();
+    connection.markForDeletion(destroyed.entityId());
+    connection.markForDeletion(12);
+    Entity respawned = entity(12);
+    connection.removeEntitiesIfMarked(new int[]{destroyed.entityId(), 12});
+    assertNull(connection.entityBy(destroyed.entityId()));
+    assertSame(respawned, connection.entityBy(12));
+  }
+
+  @Test
   void legacyAttachmentAlsoClearsTheLocalPlayerWithoutATrackedEntity() {
     tracker.attachment(user, PLAYER, vehicle.entityId());
     tracker.attachment(user, PLAYER, -1);
