@@ -31,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static de.jpx3.intave.IntaveControl.ENABLE_MOVEMENT_DEBUGGER_COLLECTOR;
 import static de.jpx3.intave.math.MathHelper.formatDouble;
 
 public class Entity {
@@ -68,7 +69,7 @@ public class Entity {
   public EntityPositionContext position;
   public EntityPositionContext lastPosition;
   public EntityPositionContext alternativePosition;
-  public final Deque<String> positionChanges = new ArrayDeque<>(11);
+  public final Deque<PositionChange> positionChanges = new ArrayDeque<>(11);
   public final ReentrantLock debugPushLock = new ReentrantLock();
 
   public PositionDeltaCodec immediateCodec = new PositionDeltaCodec();
@@ -182,19 +183,45 @@ public class Entity {
       --position.newPosRotationIncrements;
       setPosition(newPosX, newPosY, newPosZ);
       setShiftedPositionY(shiftedNewY);
-      pushDebug("LERP(" + position.newPosRotationIncrements + ") to " + formatDouble(newPosX, 3) + " " + formatDouble(newPosY, 3) + " " + formatDouble(newPosZ, 3));
+      pushDebug("LERP", position.newPosRotationIncrements, newPosX, newPosY, newPosZ);
     }
   }
 
-  public void pushDebug(String message) {
+  /**
+   * Records a position change; the message is only formatted when {@link #positionChanges()} is read.
+   *
+   * @param steps interpolation steps shown as {@code kind(steps)}, or -1 to omit them
+   */
+  private void pushDebug(String kind, int steps, double x, double y, double z) {
+    PositionChange change = new PositionChange(kind, steps, x, y, z);
     try {
       debugPushLock.lock();
       if (positionChanges.size() > 10) {
         positionChanges.removeFirst();
       }
-      positionChanges.add(message);
+      positionChanges.add(change);
     } finally {
       debugPushLock.unlock();
+    }
+  }
+
+  private static final class PositionChange {
+    private final String kind;
+    private final int steps;
+    private final double x, y, z;
+
+    private PositionChange(String kind, int steps, double x, double y, double z) {
+      this.kind = kind;
+      this.steps = steps;
+      this.x = x;
+      this.y = y;
+      this.z = z;
+    }
+
+    @Override
+    public String toString() {
+      return (steps < 0 ? kind : kind + "(" + steps + ")")
+        + " to " + formatDouble(x, 3) + " " + formatDouble(y, 3) + " " + formatDouble(z, 3);
     }
   }
 
@@ -298,7 +325,7 @@ public class Entity {
 
     if (immediateTeleport) {
       setPosition(newPosX, newPosY, newPosZ);
-      pushDebug("TP(Set position) to " + formatDouble(newPosX, 3) + " " + formatDouble(newPosY, 3) + " " + formatDouble(newPosZ, 3));
+      pushDebug("TP(Set position)", -1, newPosX, newPosY, newPosZ);
     } else {
       // Always set on 1.16+ as they removed the threshold
       boolean samePosition =
@@ -310,7 +337,7 @@ public class Entity {
       } else {
         setPositionAndRotationEntityLiving(newPosX, newPosY, newPosZ, 3);
       }
-      pushDebug("TP(Set lerp target) to " + formatDouble(newPosX, 3) + " " + formatDouble(newPosY, 3) + " " + formatDouble(newPosZ, 3));
+      pushDebug("TP(Set lerp target)", -1, newPosX, newPosY, newPosZ);
     }
     double alternativeNewPosY = (double) this.serverPosY / 32d + 0.015625d;
     if (Math.abs(position.posX - newPosX) < 0.03125d &&
@@ -326,7 +353,7 @@ public class Entity {
     PositionMoveRotation posMoveRot = EntityMovementReader.readPositionSync(packet, ServerProtocolVersion.current());
     Position position = posMoveRot.position();
     handleEntityPositionSync(position);
-    if (entityName().toLowerCase().contains("chicken")) {
+    if (ENABLE_MOVEMENT_DEBUGGER_COLLECTOR && entityName().toLowerCase().contains("chicken")) {
       ProtocolMetadata protocol = user.meta().protocol();
       protocol.lastEntityId = entityId;
       protocol.lastEntityPosition = position;
@@ -349,10 +376,10 @@ public class Entity {
     boolean instantTeleport = squaredDistanceTo(newPosX, newPosY, newPosZ) > 4096;
     if (instantTeleport) {
       setPosition(newPosX, newPosY, newPosZ);
-      pushDebug("TP(Set position) to " + formatDouble(newPosX, 3) + " " + formatDouble(newPosY, 3) + " " + formatDouble(newPosZ, 3));
+      pushDebug("TP(Set position)", -1, newPosX, newPosY, newPosZ);
     } else {
       setPositionAndRotationEntityLiving(newPosX, newPosY, newPosZ, 3);
-      pushDebug("TP(Set lerp target) to " + formatDouble(newPosX, 3) + " " + formatDouble(newPosY, 3) + " " + formatDouble(newPosZ, 3));
+      pushDebug("TP(Set lerp target)", -1, newPosX, newPosY, newPosZ);
     }
   }
 
@@ -421,7 +448,7 @@ public class Entity {
     // 3 is used to interpolate the entity position in new client ticks
     setPositionAndRotationEntityLiving(newPosX, newPosY, newPosZ, 3);
     setAlternativeYPosition(newPosY);
-    pushDebug("REL(Set lerp target) to " + formatDouble(newPosX, 3) + " " + formatDouble(newPosY, 3) + " " + formatDouble(newPosZ, 3));
+    pushDebug("REL(Set lerp target)", -1, newPosX, newPosY, newPosZ);
   }
 
   /**
@@ -578,7 +605,16 @@ public class Entity {
   }
 
   public List<String> positionChanges() {
-    return new ArrayList<>(positionChanges);
+    List<String> messages = new ArrayList<>(positionChanges.size());
+    try {
+      debugPushLock.lock();
+      for (PositionChange change : positionChanges) {
+        messages.add(change.toString());
+      }
+    } finally {
+      debugPushLock.unlock();
+    }
+    return messages;
   }
 
   /**
