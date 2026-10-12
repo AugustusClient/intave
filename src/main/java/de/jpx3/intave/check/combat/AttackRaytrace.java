@@ -736,11 +736,13 @@ public final class AttackRaytrace extends MetaCheck<AttackRaytrace.AttackRaytrac
     granular.put("name", attacked.entityName());
     granular.put("size", String.valueOf(attacked.typeData().size()));
 
-    List<String> positionChanges = attacked.positionChanges();
-    if (positionChanges != null && !positionChanges.isEmpty()) {
-      int size = positionChanges.size();
-      for (int i = 5; i < size; i++) {
-        granular.put(String.valueOf((i - size)), positionChanges.get(i));
+    if (result != RaytraceResult.VALID) {
+      List<String> positionChanges = attacked.positionChanges();
+      if (positionChanges != null && !positionChanges.isEmpty()) {
+        int size = positionChanges.size();
+        for (int i = 5; i < size; i++) {
+          granular.put(String.valueOf((i - size)), positionChanges.get(i));
+        }
       }
     }
     switch (result) {
