@@ -27,9 +27,7 @@ import de.jpx3.intave.module.linker.OneForOne;
 import de.jpx3.intave.module.linker.SubscriptionInstanceProvider;
 import de.jpx3.intave.module.linker.packet.tinyprotocol.InjectionService;
 import de.jpx3.intave.packet.reader.PacketReader;
-import de.jpx3.intave.packet.reader.PacketReaders;
 import de.jpx3.intave.user.User;
-import de.jpx3.intave.user.UserRepository;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 
@@ -38,7 +36,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.IntFunction;
 import java.util.function.IntUnaryOperator;
 
@@ -327,9 +324,6 @@ public final class PacketSubscriptionLinker extends Module {
     return packetType.name() != null && packetType.name().equalsIgnoreCase(name);
   }
 
-  private static final ThreadLocal<Map<Integer, Object[]>> argumentCache = ThreadLocal.withInitial(HashMap::new);
-  private static final ThreadLocal<Map<Integer, Boolean>> argumentLocks = ThreadLocal.withInitial(HashMap::new);
-
   private PacketSubscriptionMethodExecutor assemblePESubscriptionMethodCaller(
     Class<? extends PacketEventSubscriber> targetClass,
     Method calledMethod,
@@ -354,95 +348,8 @@ public final class PacketSubscriptionLinker extends Module {
       );
       return instanceOf(executorClass);
     } else {
-      Class<?>[] parameterTypes = calledMethod.getParameterTypes();
-      int length = parameterTypes.length;
-
-      int playerParameterIndex = findParameterPosition(parameterTypes, Player.class);
-      int userParameterPosition = findParameterPosition(parameterTypes, User.class);
-      int cancelableParameterPosition = findParameterPosition(parameterTypes, Cancellable.class);
-      int packetContainerParameterPosition = findParameterPosition(parameterTypes, PacketContainer.class);
-      int packetReaderParameterPosition = findParameterPosition(parameterTypes, PacketReader.class);
-      int packetEventParameterPosition = findParameterPosition(parameterTypes, PacketEvent.class);
-      int packetTypeParameterPosition = findParameterPosition(parameterTypes, PacketType.class);
-
-      AtomicBoolean block = new AtomicBoolean(false);
-
-      return (subscriber, event) -> {
-        if (block.get()) {
-          return;
-        }
-        Player player = event.getPlayer();
-
-        Map<Integer, Boolean> locks = argumentLocks.get();
-        Boolean isLocked = locks.get(length);
-        if (isLocked == null) {
-          locks.put(length, true);
-          isLocked = false;
-        }
-
-        Object[] arguments = isLocked ? new Object[length] : argumentCache.get().computeIfAbsent(length, x -> new Object[length]);
-
-        if (playerParameterIndex != -1) {
-          arguments[playerParameterIndex] = player;
-        }
-        if (userParameterPosition != -1) {
-          arguments[userParameterPosition] = UserRepository.userOf(player);
-        }
-        if (cancelableParameterPosition != -1) {
-          arguments[cancelableParameterPosition] = event;
-        }
-        if (packetContainerParameterPosition != -1) {
-          arguments[packetContainerParameterPosition] = event.getPacket();
-        }
-        PacketReader packetReader = null;
-        if (packetReaderParameterPosition != -1) {
-          try {
-            packetReader = PacketReaders.readerOf(event.getPacket());
-            arguments[packetReaderParameterPosition] = packetReader;
-          } catch (Exception e) {
-//            throw new RuntimeException("Failed to create packet reader for packet " + event.getPacketType() + " in " + subscriber.getClass().getCanonicalName(), e);
-            block.set(true);
-//            IntaveLogger.logger().error("Failed to create packet reader for packet " + event.getPacketType() + " in " + subscriber.getClass().getCanonicalName());
-            IntaveLogger.logger().info(subscriber.getClass().getCanonicalName() + " skipped packet type due to ProtocolLib missing packet " + event.getPacketType().name());
-            return;
-          }
-        }
-        if (packetEventParameterPosition != -1) {
-          arguments[packetEventParameterPosition] = event;
-        }
-        if (packetTypeParameterPosition != -1) {
-          arguments[packetTypeParameterPosition] = event.getPacketType();
-        }
-
-        try {
-          calledMethod.invoke(subscriber, arguments);
-        } catch (Exception e) {
-          throw new RuntimeException("Failed to invoke packet subscription method " + calledMethod + " in " + subscriber.getClass().getCanonicalName(), e);
-        }
-
-        if (packetReader != null) {
-          packetReader.releaseSafe();
-        }
-
-        if (!isLocked) {
-          locks.put(length, false);
-          Arrays.fill(arguments, null);
-        }
-      };
+      return MethodHandleSubscriptionExecutor.of(calledMethod);
     }
-  }
-
-  private static int findParameterPosition(Class<?>[] parameterTypes, Class<?> parameterType) {
-    for (int i = 0; i < parameterTypes.length; i++) {
-      if (parameterTypes[i] == parameterType) {
-        return i;
-      }
-      // or is a subclass of the parameter type
-      if (parameterType.isAssignableFrom(parameterTypes[i])) {
-        return i;
-      }
-    }
-    return -1;
   }
 
   private <T> T instanceOf(Class<T> clazz) {
