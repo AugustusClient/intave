@@ -468,13 +468,14 @@ public final class EntityTracker extends Module {
 
     MovementMetadata movement = user.meta().movement();
     double distanceBefore = entity.distanceToPlayerCache > 8 ? 10 : entity.immediateServerPosition.distance(movement.positionX, movement.positionY, movement.positionZ);
-    entity.immediateEntityPositionSync(packet);
+    Position syncPosition = EntityMovementReader.readPositionSync(packet, ServerProtocolVersion.current()).position();
+    entity.immediateEntityPositionSync(syncPosition);
     double distanceAfter = distanceBefore > 8 ? 10 : entity.immediateServerPosition.distance(movement.positionX, movement.positionY, movement.positionZ);
 
     if (entity.typeData().isLivingEntity() && entity.tracingEnabled()) {
       EmptyFeedbackCallback task = () -> {
         entity.verifiedPosition = false;
-        entity.handleEntityPositionSync(user, packet);
+        entity.handleEntityPositionSync(user, syncPosition);
         entity.clientSynchronized = true;
         nayoroEntityPositionUpdate(player, entity);
       };
@@ -485,7 +486,7 @@ public final class EntityTracker extends Module {
       }
       user.tracedPacketTickFeedback(event, task, observer, options);
     } else {
-      entity.handleEntityPositionSync(user, packet);
+      entity.handleEntityPositionSync(user, syncPosition);
       entity.clientSynchronized = false;
     }
   }
