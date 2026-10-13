@@ -16,7 +16,7 @@ import de.jpx3.intave.adapter.MinecraftVersion;
 import static de.jpx3.intave.adapter.MinecraftVersions.*;
 
 public final class ServerProtocolVersion {
-	private static volatile Cached cached;
+	private static Cached cached;
 
 	private ServerProtocolVersion() {}
 
