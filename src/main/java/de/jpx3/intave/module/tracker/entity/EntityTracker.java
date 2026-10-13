@@ -56,6 +56,8 @@ import de.jpx3.intave.version.ServerProtocolVersion;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.*;
 import de.jpx3.intave.world.Particles;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -298,12 +300,33 @@ public final class EntityTracker extends Module {
     ignoreCancelled = false
   )
   public void receiveEntityDestroy(PacketEvent event, Player player, EntityIterable iterable) {
-    iterable.forEach(entityId ->
-      enterEntityDestroy(event, player, entityId)
-    );
+    IntList markedIds = new IntArrayList();
+    try {
+      iterable.forEach(entityId ->
+        enterEntityDestroy(event, player, entityId, markedIds)
+      );
+    } finally {
+      if (!markedIds.isEmpty()) {
+        scheduleMarkedRemoval(UserRepository.userOf(player), markedIds.toIntArray());
+      }
+    }
   }
 
-  private void enterEntityDestroy(PacketEvent event, Player player, int entityID) {
+  // one chain per destroy packet: the synchronizer always enqueues, so every id still gets the same two hops as before
+  private void scheduleMarkedRemoval(User user, int[] entityIds) {
+    ConnectionMetadata connection = user.meta().connection();
+    Synchronizer.synchronize(user, () -> {
+      user.tickFeedback(() -> {
+        Synchronizer.synchronize(user, () -> {
+          user.tickFeedback(() -> {
+            connection.removeEntitiesIfMarked(entityIds);
+          }/*, APPEND_ON_OVERFLOW*/);
+        });
+      }/*, APPEND_ON_OVERFLOW*/);
+    });
+  }
+
+  private void enterEntityDestroy(PacketEvent event, Player player, int entityID, IntList markedIds) {
     // Entity destroy packets are NEVER to be synchronized
     /*
     Important: When the destroy entity packet is synchronised the spawn entity packet needs also be synchronized because:
@@ -315,10 +338,10 @@ public final class EntityTracker extends Module {
     if (connection.duplicatedEntityIds.contains(entityID)) {
       return;
     }
-    processEntityDestroy(event, player, entityID);
+    processEntityDestroy(event, player, entityID, markedIds);
   }
 
-  private void processEntityDestroy(PacketEvent event, Player player, int entityId) {
+  private void processEntityDestroy(PacketEvent event, Player player, int entityId, IntList markedIds) {
     User user = UserRepository.userOf(player);
     AttackMetadata attackData = user.meta().attack();
     ConnectionMetadata connection = user.meta().connection();
@@ -344,16 +367,7 @@ public final class EntityTracker extends Module {
     }
 
     connection.markForDeletion(entityId);
-
-    Synchronizer.synchronize(user, () -> {
-      user.tickFeedback(() -> {
-        Synchronizer.synchronize(user, () -> {
-          user.tickFeedback(() -> {
-            connection.removeEntityIfMarked(entityId);
-          }/*, APPEND_ON_OVERFLOW*/);
-        });
-      }/*, APPEND_ON_OVERFLOW*/);
-    });
+    markedIds.add(entityId);
 
     if (entity != null) {
       StaticEntityCollisions.enterEntityDespawn(user, entity);
@@ -454,13 +468,14 @@ public final class EntityTracker extends Module {
 
     MovementMetadata movement = user.meta().movement();
     double distanceBefore = entity.distanceToPlayerCache > 8 ? 10 : entity.immediateServerPosition.distance(movement.positionX, movement.positionY, movement.positionZ);
-    entity.immediateEntityPositionSync(packet);
+    Position syncPosition = EntityMovementReader.readPositionSync(packet, ServerProtocolVersion.current()).position();
+    entity.immediateEntityPositionSync(syncPosition);
     double distanceAfter = distanceBefore > 8 ? 10 : entity.immediateServerPosition.distance(movement.positionX, movement.positionY, movement.positionZ);
 
     if (entity.typeData().isLivingEntity() && entity.tracingEnabled()) {
       EmptyFeedbackCallback task = () -> {
         entity.verifiedPosition = false;
-        entity.handleEntityPositionSync(user, packet);
+        entity.handleEntityPositionSync(user, syncPosition);
         entity.clientSynchronized = true;
         nayoroEntityPositionUpdate(player, entity);
       };
@@ -471,7 +486,7 @@ public final class EntityTracker extends Module {
       }
       user.tracedPacketTickFeedback(event, task, observer, options);
     } else {
-      entity.handleEntityPositionSync(user, packet);
+      entity.handleEntityPositionSync(user, syncPosition);
       entity.clientSynchronized = false;
     }
   }

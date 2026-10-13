@@ -422,6 +422,12 @@ public final class ConnectionMetadata {
     }
   }
 
+  public void removeEntitiesIfMarked(int[] entityIds) {
+    for (int entityId : entityIds) {
+      removeEntityIfMarked(entityId);
+    }
+  }
+
   public void queueToNextTransaction(Runnable runnable) {
     nextFeedbackSubscribers.add(runnable);
   }
