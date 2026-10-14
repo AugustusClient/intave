@@ -18,6 +18,20 @@ class ServerProtocolVersionTest {
     }
 
     @Test
+    void switchingCurrentVersionReturnsNewProtocol() {
+        try {
+            MinecraftVersion.setCurrent(MinecraftVersion.fromServerVersion("git-Paper-445 (MC: 1.8.8)"));
+            assertEquals(47, ServerProtocolVersion.current());
+            MinecraftVersion.setCurrent(MinecraftVersions.VER1_21_4);
+            assertEquals(769, ServerProtocolVersion.current());
+            MinecraftVersion.setCurrent(MinecraftVersion.fromServerVersion("git-Paper-445 (MC: 1.8.8)"));
+            assertEquals(47, ServerProtocolVersion.current());
+        } finally {
+            MinecraftVersion.setCurrent(MinecraftVersions.VER1_21_4);
+        }
+    }
+
+    @Test
     void mapsEveryLocalClientSourceReleaseToItsExactProtocol() {
         String[] versions = {"1.8.9", "1.9.4", "1.10.2", "1.11.2", "1.12.2", "1.13.2", "1.14.4", "1.15.2",
             "1.16.5", "1.17.1", "1.18.2", "1.19.4", "1.20", "1.20.1", "1.20.2", "1.20.4", "1.20.5",

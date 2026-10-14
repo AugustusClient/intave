@@ -16,10 +16,19 @@ import de.jpx3.intave.adapter.MinecraftVersion;
 import static de.jpx3.intave.adapter.MinecraftVersions.*;
 
 public final class ServerProtocolVersion {
+	private static Cached cached;
+
 	private ServerProtocolVersion() {}
 
 	public static int current() {
-		return of(MinecraftVersion.current());
+		MinecraftVersion current = MinecraftVersion.current();
+		Cached cached = ServerProtocolVersion.cached;
+		if (cached != null && cached.version == current) {
+			return cached.protocol;
+		}
+		int protocol = of(current);
+		ServerProtocolVersion.cached = new Cached(current, protocol);
+		return protocol;
 	}
 
 	public static int of(MinecraftVersion version) {
@@ -27,5 +36,15 @@ public final class ServerProtocolVersion {
 			return -1;
 		}
 		return ProtocolVersionConverter.exactProtocolVersionBy(version);
+	}
+
+	private static final class Cached {
+		private final MinecraftVersion version;
+		private final int protocol;
+
+		private Cached(MinecraftVersion version, int protocol) {
+			this.version = version;
+			this.protocol = protocol;
+		}
 	}
 }

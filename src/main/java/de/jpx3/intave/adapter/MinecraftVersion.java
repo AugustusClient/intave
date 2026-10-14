@@ -41,6 +41,8 @@ public final class MinecraftVersion implements Comparable<MinecraftVersion> {
 	private final SnapshotVersion snapshot;
 	private MinecraftVersion atCurrentOrAboveFor;
 	private boolean atCurrentOrAbove;
+	private int hash;
+	private volatile boolean isCached;
 
 	public MinecraftVersion(Server server) {
 		this(extractVersion(server.getVersion()));
@@ -248,7 +250,11 @@ public final class MinecraftVersion implements Comparable<MinecraftVersion> {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.getMajor(), this.getMinor(), this.getBuild(), this.getDevelopmentStage(), this.getSnapshot());
+		if (!isCached) {
+			hash = Objects.hash(this.getMajor(), this.getMinor(), this.getBuild(), this.getDevelopmentStage(), this.getSnapshot());
+			isCached = true;
+		}
+		return hash;
 	}
 
 	@Override
