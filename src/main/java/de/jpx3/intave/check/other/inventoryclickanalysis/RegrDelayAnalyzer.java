@@ -11,7 +11,6 @@
 
 package de.jpx3.intave.check.other.inventoryclickanalysis;
 
-import com.comphenix.protocol.events.PacketContainer;
 import de.jpx3.intave.check.MetaCheckPart;
 import de.jpx3.intave.check.other.InventoryClickAnalysis;
 import de.jpx3.intave.math.MathHelper;
@@ -29,7 +28,6 @@ import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.CheckCustomMetadata;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -51,8 +49,7 @@ public class RegrDelayAnalyzer extends MetaCheckPart<InventoryClickAnalysis, Reg
       PacketId.Server.OPEN_WINDOW
     }
   )
-  public void openWindowPacket(Player player, PacketContainer packet) {
-    User user = userOf(player);
+  public void openWindowPacket(User user) {
     ClickDelayMeta meta = metaOf(user);
     user.tickFeedback(() -> {
       meta.lastWindowOpenTimestamp = System.currentTimeMillis();
@@ -71,11 +68,10 @@ public class RegrDelayAnalyzer extends MetaCheckPart<InventoryClickAnalysis, Reg
       WINDOW_CLICK
     }
   )
-  public void windowClickPacket(Player player, WindowClickReader windowClick) {
-    if (player.getGameMode().equals(GameMode.CREATIVE)) {
+  public void windowClickPacket(User user, WindowClickReader windowClick) {
+    if (user.player().getGameMode().equals(GameMode.CREATIVE)) {
       return;
     }
-    User user = userOf(player);
     ClickDelayMeta meta = metaOf(user);
     int slot = windowClick.slot();
     ItemStack itemStack = windowClick.itemStack();
@@ -85,7 +81,7 @@ public class RegrDelayAnalyzer extends MetaCheckPart<InventoryClickAnalysis, Reg
       if ((clickedItemType != meta.lastClickedItemType || isDrop || windowClick.missingItemStack()) && clickedItemType != Material.AIR && meta.lastClickedTimestamp != 0) {
         if (windowClick.clickType() != WindowClickReader.InventoryClickType.SWAP &&
           windowClick.clickType() != WindowClickReader.InventoryClickType.QUICK_CRAFT) {
-          checkWindowClick(player, meta, slot);
+          checkWindowClick(meta, slot);
         }
       }
     }
@@ -103,8 +99,7 @@ public class RegrDelayAnalyzer extends MetaCheckPart<InventoryClickAnalysis, Reg
       CLOSE_WINDOW
     }
   )
-  public void closeWindowPacket(Player player) {
-    User user = userOf(player);
+  public void closeWindowPacket(User user) {
     ClickDelayMeta meta = metaOf(user);
 
     meta.windowOpen = false;
@@ -140,7 +135,7 @@ public class RegrDelayAnalyzer extends MetaCheckPart<InventoryClickAnalysis, Reg
 
       if (meanTime > 2 && varTime < 0.01) {
         Violation violation = Violation.builderFor(InventoryClickAnalysis.class)
-          .forPlayer(player)
+          .forUser(user)
           .withVL(1)
           .withMessage("is taking items at constant speed")
           .appendFlags(DISPLAY_IN_ALL_VERBOSE_MODES)
@@ -155,7 +150,7 @@ public class RegrDelayAnalyzer extends MetaCheckPart<InventoryClickAnalysis, Reg
 
       if (slope[0] > 0.3 && averageSpeed > 15 && varDistance > 0.1) {
         Violation violation = Violation.builderFor(InventoryClickAnalysis.class)
-          .forPlayer(player)
+          .forUser(user)
           .withVL(10)
           .withMessage("is taking items too quickly")
           .appendFlags(DISPLAY_IN_ALL_VERBOSE_MODES)
@@ -170,7 +165,7 @@ public class RegrDelayAnalyzer extends MetaCheckPart<InventoryClickAnalysis, Reg
 
       if ((varDistance > 2 && varTime < 0.02) || (varDistance < 0.02 && varTime > 2)) {
         Violation violation = Violation.builderFor(InventoryClickAnalysis.class)
-          .forPlayer(player)
+          .forUser(user)
           .withVL(10)
           .withMessage("seems indifferent to distance taking items")
           .appendFlags(DISPLAY_IN_ALL_VERBOSE_MODES)
@@ -188,7 +183,7 @@ public class RegrDelayAnalyzer extends MetaCheckPart<InventoryClickAnalysis, Reg
 
       if ((slope[0] < 0.1 || pearson < 0.1) && meanDistance > 1.2) {
         Violation violation = Violation.builderFor(InventoryClickAnalysis.class)
-          .forPlayer(player)
+          .forUser(user)
           .withVL(10)
           .withMessage("seems indifferent to distance taking items")
           .appendFlags(DISPLAY_IN_ALL_VERBOSE_MODES)
@@ -239,7 +234,7 @@ public class RegrDelayAnalyzer extends MetaCheckPart<InventoryClickAnalysis, Reg
 
       if (averageSpeed > 20) {
         Violation violation = Violation.builderFor(InventoryClickAnalysis.class)
-          .forPlayer(player)
+          .forUser(user)
           .withVL(MathHelper.minmax(1, (averageSpeed/2) - 15, 50))
 //          .withVL(1)
           .appendFlags(DISPLAY_IN_ALL_VERBOSE_MODES)
@@ -412,7 +407,7 @@ public class RegrDelayAnalyzer extends MetaCheckPart<InventoryClickAnalysis, Reg
     return chi2;
   }
 
-  private void checkWindowClick(Player player, ClickDelayMeta meta, int slot) {
+  private void checkWindowClick(ClickDelayMeta meta, int slot) {
     double distance = distanceBetween(slot, meta.lastSlot);
     double time = (System.currentTimeMillis() - meta.lastClickedTimestamp) / 1000d;
     if (time > 2) {

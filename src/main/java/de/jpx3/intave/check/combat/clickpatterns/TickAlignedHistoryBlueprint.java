@@ -1,8 +1,5 @@
 package de.jpx3.intave.check.combat.clickpatterns;
 
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import de.jpx3.intave.check.Blueprint;
 import de.jpx3.intave.check.combat.ClickPatterns;
@@ -12,11 +9,8 @@ import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.module.violation.Violation;
 import de.jpx3.intave.packet.reader.BlockDigReader;
 import de.jpx3.intave.packet.reader.EntityUseReader;
-import de.jpx3.intave.packet.reader.PacketReaders;
 import de.jpx3.intave.user.User;
-import de.jpx3.intave.user.UserRepository;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 
 import static com.comphenix.protocol.wrappers.EnumWrappers.PlayerDigType.DROP_ITEM;
 import static de.jpx3.intave.module.linker.packet.PacketId.Client.*;
@@ -29,43 +23,28 @@ public abstract class TickAlignedHistoryBlueprint<E extends TickAlignedMeta> ext
     super(parentCheck, metaClass);
   }
 
-  @PacketSubscription(
-    priority = ListenerPriority.HIGH,
-    packetsIn = {
-      USE_ENTITY, ARM_ANIMATION, BLOCK_DIG
-    }
-  )
-  public final void clientClickUpdate(PacketEvent event) {
-    Player player = event.getPlayer();
-    User user = UserRepository.userOf(player);
-
+  @PacketSubscription(priority = ListenerPriority.HIGH, packetsIn = USE_ENTITY)
+  public final void clientAttackUpdate(User user, EntityUseReader reader) {
     TickAlignedMeta meta = metaOf(user);
-
-    PacketContainer packet = event.getPacket();
-    PacketType type = packet.getType();
-    if (type == PacketType.Play.Client.USE_ENTITY) {
-      EntityUseReader reader = PacketReaders.readerOf(packet);
-      EnumWrappers.EntityUseAction entityUseAction = reader.useAction();
-      if (entityUseAction == EnumWrappers.EntityUseAction.ATTACK) {
-        meta.attacks++;
-      }
-      reader.release();
-    } else if (type == PacketType.Play.Client.ARM_ANIMATION) {
-      meta.clicks++;
-    } else if (type == PacketType.Play.Client.BLOCK_DIG) {
-      EnumWrappers.PlayerDigType digType;
-      try (BlockDigReader reader = PacketReaders.readerOf(packet)) {
-        digType = reader.action();
-      }
-      if (digType == null) return;
-//      if (digType == )
-      if (digType == DROP_ITEM && user.meta().inventory().heldItemType() == Material.AIR) {
-
-      } else {
-        meta.breakingBlock = user.meta().attack().inBreakProcess;
-        meta.places++;
-      }
+    if (reader.isAttackPacket()) {
+      meta.attacks++;
     }
+  }
+
+  @PacketSubscription(priority = ListenerPriority.HIGH, packetsIn = ARM_ANIMATION)
+  public final void clientSwingUpdate(User user) {
+    metaOf(user).clicks++;
+  }
+
+  @PacketSubscription(priority = ListenerPriority.HIGH, packetsIn = BLOCK_DIG)
+  public final void clientDigUpdate(User user, BlockDigReader reader) {
+    TickAlignedMeta meta = metaOf(user);
+    EnumWrappers.PlayerDigType digType = reader.action();
+    if (digType == null || (digType == DROP_ITEM && user.meta().inventory().heldItemType() == Material.AIR)) {
+      return;
+    }
+    meta.breakingBlock = user.meta().attack().inBreakProcess;
+    meta.places++;
   }
 
   @PacketSubscription(
@@ -74,10 +53,7 @@ public abstract class TickAlignedHistoryBlueprint<E extends TickAlignedMeta> ext
       FLYING, LOOK, POSITION, POSITION_LOOK
     }
   )
-  public final void clientTickUpdate(PacketEvent event) {
-    Player player = event.getPlayer();
-    User user = UserRepository.userOf(player);
-
+  public final void clientTickUpdate(User user) {
     TickAlignedMeta meta = metaOf(user);
     TickAction action = TickAction.NOTHING;
     int intensity = 0;
@@ -109,7 +85,7 @@ public abstract class TickAlignedHistoryBlueprint<E extends TickAlignedMeta> ext
   public final void flag(User user, String message, int vl) {
     String details = "pattern: " + buildHistoryString(user);
     Violation violation = Violation.builderFor(ClickPatterns.class)
-      .forPlayer(user.player()).withDefaultThreshold()
+      .forUser(user).withDefaultThreshold()
       .withMessage(message).withDetails(details)
       .appendFlags(DISPLAY_IN_ALL_VERBOSE_MODES).withVL(vl).build();
     Modules.violationProcessor().processViolation(violation);

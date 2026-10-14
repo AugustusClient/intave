@@ -11,7 +11,6 @@
 
 package de.jpx3.intave.check.combat.heuristics.inventory;
 
-import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import de.jpx3.intave.check.combat.Heuristics;
@@ -21,6 +20,7 @@ import de.jpx3.intave.check.movement.physics.environment.SimulationEnvironment;
 import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.module.mitigate.AttackNerfStrategy;
+import de.jpx3.intave.packet.reader.PlayerMoveReader;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.meta.AbilityMetadata;
 import de.jpx3.intave.user.meta.CheckCustomMetadata;
@@ -86,12 +86,9 @@ public final class PacketInventoryHeuristic extends ClassicHeuristic<PacketInven
       POSITION, POSITION_LOOK, FLYING, LOOK
     }
   )
-  public void receiveMovement(PacketEvent event) {
-    Player player = event.getPlayer();
-    User user = userOf(player);
+  public void receiveMovement(User user, PlayerMoveReader reader) {
     PacketInventoryMeta meta = metaOf(user);
-    PacketContainer packet = event.getPacket();
-    boolean hasRotation = packet.getBooleans().read(2);
+    boolean hasRotation = reader.hasRotation();
 
     InventoryMetadata inventoryData = user.meta().inventory();
     SimulationEnvironment movementData = user.meta().movement();
@@ -107,7 +104,7 @@ public final class PacketInventoryHeuristic extends ClassicHeuristic<PacketInven
       meta.performedInventoryOpenOperation = false;
     }
 
-    if (inventoryOpen && hasRotation && movementData.ticksPast(TELEPORT) > 20 && !player.isInsideVehicle()) {
+    if (inventoryOpen && hasRotation && movementData.ticksPast(TELEPORT) > 20 && !user.player().isInsideVehicle()) {
       if (meta.rotationsInInventory++ > 1) {
         flag(user, "sent rotations while an inventory was open", meta.rotationsInInventory + " rotations");
         user.nerf(AttackNerfStrategy.HT_LIGHT, nerfId);
