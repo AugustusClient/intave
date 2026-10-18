@@ -27,6 +27,7 @@ import de.jpx3.intave.module.linker.packet.ListenerPriority;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.packet.PacketSender;
 import de.jpx3.intave.player.ItemProperties;
+import de.jpx3.intave.share.PlayerHand;
 import de.jpx3.intave.user.MessageChannel;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
@@ -170,7 +171,7 @@ public class PlayerHandTracker extends Module {
   }
 
   private void handleItemUseRequest(
-    Cancellable cancellable, User user, EnumWrappers.Hand hand
+    Cancellable cancellable, User user, PlayerHand hand
   ) {
     InventoryMetadata inventoryData = user.meta().inventory();
     PunishmentMetadata punishmentData = user.meta().punishment();

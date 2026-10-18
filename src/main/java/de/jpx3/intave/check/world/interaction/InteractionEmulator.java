@@ -12,7 +12,6 @@
 package de.jpx3.intave.check.world.interaction;
 
 import com.comphenix.protocol.wrappers.BlockPosition;
-import com.comphenix.protocol.wrappers.EnumWrappers;
 import de.jpx3.intave.IntaveControl;
 import de.jpx3.intave.IntavePlugin;
 import de.jpx3.intave.access.player.event.BucketAction;
@@ -38,6 +37,7 @@ import de.jpx3.intave.module.nayoro.SampleTypes;
 import de.jpx3.intave.module.tracker.player.AbilityTracker;
 import de.jpx3.intave.share.Direction;
 import de.jpx3.intave.share.MovingObjectPosition;
+import de.jpx3.intave.share.PlayerHand;
 import de.jpx3.intave.share.Position;
 import de.jpx3.intave.share.RawVector3d;
 import de.jpx3.intave.user.User;
@@ -257,10 +257,10 @@ public final class InteractionEmulator implements EventProcessor {
       // only failed, not critical failed, this should not be possible to abuse
       return EmulationResult.FAILED_NON_CRITICAL;
     }
-    EnumWrappers.Hand hand = interaction.hand();
+    PlayerHand hand = interaction.hand();
     boolean access = WorldPermission.blockPlacePermission(
       player, world,
-      hand == null || hand == EnumWrappers.Hand.MAIN_HAND,
+      hand == null || hand == PlayerHand.MAIN_HAND,
       blockX, blockY, blockZ,
       interaction.targetDirectionIndex(),
       placedBlockType, variant

@@ -34,9 +34,11 @@ import de.jpx3.intave.module.feedback.EmptyFeedbackCallback;
 import de.jpx3.intave.module.linker.packet.ForwardingPacketAdapter;
 import de.jpx3.intave.module.tracker.entity.Entity;
 import de.jpx3.intave.packet.Relative;
+import de.jpx3.intave.packet.converter.PlayerHandConverter;
 import de.jpx3.intave.packet.converter.PosMoveRotConverter;
 import de.jpx3.intave.packet.converter.PositionAndRotationConverter;
 import de.jpx3.intave.share.Motion;
+import de.jpx3.intave.share.PlayerHand;
 import de.jpx3.intave.share.Position;
 import de.jpx3.intave.share.PositionAndRotation;
 import de.jpx3.intave.share.PositionMoveRotation;
@@ -69,19 +71,19 @@ public final class ReaderTests extends IntegrationTests {
 
   @Test(testCode = "recorded-packet-actions", severity = Severity.ERROR)
   public void testRecordedPacketActions() {
-    for (EnumWrappers.Hand hand : EnumWrappers.Hand.values()) {
-      if (MinecraftVersions.VER1_9_0.below() && hand == EnumWrappers.Hand.OFF_HAND) continue;
+    for (PlayerHand hand : PlayerHand.values()) {
+      if (MinecraftVersions.VER1_9_0.below() && hand == PlayerHand.OFF_HAND) continue;
       // 26.3 removed the serverbound swing packet; the other action packets still exist.
       if (MinecraftVersions.VER26_3.below()) {
         PacketContainer swing = new PacketContainer(PacketType.Play.Client.ARM_ANIMATION);
-        if (MinecraftVersions.VER1_9_0.atOrAbove()) swing.getHands().write(0, hand);
+        if (MinecraftVersions.VER1_9_0.atOrAbove()) swing.getHands().write(0, PlayerHandConverter.toProtocolLib(hand));
         try (ArmAnimationReader reader = PacketReaders.readerOf(swing)) {
           assertEquals(hand, reader.hand());
         }
       }
       PacketContainer use = new PacketContainer(PacketType.Play.Client.BLOCK_PLACE);
       if (MinecraftVersions.VER1_9_0.atOrAbove()) {
-        use.getHands().write(0, hand);
+        use.getHands().write(0, PlayerHandConverter.toProtocolLib(hand));
       } else {
         use.getIntegers().write(0, 255);
       }
@@ -127,13 +129,13 @@ public final class ReaderTests extends IntegrationTests {
     for (EnumWrappers.EntityUseAction action : Arrays.asList(
       EnumWrappers.EntityUseAction.INTERACT, EnumWrappers.EntityUseAction.INTERACT_AT
     )) {
-      for (EnumWrappers.Hand hand : EnumWrappers.Hand.values()) {
-        if (MinecraftVersions.VER1_9_0.below() && hand == EnumWrappers.Hand.OFF_HAND) continue;
+      for (PlayerHand hand : PlayerHand.values()) {
+        if (MinecraftVersions.VER1_9_0.below() && hand == PlayerHand.OFF_HAND) continue;
 
         PacketContainer packet = new PacketContainer(PacketType.Play.Client.USE_ENTITY);
         packet.getEntityUseActions().write(0, action);
         if (MinecraftVersions.VER1_9_0.atOrAbove()) {
-          packet.getHands().write(0, hand);
+          packet.getHands().write(0, PlayerHandConverter.toProtocolLib(hand));
         }
         packet.getVectors().write(0, action == EnumWrappers.EntityUseAction.INTERACT_AT ? hitPosition : null);
         try (EntityUseReader reader = PacketReaders.readerOf(packet)) {
@@ -511,7 +513,7 @@ public final class ReaderTests extends IntegrationTests {
       cache.setClientSpeculationValue(world, 0, 64, 0, Material.AIR, 0, 37);
       Interaction placement = new Interaction(0, null, world, player, null, 1,
         InteractionType.PLACE, Material.STONE, new ItemStack(Material.STONE),
-        EnumWrappers.Hand.MAIN_HAND, null, 0.5F, 1F, 0.5F, 37);
+        PlayerHand.MAIN_HAND, null, 0.5F, 1F, 0.5F, 37);
       placement.setEmulated();
       placement.markPlacementEmulated();
       placement.setEmulationPosition(new BlockPosition(0, 64, 0));
@@ -549,7 +551,7 @@ public final class ReaderTests extends IntegrationTests {
 
       Interaction deferredPlacement = new Interaction(1, null, world, player, null, 1,
         InteractionType.PLACE, Material.STONE, new ItemStack(Material.STONE),
-        EnumWrappers.Hand.MAIN_HAND, null, 0.5F, 1F, 0.5F, 39);
+        PlayerHand.MAIN_HAND, null, 0.5F, 1F, 0.5F, 39);
       interactionMeta.speculativeInteraction = deferredPlacement;
       check.receiveAnyTickContextPacket(PacketEvent.fromClient(this,
         new PacketContainer(PacketType.Play.Client.PONG), player));

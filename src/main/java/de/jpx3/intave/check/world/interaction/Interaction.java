@@ -5,6 +5,7 @@ import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import de.jpx3.intave.share.Direction;
 import de.jpx3.intave.share.MovingObjectPosition;
+import de.jpx3.intave.share.PlayerHand;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -20,7 +21,7 @@ public final class Interaction {
   private InteractionType type;
   private final Material itemTypeInHand;
   private final ItemStack itemInHand;
-  private final EnumWrappers.Hand hand;
+  private final PlayerHand hand;
   private final EnumWrappers.PlayerDigType digType;
   private final float facingX, facingY, facingZ;
   private boolean entered = false;
@@ -40,7 +41,7 @@ public final class Interaction {
     BlockPosition targetBlock, int targetDirection,
     InteractionType type,
     Material itemTypeInHand, ItemStack itemInHand,
-    EnumWrappers.Hand hand, EnumWrappers.PlayerDigType digType,
+    PlayerHand hand, EnumWrappers.PlayerDigType digType,
     float facingX, float facingY, float facingZ,
     int sequenceNumber
   ) {
@@ -93,7 +94,7 @@ public final class Interaction {
     return itemInHand;
   }
 
-  public EnumWrappers.Hand hand() {
+  public PlayerHand hand() {
     return hand;
   }
 

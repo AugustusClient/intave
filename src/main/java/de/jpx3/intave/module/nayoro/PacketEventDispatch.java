@@ -23,6 +23,7 @@ import de.jpx3.intave.module.linker.packet.PacketEventSubscriber;
 import de.jpx3.intave.module.linker.packet.PacketId;
 import de.jpx3.intave.module.linker.packet.PacketSubscription;
 import de.jpx3.intave.packet.reader.*;
+import de.jpx3.intave.share.PlayerHand;
 import de.jpx3.intave.user.User;
 import de.jpx3.intave.user.UserRepository;
 import de.jpx3.intave.user.meta.InventoryMetadata;
@@ -107,7 +108,7 @@ public final class PacketEventDispatch implements PacketEventSubscriber {
       return;
     }
     InventoryMetadata inventory = user.meta().inventory();
-    EnumWrappers.Hand hand = reader.hand();
+    PlayerHand hand = reader.hand();
     if (hand == null) {
       hand = inventory.activeHand();
     }
@@ -129,7 +130,7 @@ public final class PacketEventDispatch implements PacketEventSubscriber {
   ) {
     InventoryMetadata inventory = user.meta().inventory();
     if (reader.isStab()) {
-      EnumWrappers.Hand hand = EnumWrappers.Hand.MAIN_HAND;
+      PlayerHand hand = PlayerHand.MAIN_HAND;
       eventEmitter.accept(user, new ItemActionEvent(
         ItemActionEvent.Action.STAB,
         SampleTypes.hand(hand),
@@ -141,7 +142,7 @@ public final class PacketEventDispatch implements PacketEventSubscriber {
     if (reader.action() != EnumWrappers.PlayerDigType.RELEASE_USE_ITEM) {
       return;
     }
-    EnumWrappers.Hand hand = inventory.activeHand();
+    PlayerHand hand = inventory.activeHand();
     eventEmitter.accept(user, new ItemActionEvent(
       ItemActionEvent.Action.RELEASE_USE,
       SampleTypes.hand(hand),
@@ -150,9 +151,9 @@ public final class PacketEventDispatch implements PacketEventSubscriber {
   }
 
   private static ItemStack itemInHand(
-    InventoryMetadata inventory, EnumWrappers.Hand hand
+    InventoryMetadata inventory, PlayerHand hand
   ) {
-    return hand == EnumWrappers.Hand.OFF_HAND
+    return hand == PlayerHand.OFF_HAND
       ? inventory.offhandItem()
       : inventory.heldItem();
   }

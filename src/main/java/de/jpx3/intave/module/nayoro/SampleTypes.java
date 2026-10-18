@@ -12,11 +12,11 @@
 package de.jpx3.intave.module.nayoro;
 
 import ac.intave.samples.share.*;
-import com.comphenix.protocol.wrappers.EnumWrappers;
 import de.jpx3.intave.entity.size.HitboxSize;
 import de.jpx3.intave.share.BlockState;
 import de.jpx3.intave.share.BoundingBox;
 import de.jpx3.intave.share.Direction;
+import de.jpx3.intave.share.PlayerHand;
 import de.jpx3.intave.share.RawVector3d;
 import org.bukkit.inventory.ItemStack;
 
@@ -75,7 +75,7 @@ public final class SampleTypes {
       : ac.intave.samples.share.Direction.valueOf(direction.name());
   }
 
-  public static Hand hand(EnumWrappers.Hand hand) {
+  public static Hand hand(PlayerHand hand) {
     return hand == null ? null : Hand.valueOf(hand.name());
   }
 
